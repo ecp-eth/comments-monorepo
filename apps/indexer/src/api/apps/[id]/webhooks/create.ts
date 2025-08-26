@@ -3,11 +3,15 @@ import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../lib/schemas";
-import { appWebhookManager, siweMiddleware } from "../../../../services";
+import {
+  appManager,
+  appWebhookManager,
+  siweMiddleware,
+} from "../../../../services";
 import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas";
-import { AppWebhookManagerAppNotFoundError } from "../../../../services/app-webhook-manager";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { EventNamesSchema } from "../../../../events/shared/schemas";
+import { AppManagerAppNotFoundError } from "../../../../services/app-manager";
 
 export const AppWebhookCreateRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -96,9 +100,13 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
       const { auth, url, events, name } = c.req.valid("json");
 
       try {
-        const { appWebhook } = await appWebhookManager.createAppWebhook({
+        const app = await appManager.getApp({
+          id: appId,
           ownerId: c.get("user").id,
-          appId,
+        });
+
+        const { appWebhook } = await appWebhookManager.createAppWebhook({
+          app: app.app,
           webhook: {
             url,
             events,
@@ -115,7 +123,7 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
           200,
         );
       } catch (error) {
-        if (error instanceof AppWebhookManagerAppNotFoundError) {
+        if (error instanceof AppManagerAppNotFoundError) {
           return c.json(
             {
               message: "App not found",

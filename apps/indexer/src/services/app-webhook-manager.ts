@@ -18,27 +18,13 @@ export class AppWebhookManager implements IAppWebhookManager {
   }
 
   async createAppWebhook(params: IAppWebhookManager_CreateAppWebhookParams) {
-    const { ownerId, appId, webhook } =
-      CreateAppWebhookParamsSchema.parse(params);
+    const { app, webhook } = CreateAppWebhookParamsSchema.parse(params);
 
     return await this.db.transaction(async (tx) => {
-      const app = await tx.query.app.findFirst({
-        where(fields, operators) {
-          return operators.and(
-            operators.eq(fields.id, appId),
-            operators.eq(fields.ownerId, ownerId),
-          );
-        },
-      });
-
-      if (!app) {
-        throw new AppWebhookManagerAppNotFoundError();
-      }
-
       const [appWebhook] = await tx
         .insert(schema.appWebhook)
         .values({
-          appId,
+          appId: app.id,
           name: webhook.name,
           url: webhook.url,
           auth: webhook.auth,
@@ -57,35 +43,47 @@ export class AppWebhookManager implements IAppWebhookManager {
     });
   }
 
-  async listAppWebhooks(params: IAppWebhookManager_ListAppWebhooksParams) {
-    const { appId, ownerId, page, limit } =
-      ListAppWebhooksParamsSchema.parse(params);
+  async deleteAppWebhook(params: IAppWebhookManager_DeleteAppWebhookParams) {
+    const { appId, webhookId } = DeleteAppWebhookParamsSchema.parse(params);
 
-    const db = this.db;
+    return await this.db.transaction(async (tx) => {
+      const appWebhook = await tx.query.appWebhook.findFirst({
+        where(fields, operators) {
+          return operators.and(
+            operators.eq(fields.id, webhookId),
+            operators.eq(fields.appId, appId),
+          );
+        },
+      });
 
-    const app = await db.query.app.findFirst({
-      where(fields, operators) {
-        return operators.and(
-          operators.eq(fields.id, appId),
-          operators.eq(fields.ownerId, ownerId),
-        );
-      },
-      extras: {
-        webhooksCount: db
-          .$count(schema.appWebhook, eq(schema.appWebhook.appId, schema.app.id))
-          .as("webhooksCount"),
-      },
+      if (!appWebhook) {
+        throw new AppWebhookManagerAppWebhookNotFoundError();
+      }
+
+      await tx
+        .delete(schema.appWebhook)
+        .where(eq(schema.appWebhook.id, webhookId))
+        .execute();
+
+      return {
+        appWebhook,
+      };
     });
+  }
 
-    if (!app) {
-      throw new AppWebhookManagerAppNotFoundError();
-    }
+  async listAppWebhooks(params: IAppWebhookManager_ListAppWebhooksParams) {
+    const { app, page, limit } = ListAppWebhooksParamsSchema.parse(params);
 
-    const totalPages = Math.ceil(app.webhooksCount / limit);
+    const appWebhooksCount = await this.db.$count(
+      schema.appWebhook,
+      eq(schema.appWebhook.appId, app.id),
+    );
 
-    const appWebhooks = await db.query.appWebhook.findMany({
+    const totalPages = Math.ceil(appWebhooksCount / limit);
+
+    const appWebhooks = await this.db.query.appWebhook.findMany({
       where(fields, operators) {
-        return operators.eq(fields.appId, appId);
+        return operators.eq(fields.appId, app.id);
       },
       orderBy(fields, operators) {
         return operators.desc(fields.createdAt);
@@ -104,8 +102,10 @@ export class AppWebhookManager implements IAppWebhookManager {
 }
 
 const CreateAppWebhookParamsSchema = z.object({
-  ownerId: z.string().uuid(),
-  appId: z.string().uuid(),
+  app: z.object({
+    id: z.string().uuid(),
+    ownerId: z.string().uuid(),
+  }),
   webhook: z.object({
     url: z.string().url(),
     events: z.array(EventNamesSchema),
@@ -123,8 +123,10 @@ type IAppWebhookManager_CreateAppWebhookResult = {
 };
 
 const ListAppWebhooksParamsSchema = z.object({
-  appId: z.string().uuid(),
-  ownerId: z.string().uuid(),
+  app: z.object({
+    id: z.string().uuid(),
+    ownerId: z.string().uuid(),
+  }),
   page: z.number().int().min(1).default(1),
   limit: z.number().int().min(1).max(100).default(10),
 });
@@ -140,6 +142,19 @@ type IAppWebhookManager_ListAppWebhooksResult = {
   };
 };
 
+const DeleteAppWebhookParamsSchema = z.object({
+  appId: z.string().uuid(),
+  webhookId: z.string().uuid(),
+});
+
+type IAppWebhookManager_DeleteAppWebhookParams = z.infer<
+  typeof DeleteAppWebhookParamsSchema
+>;
+
+type IAppWebhookManager_DeleteAppWebhookResult = {
+  appWebhook: AppWebhookSelectType;
+};
+
 export interface IAppWebhookManager {
   createAppWebhook: (
     params: IAppWebhookManager_CreateAppWebhookParams,
@@ -148,6 +163,10 @@ export interface IAppWebhookManager {
   listAppWebhooks: (
     params: IAppWebhookManager_ListAppWebhooksParams,
   ) => Promise<IAppWebhookManager_ListAppWebhooksResult>;
+
+  deleteAppWebhook: (
+    params: IAppWebhookManager_DeleteAppWebhookParams,
+  ) => Promise<IAppWebhookManager_DeleteAppWebhookResult>;
 }
 
 export class AppWebhookManagerError extends Error {
@@ -157,16 +176,16 @@ export class AppWebhookManagerError extends Error {
   }
 }
 
-export class AppWebhookManagerAppNotFoundError extends AppWebhookManagerError {
-  constructor() {
-    super("App not found");
-    this.name = "AppWebhookManagerAppNotFoundError";
-  }
-}
-
 export class AppWebhookManagerFailedToCreateAppWebhookError extends AppWebhookManagerError {
   constructor() {
     super("Failed to create app webhook");
     this.name = "AppWebhookManagerFailedToCreateAppWebhookError";
+  }
+}
+
+export class AppWebhookManagerAppWebhookNotFoundError extends AppWebhookManagerError {
+  constructor() {
+    super("App webhook not found");
+    this.name = "AppWebhookManagerAppWebhookNotFoundError";
   }
 }

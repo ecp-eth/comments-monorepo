@@ -5,6 +5,7 @@ import {
 } from "../../../lib/schemas";
 import { appManager, siweMiddleware } from "../../../services";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
+import { AppManagerAppNotFoundError } from "../../../services/app-manager";
 
 export const AppGetRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -65,18 +66,27 @@ export function setupAppGet(app: OpenAPIHono) {
     },
     async (c) => {
       const { id } = c.req.valid("param");
-      const { app, signingKey } = await appManager.getApp({
-        id,
-        ownerId: c.get("user").id,
-      });
 
-      return c.json(
-        formatResponseUsingZodSchema(AppGetResponseSchema, {
-          ...app,
-          secret: signingKey.secret,
-        }),
-        200,
-      );
+      try {
+        const { app, signingKey } = await appManager.getApp({
+          id,
+          ownerId: c.get("user").id,
+        });
+
+        return c.json(
+          formatResponseUsingZodSchema(AppGetResponseSchema, {
+            ...app,
+            secret: signingKey.secret,
+          }),
+          200,
+        );
+      } catch (error) {
+        if (error instanceof AppManagerAppNotFoundError) {
+          return c.json({ message: "App not found" }, 404);
+        }
+
+        throw error;
+      }
     },
   );
 }
