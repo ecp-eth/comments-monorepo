@@ -5,6 +5,7 @@ import {
   OpenAPIDateStringSchema,
 } from "../../../lib/schemas";
 import { HTTPException } from "hono/http-exception";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
 
 export const UserMeResponseSchema = z.object({
   id: z.string().uuid(),
@@ -64,19 +65,11 @@ export function setupUserMe(app: OpenAPIHono) {
       }
 
       return c.json(
-        // use zod to parse the response so we convert the dates to ISO strings
-        // because zod doesn't do this
-        UserMeResponseSchema.parse({
+        formatResponseUsingZodSchema(UserMeResponseSchema, {
           id: user.id,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          authMethods: user.authCredentials.map((credential) => ({
-            id: credential.id,
-            createdAt: credential.createdAt,
-            updatedAt: credential.updatedAt,
-            identifier: credential.identifier,
-            method: credential.method,
-          })),
+          authMethods: user.authCredentials,
         }),
         200,
       );

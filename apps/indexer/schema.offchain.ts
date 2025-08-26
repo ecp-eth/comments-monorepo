@@ -136,7 +136,7 @@ export const userAuthCredentials = offchainSchema.table(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    method: text().notNull(),
+    method: text().notNull().$type<"siwe">(),
     identifier: text().notNull(),
   },
   (table) => [

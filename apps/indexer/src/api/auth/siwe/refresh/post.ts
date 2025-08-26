@@ -2,6 +2,7 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { SiweAuthServiceError } from "../../../../services/siwe-auth-service";
 import { siweAuthService } from "../../../../services";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 
 const AuthSiweRefreshHeadersSchema = z.object({
   Authorization: z
@@ -56,10 +57,13 @@ export function setupAuthSiweRefresh(app: OpenAPIHono) {
       const { Authorization: refreshToken } = c.req.valid("header");
 
       try {
-        return c.json(
+        const tokens =
           await siweAuthService.verifyRefreshTokenAndIssueNewTokens(
             refreshToken,
-          ),
+          );
+
+        return c.json(
+          formatResponseUsingZodSchema(AuthSiweRefreshResponseSchema, tokens),
           200,
         );
       } catch (e) {
