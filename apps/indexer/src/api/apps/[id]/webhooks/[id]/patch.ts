@@ -8,11 +8,11 @@ import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../../lib/schemas";
-import { WebhookAuthConfigSchema } from "../../../../../webhooks/schemas";
-import { EventNamesSchema } from "../../../../../events/shared/schemas";
-import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
-import { AppManagerAppNotFoundError } from "../../../../../services/app-manager";
-import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../services/app-webhook-manager";
+import { WebhookAuthConfigSchema } from "../../../../../webhooks/schemas.ts";
+import { EventNamesSchema } from "../../../../../events/shared/schemas.ts";
+import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters.ts";
+import { AppManagerAppNotFoundError } from "../../../../../services/app-manager-service.ts";
+import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../services/app-webhook-manager-service.ts";
 
 export const AppWebhookPatchRequestParamsSchema = z.object({
   appId: z.string().uuid(),

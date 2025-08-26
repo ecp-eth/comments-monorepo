@@ -3,16 +3,16 @@ import {
   appManager,
   appWebhookManager,
   siweMiddleware,
-} from "../../../../../services";
+} from "../../../../../services/index.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../../../../lib/schemas";
-import { EventNamesSchema } from "../../../../../events/shared/schemas";
-import { WebhookAuthConfigSchema } from "../../../../../webhooks/schemas";
-import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
-import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../services/app-webhook-manager";
-import { AppManagerAppNotFoundError } from "../../../../../services/app-manager";
+} from "../../../../../lib/schemas.ts";
+import { EventNamesSchema } from "../../../../../events/shared/schemas.ts";
+import { WebhookAuthConfigSchema } from "../../../../../webhooks/schemas.ts";
+import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters.ts";
+import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../services/app-webhook-manager-service.ts";
+import { AppManagerAppNotFoundError } from "../../../../../services/app-manager-service.ts";
 
 export const AppWebhookDeleteRequestParamsSchema = z.object({
   appId: z.string().uuid(),

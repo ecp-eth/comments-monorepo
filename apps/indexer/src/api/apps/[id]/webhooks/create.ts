@@ -2,16 +2,16 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../../../lib/schemas";
+} from "../../../../lib/schemas.ts";
 import {
   appManager,
   appWebhookManager,
   siweMiddleware,
-} from "../../../../services";
-import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas";
-import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { EventNamesSchema } from "../../../../events/shared/schemas";
-import { AppManagerAppNotFoundError } from "../../../../services/app-manager";
+} from "../../../../services/index.ts";
+import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas.ts";
+import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters.ts";
+import { EventNamesSchema } from "../../../../events/shared/schemas.ts";
+import { AppManagerAppNotFoundError } from "../../../../services/app-manager-service.ts";
 
 export const AppWebhookCreateRequestParamsSchema = z.object({
   id: z.string().uuid(),

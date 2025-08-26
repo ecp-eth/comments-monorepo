@@ -1,11 +1,11 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { appManager, siweMiddleware } from "../../../services";
+import { appManager, siweMiddleware } from "../../../services/index.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../../lib/schemas";
-import { AppManagerAppNotFoundError } from "../../../services/app-manager";
-import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
+} from "../../../lib/schemas.ts";
+import { AppManagerAppNotFoundError } from "../../../services/app-manager-service.ts";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
 
 export const AppDeleteRequestParamsSchema = z.object({
   id: z.string().uuid(),

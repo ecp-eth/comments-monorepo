@@ -2,9 +2,9 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../lib/schemas";
-import { appManager, siweMiddleware } from "../../services";
-import { formatResponseUsingZodSchema } from "../../lib/response-formatters";
+} from "../../lib/schemas.ts";
+import { appManager, siweMiddleware } from "../../services/index.ts";
+import { formatResponseUsingZodSchema } from "../../lib/response-formatters.ts";
 
 export const AppGetRequestQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
