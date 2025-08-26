@@ -1,6 +1,7 @@
 import z from "zod";
 import {
   bigintToStringSchema,
+  CommentModerationStatusSchema,
   dateToIsoStringSchema,
   EventFromChainSchema,
   MetadataSetOperationSchema,
@@ -19,7 +20,7 @@ const CommentEventDataSchema = z.object({
   content: z.string(),
   commentType: z.number().int(),
   metadata: MetadataArraySchema,
-  moderationStatus: z.enum(["pending", "approved", "rejected"]),
+  moderationStatus: CommentModerationStatusSchema,
   references: IndexerAPICommentReferencesSchema,
 });
 
@@ -105,7 +106,7 @@ export const CommentEditedEventSchema = z
         updatedAt: dateToIsoStringSchema,
         content: z.string(),
         references: IndexerAPICommentReferencesSchema,
-        moderationStatus: z.enum(["pending", "approved", "rejected"]),
+        moderationStatus: CommentModerationStatusSchema,
       }),
     }),
   })
@@ -114,3 +115,24 @@ export const CommentEditedEventSchema = z
 export type CommentEditedEventInput = z.input<typeof CommentEditedEventSchema>;
 
 export type CommentEditedEvent = z.infer<typeof CommentEditedEventSchema>;
+
+export const CommentModerationStatusUpdatedEventSchema = z.object({
+  event: z.literal("comment:moderation:status:updated"),
+  uid: z.string(),
+  version: z.literal(1),
+  data: z.object({
+    comment: z.object({
+      id: HexSchema,
+      moderationStatus: CommentModerationStatusSchema,
+      moderationStatusChangedAt: dateToIsoStringSchema,
+    }),
+  }),
+});
+
+export type CommentModerationStatusUpdatedEventInput = z.input<
+  typeof CommentModerationStatusUpdatedEventSchema
+>;
+
+export type CommentModerationStatusUpdatedEvent = z.infer<
+  typeof CommentModerationStatusUpdatedEventSchema
+>;
