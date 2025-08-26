@@ -12,6 +12,9 @@ import {
   type CommentEditedEvent,
   CommentEditedEventSchema,
   type CommentEditedEventInput,
+  type CommentModerationStatusUpdatedEvent,
+  CommentModerationStatusUpdatedEventSchema,
+  type CommentModerationStatusUpdatedEventInput,
 } from "./schemas";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { ModerationStatus } from "../../services/types";
@@ -149,4 +152,25 @@ export function ponderEventToCommentEditedEvent({
       },
     },
   } satisfies CommentEditedEventInput);
+}
+
+export function createCommentModerationStatusUpdatedEvent({
+  comment,
+}: {
+  comment: CommentSelectType;
+}): CommentModerationStatusUpdatedEvent {
+  const uid = `comment:moderation:status:updated:${comment.chainId}:${comment.moderationStatusChangedAt.getTime()}:${comment.id}`;
+
+  return CommentModerationStatusUpdatedEventSchema.parse({
+    event: "comment:moderation:status:updated",
+    uid,
+    version: 1,
+    data: {
+      comment: {
+        id: comment.id,
+        moderationStatus: comment.moderationStatus,
+        moderationStatusChangedAt: comment.moderationStatusChangedAt,
+      },
+    },
+  } satisfies CommentModerationStatusUpdatedEventInput);
 }

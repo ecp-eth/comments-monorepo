@@ -15,6 +15,7 @@ import {
   CommentModerationStatusNotFoundError,
   CommentNotFoundError,
 } from "./errors";
+import { createCommentModerationStatusUpdatedEvent } from "../events/comment";
 
 type PremoderationServiceOptions = {
   classificationThreshold: number;
@@ -199,10 +200,29 @@ export class PremoderationService implements ICommentPremoderationService {
         .set({
           moderationStatus: status,
           moderationStatusChangedAt: changedAt,
+          updatedAt: changedAt,
         })
         .where(eq(schema.comment.id, commentId))
         .returning()
         .execute();
+
+      if (updatedComment) {
+        const commentModerationStatusEvent =
+          createCommentModerationStatusUpdatedEvent({
+            comment: updatedComment,
+          });
+
+        await this.db
+          .insert(schema.eventOutbox)
+          .values({
+            aggregateType: "comment",
+            aggregateId: commentModerationStatusEvent.data.comment.id,
+            eventType: commentModerationStatusEvent.event,
+            eventUid: commentModerationStatusEvent.uid,
+            payload: commentModerationStatusEvent,
+          })
+          .execute();
+      }
 
       if (status === "pending") {
         // keep the old revisions untouched

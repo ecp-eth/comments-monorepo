@@ -14,6 +14,7 @@ import type {
   CommentHookMetadataSetEvent,
   CommentDeletedEvent,
   CommentEditedEvent,
+  CommentModerationStatusUpdatedEvent,
 } from "./comment/schemas";
 
 export type Events =
@@ -27,7 +28,8 @@ export type Events =
   | CommentAddedEvent
   | CommentHookMetadataSetEvent
   | CommentDeletedEvent
-  | CommentEditedEvent;
+  | CommentEditedEvent
+  | CommentModerationStatusUpdatedEvent;
 
 export type EventTypes = Events["event"];
 
