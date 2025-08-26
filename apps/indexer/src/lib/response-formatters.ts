@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
@@ -271,4 +272,18 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
       resolvedFarcasterData,
     ),
   };
+}
+
+/**
+ * This function formats the response using a zod schema.
+ * It respects the schema's input and output shape. Can be used to transform json incompatible data to json compatible data.
+ * @param schema - The zod schema to use for formatting the response.
+ * @param responseData - The data to format.
+ * @returns The formatted response.
+ */
+export function formatResponseUsingZodSchema<T extends z.ZodType>(
+  schema: T,
+  responseData: z.input<T>,
+): z.output<T> {
+  return schema.parse(responseData);
 }

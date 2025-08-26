@@ -5,6 +5,7 @@ import {
   AppManagerAppNotFoundError,
   AppManagerFailedToRefreshAppSecretError,
 } from "../../../../../services/app-manager";
+import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
 
 export const AppSecretRefreshRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -68,7 +69,12 @@ export function setupAppSecretRefresh(app: OpenAPIHono) {
           ownerId: c.get("user").id,
         });
 
-        return c.json(AppSecretRefreshResponseSchema.parse(appSigningKey), 200);
+        return c.json(
+          formatResponseUsingZodSchema(AppSecretRefreshResponseSchema, {
+            secret: appSigningKey.secret,
+          }),
+          200,
+        );
       } catch (e) {
         if (
           e instanceof AppManagerAppNotFoundError ||

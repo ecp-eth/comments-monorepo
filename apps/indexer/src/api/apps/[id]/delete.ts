@@ -5,6 +5,7 @@ import {
   OpenAPIDateStringSchema,
 } from "../../../lib/schemas";
 import { AppManagerAppNotFoundError } from "../../../services/app-manager";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
 
 export const AppDeleteRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -70,7 +71,10 @@ export function setupAppDelete(app: OpenAPIHono) {
           ownerId: c.get("user").id,
         });
 
-        return c.json(AppDeleteResponseSchema.parse(app), 200);
+        return c.json(
+          formatResponseUsingZodSchema(AppDeleteResponseSchema, app),
+          200,
+        );
       } catch (e) {
         if (e instanceof AppManagerAppNotFoundError) {
           return c.json(

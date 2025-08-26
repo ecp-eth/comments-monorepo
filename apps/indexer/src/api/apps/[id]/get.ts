@@ -4,6 +4,7 @@ import {
   OpenAPIDateStringSchema,
 } from "../../../lib/schemas";
 import { appManager, siweMiddleware } from "../../../services";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
 
 export const AppGetRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -70,7 +71,7 @@ export function setupAppGet(app: OpenAPIHono) {
       });
 
       return c.json(
-        AppGetResponseSchema.parse({
+        formatResponseUsingZodSchema(AppGetResponseSchema, {
           ...app,
           secret: signingKey.secret,
         }),
