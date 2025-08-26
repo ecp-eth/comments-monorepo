@@ -1,11 +1,17 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { appWebhookManager, siweMiddleware } from "../../../../services";
+import {
+  appManager,
+  appWebhookManager,
+  siweMiddleware,
+} from "../../../../services";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../lib/schemas";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { AppWebhookManagerAppNotFoundError } from "../../../../services/app-webhook-manager";
+import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas";
+import { EventNamesSchema } from "../../../../events/shared/schemas";
+import { AppManagerAppNotFoundError } from "../../../../services/app-manager";
 
 export const AppWebhooksGetRequestParamsSchema = z.object({
   id: z.string().uuid(),
@@ -22,6 +28,10 @@ export const AppWebhooksGetResponseSchema = z.object({
       id: z.string().uuid(),
       createdAt: OpenAPIDateStringSchema,
       updatedAt: OpenAPIDateStringSchema,
+      name: z.string(),
+      url: z.string().url(),
+      auth: WebhookAuthConfigSchema,
+      eventFilter: z.array(EventNamesSchema),
     }),
   ),
   pageInfo: z.object({
@@ -88,10 +98,14 @@ export function setupAppWebhooksGet(app: OpenAPIHono) {
       const { page, limit } = c.req.valid("query");
 
       try {
+        const app = await appManager.getApp({
+          id: appId,
+          ownerId: c.get("user").id,
+        });
+
         const { appWebhooks, pageInfo } =
           await appWebhookManager.listAppWebhooks({
-            appId,
-            ownerId: c.get("user").id,
+            app: app.app,
             page,
             limit,
           });
@@ -104,7 +118,7 @@ export function setupAppWebhooksGet(app: OpenAPIHono) {
           200,
         );
       } catch (error) {
-        if (error instanceof AppWebhookManagerAppNotFoundError) {
+        if (error instanceof AppManagerAppNotFoundError) {
           return c.json(
             {
               message: "App not found",
