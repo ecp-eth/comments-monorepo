@@ -4,6 +4,7 @@ import {
   OpenAPIDateStringSchema,
 } from "../../lib/schemas";
 import { appManager, siweMiddleware } from "../../services";
+import { formatResponseUsingZodSchema } from "../../lib/response-formatters";
 
 export const AppGetRequestQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
@@ -78,7 +79,13 @@ export function setupAppsGet(app: OpenAPIHono) {
         ownerId: c.get("user").id,
       });
 
-      return c.json(AppsGetResponseSchema.parse(result), 200);
+      return c.json(
+        formatResponseUsingZodSchema(AppsGetResponseSchema, {
+          results: result.apps,
+          pageInfo: result.pageInfo,
+        }),
+        200,
+      );
     },
   );
 }

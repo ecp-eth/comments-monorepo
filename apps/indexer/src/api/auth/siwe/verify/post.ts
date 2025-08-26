@@ -3,6 +3,7 @@ import { siweAuthService } from "../../../../services";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { SiweAuthServiceError } from "../../../../services/siwe-auth-service";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 
 export const AuthSiweVerifyRequestSchema = z.object({
   message: z.string().nonempty(),
@@ -66,7 +67,10 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
           token,
         });
 
-        return c.json(tokens, 200);
+        return c.json(
+          formatResponseUsingZodSchema(AuthSiweVerifyResponseSchema, tokens),
+          200,
+        );
       } catch (e) {
         if (e instanceof SiweAuthServiceError) {
           return c.json(
