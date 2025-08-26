@@ -8,9 +8,19 @@ import {
   MetadataSetOperationSchema,
 } from "../shared/schemas";
 
+export const ChannelEvents = [
+  "channel:created",
+  "channel:updated",
+  "channel:hook:status:updated",
+  "channel:metadata:set",
+  "channel:transfer",
+] as const;
+
+export type ChannelEvent = (typeof ChannelEvents)[number];
+
 export const ChannelCreatedEventSchema = z
   .object({
-    event: z.literal("channel:created"),
+    event: z.literal("channel:created" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -37,7 +47,7 @@ export type ChannelCreatedEvent = z.infer<typeof ChannelCreatedEventSchema>;
 
 export const ChannelUpdatedEventSchema = z
   .object({
-    event: z.literal("channel:updated"),
+    event: z.literal("channel:updated" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -60,7 +70,7 @@ export type ChannelUpdatedEvent = z.infer<typeof ChannelUpdatedEventSchema>;
 
 export const ChannelHookStatusUpdatedEventSchema = z
   .object({
-    event: z.literal("channel:hook:status:updated"),
+    event: z.literal("channel:hook:status:updated" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -87,7 +97,7 @@ export type ChannelHookStatusUpdatedEvent = z.infer<
 
 export const ChannelMetadataSetEventSchema = z
   .object({
-    event: z.literal("channel:metadata:set"),
+    event: z.literal("channel:metadata:set" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -111,7 +121,7 @@ export type ChannelMetadataSetEvent = z.infer<
 
 export const ChannelTransferEventSchema = z
   .object({
-    event: z.literal("channel:transfer"),
+    event: z.literal("channel:transfer" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
