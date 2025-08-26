@@ -2,9 +2,13 @@ import { z } from "zod";
 import { dateToIsoStringSchema, EventFromChainSchema } from "../shared/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 
+export const ApprovalEvents = ["approval:added", "approval:removed"] as const;
+
+export type ApprovalEvent = (typeof ApprovalEvents)[number];
+
 export const ApprovalAddedEventSchema = z
   .object({
-    event: z.literal("approval:added"),
+    event: z.literal("approval:added" satisfies ApprovalEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -25,7 +29,7 @@ export type ApprovalAddedEvent = z.infer<typeof ApprovalAddedEventSchema>;
 
 export const ApprovalRemovedEventSchema = z
   .object({
-    event: z.literal("approval:removed"),
+    event: z.literal("approval:removed" satisfies ApprovalEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
