@@ -26,6 +26,7 @@ import { SiweAuthService } from "./siwe-auth-service";
 import { config } from "ponder:internal";
 import { createSiweMiddleware } from "../middleware/siwe";
 import { AppManager } from "./app-manager";
+import { AppWebhookManager } from "./app-webhook-manager";
 
 export { db };
 
@@ -159,5 +160,9 @@ export const siweMiddleware = createSiweMiddleware({
 });
 
 export const appManager = new AppManager({
+  db,
+});
+
+export const appWebhookManager = new AppWebhookManager({
   db,
 });

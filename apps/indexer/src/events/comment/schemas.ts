@@ -10,6 +10,16 @@ import { HexSchema } from "@ecp.eth/sdk/core";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments";
 import { IndexerAPICommentReferencesSchema } from "@ecp.eth/sdk/indexer";
 
+export const CommentEvents = [
+  "comment:added",
+  "comment:hook:metadata:set",
+  "comment:deleted",
+  "comment:edited",
+  "comment:moderation:status:updated",
+] as const;
+
+export type CommentEvent = (typeof CommentEvents)[number];
+
 const CommentEventDataSchema = z.object({
   id: HexSchema,
   createdAt: dateToIsoStringSchema,
@@ -34,7 +44,7 @@ const ReplyCommentEventDataSchema = CommentEventDataSchema.extend({
 
 export const CommentAddedEventSchema = z
   .object({
-    event: z.literal("comment:added"),
+    event: z.literal("comment:added" satisfies CommentEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -52,7 +62,7 @@ export type CommentAddedEvent = z.infer<typeof CommentAddedEventSchema>;
 
 export const CommentHookMetadataSetEventSchema = z
   .object({
-    event: z.literal("comment:hook:metadata:set"),
+    event: z.literal("comment:hook:metadata:set" satisfies CommentEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -76,7 +86,7 @@ export type CommentHookMetadataSetEvent = z.infer<
 
 export const CommentDeletedEventSchema = z
   .object({
-    event: z.literal("comment:deleted"),
+    event: z.literal("comment:deleted" satisfies CommentEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -97,7 +107,7 @@ export type CommentDeletedEvent = z.infer<typeof CommentDeletedEventSchema>;
 
 export const CommentEditedEventSchema = z
   .object({
-    event: z.literal("comment:edited"),
+    event: z.literal("comment:edited" satisfies CommentEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -117,7 +127,7 @@ export type CommentEditedEventInput = z.input<typeof CommentEditedEventSchema>;
 export type CommentEditedEvent = z.infer<typeof CommentEditedEventSchema>;
 
 export const CommentModerationStatusUpdatedEventSchema = z.object({
-  event: z.literal("comment:moderation:status:updated"),
+  event: z.literal("comment:moderation:status:updated" satisfies CommentEvent),
   uid: z.string(),
   version: z.literal(1),
   data: z.object({

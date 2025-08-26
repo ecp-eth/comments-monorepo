@@ -12,6 +12,7 @@ import {
   check,
   unique,
   bigserial,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
@@ -25,6 +26,7 @@ import type {
   EventTypes,
   EventOutboxAggregateType,
 } from "./src/events/types.ts";
+import type { WebhookAuthConfig } from "./src/webhooks/schemas.ts";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
@@ -236,6 +238,7 @@ export const appRelations = relations(app, ({ one, many }) => ({
     references: [user.id],
   }),
   appSigningKeys: many(appSigningKeys),
+  appWebhooks: many(appWebhook),
 }));
 
 export const appSigningKeys = offchainSchema.table(
@@ -262,6 +265,35 @@ export type AppSigningKeysSelectType = typeof appSigningKeys.$inferSelect;
 export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
   app: one(app, {
     fields: [appSigningKeys.appId],
+    references: [app.id],
+  }),
+}));
+
+export const appWebhook = offchainSchema.table("app_webhook", {
+  id: uuid().primaryKey().defaultRandom(),
+  appId: uuid()
+    .notNull()
+    .references(() => app.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  name: text().notNull(),
+  url: text().notNull(),
+  auth: jsonb().notNull().$type<WebhookAuthConfig>().default({
+    type: "no-auth",
+  }),
+  eventFilter: text().array().notNull().default([]).$type<EventTypes[]>(),
+  paused: boolean().notNull().default(false),
+  pausedAt: timestamp({ withTimezone: true }),
+});
+
+export type AppWebhookSelectType = typeof appWebhook.$inferSelect;
+
+export const appWebhookRelations = relations(appWebhook, ({ one }) => ({
+  app: one(app, {
+    fields: [appWebhook.appId],
     references: [app.id],
   }),
 }));
