@@ -2,10 +2,10 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../../lib/schemas";
-import { appManager, siweMiddleware } from "../../../services";
-import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
-import { AppManagerAppNotFoundError } from "../../../services/app-manager";
+} from "../../../lib/schemas.ts";
+import { appManager, siweMiddleware } from "../../../services/index.ts";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
+import { AppManagerAppNotFoundError } from "../../../services/app-manager-service.ts";
 
 export const AppGetRequestParamsSchema = z.object({
   id: z.string().uuid(),

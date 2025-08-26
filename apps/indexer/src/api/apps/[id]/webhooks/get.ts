@@ -3,15 +3,15 @@ import {
   appManager,
   appWebhookManager,
   siweMiddleware,
-} from "../../../../services";
+} from "../../../../services/index.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
-} from "../../../../lib/schemas";
-import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas";
-import { EventNamesSchema } from "../../../../events/shared/schemas";
-import { AppManagerAppNotFoundError } from "../../../../services/app-manager";
+} from "../../../../lib/schemas.ts";
+import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters.ts";
+import { WebhookAuthConfigSchema } from "../../../../webhooks/schemas.ts";
+import { EventNamesSchema } from "../../../../events/shared/schemas.ts";
+import { AppManagerAppNotFoundError } from "../../../../services/app-manager-service.ts";
 
 export const AppWebhooksGetRequestParamsSchema = z.object({
   id: z.string().uuid(),
