@@ -6,7 +6,7 @@ import type {
   AppSelectType,
   AppSigningKeysSelectType,
 } from "../../schema.offchain";
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 
 type AppManagerOptions = {
   db: NodePgDatabase<typeof schema>;
@@ -176,7 +176,9 @@ export class AppManager implements IAppManager {
       where(fields, operators) {
         return operators.and(operators.eq(fields.ownerId, ownerId));
       },
-      orderBy: [desc(schema.app.createdAt)],
+      orderBy(fields, operators) {
+        return operators.desc(fields.createdAt);
+      },
       limit,
       offset: (page - 1) * limit,
     });
