@@ -57,6 +57,13 @@
       "when": 1756113902853,
       "tag": "0007_channel_events",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1756209575687,
+      "tag": "0008_app_webhooks",
+      "breakpoints": true
     }
   ]
 }
