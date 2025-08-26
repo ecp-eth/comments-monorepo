@@ -120,6 +120,49 @@ export class AppWebhookManager implements IAppWebhookManager {
       },
     };
   }
+
+  async updateAppWebhook(params: IAppWebhookManager_UpdateAppWebhookParams) {
+    const { appId, webhookId, patches } =
+      UpdateAppWebhookParamsSchema.parse(params);
+
+    const appWebhook = await this.db.query.appWebhook.findFirst({
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.id, webhookId),
+          operators.eq(fields.appId, appId),
+        );
+      },
+    });
+
+    if (!appWebhook) {
+      throw new AppWebhookManagerAppWebhookNotFoundError();
+    }
+
+    if (Object.keys(patches).length === 0) {
+      return {
+        appWebhook,
+      };
+    }
+
+    const [updatedAppWebhook] = await this.db
+      .update(schema.appWebhook)
+      .set({
+        ...appWebhook,
+        ...patches,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.appWebhook.id, webhookId))
+      .returning()
+      .execute();
+
+    if (!updatedAppWebhook) {
+      throw new AppWebhookManagerFailedToUpdateAppWebhookError();
+    }
+
+    return {
+      appWebhook: updatedAppWebhook,
+    };
+  }
 }
 
 const CreateAppWebhookParamsSchema = z.object({
@@ -189,6 +232,27 @@ type IAppWebhookManager_GetAppWebhookResult = {
   appWebhook: AppWebhookSelectType;
 };
 
+const UpdateAppWebhookParamsSchema = z.object({
+  appId: z.string().uuid(),
+  webhookId: z.string().uuid(),
+  patches: z
+    .object({
+      auth: WebhookAuthConfigSchema,
+      eventFilter: z.array(EventNamesSchema),
+      name: z.string(),
+      url: z.string().url(),
+    })
+    .partial(),
+});
+
+type IAppWebhookManager_UpdateAppWebhookParams = z.infer<
+  typeof UpdateAppWebhookParamsSchema
+>;
+
+type IAppWebhookManager_UpdateAppWebhookResult = {
+  appWebhook: AppWebhookSelectType;
+};
+
 export interface IAppWebhookManager {
   createAppWebhook: (
     params: IAppWebhookManager_CreateAppWebhookParams,
@@ -205,6 +269,10 @@ export interface IAppWebhookManager {
   listAppWebhooks: (
     params: IAppWebhookManager_ListAppWebhooksParams,
   ) => Promise<IAppWebhookManager_ListAppWebhooksResult>;
+
+  updateAppWebhook: (
+    params: IAppWebhookManager_UpdateAppWebhookParams,
+  ) => Promise<IAppWebhookManager_UpdateAppWebhookResult>;
 }
 
 export class AppWebhookManagerError extends Error {
@@ -225,5 +293,12 @@ export class AppWebhookManagerAppWebhookNotFoundError extends AppWebhookManagerE
   constructor() {
     super("App webhook not found");
     this.name = "AppWebhookManagerAppWebhookNotFoundError";
+  }
+}
+
+export class AppWebhookManagerFailedToUpdateAppWebhookError extends AppWebhookManagerError {
+  constructor() {
+    super("Failed to update app webhook");
+    this.name = "AppWebhookManagerFailedToUpdateAppWebhookError";
   }
 }
