@@ -71,6 +71,27 @@ export class AppWebhookManager implements IAppWebhookManager {
     });
   }
 
+  async getAppWebhook(params: IAppWebhookManager_GetAppWebhookParams) {
+    const { appId, webhookId } = GetAppWebhookParamsSchema.parse(params);
+
+    const appWebhook = await this.db.query.appWebhook.findFirst({
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.id, webhookId),
+          operators.eq(fields.appId, appId),
+        );
+      },
+    });
+
+    if (!appWebhook) {
+      throw new AppWebhookManagerAppWebhookNotFoundError();
+    }
+
+    return {
+      appWebhook,
+    };
+  }
+
   async listAppWebhooks(params: IAppWebhookManager_ListAppWebhooksParams) {
     const { app, page, limit } = ListAppWebhooksParamsSchema.parse(params);
 
@@ -155,18 +176,35 @@ type IAppWebhookManager_DeleteAppWebhookResult = {
   appWebhook: AppWebhookSelectType;
 };
 
+const GetAppWebhookParamsSchema = z.object({
+  appId: z.string().uuid(),
+  webhookId: z.string().uuid(),
+});
+
+type IAppWebhookManager_GetAppWebhookParams = z.infer<
+  typeof GetAppWebhookParamsSchema
+>;
+
+type IAppWebhookManager_GetAppWebhookResult = {
+  appWebhook: AppWebhookSelectType;
+};
+
 export interface IAppWebhookManager {
   createAppWebhook: (
     params: IAppWebhookManager_CreateAppWebhookParams,
   ) => Promise<IAppWebhookManager_CreateAppWebhookResult>;
 
-  listAppWebhooks: (
-    params: IAppWebhookManager_ListAppWebhooksParams,
-  ) => Promise<IAppWebhookManager_ListAppWebhooksResult>;
-
   deleteAppWebhook: (
     params: IAppWebhookManager_DeleteAppWebhookParams,
   ) => Promise<IAppWebhookManager_DeleteAppWebhookResult>;
+
+  getAppWebhook: (
+    params: IAppWebhookManager_GetAppWebhookParams,
+  ) => Promise<IAppWebhookManager_GetAppWebhookResult>;
+
+  listAppWebhooks: (
+    params: IAppWebhookManager_ListAppWebhooksParams,
+  ) => Promise<IAppWebhookManager_ListAppWebhooksResult>;
 }
 
 export class AppWebhookManagerError extends Error {
