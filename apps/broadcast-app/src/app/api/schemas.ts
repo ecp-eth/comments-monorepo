@@ -4,11 +4,11 @@ import { z } from "zod";
 export const refreshAccessTokenResponseSchema = z.object({
   accessToken: z.object({
     token: z.string(),
-    expiresIn: z.number(),
+    expiresAt: z.number(),
   }),
   refreshToken: z.object({
     token: z.string(),
-    expiresIn: z.number(),
+    expiresAt: z.number(),
   }),
 });
 
@@ -20,10 +20,10 @@ export const siweVerifyResponseSchema = z.object({
   address: HexSchema,
   accessToken: z.object({
     token: z.string(),
-    expiresIn: z.number(),
+    expiresAt: z.number(),
   }),
   refreshToken: z.object({
     token: z.string(),
-    expiresIn: z.number(),
+    expiresAt: z.number(),
   }),
 });

@@ -16,7 +16,7 @@ export async function authSiweNonceGET(api: OpenAPIHono) {
               schema: z.object({
                 nonce: z.string(),
                 nonceToken: z.string(),
-                expiresIn: z.number().int().positive(),
+                expiresAt: z.number().int().positive(),
               }),
             },
           },
@@ -24,7 +24,9 @@ export async function authSiweNonceGET(api: OpenAPIHono) {
       },
     },
     async (c) => {
-      return c.json(await siweAuthService.generateNonceAndToken(), 200);
+      return c.json(await siweAuthService.generateNonceAndToken(), 200, {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+      });
     },
   );
 }

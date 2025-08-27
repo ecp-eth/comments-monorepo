@@ -58,7 +58,7 @@ export default function SignInPage() {
         .object({
           nonce: z.string(),
           nonceToken: z.string(),
-          expiresIn: z.number(),
+          expiresAt: z.number(),
         })
         .parse(nonceResponseData);
 

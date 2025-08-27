@@ -23,11 +23,15 @@ export async function authSiweRefreshPOST(api: OpenAPIHono) {
               schema: z.object({
                 accessToken: z.object({
                   token: z.string().nonempty(),
-                  expiresIn: z.number().int().positive(),
+                  expiresAt: z.number().int().positive().openapi({
+                    description: "Unix timestamp in seconds",
+                  }),
                 }),
                 refreshToken: z.object({
                   token: z.string().nonempty(),
-                  expiresIn: z.number().int().positive(),
+                  expiresAt: z.number().int().positive().openapi({
+                    description: "Unix timestamp in seconds",
+                  }),
                 }),
               }),
             },

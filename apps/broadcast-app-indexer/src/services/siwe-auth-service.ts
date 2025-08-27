@@ -31,7 +31,10 @@ type SiweAuthServiceOptions = {
 export type NonceAndToken = {
   nonce: string;
   nonceToken: string;
-  expiresIn: number;
+  /**
+   * Unix timestamp in seconds
+   */
+  expiresAt: number;
 };
 
 export type VerifiedMessage = {
@@ -40,7 +43,10 @@ export type VerifiedMessage = {
 
 export type CreateJWTTokenResult = {
   token: string;
-  expiresIn: number;
+  /**
+   * Unix timestamp in seconds
+   */
+  expiresAt: number;
 };
 
 const JWTAccessTokenPayloadSchema = z.object({
@@ -102,11 +108,11 @@ export class SiweAuthService {
   async generateNonceAndToken(): Promise<NonceAndToken> {
     const nonce = generateSiweNonce();
     const now = Math.floor(Date.now() / 1000);
-    const expiresIn = now + this.jwtNonceTokenLifetime;
+    const expiresAt = now + this.jwtNonceTokenLifetime;
 
     const token = await signJWT(
       {
-        exp: expiresIn,
+        exp: expiresAt,
         iss: this.jwtIssuer,
         iat: now,
         aud: this.jwtAudienceNonce,
@@ -119,7 +125,7 @@ export class SiweAuthService {
     return {
       nonce,
       nonceToken: token,
-      expiresIn,
+      expiresAt,
     };
   }
 
@@ -152,7 +158,7 @@ export class SiweAuthService {
       await tx.insert(schema.authSiweRefreshToken).values({
         id: refreshToken.tokenId,
         sessionId,
-        expiresAt: new Date(Date.now() + refreshToken.expiresIn * 1000),
+        expiresAt: new Date(refreshToken.expiresAt * 1000),
       });
     });
 
@@ -244,7 +250,12 @@ export class SiweAuthService {
           isUsed: true,
           updatedAt: new Date(),
         })
-        .where(eq(schema.authSiweRefreshToken.id, refreshTokenRecord.id))
+        .where(
+          and(
+            eq(schema.authSiweRefreshToken.id, refreshTokenRecord.id),
+            eq(schema.authSiweRefreshToken.isUsed, false),
+          ),
+        )
         .execute();
 
       const newAccessToken = await this.issueJWTAccessToken(
@@ -262,18 +273,18 @@ export class SiweAuthService {
         .values({
           id: newRefreshToken.tokenId,
           sessionId,
-          expiresAt: new Date(Date.now() + newRefreshToken.expiresIn * 1000),
+          expiresAt: new Date(newRefreshToken.expiresAt * 1000),
         })
         .execute();
 
       return {
         accessToken: {
           token: newAccessToken.token,
-          expiresIn: newAccessToken.expiresIn,
+          expiresAt: newAccessToken.expiresAt,
         },
         refreshToken: {
           token: newRefreshToken.token,
-          expiresIn: newRefreshToken.expiresIn,
+          expiresAt: newRefreshToken.expiresAt,
         },
       };
     });
@@ -345,6 +356,7 @@ export class SiweAuthService {
     sessionId: string,
   ): Promise<CreateJWTTokenResult> {
     const now = Math.floor(Date.now() / 1000);
+    const expiresAt = now + this.jwtAccessTokenLifetime;
 
     const token = await signJWT(
       {
@@ -352,7 +364,7 @@ export class SiweAuthService {
           address: verifiedMessage.address,
           sessionId,
         } satisfies JWTAccessTokenPayload),
-        exp: now + this.jwtAccessTokenLifetime,
+        exp: expiresAt,
         aud: this.jwtAudienceAccessToken,
         iat: now,
         iss: this.jwtIssuer,
@@ -364,7 +376,7 @@ export class SiweAuthService {
 
     return {
       token,
-      expiresIn: this.jwtAccessTokenLifetime,
+      expiresAt,
     };
   }
 
@@ -374,6 +386,7 @@ export class SiweAuthService {
   ): Promise<CreateJWTTokenResult & { tokenId: string }> {
     const tokenId = randomUUID();
     const now = Math.floor(Date.now() / 1000);
+    const expiresAt = now + this.jwtRefreshTokenLifetime;
 
     const token = await signJWT(
       {
@@ -382,7 +395,7 @@ export class SiweAuthService {
           sessionId,
           tokenId,
         } satisfies JWTRefreshTokenPayload),
-        exp: now + this.jwtRefreshTokenLifetime,
+        exp: expiresAt,
         aud: this.jwtAudienceRefreshToken,
         iat: now,
         iss: this.jwtIssuer,
@@ -395,7 +408,7 @@ export class SiweAuthService {
     return {
       token,
       tokenId,
-      expiresIn: this.jwtRefreshTokenLifetime,
+      expiresAt,
     };
   }
 

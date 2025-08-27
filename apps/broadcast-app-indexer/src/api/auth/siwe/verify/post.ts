@@ -33,11 +33,15 @@ export async function authSiweVerifyPOST(api: OpenAPIHono) {
                 address: HexSchema,
                 accessToken: z.object({
                   token: z.string().nonempty(),
-                  expiresIn: z.number().int().positive(),
+                  expiresAt: z.number().int().positive().openapi({
+                    description: "Unix timestamp in seconds",
+                  }),
                 }),
                 refreshToken: z.object({
                   token: z.string().nonempty(),
-                  expiresIn: z.number().int().positive(),
+                  expiresAt: z.number().int().positive().openapi({
+                    description: "Unix timestamp in seconds",
+                  }),
                 }),
               }),
             },
