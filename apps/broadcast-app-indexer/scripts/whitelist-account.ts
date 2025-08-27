@@ -86,7 +86,7 @@ if (chain === base) {
   }
 
   const wantsDifferentBroadcastContractAddress = await readline.question(
-    "Would you want to use different broadcast contract address than 0x35bBcd0f8b148F2D6e7344488A862fb45772c66b on anvil? (y/n)\n",
+    "Would you want to use different broadcast contract address than 0xea4057D3B429B2C242b24AD95913eDF987e5b4fB on anvil? (y/n)\n",
   );
 
   if (wantsDifferentBroadcastContractAddress === "y") {
@@ -94,7 +94,7 @@ if (chain === base) {
       await readline.question("Enter the broadcast contract address: "),
     );
   } else {
-    broadcastContractAddress = "0x35bBcd0f8b148F2D6e7344488A862fb45772c66b";
+    broadcastContractAddress = "0xea4057D3B429B2C242b24AD95913eDF987e5b4fB";
   }
 }
 
