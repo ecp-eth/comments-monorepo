@@ -141,11 +141,5 @@ export function useMiniAppContextState() {
 }
 
 export function useMiniAppContext() {
-  const context = useContext(miniAppContext);
-
-  if (!context) {
-    throw new Error("useMiniAppContext must be used within a MiniAppProvider");
-  }
-
-  return context;
+  return useContext(miniAppContext);
 }
