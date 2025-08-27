@@ -269,34 +269,112 @@ export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
   }),
 }));
 
-export const appWebhook = offchainSchema.table("app_webhook", {
-  id: uuid().primaryKey().defaultRandom(),
-  appId: uuid()
-    .notNull()
-    .references(() => app.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
+export const appWebhook = offchainSchema.table(
+  "app_webhook",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    name: text().notNull(),
+    url: text().notNull(),
+    auth: jsonb().notNull().$type<WebhookAuthConfig>().default({
+      type: "no-auth",
     }),
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  name: text().notNull(),
-  url: text().notNull(),
-  auth: jsonb().notNull().$type<WebhookAuthConfig>().default({
-    type: "no-auth",
-  }),
-  eventFilter: text().array().notNull().default([]).$type<EventTypes[]>(),
-  paused: boolean().notNull().default(false),
-  pausedAt: timestamp({ withTimezone: true }),
-});
+    eventFilter: text().array().notNull().default([]).$type<EventTypes[]>(),
+    paused: boolean().notNull().default(false),
+    pausedAt: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    index("aw_by_event_idx").using("gin", table.eventFilter),
+    index("aw_by_paused_status_idx").on(table.paused),
+  ],
+);
 
 export type AppWebhookSelectType = typeof appWebhook.$inferSelect;
 
-export const appWebhookRelations = relations(appWebhook, ({ one }) => ({
+export const appWebhookRelations = relations(appWebhook, ({ one, many }) => ({
   app: one(app, {
     fields: [appWebhook.appId],
     references: [app.id],
   }),
+  deliveries: many(appWebhookDelivery),
 }));
+
+export const appWebhookDelivery = offchainSchema.table(
+  "app_webhook_delivery",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    appWebhookId: uuid().references(() => appWebhook.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+    eventId: bigserial({ mode: "bigint" }).references(() => eventOutbox.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+    status: text({ enum: ["pending", "success", "failed"] })
+      .notNull()
+      .default("pending"),
+    attemtsCount: integer().notNull().default(0),
+    lastError: text(),
+  },
+  (table) => [
+    // prevents double-enqueue and re-sends on reindexing
+    unique("awd_dedupe_deliveries_uq").on(table.appWebhookId, table.eventId),
+    index("aws_by_status_and_next_attempt_at_idx").on(
+      table.status,
+      table.nextAttemptAt,
+    ),
+    index("awd_by_webhook_idx").on(table.appWebhookId),
+  ],
+);
+
+export const appWebhookDeliveryRelations = relations(
+  appWebhookDelivery,
+  ({ one, many }) => ({
+    appWebhook: one(appWebhook, {
+      fields: [appWebhookDelivery.appWebhookId],
+      references: [appWebhook.id],
+    }),
+    attempts: many(appWebhookDeliveryAttempt),
+  }),
+);
+
+export const appWebhookDeliveryAttempt = offchainSchema.table(
+  "app_webhook_delivery_attempt",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    appWebhookDeliveryId: bigserial({ mode: "bigint" }).references(
+      () => appWebhookDelivery.id,
+      {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      },
+    ),
+    responseStatus: integer(),
+    responseMs: integer(),
+    error: text(),
+  },
+);
+
+export const appWebhookDeliveryAttemptRelations = relations(
+  appWebhookDeliveryAttempt,
+  ({ one }) => ({
+    delivery: one(appWebhookDelivery, {
+      fields: [appWebhookDeliveryAttempt.appWebhookDeliveryId],
+      references: [appWebhookDelivery.id],
+    }),
+  }),
+);
 
 /**
  * This table is used to store events that need to be fan-out to the subscribers.
