@@ -632,7 +632,7 @@ importers:
         specifier: 2.10.3
         version: 2.10.3(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@dotenvx/dotenvx':
-        specifier: ^1.47.6
+        specifier: ^1.48.4
         version: 1.48.4
       '@ecp.eth/sdk':
         specifier: workspace:*
