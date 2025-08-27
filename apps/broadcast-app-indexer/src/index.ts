@@ -289,15 +289,24 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
 
     if (opcode === 1) {
       await db.transaction(async (tx) => {
-        await tx.insert(schema.channelSubscription).values({
-          channelId,
-          chainId,
-          userAddress: listUserAddress,
-          createdAt: new Date(Number(event.block.timestamp) * 1000),
-          updatedAt: new Date(Number(event.block.timestamp) * 1000),
-          txHash: event.transaction.hash,
-          logIndex: event.log.logIndex,
-        });
+        await tx
+          .insert(schema.channelSubscription)
+          .values({
+            channelId,
+            chainId,
+            userAddress: listUserAddress,
+            createdAt: new Date(Number(event.block.timestamp) * 1000),
+            updatedAt: new Date(Number(event.block.timestamp) * 1000),
+            txHash: event.transaction.hash,
+            logIndex: event.log.logIndex,
+          })
+          .onConflictDoNothing({
+            target: [
+              schema.channelSubscription.channelId,
+              schema.channelSubscription.userAddress,
+            ],
+          })
+          .execute();
 
         // create farcaster notification settings for the channel
         const userFarcasterMiniAppSettings =
@@ -350,7 +359,8 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
               eq(schema.channelSubscription.channelId, channelId),
               eq(schema.channelSubscription.userAddress, listUserAddress),
             ),
-          );
+          )
+          .execute();
 
         // delete farcaster notification settings for the channel
         await tx
@@ -368,7 +378,8 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
                 listUserAddress,
               ),
             ),
-          );
+          )
+          .execute();
       });
     }
   } catch (e) {
