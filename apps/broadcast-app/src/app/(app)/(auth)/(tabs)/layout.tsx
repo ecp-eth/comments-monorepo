@@ -20,11 +20,19 @@ export default function BottomTabLayout({ children }: BottomTabLayoutProps) {
     <div
       className={cn(
         "flex flex-col h-screen max-w-[400px] mx-auto bg-background",
-        miniAppContext.isInMiniApp &&
-          miniAppContext.client.safeAreaInsets?.bottom
-          ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
-          : "pb-[env(safe-area-inset-bottom)]",
+        !miniAppContext.isInMiniApp
+          ? `pb-[max(env(safe-area-inset-bottom), 1rem)]`
+          : undefined,
+        miniAppContext.isInMiniApp && "pb-4",
       )}
+      style={
+        miniAppContext.isInMiniApp &&
+        miniAppContext.client.safeAreaInsets?.bottom
+          ? {
+              paddingBottom: `${miniAppContext.client.safeAreaInsets.bottom}px`,
+            }
+          : undefined
+      }
     >
       <main className="flex-1 overflow-hidden">{children}</main>
 

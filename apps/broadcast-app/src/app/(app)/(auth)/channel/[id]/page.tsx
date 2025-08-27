@@ -244,11 +244,19 @@ export default function ChannelPage(props: {
       <div
         className={cn(
           "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
-          miniAppContext.isInMiniApp &&
-            miniAppContext.client.safeAreaInsets?.bottom
-            ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
-            : "pb-[env(safe-area-inset-bottom)]",
+          !miniAppContext.isInMiniApp
+            ? `pb-[max(env(safe-area-inset-bottom), 1rem)]`
+            : undefined,
+          miniAppContext.isInMiniApp && "pb-4",
         )}
+        style={
+          miniAppContext.isInMiniApp &&
+          miniAppContext.client.safeAreaInsets?.bottom
+            ? {
+                paddingBottom: `${miniAppContext.client.safeAreaInsets.bottom}px`,
+              }
+            : undefined
+        }
       >
         <div className="p-4 border-b">
           <div className="flex items-center space-x-3">
@@ -281,12 +289,20 @@ export default function ChannelPage(props: {
   return (
     <div
       className={cn(
-        "h-screen max-w-[400px] mx-auto bg-background flex flex-col pb-4",
-        miniAppContext.isInMiniApp &&
-          miniAppContext.client.safeAreaInsets?.bottom
-          ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
-          : "pb-[env(safe-area-inset-bottom)]",
+        "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
+        !miniAppContext.isInMiniApp
+          ? `pb-[max(env(safe-area-inset-bottom), 1rem)]`
+          : undefined,
+        miniAppContext.isInMiniApp && "pb-4",
       )}
+      style={
+        miniAppContext.isInMiniApp &&
+        miniAppContext.client.safeAreaInsets?.bottom
+          ? {
+              paddingBottom: `${miniAppContext.client.safeAreaInsets.bottom}px`,
+            }
+          : undefined
+      }
     >
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background border-b p-4">
