@@ -112,6 +112,9 @@ jobs:
       NEYNAR_API_KEY: "NEYNAR_API_KEY"
       SIM_API_KEY: "SIM_API_KEY"
       NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL: "https://basescan.org/tx/{txHash}"
+      NEXT_PUBLIC_CHAIN_ID: 31337
+      NEXT_PUBLIC_RPC_URL: "http://localhost:8545"
+      NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS: "0x35bBcd0f8b148F2D6e7344488A862fb45772c66b"
 
     name: Build and Test on Node.js 22
     steps:
