@@ -13,7 +13,7 @@ import {
   efpListRegistryAbi,
 } from "./abi/generated/efp-abi";
 import { env } from "./env";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 function isChain(chain: unknown): chain is { id: number } {
   if (!chain || typeof chain !== "object") {
@@ -322,6 +322,22 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
                 };
               }),
             )
+            .onConflictDoUpdate({
+              set: {
+                notificationsEnabled: sql`excluded.notifications_enabled`,
+                updatedAt: sql`excluded.updated_at`,
+              },
+              target: [
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .channelId,
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .clientFid,
+                schema.channelSubscriptionFarcasterNotificationSettings.appId,
+                schema.channelSubscriptionFarcasterNotificationSettings
+                  .userAddress,
+                schema.channelSubscriptionFarcasterNotificationSettings.userFid,
+              ],
+            })
             .execute();
         }
       });
