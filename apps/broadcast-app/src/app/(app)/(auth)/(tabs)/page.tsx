@@ -14,6 +14,7 @@ import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
 import { useState } from "react";
 import { ChannelCreationBottomSheet } from "@/components/channel-creation-bottom-sheet";
 import { useAuthProtect } from "@/components/auth-provider";
+import { AuthDropdownMenu } from "@/components/auth-dropdown-menu";
 
 export default function DiscoverChannelsPage() {
   const {
@@ -116,19 +117,20 @@ export default function DiscoverChannelsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
+      <div className="p-4 border-b flex items-center gap-3">
+        <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold">Discover Channels</h1>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => setShowChannelCreation(true)}
-          >
-            <PlusIcon className="h-4 w-4" />
-            Create
-          </Button>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => setShowChannelCreation(true)}
+        >
+          <PlusIcon className="h-4 w-4" />
+          Create
+        </Button>
+        <AuthDropdownMenu />
       </div>
 
       <ScrollArea className="flex-1" viewportClassName="h-full">

@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useAccount, useChainId, useDisconnect } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import z from "zod";
 import {
   AlertTriangleIcon,
@@ -22,6 +22,7 @@ import {
   RotateCwIcon,
   WalletIcon,
   XIcon,
+  LogOutIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,6 @@ import type { QueryKey } from "@tanstack/react-query";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { Channel } from "@/api/schemas";
 import { useChannelNotificationsManager } from "@/hooks/useChannelNotificationsManager";
-import { Hex } from "@ecp.eth/sdk/core";
 import { EditCommentBottomSheet } from "@/components/edit-comment-bottom-sheet";
 import { ReportBottomSheet } from "@/components/report-bottom-sheet";
 import { useRouter } from "next/navigation";
@@ -64,6 +64,7 @@ import { toast } from "sonner";
 import { ConnectAccountError } from "@ecp.eth/shared/hooks/useConnectAccount";
 import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useDisconnectWalletAndLogout } from "@/hooks/useDisconnectWalletAndLogout";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -295,7 +296,7 @@ export default function ChannelPage(props: {
             <h1 className="font-semibold truncate">{channel.name}</h1>
           </div>
 
-          <ChannelDropdownMenu address={address} channel={channel} />
+          <ChannelDropdownMenu channel={channel} />
         </div>
       </div>
 
@@ -394,12 +395,11 @@ export default function ChannelPage(props: {
 }
 
 type ChannelDropdownMenuProps = {
-  address: Hex | undefined;
   channel: Channel;
 };
 
-function ChannelDropdownMenu({ address, channel }: ChannelDropdownMenuProps) {
-  const { disconnect } = useDisconnect();
+function ChannelDropdownMenu({ channel }: ChannelDropdownMenuProps) {
+  const disconnectWalletAndLogout = useDisconnectWalletAndLogout();
   const subscribeMutation = useSubscribeToChannel({
     channel,
   });
@@ -478,12 +478,6 @@ function ChannelDropdownMenu({ address, channel }: ChannelDropdownMenuProps) {
             <BellIcon className="h-4 w-4 mr-1" /> Enable notifications
           </DropdownMenuItem>
         )}
-
-        {address && (
-          <DropdownMenuItem onClick={() => disconnect()}>
-            <WalletIcon className="h-4 w-4 mr-1" /> Disconnect wallet
-          </DropdownMenuItem>
-        )}
         <Dialog>
           <DialogTrigger asChild>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
@@ -514,6 +508,10 @@ function ChannelDropdownMenu({ address, channel }: ChannelDropdownMenuProps) {
             </div>
           </DialogContent>
         </Dialog>
+
+        <DropdownMenuItem onClick={() => disconnectWalletAndLogout()}>
+          <LogOutIcon className="h-4 w-4 mr-1" /> Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

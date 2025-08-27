@@ -8,6 +8,7 @@ import { ChannelCard } from "@/components/channel-card";
 import { cn } from "@/lib/utils";
 import { useMyChannelsQuery } from "@/queries/my-channels";
 import { useAuthProtect } from "@/components/auth-provider";
+import { AuthDropdownMenu } from "@/components/auth-dropdown-menu";
 
 export default function MyChannelsPage() {
   const {
@@ -99,8 +100,11 @@ export default function MyChannelsPage() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b">
-        <h1 className="text-2xl font-bold">My Channels</h1>
+      <div className="p-4 border-b flex items-center gap-3">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl font-bold">My Channels</h1>
+        </div>
+        <AuthDropdownMenu />
       </div>
 
       <ScrollArea className="flex-1">
