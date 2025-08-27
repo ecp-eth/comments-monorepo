@@ -2,12 +2,14 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 
 import {
   appManager,
+  appWebhookManager,
   eventOutboxService,
   siweMiddleware,
 } from "../../../../../../services/index.ts";
 import { APIErrorResponseSchema } from "../../../../../../lib/schemas.ts";
 import { AppManagerAppNotFoundError } from "../../../../../../services/app-manager-service.ts";
 import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../services/app-webhook-manager-service.ts";
+import { createTestEvent } from "../../../../../../events/test/index.ts";
 
 export const AppWebhookTestRequestParamsSchema = z.object({
   appId: z.string().uuid(),
@@ -71,9 +73,18 @@ export function setupAppWebhookTest(app: OpenAPIHono) {
           ownerId: c.get("user").id,
         });
 
-        await eventOutboxService.publishTestEvent({
-          appId: app.id,
+        const { appWebhook } = await appWebhookManager.getAppWebhook({
           webhookId,
+          appId: app.id,
+        });
+
+        await eventOutboxService.publishEvent({
+          event: createTestEvent({
+            appId: app.id,
+            webhookId: appWebhook.id,
+          }),
+          aggregateId: appWebhook.id,
+          aggregateType: "app-webhook",
         });
 
         return c.newResponse(null, 204);

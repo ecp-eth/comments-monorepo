@@ -8,7 +8,10 @@ import {
 } from "../shared/schemas.ts";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments";
-import { IndexerAPICommentReferencesSchema } from "@ecp.eth/sdk/indexer";
+import {
+  IndexerAPICommentReferencesSchema,
+  IndexerAPICommentZeroExSwapSchema,
+} from "@ecp.eth/sdk/indexer";
 
 export const CommentEvents = [
   "comment:added",
@@ -52,6 +55,7 @@ export const CommentAddedEventSchema = z
         RootCommentEventDataSchema,
         ReplyCommentEventDataSchema,
       ]),
+      zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
     }),
   })
   .merge(EventFromChainSchema);

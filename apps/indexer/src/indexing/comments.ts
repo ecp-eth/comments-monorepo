@@ -3,37 +3,40 @@ import { ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
-} from "../lib/utils";
+} from "../lib/utils.ts";
 import {
   commentModerationService,
   db,
+  eventOutboxService,
   mutedAccountsManagementService,
-} from "../services";
+} from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
-import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
+import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
 import {
   resolveCommentReferences,
   type ResolveCommentReferencesOptions,
-} from "../lib/resolve-comment-references";
-import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
-import { ensByNameResolverService } from "../services/ens-by-name-resolver";
-import { erc20ByAddressResolverService } from "../services/erc20-by-address-resolver";
-import { erc20ByTickerResolverService } from "../services/erc20-by-ticker-resolver";
-import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
-import { farcasterByNameResolverService } from "../services/farcaster-by-name-resolver";
-import { urlResolverService } from "../services/url-resolver";
+} from "../lib/resolve-comment-references.ts";
+import {
+  ensByAddressResolverService,
+  ensByNameResolverService,
+  erc20ByAddressResolverService,
+  erc20ByTickerResolverService,
+  farcasterByAddressResolverService,
+  farcasterByNameResolverService,
+  urlResolverService,
+} from "../services/index.ts";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { env } from "../env";
+import { env } from "../env.ts";
 import { eq } from "drizzle-orm";
 import {
   ponderEventToCommentAddedEvent,
   ponderEventToCommentDeletedEvent,
   ponderEventToCommentHookMetadataSetEvent,
   ponderEventToCommentEditedEvent,
-} from "../events/comment";
-import { schema } from "../../schema";
-import type { MetadataSetOperation } from "../events/shared/schemas";
+} from "../events/comment/index.ts";
+import { schema } from "../../schema.ts";
+import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -191,27 +194,19 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
       await moderationResult.saveAndNotify();
 
-      const commentAddedEvent = ponderEventToCommentAddedEvent({
-        event,
-        context,
-        moderationStatus: moderationResult.result.status,
-        references: referencesResolutionResult.references,
-        comment: insertedComment,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentAddedEvent({
+          event,
+          context,
+          moderationStatus: moderationResult.result.status,
+          references: referencesResolutionResult.references,
+          comment: insertedComment,
+          zeroExSwap,
+        }),
+        aggregateId: insertedComment.id,
+        aggregateType: "comment",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventUid: commentAddedEvent.uid,
-          eventType: commentAddedEvent.event,
-          aggregateType: "comment",
-          aggregateId: insertedComment.id,
-          payload: commentAddedEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
     });
   });
 
@@ -284,27 +279,17 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         .where(eq(schema.comment.id, event.args.commentId))
         .execute();
 
-      const commentHookMetadataSetEvent =
-        ponderEventToCommentHookMetadataSetEvent({
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentHookMetadataSetEvent({
           event,
           context,
           hookMetadata,
           hookMetadataOperation,
-        });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventUid: commentHookMetadataSetEvent.uid,
-          eventType: commentHookMetadataSetEvent.event,
-          aggregateType: "comment",
-          aggregateId: commentHookMetadataSetEvent.data.comment.id,
-          payload: commentHookMetadataSetEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
+      });
     });
   });
 
@@ -327,24 +312,15 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         .where(eq(schema.comment.id, event.args.commentId))
         .execute();
 
-      const commentDeletedEvent = ponderEventToCommentDeletedEvent({
-        event,
-        context,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentDeletedEvent({
+          event,
+          context,
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventUid: commentDeletedEvent.uid,
-          eventType: commentDeletedEvent.event,
-          aggregateType: "comment",
-          aggregateId: commentDeletedEvent.data.comment.id,
-          payload: commentDeletedEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
 
       if (
         existingComment.commentType === COMMENT_TYPE_REACTION &&
@@ -446,26 +422,17 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         .where(eq(schema.comment.id, event.args.commentId))
         .execute();
 
-      const commentEditedEvent = ponderEventToCommentEditedEvent({
-        event,
-        context,
-        references: referencesResolutionResult.references,
-        moderationStatus: moderationResult.result.status,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentEditedEvent({
+          event,
+          context,
+          references: referencesResolutionResult.references,
+          moderationStatus: moderationResult.result.status,
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventUid: commentEditedEvent.uid,
-          eventType: commentEditedEvent.event,
-          aggregateType: "comment",
-          aggregateId: commentEditedEvent.data.comment.id,
-          payload: commentEditedEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
 
       await moderationResult.saveAndNotify();
     });

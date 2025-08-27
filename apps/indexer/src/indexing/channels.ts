@@ -1,17 +1,17 @@
 import * as Sentry from "@sentry/node";
 import { ponder as Ponder } from "ponder:registry";
 import { ZERO_ADDRESS } from "@ecp.eth/sdk";
-import { schema } from "../../schema";
-import { db } from "../services";
+import { schema } from "../../schema.ts";
+import { db, eventOutboxService } from "../services/index.ts";
 import {
   ponderEventToCreateChannelEvent,
   ponderEventToUpdateChannelEvent,
   ponderEventToUpdateChannelHookStatusEvent,
   ponderEventToUpdateChannelMetadataEvent,
   ponderEventToUpdateChannelTransferEvent,
-} from "../events/channel";
+} from "../events/channel/index.ts";
 import { eq } from "drizzle-orm";
-import type { MetadataSetOperation } from "../events/shared/schemas";
+import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 
 export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
   ponder.on(
@@ -36,24 +36,15 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
           })
           .execute();
 
-        const channelCreatedEvent = ponderEventToCreateChannelEvent({
-          event,
-          context,
+        await eventOutboxService.publishEvent({
+          event: ponderEventToCreateChannelEvent({
+            event,
+            context,
+          }),
+          aggregateId: event.args.channelId.toString(),
+          aggregateType: "channel",
+          tx,
         });
-
-        await tx
-          .insert(schema.eventOutbox)
-          .values({
-            eventType: channelCreatedEvent.event,
-            eventUid: channelCreatedEvent.uid,
-            aggregateType: "channel",
-            aggregateId: channelCreatedEvent.data.channel.id,
-            payload: channelCreatedEvent,
-          })
-          .onConflictDoNothing({
-            target: [schema.eventOutbox.eventUid],
-          })
-          .execute();
       });
     },
   );
@@ -73,24 +64,15 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
           .where(eq(schema.channel.id, event.args.channelId))
           .execute();
 
-        const channelUpdatedEvent = ponderEventToUpdateChannelEvent({
-          event,
-          context,
+        await eventOutboxService.publishEvent({
+          event: ponderEventToUpdateChannelEvent({
+            event,
+            context,
+          }),
+          aggregateId: event.args.channelId.toString(),
+          aggregateType: "channel",
+          tx,
         });
-
-        await tx
-          .insert(schema.eventOutbox)
-          .values({
-            eventType: channelUpdatedEvent.event,
-            eventUid: channelUpdatedEvent.uid,
-            aggregateType: "channel",
-            aggregateId: channelUpdatedEvent.data.channel.id,
-            payload: channelUpdatedEvent,
-          })
-          .onConflictDoNothing({
-            target: [schema.eventOutbox.eventUid],
-          })
-          .execute();
       });
     },
   );
@@ -108,25 +90,15 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
           .where(eq(schema.channel.id, event.args.channelId))
           .execute();
 
-        const channelHookStatusUpdatedEvent =
-          ponderEventToUpdateChannelHookStatusEvent({
+        await eventOutboxService.publishEvent({
+          event: ponderEventToUpdateChannelHookStatusEvent({
             event,
             context,
-          });
-
-        await tx
-          .insert(schema.eventOutbox)
-          .values({
-            eventType: channelHookStatusUpdatedEvent.event,
-            eventUid: channelHookStatusUpdatedEvent.uid,
-            aggregateType: "channel",
-            aggregateId: channelHookStatusUpdatedEvent.data.channel.id,
-            payload: channelHookStatusUpdatedEvent,
-          })
-          .onConflictDoNothing({
-            target: [schema.eventOutbox.eventUid],
-          })
-          .execute();
+          }),
+          aggregateId: event.args.channelId.toString(),
+          aggregateType: "channel",
+          tx,
+        });
       });
     },
   );
@@ -202,28 +174,17 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
           .where(eq(schema.channel.id, event.args.channelId))
           .execute();
 
-        const channelMetadataSetEvent = ponderEventToUpdateChannelMetadataEvent(
-          {
+        await eventOutboxService.publishEvent({
+          event: ponderEventToUpdateChannelMetadataEvent({
             event,
             context,
             metadata,
             metadataOperation,
-          },
-        );
-
-        await tx
-          .insert(schema.eventOutbox)
-          .values({
-            eventType: channelMetadataSetEvent.event,
-            eventUid: channelMetadataSetEvent.uid,
-            aggregateType: "channel",
-            aggregateId: channelMetadataSetEvent.data.channel.id,
-            payload: channelMetadataSetEvent,
-          })
-          .onConflictDoNothing({
-            target: [schema.eventOutbox.eventUid],
-          })
-          .execute();
+          }),
+          aggregateId: event.args.channelId.toString(),
+          aggregateType: "channel",
+          tx,
+        });
       });
     },
   );
@@ -257,24 +218,15 @@ export function initializeChannelEventsIndexing(ponder: typeof Ponder) {
         .where(eq(schema.channel.id, event.args.tokenId))
         .execute();
 
-      const channelTransferEvent = ponderEventToUpdateChannelTransferEvent({
-        event,
-        context,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToUpdateChannelTransferEvent({
+          event,
+          context,
+        }),
+        aggregateId: event.args.tokenId.toString(),
+        aggregateType: "channel",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventType: channelTransferEvent.event,
-          eventUid: channelTransferEvent.uid,
-          aggregateType: "channel",
-          aggregateId: channelTransferEvent.data.channel.id,
-          payload: channelTransferEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
     });
   });
 }

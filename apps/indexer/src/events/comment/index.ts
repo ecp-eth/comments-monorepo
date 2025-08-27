@@ -16,7 +16,10 @@ import {
   CommentModerationStatusUpdatedEventSchema,
   type CommentModerationStatusUpdatedEventInput,
 } from "./schemas.ts";
-import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import type {
+  IndexerAPICommentReferencesSchemaType,
+  IndexerAPICommentZeroExSwapSchemaType,
+} from "@ecp.eth/sdk/indexer";
 import type { ModerationStatus } from "../../services/types.ts";
 import type { CommentSelectType } from "ponder:schema";
 import type { MetadataArray, MetadataSetOperation } from "../shared/schemas.ts";
@@ -27,10 +30,12 @@ export function ponderEventToCommentAddedEvent({
   moderationStatus,
   references,
   comment,
+  zeroExSwap,
 }: IndexingFunctionArgs<"CommentsV1:CommentAdded"> & {
   comment: CommentSelectType;
   moderationStatus: ModerationStatus;
   references: IndexerAPICommentReferencesSchemaType;
+  zeroExSwap: IndexerAPICommentZeroExSwapSchemaType | null;
 }): CommentAddedEvent {
   const uid = `comment:added:${context.chain.id}:${event.block.number}:${event.transaction.hash}:${event.log.logIndex}:${event.args.commentId}`;
 
@@ -65,6 +70,7 @@ export function ponderEventToCommentAddedEvent({
               targetUri: comment.targetUri,
             }),
       },
+      zeroExSwap,
     },
   } satisfies CommentAddedEventInput);
 }

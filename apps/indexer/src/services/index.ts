@@ -31,6 +31,14 @@ import { EventOutboxService } from "./event-outbox-service.ts";
 
 export { db };
 
+export { ensByAddressResolverService } from "./ens-by-address-resolver.ts";
+export { ensByNameResolverService } from "./ens-by-name-resolver.ts";
+export { erc20ByAddressResolverService } from "./erc20-by-address-resolver.ts";
+export { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
+export { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
+export { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
+export { urlResolverService } from "./url-resolver.ts";
+
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
     if (data) {
