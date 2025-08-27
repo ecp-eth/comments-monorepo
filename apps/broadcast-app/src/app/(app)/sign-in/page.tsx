@@ -123,7 +123,7 @@ export default function SignInPage() {
   });
 
   return (
-    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col items-center justify-center p-8">
+    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col items-center justify-center p-8 pb-[env(safe-area-inset-bottom)]">
       <div className="text-center space-y-8">
         {/* App Logo */}
         <div className="space-y-4">

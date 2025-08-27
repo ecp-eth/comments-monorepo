@@ -269,7 +269,7 @@ export default function ChannelPage(props: {
   const isOwner = address?.toLowerCase() === channel.owner.toLowerCase();
 
   return (
-    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
+    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col pb-[env(safe-area-inset-bottom)]">
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background border-b p-4">
         <div className="flex items-center space-x-3">

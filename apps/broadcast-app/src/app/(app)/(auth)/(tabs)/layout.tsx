@@ -15,7 +15,7 @@ export default function BottomTabLayout({ children }: BottomTabLayoutProps) {
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col h-screen max-w-[400px] mx-auto bg-background">
+    <div className="flex flex-col h-screen max-w-[400px] mx-auto bg-background pb-[env(safe-area-inset-bottom)]">
       <main className="flex-1 overflow-hidden">{children}</main>
 
       <div className="border-t bg-background">
