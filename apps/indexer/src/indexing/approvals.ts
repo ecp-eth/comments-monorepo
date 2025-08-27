@@ -1,10 +1,10 @@
 import { ponder as Ponder } from "ponder:registry";
-import { db } from "../services";
+import { db, eventOutboxService } from "../services/index.ts";
 import {
   ponderEventToApprovalAddedEvent,
   ponderEventToApprovalRemovedEvent,
-} from "../events/approval";
-import { schema } from "../../schema";
+} from "../events/approval/index.ts";
+import { schema } from "../../schema.ts";
 import { eq } from "drizzle-orm";
 
 export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
@@ -40,25 +40,16 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
         throw new Error(`Approval ${id} not found`);
       }
 
-      const approvalAddedEvent = ponderEventToApprovalAddedEvent({
-        approval,
-        event,
-        context,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToApprovalAddedEvent({
+          approval,
+          event,
+          context,
+        }),
+        aggregateId: approval.id,
+        aggregateType: "approval",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventType: approvalAddedEvent.event,
-          eventUid: approvalAddedEvent.uid,
-          aggregateType: "approval",
-          aggregateId: approvalAddedEvent.data.approval.id,
-          payload: approvalAddedEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
     });
   });
 
@@ -80,25 +71,16 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
         throw new Error(`Approval ${id} not found`);
       }
 
-      const approvalRemovedEvent = ponderEventToApprovalRemovedEvent({
-        approval,
-        event,
-        context,
+      await eventOutboxService.publishEvent({
+        event: ponderEventToApprovalRemovedEvent({
+          approval,
+          event,
+          context,
+        }),
+        aggregateId: approval.id,
+        aggregateType: "approval",
+        tx,
       });
-
-      await tx
-        .insert(schema.eventOutbox)
-        .values({
-          eventType: approvalRemovedEvent.event,
-          eventUid: approvalRemovedEvent.uid,
-          aggregateType: "approval",
-          aggregateId: approvalRemovedEvent.data.approval.id,
-          payload: approvalRemovedEvent,
-        })
-        .onConflictDoNothing({
-          target: [schema.eventOutbox.eventUid],
-        })
-        .execute();
     });
   });
 }
