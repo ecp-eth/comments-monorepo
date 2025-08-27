@@ -358,7 +358,7 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
   } catch (e) {
     if (e instanceof Error && e.message.includes("Invalid CAIP")) {
       if (process.env.NODE_ENV !== "production") {
-        console.info(
+        console.warn(
           "Skipping list operation because it doesn't contain valid asset id, it probably isn't ERC721 record",
           {
             recordData,
@@ -368,6 +368,8 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
 
       return;
     }
+
+    console.error(e);
 
     return;
   }
