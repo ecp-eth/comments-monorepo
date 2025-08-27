@@ -287,9 +287,6 @@ export default function ChannelPage(props: {
     <div
       className={cn(
         "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
-        !miniAppContext.isInMiniApp
-          ? `pb-[max(env(safe-area-inset-bottom), 1rem)]`
-          : undefined,
         miniAppContext.isInMiniApp && "pb-4",
       )}
       style={
@@ -298,7 +295,9 @@ export default function ChannelPage(props: {
           ? {
               paddingBottom: `${miniAppContext.client.safeAreaInsets.bottom}px`,
             }
-          : undefined
+          : {
+              paddingBottom: "max(env(safe-area-inset-bottom), 1rem)",
+            }
       }
     >
       {/* Sticky Header */}
