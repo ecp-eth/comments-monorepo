@@ -281,7 +281,7 @@ export default function ChannelPage(props: {
   return (
     <div
       className={cn(
-        "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
+        "h-screen max-w-[400px] mx-auto bg-background flex flex-col pb-4",
         miniAppContext.isInMiniApp &&
           miniAppContext.client.safeAreaInsets?.bottom
           ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
