@@ -16,12 +16,13 @@ import { siweVerifyResponseSchema } from "@/app/api/schemas";
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
+import { cn } from "@/lib/utils";
 
 export default function SignInPage() {
   const auth = useAuth();
   const { address } = useAccount();
   const chainId = useChainId();
-  const { isInMiniApp } = useMiniAppContext();
+  const miniAppContext = useMiniAppContext();
   const connectAccountUsingRainbowKit = useConnectAccount();
   const { connectAsync: connectAccountUsingWagmi, connectors } = useConnect();
   const { signMessageAsync } = useSignMessage();
@@ -31,7 +32,7 @@ export default function SignInPage() {
       let addr = address;
 
       if (!addr) {
-        if (isInMiniApp) {
+        if (miniAppContext.isInMiniApp) {
           const result = await connectAccountUsingWagmi({
             connector: connectors[0], // use mini app connector
           });
@@ -123,7 +124,15 @@ export default function SignInPage() {
   });
 
   return (
-    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col items-center justify-center p-8 pb-[env(safe-area-inset-bottom)]">
+    <div
+      className={cn(
+        "h-screen max-w-[400px] mx-auto bg-background flex flex-col items-center justify-center p-8",
+        miniAppContext.isInMiniApp &&
+          miniAppContext.client.safeAreaInsets?.bottom
+          ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
+          : "pb-[env(safe-area-inset-bottom)]",
+      )}
+    >
       <div className="text-center space-y-8">
         {/* App Logo */}
         <div className="space-y-4">

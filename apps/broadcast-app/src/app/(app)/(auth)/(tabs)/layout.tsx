@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMiniAppContext } from "@/hooks/useMiniAppContext";
 
 interface BottomTabLayoutProps {
   children: React.ReactNode;
@@ -13,9 +14,18 @@ interface BottomTabLayoutProps {
 
 export default function BottomTabLayout({ children }: BottomTabLayoutProps) {
   const pathname = usePathname();
+  const miniAppContext = useMiniAppContext();
 
   return (
-    <div className="flex flex-col h-screen max-w-[400px] mx-auto bg-background pb-[env(safe-area-inset-bottom)]">
+    <div
+      className={cn(
+        "flex flex-col h-screen max-w-[400px] mx-auto bg-background",
+        miniAppContext.isInMiniApp &&
+          miniAppContext.client.safeAreaInsets?.bottom
+          ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
+          : "pb-[env(safe-area-inset-bottom)]",
+      )}
+    >
       <main className="flex-1 overflow-hidden">{children}</main>
 
       <div className="border-t bg-background">

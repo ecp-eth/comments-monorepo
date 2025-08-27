@@ -65,6 +65,7 @@ import { ConnectAccountError } from "@ecp.eth/shared/hooks/useConnectAccount";
 import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useDisconnectWalletAndLogout } from "@/hooks/useDisconnectWalletAndLogout";
+import { useMiniAppContext } from "@/hooks/useMiniAppContext";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -73,6 +74,7 @@ export default function ChannelPage(props: {
   const { address } = useAccount();
   const connectAsync = useConnectAccount();
   const chainId = useChainId();
+  const miniAppContext = useMiniAppContext();
   const { id: channelId } = z
     .object({
       id: z.coerce.bigint(),
@@ -239,7 +241,15 @@ export default function ChannelPage(props: {
 
   if (commentsQuery.status === "pending" || channelQuery.status === "pending") {
     return (
-      <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col">
+      <div
+        className={cn(
+          "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
+          miniAppContext.isInMiniApp &&
+            miniAppContext.client.safeAreaInsets?.bottom
+            ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
+            : "pb-[env(safe-area-inset-bottom)]",
+        )}
+      >
         <div className="p-4 border-b">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
@@ -269,7 +279,15 @@ export default function ChannelPage(props: {
   const isOwner = address?.toLowerCase() === channel.owner.toLowerCase();
 
   return (
-    <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col pb-[env(safe-area-inset-bottom)]">
+    <div
+      className={cn(
+        "h-screen max-w-[400px] mx-auto bg-background flex flex-col",
+        miniAppContext.isInMiniApp &&
+          miniAppContext.client.safeAreaInsets?.bottom
+          ? `pb-[${miniAppContext.client.safeAreaInsets.bottom}px]`
+          : "pb-[env(safe-area-inset-bottom)]",
+      )}
+    >
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-background border-b p-4">
         <div className="flex items-center space-x-3">
