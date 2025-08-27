@@ -28,6 +28,7 @@ import { createSiweMiddleware } from "../middleware/siwe.ts";
 import { AppManager } from "./app-manager-service.ts";
 import { AppWebhookManager } from "./app-webhook-manager-service.ts";
 import { EventOutboxService } from "./event-outbox-service.ts";
+import { EventOutboxFanOutService } from "./events/event-outbox-fan-out-service.ts";
 
 export { db };
 
@@ -177,5 +178,9 @@ export const appWebhookManager = new AppWebhookManager({
 });
 
 export const eventOutboxService = new EventOutboxService({
+  db,
+});
+
+export const eventOutboxFanOutService = new EventOutboxFanOutService({
   db,
 });

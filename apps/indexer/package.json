@@ -20,11 +20,12 @@
     "test:watch": "vitest",
     "drizzle-kit": "dotenvx run --convention nextjs -- drizzle-kit",
     "db:migrate:generate": "pnpm drizzle-kit generate",
-    "db:migrate:up": "pnpm drizzle-kit migrate"
+    "db:migrate:up": "pnpm drizzle-kit migrate",
+    "worker:fan-out": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/fan-out-worker.ts"
   },
   "dependencies": {
     "@0x/0x-parser": "2.10.3",
-    "@dotenvx/dotenvx": "^1.47.6",
+    "@dotenvx/dotenvx": "^1.48.4",
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
     "@envelop/sentry": "^14.0.0",
