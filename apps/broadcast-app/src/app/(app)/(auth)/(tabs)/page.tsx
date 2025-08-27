@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 import { ChannelCard } from "@/components/channel-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { useDiscoverChannelsQuery } from "@/queries/discover-channels";
 import { useState } from "react";
 import { ChannelCreationBottomSheet } from "@/components/channel-creation-bottom-sheet";
 import { useAuthProtect } from "@/components/auth-provider";
 import { AuthDropdownMenu } from "@/components/auth-dropdown-menu";
+import { useChannelsQuery } from "@/queries/channels";
 
 export default function DiscoverChannelsPage() {
   const {
@@ -26,7 +26,7 @@ export default function DiscoverChannelsPage() {
     fetchNextPage,
     isFetchingNextPage,
     hasNextPage,
-  } = useDiscoverChannelsQuery();
+  } = useChannelsQuery();
   const [showChannelCreation, setShowChannelCreation] = useState(false);
 
   useAuthProtect(error);
@@ -57,7 +57,7 @@ export default function DiscoverChannelsPage() {
   if (status === "pending") {
     return (
       <div className="h-full p-4">
-        <h1 className="text-2xl font-bold mb-6">Discover Channels</h1>
+        <h1 className="text-2xl font-bold mb-6">Channels</h1>
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <div
@@ -119,7 +119,7 @@ export default function DiscoverChannelsPage() {
     <div className="h-full flex flex-col">
       <div className="p-4 border-b flex items-center gap-3">
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-bold">Discover Channels</h1>
+          <h1 className="text-2xl font-bold">Channels</h1>
         </div>
         <Button
           variant="outline"

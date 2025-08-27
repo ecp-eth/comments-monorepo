@@ -6,7 +6,7 @@ import { sdk, AddMiniApp } from "@farcaster/miniapp-sdk";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
-import { useUpdateChannelInMyChannelsQuery } from "@/queries/my-channels";
+import { useUpdateChannelInChannelsQuery } from "@/queries/channels";
 
 type Status =
   | "enabled"
@@ -26,7 +26,7 @@ export function useChannelNotificationsManager(
   channel: Channel,
 ): ChannelManagerAPI {
   const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
-  const updateChannelInMyChannelsQuery = useUpdateChannelInMyChannelsQuery();
+  const updateChannelInChannelsQuery = useUpdateChannelInChannelsQuery();
   const miniAppContext = useMiniAppContext();
   const setNotificationStatusMutation = useSetNotificationStatusOnChannel({
     channelId: channel.id,
@@ -96,7 +96,7 @@ export function useChannelNotificationsManager(
           [clientFid]: true,
         },
       });
-      updateChannelInMyChannelsQuery(channel.id, {
+      updateChannelInChannelsQuery(channel.id, {
         notificationSettings: {
           ...channel.notificationSettings,
           [clientFid]: true,
@@ -133,7 +133,7 @@ export function useChannelNotificationsManager(
           [clientFid]: false,
         },
       });
-      updateChannelInMyChannelsQuery(channel.id, {
+      updateChannelInChannelsQuery(channel.id, {
         notificationSettings: {
           ...channel.notificationSettings,
           [clientFid]: false,

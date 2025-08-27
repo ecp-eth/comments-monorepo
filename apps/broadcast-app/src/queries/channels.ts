@@ -1,21 +1,18 @@
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
-import { ListChannelsResponseSchema } from "@/api/schemas";
+import { type Channel, ListChannelsResponseSchema } from "@/api/schemas";
 import { useCallback } from "react";
 import { z } from "zod";
-import {
-  createDiscoverChannelsQueryKey,
-  createMyChannelsQueryKey,
-} from "./query-keys";
+import { createChannelsQueryKey } from "./query-keys";
 import { UnauthorizedError } from "@/errors";
 import { useAuth } from "@/components/auth-provider";
 import { secureFetch } from "@/lib/secure-fetch";
 
-export function useDiscoverChannelsQuery() {
+export function useChannelsQuery() {
   const auth = useAuth();
 
   return useInfiniteQuery({
-    queryKey: createDiscoverChannelsQueryKey(),
+    queryKey: createChannelsQueryKey(),
     refetchOnMount: true,
     queryFn: async ({ pageParam: cursor, signal }) => {
       const searchParams = new URLSearchParams();
@@ -23,6 +20,8 @@ export function useDiscoverChannelsQuery() {
       if (cursor) {
         searchParams.set("cursor", cursor);
       }
+
+      searchParams.set("limit", "2");
 
       const response = await secureFetch(auth, async ({ headers }) => {
         return fetch(
@@ -52,36 +51,41 @@ export function useDiscoverChannelsQuery() {
   });
 }
 
-const discoverChannelsQuerySchema = z.object({
+const channelsQuerySchema = z.object({
   pages: z.array(ListChannelsResponseSchema),
   pageParams: z.array(z.string().optional()),
 });
 
-type DiscoverChannelsQueryData = z.infer<typeof discoverChannelsQuerySchema>;
+type ChannelsQueryData = z.infer<typeof channelsQuerySchema>;
 
-export function useRemoveChannelFromDiscoverQuery() {
+export function useUpdateChannelInChannelsQuery() {
   const queryClient = useQueryClient();
 
   return useCallback(
-    (channelId: bigint) => {
-      const queryKey = createDiscoverChannelsQueryKey();
+    (channelId: bigint, channelUpdate: Partial<Channel>) => {
+      const queryKey = createChannelsQueryKey();
 
       queryClient.setQueryData(
         queryKey,
-        (
-          old: DiscoverChannelsQueryData | undefined,
-        ): DiscoverChannelsQueryData | undefined => {
+        (old: ChannelsQueryData | undefined): ChannelsQueryData | undefined => {
           if (!old) {
             return undefined;
           }
 
-          const queryData = discoverChannelsQuerySchema.parse(old);
+          const queryData = channelsQuerySchema.parse(old);
 
           return {
             pages: queryData.pages.map((page) => {
-              const filteredResults = page.results.filter(
-                (channel) => channel.id !== channelId,
-              );
+              const filteredResults = page.results.map((channel) => {
+                if (channel.id === channelId) {
+                  return {
+                    ...channel,
+                    ...channelUpdate,
+                  };
+                }
+
+                return channel;
+              });
 
               return {
                 ...page,
@@ -92,11 +96,6 @@ export function useRemoveChannelFromDiscoverQuery() {
           };
         },
       );
-
-      queryClient.refetchQueries({
-        exact: true,
-        queryKey: createMyChannelsQueryKey(),
-      });
     },
     [queryClient],
   );

@@ -9,23 +9,35 @@ import { ChannelResponse } from "../../../shared-responses";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { siweMiddleware } from "../../../middleware/siwe";
 
-function toChannelCursor(channel: { id: bigint; createdAt: Date }): string {
+function toChannelCursor(channel: {
+  hasSubscription: boolean;
+  id: bigint;
+  createdAt: Date;
+}): string {
   return Buffer.from(
-    `${channel.id.toString()}#${channel.createdAt.toISOString()}`,
+    `${channel.hasSubscription}#${channel.id.toString()}#${channel.createdAt.toISOString()}`,
   ).toString("base64url");
 }
 
-function fromChannelCursor(cursor: string): { id: bigint; createdAt: Date } {
+function fromChannelCursor(cursor: string): {
+  hasSubscription: boolean;
+  id: bigint;
+  createdAt: Date;
+} {
   const decoded = Buffer.from(cursor, "base64url").toString("utf-8");
 
-  const [id, createdAt] = decoded.split("#");
+  const [hasSubscription, id, createdAt] = decoded.split("#");
 
   return z
     .object({
+      hasSubscription: z
+        .enum(["true", "false"])
+        .transform((val) => val === "true"),
       id: z.coerce.bigint(),
       createdAt: z.coerce.date(),
     })
     .parse({
+      hasSubscription,
       id,
       createdAt,
     });
@@ -42,11 +54,11 @@ const requestQuerySchema = z.object({
     }),
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),
   subscriptionFilter: z
-    .enum(["subscribed", "unsubscribed"])
-    .default("unsubscribed")
+    .enum(["subscribed", "unsubscribed", "all"])
+    .default("all")
     .openapi({
       description:
-        "If false is passed only unsubscribed channels will be returned",
+        "Filter by subscription status. If all is selected then first subscribed channels are returned and then the rest.",
     }),
 });
 
@@ -88,6 +100,8 @@ export async function channelsGET(api: OpenAPIHono) {
       const { appId } = c.req.valid("param");
       const userAddress = c.get("user")!.address;
 
+      console.log(cursor);
+
       const results = await db
         .select()
         .from(schema.channel)
@@ -102,19 +116,38 @@ export async function channelsGET(api: OpenAPIHono) {
           and(
             cursor
               ? or(
-                  lt(schema.channel.createdAt, cursor.createdAt),
+                  lt(
+                    isNotNull(schema.channelSubscription.channelId),
+                    cursor.hasSubscription,
+                  ),
                   and(
-                    eq(schema.channel.createdAt, cursor.createdAt),
-                    lt(schema.channel.id, cursor.id),
+                    eq(
+                      isNotNull(schema.channelSubscription.channelId),
+                      cursor.hasSubscription,
+                    ),
+                    or(
+                      lt(schema.channel.createdAt, cursor.createdAt),
+                      and(
+                        eq(schema.channel.createdAt, cursor.createdAt),
+                        lt(schema.channel.id, cursor.id),
+                      ),
+                    ),
                   ),
                 )
               : undefined,
             subscriptionFilter === "subscribed"
               ? isNotNull(schema.channelSubscription.userAddress)
-              : isNull(schema.channelSubscription.userAddress),
+              : undefined,
+            subscriptionFilter === "unsubscribed"
+              ? isNull(schema.channelSubscription.userAddress)
+              : undefined,
           ),
         )
-        .orderBy(desc(schema.channel.createdAt), desc(schema.channel.id))
+        .orderBy(
+          desc(isNotNull(schema.channelSubscription.channelId)),
+          desc(schema.channel.createdAt),
+          desc(schema.channel.id),
+        )
         .limit(limit + 1);
 
       const pageResults = results.slice(0, limit);
@@ -151,7 +184,11 @@ export async function channelsGET(api: OpenAPIHono) {
           pageInfo: {
             hasNextPage,
             nextCursor: nextCursor
-              ? toChannelCursor(nextCursor.channel)
+              ? toChannelCursor({
+                  hasSubscription: !!nextCursor.channel_subscription,
+                  id: nextCursor.channel.id,
+                  createdAt: nextCursor.channel.createdAt,
+                })
               : undefined,
           },
         }),

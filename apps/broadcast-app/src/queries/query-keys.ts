@@ -1,11 +1,7 @@
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
-export function createDiscoverChannelsQueryKey() {
-  return ["discover-channels"] as const;
-}
-
-export function createMyChannelsQueryKey() {
-  return ["my-channels"] as const;
+export function createChannelsQueryKey() {
+  return ["channels"] as const;
 }
 
 export function createChannelQueryKey(channelId: bigint) {

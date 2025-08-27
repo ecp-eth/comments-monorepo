@@ -2,11 +2,11 @@ import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import type { Channel } from "@/api/schemas";
 import { toast } from "sonner";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
-import { useRemoveChannelFromMyChannelsQuery } from "@/queries/my-channels";
 import { useRemoveERC721RecordToPrimaryList } from "./efp/useRemoveERC721RecordFromPrimaryList";
 import { useMiniAppContext } from "./useMiniAppContext";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
+import { useUpdateChannelInChannelsQuery } from "@/queries/channels";
 
 type UseUnsubscribeToChannelOptions = {
   channel: Channel;
@@ -20,8 +20,7 @@ export function useUnsubscribeToChannel({
   ...options
 }: UseUnsubscribeToChannelOptions) {
   const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
-  const removeChannelFromMyChannelsQuery =
-    useRemoveChannelFromMyChannelsQuery();
+  const updateChannelInChannelsQuery = useUpdateChannelInChannelsQuery();
   const { mutateAsync: removeERC721RecordFromPrimaryList } =
     useRemoveERC721RecordToPrimaryList({
       channelId: channel.id,
@@ -36,7 +35,15 @@ export function useUnsubscribeToChannel({
     onSuccess() {
       toast.success(`Unsubscribed from channel ${channel.name}`);
 
-      removeChannelFromMyChannelsQuery(channel.id);
+      updateChannelInChannelsQuery(channel.id, {
+        isSubscribed: false,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          ...(miniAppContext.isInMiniApp && {
+            [miniAppContext.client.clientFid]: false,
+          }),
+        },
+      });
 
       updateChannelInChannelQuery(channel.id, {
         isSubscribed: false,

@@ -1,6 +1,6 @@
 import { BroadcastHookABI } from "@/abi/generated/broadcast-hook-abi";
 import { publicEnv } from "@/env/public";
-import { createDiscoverChannelsQueryKey } from "@/queries/query-keys";
+import { createChannelsQueryKey } from "@/queries/query-keys";
 import { IndexerAPIMetadataSchema } from "@ecp.eth/sdk/indexer";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -67,7 +67,7 @@ export function useCreateChannel() {
       );
 
       queryClient.refetchQueries({
-        queryKey: [createDiscoverChannelsQueryKey()],
+        queryKey: createChannelsQueryKey(),
       });
     },
   });

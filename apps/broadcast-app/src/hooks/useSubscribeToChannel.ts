@@ -1,7 +1,6 @@
 import { sdk } from "@farcaster/miniapp-sdk";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { useMiniAppContext } from "./useMiniAppContext";
-import { useRemoveChannelFromDiscoverQuery } from "@/queries/discover-channels";
 import { useUpdateChannelInChannelQuery } from "@/queries/channel";
 import { toast } from "sonner";
 import type { Channel } from "@/api/schemas";
@@ -13,6 +12,7 @@ import {
 import { useAuthProtect } from "@/components/auth-provider";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
+import { useUpdateChannelInChannelsQuery } from "@/queries/channels";
 
 type UseSubscribeToChannelReturnValue =
   | (SetMiniAppNotificationStatusResponse & { clientFid: number })
@@ -30,8 +30,8 @@ export function useSubscribeToChannel({
   ...options
 }: UseSubscribeToChannelOptions) {
   const miniAppContext = useMiniAppContext();
+  const updateChannelInChannelsQuery = useUpdateChannelInChannelsQuery();
   const updateChannelInChannelQuery = useUpdateChannelInChannelQuery();
-  const removeChannelFromDiscoverQuery = useRemoveChannelFromDiscoverQuery();
   const { mutateAsync: addERC721RecordToPrimaryList } =
     useAddERC721RecordToPrimaryList({
       channelId: channel.id,
@@ -88,7 +88,15 @@ export function useSubscribeToChannel({
     onSuccess(data) {
       toast.success(`Subscribed to channel ${channel.name}`);
 
-      removeChannelFromDiscoverQuery(channel.id);
+      updateChannelInChannelsQuery(channel.id, {
+        isSubscribed: true,
+        notificationSettings: {
+          ...channel.notificationSettings,
+          ...(data && {
+            [data.clientFid]: data.notificationsEnabled,
+          }),
+        },
+      });
 
       updateChannelInChannelQuery(channel.id, {
         isSubscribed: true,
