@@ -21,7 +21,7 @@ import {
   Loader2Icon,
   RotateCwIcon,
 } from "lucide-react";
-import { useAccount, useConnect, usePublicClient } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { ChannelManagerABI } from "@ecp.eth/sdk";
 import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
 import { useQuery } from "@tanstack/react-query";
@@ -34,6 +34,7 @@ import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { useConnectAccount } from "@/hooks/useConnectAccount";
 
 interface ChannelCreationBottomSheetProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ export function ChannelCreationBottomSheet({
   onClose,
 }: ChannelCreationBottomSheetProps) {
   const { address } = useAccount();
-  const { connect, connectors } = useConnect();
+  const connectAccount = useConnectAccount();
   const publicClient = usePublicClient();
   const onCloseRef = useFreshRef(onClose);
 
@@ -76,12 +77,6 @@ export function ChannelCreationBottomSheet({
       };
     },
   });
-
-  const handleConnectWallet = async () => {
-    connect({
-      connector: connectors[0],
-    });
-  };
 
   const handleClose = () => {
     onCloseRef.current();
@@ -115,7 +110,7 @@ export function ChannelCreationBottomSheet({
             <p className="text-muted-foreground mb-6">
               You need to connect your wallet to create a channel
             </p>
-            <Button onClick={handleConnectWallet} className="w-full">
+            <Button onClick={() => connectAccount()} className="w-full">
               <Wallet className="h-4 w-4 mr-2" />
               Connect Wallet
             </Button>
