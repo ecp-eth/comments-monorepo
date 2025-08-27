@@ -63,7 +63,7 @@ export function useCreateChannel() {
     },
     onSuccess: () => {
       toast.success(
-        "Channel created successfully. It can take a while to appear in the discover channels list.",
+        "Channel created successfully. It can take a while to appear in the channels list.",
       );
 
       queryClient.refetchQueries({
