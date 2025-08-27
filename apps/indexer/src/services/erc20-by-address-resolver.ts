@@ -2,8 +2,8 @@ import { LRUCache } from "lru-cache";
 import { env } from "../env.ts";
 import {
   createERC20ByAddressResolver,
-  ERC20ByAddressResolverKey,
-  ResolvedERC20Data,
+  type ERC20ByAddressResolverKey,
+  type ResolvedERC20Data,
 } from "../resolvers/index.ts";
 
 // could also use redis

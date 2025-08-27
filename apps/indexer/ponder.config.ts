@@ -62,7 +62,7 @@ const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
   >,
 );
 
-console.log(`Detected chains:`, chains);
+console.log(`Detected chains:`, Object.keys(chains));
 
 export default createConfig({
   chains,
