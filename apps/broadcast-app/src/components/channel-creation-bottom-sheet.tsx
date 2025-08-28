@@ -11,15 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
-  Wallet,
-  Users,
-  Loader2,
-  Info,
-  AlertTriangleIcon,
+  WalletIcon,
+  UsersIcon,
   Loader2Icon,
+  AlertTriangleIcon,
   RotateCwIcon,
+  InfoIcon,
 } from "lucide-react";
 import { useAccount, usePublicClient } from "wagmi";
 import { ChannelManagerABI } from "@ecp.eth/sdk";
@@ -105,13 +104,13 @@ export function ChannelCreationBottomSheet({
       return (
         <div className="space-y-4">
           <div className="text-center py-8">
-            <Wallet className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <WalletIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Connect Your Wallet</h3>
             <p className="text-muted-foreground mb-6">
               You need to connect your wallet to create a channel
             </p>
             <Button onClick={() => connectAccount()} className="w-full">
-              <Wallet className="h-4 w-4 mr-2" />
+              <WalletIcon className="h-4 w-4 mr-2" />
               Connect Wallet
             </Button>
           </div>
@@ -170,7 +169,7 @@ export function ChannelCreationBottomSheet({
       return (
         <div className="space-y-4">
           <div className="text-center py-8">
-            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <UsersIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">Join the Waitlist</h3>
             <p className="text-muted-foreground mb-6">
               Channel creation is currently limited to whitelisted users. Join
@@ -183,7 +182,7 @@ export function ChannelCreationBottomSheet({
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <Users className="h-4 w-4" />
+                <UsersIcon className="h-4 w-4" />
                 Join waitlist
               </Link>
             </Button>
@@ -218,11 +217,16 @@ export function ChannelCreationBottomSheet({
     return (
       <div className="space-y-4">
         <Alert>
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            Creating a channel costs{" "}
-            <strong>{formatEther(query.data.channelCreationFee)} ETH</strong> to
-            prevent spam and ensure quality.
+          <InfoIcon />
+          <AlertTitle className="col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight">
+            Channel Creation Fee
+          </AlertTitle>
+          <AlertDescription className="text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed">
+            <span>
+              Creating a channel costs{" "}
+              <strong>{formatEther(query.data.channelCreationFee)} ETH</strong>{" "}
+              to prevent spam and ensure quality.
+            </span>
           </AlertDescription>
         </Alert>
 
@@ -286,7 +290,7 @@ export function ChannelCreationBottomSheet({
             >
               {createChannel.isPending ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
                   Creating Channel...
                 </>
               ) : (
