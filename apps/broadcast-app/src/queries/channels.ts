@@ -21,8 +21,6 @@ export function useChannelsQuery() {
         searchParams.set("cursor", cursor);
       }
 
-      searchParams.set("limit", "2");
-
       const response = await secureFetch(auth, async ({ headers }) => {
         return fetch(
           `/api/apps/${publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS}/channels${searchParams.size > 0 ? `?${searchParams.toString()}` : ""}`,
