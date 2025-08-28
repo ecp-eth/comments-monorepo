@@ -3,16 +3,19 @@
 import * as Sentry from "@sentry/node";
 import "./init.ts";
 import { env } from "../src/env.ts";
-import { eventOutboxFanOutService } from "../src/services/index.ts";
+import { webhookEventDeliveryService } from "../src/services/index.ts";
+
+// @TODO wait for indexer to be ready and then start fanning out events.
+// @TODO perhaps add pm2 or something to package.json that will just restart workers if they die but fail if the indexer fails.
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
   debug: !(process.env.NODE_ENV === "production" && !!env.SENTRY_DSN),
   dsn: env.SENTRY_DSN,
-  environment: `fan-out-worker-${process.env.NODE_ENV || "development"}`,
+  environment: `webhook-event-delivery-worker-${process.env.NODE_ENV || "development"}`,
 });
 
-console.log("Starting fan out worker");
+console.log("Starting webhook event delivery worker");
 const abortController = new AbortController();
 
 // graceful shutdown
@@ -23,16 +26,16 @@ const abortController = new AbortController();
   });
 });
 
-await eventOutboxFanOutService
-  .fanOutEvents({
+await webhookEventDeliveryService
+  .deliverEvents({
     signal: abortController.signal,
   })
   .then(() => {
-    console.log("Fan out was aborted");
+    console.log("Webhook event delivery worker was aborted");
     process.exit(0);
   })
   .catch((e) => {
-    console.error("Fan out worker failed", e);
+    console.error("Webhook event delivery worker failed", e);
     Sentry.captureException(e);
     Sentry.flush().then(() => {
       process.exit(1);
