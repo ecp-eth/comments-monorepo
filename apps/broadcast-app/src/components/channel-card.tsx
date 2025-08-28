@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { PlusIcon, XIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import type { Channel } from "@/api/schemas";
 import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
-import { useUnsubscribeToChannel } from "@/hooks/useUnsubscribeFromChannel";
 import { cn, getChannelNftImageUrl } from "@/lib/utils";
 import { ChannelCardNotificationsToggleButton } from "./channel-card-notifications-toggle-button";
 
@@ -18,12 +17,8 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const subscribeMutation = useSubscribeToChannel({
     channel,
   });
-  const unsubscribeMutation = useUnsubscribeToChannel({
-    channel,
-  });
 
   const showSubscribeButton = !channel.isSubscribed;
-  const showUnsubscribeButton = channel.isSubscribed;
 
   return (
     <div className="flex items-center space-x-3 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
@@ -68,23 +63,6 @@ export function ChannelCard({ channel }: ChannelCardProps) {
               )}
             />
             Subscribe
-          </Button>
-        )}
-
-        {showUnsubscribeButton && (
-          <Button
-            disabled={unsubscribeMutation.isPending}
-            variant="outline"
-            size="sm"
-            onClick={() => unsubscribeMutation.mutate()}
-            className="text-xs bg-transparent"
-          >
-            <XIcon
-              className={cn(
-                "h-3 w-3",
-                unsubscribeMutation.isPending && "animate-pulse",
-              )}
-            />
           </Button>
         )}
       </div>
