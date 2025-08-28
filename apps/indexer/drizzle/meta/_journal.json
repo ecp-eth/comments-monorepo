@@ -71,6 +71,13 @@
       "when": 1756280834060,
       "tag": "0009_webhook_deliveries",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1756370858466,
+      "tag": "0010_webhook_deliveries_improvements",
+      "breakpoints": true
     }
   ]
 }
