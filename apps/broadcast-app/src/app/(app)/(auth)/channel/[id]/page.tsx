@@ -66,6 +66,7 @@ import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useDisconnectWalletAndLogout } from "@/hooks/useDisconnectWalletAndLogout";
 import { useMiniAppContext } from "@/hooks/useMiniAppContext";
+import { useChannelLogo } from "@/hooks/use-channel-logo";
 
 export default function ChannelPage(props: {
   params: Promise<{ id: string }>;
@@ -215,6 +216,7 @@ export default function ChannelPage(props: {
   }
 
   if (commentsQuery.status === "error") {
+    console.error("Error fetching comments:", commentsQuery.error);
     return (
       <div className="h-screen max-w-[400px] mx-auto bg-background flex flex-col items-center justify-center p-4 text-center">
         <AlertTriangleIcon className="h-12 w-12 text-destructive mb-4" />
@@ -312,15 +314,7 @@ export default function ChannelPage(props: {
             <ArrowLeftIcon className="h-4 w-4" />
           </Button>
 
-          <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={getChannelNftImageUrl(channel.id, channel.chainId)}
-              alt={channel.name}
-            />
-            <AvatarFallback>
-              {channel.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <ChannelLogo channel={channel} />
 
           <div className="flex-1 min-w-0">
             <h1 className="font-semibold truncate">{channel.name}</h1>
@@ -544,5 +538,19 @@ function ChannelDropdownMenu({ channel }: ChannelDropdownMenuProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+function ChannelLogo({ channel }: { channel: Channel }) {
+  const logoUrl = useChannelLogo(channel);
+
+  return (
+    <Avatar className="h-10 w-10">
+      <AvatarImage
+        src={logoUrl || getChannelNftImageUrl(channel.id, channel.chainId)}
+        alt={channel.name}
+      />
+      <AvatarFallback>{channel.name.charAt(0).toUpperCase()}</AvatarFallback>
+    </Avatar>
   );
 }

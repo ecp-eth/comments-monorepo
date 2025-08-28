@@ -70,6 +70,8 @@ const responseSchema = z.object({
   }),
 });
 
+type ResponseInput = z.input<typeof responseSchema>;
+
 export async function channelsGET(api: OpenAPIHono) {
   api.openapi(
     {
@@ -99,8 +101,6 @@ export async function channelsGET(api: OpenAPIHono) {
       const { limit, cursor, subscriptionFilter } = c.req.valid("query");
       const { appId } = c.req.valid("param");
       const userAddress = c.get("user")!.address;
-
-      console.log(cursor);
 
       const results = await db
         .select()
@@ -172,6 +172,7 @@ export async function channelsGET(api: OpenAPIHono) {
               createdAt: result.channel.createdAt,
               updatedAt: result.channel.updatedAt,
               notificationSettings,
+              metadata: result.channel.metadata,
             })),
         ),
       );
@@ -191,7 +192,7 @@ export async function channelsGET(api: OpenAPIHono) {
                 })
               : undefined,
           },
-        }),
+        } satisfies ResponseInput),
         200,
       );
     },

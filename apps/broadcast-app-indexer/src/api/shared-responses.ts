@@ -1,4 +1,5 @@
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { IndexerAPIMetadataSchema } from "@ecp.eth/sdk/indexer";
 import { z } from "@hono/zod-openapi";
 
 export const BadRequestResponse = z.object({
@@ -23,7 +24,10 @@ export const ChannelResponse = z.object({
   updatedAt: z.date().transform((val) => val.toISOString()),
   isSubscribed: z.boolean(),
   notificationSettings: z.record(z.coerce.number().int(), z.boolean()),
+  metadata: IndexerAPIMetadataSchema,
 });
+
+export type ChannelResponseInput = z.input<typeof ChannelResponse>;
 
 export const ChannelSubscriptionUpdateResponse = z.object({
   channelId: z.bigint().transform((val) => val.toString()),

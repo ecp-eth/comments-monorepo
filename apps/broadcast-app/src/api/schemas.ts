@@ -3,6 +3,7 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import z from "zod";
 import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
+import { IndexerAPIMetadataSchema } from "@ecp.eth/sdk/indexer/schemas";
 
 export const GenerateUploadUrlResponseSchema = z.object({
   url: z.string().url(),
@@ -81,6 +82,7 @@ export const ChannelSchema = z.object({
   updatedAt: z.coerce.date(),
   isSubscribed: z.boolean(),
   notificationSettings: z.record(z.coerce.number().int(), z.boolean()),
+  metadata: IndexerAPIMetadataSchema,
 });
 
 export type Channel = z.infer<typeof ChannelSchema>;

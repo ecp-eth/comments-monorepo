@@ -2,6 +2,7 @@ import { type OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   BadRequestResponse,
   ChannelResponse,
+  type ChannelResponseInput,
   NotFoundResponse,
 } from "../../../../shared-responses";
 import {
@@ -96,6 +97,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
           createdAt: channel.createdAt,
           updatedAt: channel.updatedAt,
           isSubscribed: !!subscription,
+          metadata: channel.metadata,
           // channel notification settings per farcaster client for this app
           notificationSettings:
             await farcasterChannelNotificationSettingsLoader.load({
@@ -103,7 +105,7 @@ export async function channelGET(api: OpenAPIHono): Promise<void> {
               channelId: channel.id,
               userAddress,
             }),
-        }),
+        } satisfies ChannelResponseInput),
         200,
       );
     },

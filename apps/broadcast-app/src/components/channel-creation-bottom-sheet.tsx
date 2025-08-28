@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -19,6 +19,9 @@ import {
   AlertTriangleIcon,
   RotateCwIcon,
   InfoIcon,
+  ImageIcon,
+  Upload,
+  XIcon,
 } from "lucide-react";
 import { useAccount, usePublicClient } from "wagmi";
 import { ChannelManagerABI } from "@ecp.eth/sdk";
@@ -48,7 +51,12 @@ export function ChannelCreationBottomSheet({
   const connectAccount = useConnectAccount();
   const publicClient = usePublicClient();
   const onCloseRef = useFreshRef(onClose);
-  const [formState, setFormState] = useState({ name: "", description: "" });
+  const [formState, setFormState] = useState<{
+    logo: File | null;
+    name: string;
+    description: string;
+  }>({ logo: null, name: "", description: "" });
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const query = useQuery({
     enabled: !!address,
@@ -240,12 +248,81 @@ export function ChannelCreationBottomSheet({
 
         <form className="space-y-4" onSubmit={submitMutation.mutate}>
           <div className="space-y-2">
+            <Label>Channel Logo (Optional)</Label>
+            <div className="flex items-center space-x-4">
+              {formState.logo ? (
+                <div className="relative">
+                  <img
+                    src={URL.createObjectURL(formState.logo)}
+                    alt="Channel logo preview"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-border"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                    onClick={() => {
+                      setFormState({ ...formState, logo: null });
+
+                      if (imageInputRef.current) {
+                        imageInputRef.current.value = "";
+                      }
+                    }}
+                  >
+                    <XIcon className="h-3 w-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted/50"
+                  role="button"
+                  tabIndex={0}
+                  title="Upload logo"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex-1">
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/png,image/svg"
+                  onChange={(e) =>
+                    setFormState({
+                      ...formState,
+                      logo: e.target.files?.[0] ?? null,
+                    })
+                  }
+                  className="hidden"
+                  id="logo-upload"
+                  disabled={submitMutation.isPending}
+                />
+                <Label htmlFor="logo-upload" className="cursor-pointer">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    disabled={submitMutation.isPending}
+                    type="button"
+                  >
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      {formState.logo ? "Change Logo" : "Upload Logo"}
+                    </span>
+                  </Button>
+                </Label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="channel-name">Channel Name *</Label>
             <Input
               className={cn(isNameInvalid && "border-destructive")}
               id="channel-name"
               placeholder="Enter channel name"
-              disabled={createChannel.isPending}
+              disabled={submitMutation.isPending}
               name="channel-name"
               value={formState.name}
               onChange={(e) =>
@@ -268,7 +345,7 @@ export function ChannelCreationBottomSheet({
               )}
               id="channel-description"
               placeholder="Describe what your channel is about..."
-              disabled={createChannel.isPending}
+              disabled={submitMutation.isPending}
               name="channel-description"
               value={formState.description}
               onChange={(e) =>

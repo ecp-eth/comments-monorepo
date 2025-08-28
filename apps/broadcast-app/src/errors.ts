@@ -1,6 +1,9 @@
-import { CommentFormSubmitError } from "@ecp.eth/shared/errors";
-
-export class SubmitCommentMutationError extends CommentFormSubmitError {}
+export class SubmitCommentMutationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SubmitCommentMutationError";
+  }
+}
 
 export class ChannelNotFoundError extends Error {
   constructor() {

@@ -8,6 +8,7 @@ import type { Channel } from "@/api/schemas";
 import { useSubscribeToChannel } from "@/hooks/useSubscribeToChannel";
 import { cn, getChannelNftImageUrl } from "@/lib/utils";
 import { ChannelCardNotificationsToggleButton } from "./channel-card-notifications-toggle-button";
+import { useChannelLogo } from "@/hooks/use-channel-logo";
 
 interface ChannelCardProps {
   channel: Channel;
@@ -17,6 +18,7 @@ export function ChannelCard({ channel }: ChannelCardProps) {
   const subscribeMutation = useSubscribeToChannel({
     channel,
   });
+  const logoUrl = useChannelLogo(channel);
 
   const showSubscribeButton = !channel.isSubscribed;
 
@@ -28,7 +30,7 @@ export function ChannelCard({ channel }: ChannelCardProps) {
       >
         <Avatar className="h-12 w-12 shrink-0">
           <AvatarImage
-            src={getChannelNftImageUrl(channel.id, channel.chainId)}
+            src={logoUrl || getChannelNftImageUrl(channel.id, channel.chainId)}
             alt={channel.name}
           />
           <AvatarFallback>

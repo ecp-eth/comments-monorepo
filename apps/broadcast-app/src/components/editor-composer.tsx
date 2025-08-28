@@ -4,10 +4,7 @@ import React, { useCallback, useMemo, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ImageIcon, Loader2Icon, SaveIcon, SendIcon } from "lucide-react";
-import {
-  CommentFormSubmitError,
-  InvalidCommentError,
-} from "@ecp.eth/shared/errors";
+import { CommentFormSubmitError } from "@ecp.eth/shared/errors";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import {
   ALLOWED_UPLOAD_MIME_TYPES,
@@ -134,180 +131,160 @@ export function EditorComposer({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const submitMutation = useMutation({
     mutationFn: async (): Promise<void> => {
-      try {
-        if (!editorRef.current?.editor) {
-          throw new SubmitCommentMutationError("Editor is not initialized");
-        }
+      if (!editorRef.current?.editor) {
+        throw new SubmitCommentMutationError("Editor is not initialized");
+      }
 
-        if (!address) {
-          throw new SubmitCommentMutationError("Wallet not connected");
-        }
+      if (!address) {
+        throw new SubmitCommentMutationError("Wallet not connected");
+      }
 
-        if (!publicClient) {
-          throw new SubmitCommentMutationError("Public client not initialized");
-        }
+      if (!publicClient) {
+        throw new SubmitCommentMutationError("Public client not initialized");
+      }
 
-        const resolvedAuthor = await fetchAuthorData({
-          address,
-          apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
-        }).catch((e) => {
-          // supress the error, we don't want to block the comment submission
-          console.error(e);
-
-          return undefined;
-        });
-
-        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
-
-        await uploads.uploadFiles(filesToUpload, {
-          onSuccess(uploadedFile) {
-            editorRef.current?.setFileAsUploaded(uploadedFile);
-          },
-          onError(fileId) {
-            editorRef.current?.setFileUploadAsFailed(fileId);
-          },
-        });
-
-        const references = extractReferences(
-          editorRef.current.editor.getJSON(),
-        );
-
-        // validate content
-        const content = z
-          .string()
-          .trim()
-          .parse(
-            editorRef.current.editor.getText({
-              blockSeparator: "\n",
-            }),
-          );
-
-        if (comment) {
-          const signedCommentResponse = await signEditComment({
-            author: address,
-            commentId: comment.id,
-            content,
-            metadata: comment.metadata,
-          });
-
-          const { txHash, wait } = await editComment({
-            appSignature: signedCommentResponse.signature,
-            edit: signedCommentResponse.data,
-            writeContract: writeContractAsync,
-            commentsAddress: COMMENT_MANAGER_ADDRESS,
-          });
-
-          await wait({
-            getContractEvents: publicClient.getContractEvents,
-            waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
-          });
-
-          const pendingOperation: PendingEditCommentOperationSchemaType = {
-            action: "edit",
-            chainId: comment.chainId,
-            response: signedCommentResponse,
-            state: {
-              status: "pending",
-            },
-            txHash,
-            type: "non-gasless",
-          };
-
-          commentEdition.start({
-            queryKey,
-            pendingOperation,
-          });
-
-          commentEdition.success({
-            queryKey,
-            pendingOperation,
-          });
-        } else {
-          const signedCommentResponse = await signCommentOrReaction({
-            author: address,
-            channelId,
-            content,
-            metadata: [],
-            ...(replyingTo
-              ? { parentId: replyingTo.id }
-              : {
-                  targetUri: getChannelCaipUri({
-                    chainId,
-                    channelId,
-                  }),
-                }),
-          });
-
-          const { txHash, wait } = await postComment({
-            commentsAddress: COMMENT_MANAGER_ADDRESS,
-            appSignature: signedCommentResponse.signature,
-            comment: signedCommentResponse.data,
-            writeContract: writeContractAsync,
-          });
-
-          const postedComment = await wait({
-            getContractEvents: publicClient.getContractEvents,
-            waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
-          });
-
-          const pendingOperation: PendingPostCommentOperationSchemaType = {
-            action: "post",
-            type: "non-gasless",
-            txHash,
-            chainId,
-            references,
-            response: {
-              data: postedComment
-                ? {
-                    id: postedComment.commentId,
-                    app: postedComment.app,
-                    author: postedComment.author,
-                    channelId: postedComment.channelId,
-                    content: postedComment.content,
-                    commentType: postedComment.commentType,
-                    deadline: signedCommentResponse.data.deadline,
-                    metadata: postedComment.metadata.slice(),
-                    parentId: postedComment.parentId,
-                    targetUri: postedComment.targetUri,
-                  }
-                : signedCommentResponse.data,
-              signature: signedCommentResponse.signature,
-              hash: signedCommentResponse.hash,
-            },
-            state: {
-              status: "pending",
-            },
-            resolvedAuthor,
-          };
-
-          // insert
-          commentSubmission.start({
-            pendingOperation,
-            queryKey,
-          });
-
-          // mark as posted
-          commentSubmission.success({
-            queryKey,
-            pendingOperation,
-          });
-        }
-      } catch (e) {
-        if (e instanceof z.ZodError) {
-          throw new InvalidCommentError(
-            e.flatten().fieldErrors as Record<string, string[]>,
-          );
-        } else if (e instanceof SignCommentError) {
-          throw new SubmitCommentMutationError(e.message);
-        } else if (e instanceof ContractFunctionExecutionError) {
-          throw new SubmitCommentMutationError(
-            formatContractFunctionExecutionError(e),
-          );
-        }
-
+      const resolvedAuthor = await fetchAuthorData({
+        address,
+        apiUrl: publicEnv.NEXT_PUBLIC_INDEXER_URL,
+      }).catch((e) => {
+        // supress the error, we don't want to block the comment submission
         console.error(e);
 
-        throw e;
+        return undefined;
+      });
+
+      const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+
+      await uploads.uploadFiles(filesToUpload, {
+        onSuccess(uploadedFile) {
+          editorRef.current?.setFileAsUploaded(uploadedFile);
+        },
+        onError(fileId) {
+          editorRef.current?.setFileUploadAsFailed(fileId);
+        },
+      });
+
+      const references = extractReferences(editorRef.current.editor.getJSON());
+
+      // validate content
+      const content = z
+        .string()
+        .trim()
+        .parse(
+          editorRef.current.editor.getText({
+            blockSeparator: "\n",
+          }),
+        );
+
+      if (comment) {
+        const signedCommentResponse = await signEditComment({
+          author: address,
+          commentId: comment.id,
+          content,
+          metadata: comment.metadata,
+        });
+
+        const { txHash, wait } = await editComment({
+          appSignature: signedCommentResponse.signature,
+          edit: signedCommentResponse.data,
+          writeContract: writeContractAsync,
+          commentsAddress: COMMENT_MANAGER_ADDRESS,
+        });
+
+        await wait({
+          getContractEvents: publicClient.getContractEvents,
+          waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
+        });
+
+        const pendingOperation: PendingEditCommentOperationSchemaType = {
+          action: "edit",
+          chainId: comment.chainId,
+          response: signedCommentResponse,
+          state: {
+            status: "pending",
+          },
+          txHash,
+          type: "non-gasless",
+        };
+
+        commentEdition.start({
+          queryKey,
+          pendingOperation,
+        });
+
+        commentEdition.success({
+          queryKey,
+          pendingOperation,
+        });
+      } else {
+        const signedCommentResponse = await signCommentOrReaction({
+          author: address,
+          channelId,
+          content,
+          metadata: [],
+          ...(replyingTo
+            ? { parentId: replyingTo.id }
+            : {
+                targetUri: getChannelCaipUri({
+                  chainId,
+                  channelId,
+                }),
+              }),
+        });
+
+        const { txHash, wait } = await postComment({
+          commentsAddress: COMMENT_MANAGER_ADDRESS,
+          appSignature: signedCommentResponse.signature,
+          comment: signedCommentResponse.data,
+          writeContract: writeContractAsync,
+        });
+
+        const postedComment = await wait({
+          getContractEvents: publicClient.getContractEvents,
+          waitForTransactionReceipt: publicClient.waitForTransactionReceipt,
+        });
+
+        const pendingOperation: PendingPostCommentOperationSchemaType = {
+          action: "post",
+          type: "non-gasless",
+          txHash,
+          chainId,
+          references,
+          response: {
+            data: postedComment
+              ? {
+                  id: postedComment.commentId,
+                  app: postedComment.app,
+                  author: postedComment.author,
+                  channelId: postedComment.channelId,
+                  content: postedComment.content,
+                  commentType: postedComment.commentType,
+                  deadline: signedCommentResponse.data.deadline,
+                  metadata: postedComment.metadata.slice(),
+                  parentId: postedComment.parentId,
+                  targetUri: postedComment.targetUri,
+                }
+              : signedCommentResponse.data,
+            signature: signedCommentResponse.signature,
+            hash: signedCommentResponse.hash,
+          },
+          state: {
+            status: "pending",
+          },
+          resolvedAuthor,
+        };
+
+        // insert
+        commentSubmission.start({
+          pendingOperation,
+          queryKey,
+        });
+
+        // mark as posted
+        commentSubmission.success({
+          queryKey,
+          pendingOperation,
+        });
       }
     },
     onSuccess() {
@@ -316,8 +293,18 @@ export function EditorComposer({
       onSubmitSuccess?.();
     },
     onError(error) {
-      if (error instanceof InvalidCommentError) {
+      if (error instanceof z.ZodError) {
         editorRef.current?.focus();
+        toast.error("Invalid comment, you can't send empty comment.");
+      } else if (error instanceof SignCommentError) {
+        toast.error("Failed to sign the comment. Please try again.");
+      } else if (error instanceof ContractFunctionExecutionError) {
+        toast.error(formatContractFunctionExecutionError(error));
+      } else if (error instanceof SubmitCommentMutationError) {
+        toast.error(error.message);
+      } else {
+        console.error(error);
+        toast.error("Failed to submit comment. Please try again.");
       }
     },
   });
@@ -373,7 +360,7 @@ export function EditorComposer({
 
   return (
     <form
-      className="space-y-3"
+      className="flex gap-1 items-end"
       action={async () => {
         try {
           await submitMutation.mutateAsync();
@@ -382,6 +369,16 @@ export function EditorComposer({
         }
       }}
     >
+      <Button
+        className="min-h-[38px]"
+        variant="ghost"
+        disabled={submitMutation.isPending}
+        onClick={handleAddFileClick}
+        type="button"
+        title="Add file"
+      >
+        <ImageIcon className="h-4 w-4" />
+      </Button>
       <input
         ref={fileInputRef}
         type="file"
@@ -391,6 +388,8 @@ export function EditorComposer({
         className="hidden"
       />
       <Editor
+        className="min-h-4 px-2 py-2"
+        wrapperClassName="flex-1"
         autoFocus={autoFocus}
         defaultValue={defaultValue}
         ref={editorRef}
@@ -415,33 +414,21 @@ export function EditorComposer({
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={submitMutation.isPending}
-          onClick={handleAddFileClick}
-          type="button"
-        >
-          <ImageIcon className="h-4 w-4" />
-        </Button>
-
-        <Button
-          className="gap-2"
-          disabled={submitMutation.isPending}
-          size="sm"
-          type="submit"
-        >
-          {submitMutation.isPending ? (
-            <Loader2Icon className="h-4 w-4 animate-spin" />
-          ) : submitIcon === "send" ? (
-            <SendIcon className="h-4 w-4" />
-          ) : (
-            <SaveIcon className="h-4 w-4" />
-          )}
-          {submitMutation.isPending ? submittingLabel : submitLabel}
-        </Button>
-      </div>
+      <Button
+        title={submitMutation.isPending ? submittingLabel : submitLabel}
+        className="min-h-[38px]"
+        disabled={submitMutation.isPending}
+        type="submit"
+        variant="ghost"
+      >
+        {submitMutation.isPending ? (
+          <Loader2Icon className="h-4 w-4 animate-spin" />
+        ) : submitIcon === "send" ? (
+          <SendIcon className="h-4 w-4" />
+        ) : (
+          <SaveIcon className="h-4 w-4" />
+        )}
+      </Button>
     </form>
   );
 }
