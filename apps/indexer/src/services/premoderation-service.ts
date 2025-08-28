@@ -5,16 +5,17 @@ import type {
   CommentPremoderationServiceModerateResult,
   ModerationStatus,
   CommentModerationClassfierResult,
-} from "./types";
+} from "./types.ts";
 import type { Hex } from "@ecp.eth/sdk/core";
-import type { DB } from "./db";
+import type { DB } from "./db.ts";
 import { and, desc, eq, lt } from "drizzle-orm";
-import { schema } from "../../schema";
-import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
+import { schema } from "../../schema.ts";
+import type { CommentModerationStatusesSelectType } from "../../schema.offchain.ts";
 import {
   CommentModerationStatusNotFoundError,
   CommentNotFoundError,
-} from "./errors";
+} from "./errors.ts";
+import { createCommentModerationStatusUpdatedEvent } from "../events/comment/index.ts";
 
 type PremoderationServiceOptions = {
   classificationThreshold: number;
@@ -199,10 +200,29 @@ export class PremoderationService implements ICommentPremoderationService {
         .set({
           moderationStatus: status,
           moderationStatusChangedAt: changedAt,
+          updatedAt: changedAt,
         })
         .where(eq(schema.comment.id, commentId))
         .returning()
         .execute();
+
+      if (updatedComment) {
+        const commentModerationStatusEvent =
+          createCommentModerationStatusUpdatedEvent({
+            comment: updatedComment,
+          });
+
+        await this.db
+          .insert(schema.eventOutbox)
+          .values({
+            aggregateType: "comment",
+            aggregateId: commentModerationStatusEvent.data.comment.id,
+            eventType: commentModerationStatusEvent.event,
+            eventUid: commentModerationStatusEvent.uid,
+            payload: commentModerationStatusEvent,
+          })
+          .execute();
+      }
 
       if (status === "pending") {
         // keep the old revisions untouched

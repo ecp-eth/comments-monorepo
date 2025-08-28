@@ -1,5 +1,10 @@
 import { createConfig } from "ponder";
-import { http, Transport } from "viem";
+import {
+  createPublicClient,
+  http,
+  type PublicClient,
+  type Transport,
+} from "viem";
 import {
   ChannelManagerABI,
   CommentManagerABI,
@@ -23,13 +28,19 @@ const chains = Object.entries(process.env).reduce(
         throw new Error(`Chain ${chainId} not supported by ECP`);
       }
 
+      const transport = http(value);
+
       acc[chainId] = {
         id: chainId,
-        transport: http(value),
+        transport,
         disableCache: chainId === 31337,
         startBlock,
         channelManagerAddress: supportedChain.channelManagerAddress,
         commentManagerAddress: supportedChain.commentManagerAddress,
+        publicClient: createPublicClient({
+          transport,
+          chain: supportedChain.chain,
+        }),
       };
     }
     return acc;
@@ -43,11 +54,12 @@ const chains = Object.entries(process.env).reduce(
       startBlock?: number;
       channelManagerAddress: Hex;
       commentManagerAddress: Hex;
+      publicClient: PublicClient;
     }
   >,
 );
 
-console.log(`Detected chains:`, chains);
+console.log(`Detected chains:`, Object.keys(chains));
 
 export default createConfig({
   chains,

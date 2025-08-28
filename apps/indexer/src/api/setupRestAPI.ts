@@ -19,6 +19,21 @@ import { setupGetReports } from "./reports/get";
 import { setupGetReport } from "./reports/[reportId]/get";
 import { setupPatchReport } from "./reports/[reportId]/patch";
 import { setupAdminBotWebhook } from "./webhook/bot/post";
+import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
+import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
+import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
+import { setupUserMe } from "./user/me/get";
+import { setupAppCreate } from "./apps/post";
+import { setupAppDelete } from "./apps/[id]/delete";
+import { setupAppSecretRefresh } from "./apps/[id]/secret/refresh/post";
+import { setupAppsGet } from "./apps/get";
+import { setupAppGet } from "./apps/[id]/get";
+import { setupAppWebhookCreate } from "./apps/[id]/webhooks/create";
+import { setupAppWebhooksGet } from "./apps/[id]/webhooks/get";
+import { setupAppWebhookDelete } from "./apps/[id]/webhooks/[id]/delete";
+import { setupAppWebhookGet } from "./apps/[id]/webhooks/[id]/get";
+import { setupAppWebhookPatch } from "./apps/[id]/webhooks/[id]/patch";
+import { setupAppWebhookTest } from "./apps/[id]/webhooks/[id]/test/post";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -41,6 +56,21 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetReport(app);
   setupPatchReport(app);
   setupAdminBotWebhook(app);
+  setupAuthSiweNonce(app);
+  setupAuthSiweVerify(app);
+  setupAuthSiweRefresh(app);
+  setupUserMe(app);
+  setupAppCreate(app);
+  setupAppDelete(app);
+  setupAppSecretRefresh(app);
+  setupAppsGet(app);
+  setupAppGet(app);
+  setupAppWebhookCreate(app);
+  setupAppWebhooksGet(app);
+  setupAppWebhookDelete(app);
+  setupAppWebhookGet(app);
+  setupAppWebhookPatch(app);
+  setupAppWebhookTest(app);
 
   return app;
 }

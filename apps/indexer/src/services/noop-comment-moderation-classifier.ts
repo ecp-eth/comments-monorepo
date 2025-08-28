@@ -4,7 +4,7 @@ import {
   CommentModerationLabel,
   type CommentModerationLabelsWithScore,
   type ModerationNotificationServicePendingComment,
-} from "./types";
+} from "./types.ts";
 import type { CommentSelectType } from "ponder:schema";
 
 /**

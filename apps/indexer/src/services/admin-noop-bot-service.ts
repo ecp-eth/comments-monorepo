@@ -1,5 +1,5 @@
 import type { Handler } from "hono";
-import type { IAdminTelegramBotService } from "./types";
+import type { IAdminTelegramBotService } from "./types.ts";
 
 export class NoopAdminBotService implements IAdminTelegramBotService {
   async initialize(): Promise<void> {
