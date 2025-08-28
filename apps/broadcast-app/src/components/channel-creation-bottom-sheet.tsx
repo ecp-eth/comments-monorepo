@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -23,7 +23,7 @@ import {
 import { useAccount, usePublicClient } from "wagmi";
 import { ChannelManagerABI } from "@ecp.eth/sdk";
 import { CHANNEL_MANAGER_ADDRESS } from "@/wagmi/client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { BroadcastHookABI } from "@/abi/generated/broadcast-hook-abi";
 import { publicEnv } from "@/env/public";
 import { ContractFunctionExecutionError, formatEther } from "viem";
@@ -48,6 +48,7 @@ export function ChannelCreationBottomSheet({
   const connectAccount = useConnectAccount();
   const publicClient = usePublicClient();
   const onCloseRef = useFreshRef(onClose);
+  const [formState, setFormState] = useState({ name: "", description: "" });
 
   const query = useQuery({
     enabled: !!address,
@@ -83,21 +84,28 @@ export function ChannelCreationBottomSheet({
 
   const createChannel = useCreateChannel();
 
-  const handleCreateChannelSubmit = useCallback(
-    async (formData: FormData, channelCreationFee: bigint) => {
-      const name = formData.get("channel-name") as string;
-      const description = formData.get("channel-description") as string;
+  const submitMutation = useMutation({
+    mutationFn: async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      if (query.status !== "success") {
+        throw new Error("Not ready to create channel");
+      }
+
+      if (!query.data.isWhitelisted) {
+        throw new Error("You are not whitelisted");
+      }
+
+      const channelCreationFee = query.data.channelCreationFee;
 
       await createChannel.mutateAsync({
-        name,
-        description,
+        ...formState,
         fee: channelCreationFee,
       });
 
       onCloseRef.current();
     },
-    [createChannel, onCloseRef],
-  );
+  });
 
   const renderContent = () => {
     if (!address) {
@@ -230,15 +238,7 @@ export function ChannelCreationBottomSheet({
           </AlertDescription>
         </Alert>
 
-        <form
-          className="space-y-4"
-          action={(formData) =>
-            handleCreateChannelSubmit(
-              formData,
-              query.data.channelCreationFee,
-            ).catch(() => {})
-          }
-        >
+        <form className="space-y-4" onSubmit={submitMutation.mutate}>
           <div className="space-y-2">
             <Label htmlFor="channel-name">Channel Name *</Label>
             <Input
@@ -247,6 +247,10 @@ export function ChannelCreationBottomSheet({
               placeholder="Enter channel name"
               disabled={createChannel.isPending}
               name="channel-name"
+              value={formState.name}
+              onChange={(e) =>
+                setFormState({ ...formState, name: e.target.value })
+              }
             />
             {isNameInvalid && (
               <p className="text-xs text-destructive">
@@ -266,6 +270,10 @@ export function ChannelCreationBottomSheet({
               placeholder="Describe what your channel is about..."
               disabled={createChannel.isPending}
               name="channel-description"
+              value={formState.description}
+              onChange={(e) =>
+                setFormState({ ...formState, description: e.target.value })
+              }
             />
             {isDescriptionInvalid && (
               <p className="text-xs text-destructive">
@@ -284,11 +292,11 @@ export function ChannelCreationBottomSheet({
               </span>
             )}
             <Button
-              disabled={createChannel.isPending}
+              disabled={submitMutation.isPending}
               className="w-full gap-2"
               type="submit"
             >
-              {createChannel.isPending ? (
+              {submitMutation.isPending ? (
                 <>
                   <Loader2Icon className="h-4 w-4 animate-spin" />
                   Creating Channel...
