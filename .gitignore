@@ -38,6 +38,8 @@ yarn-error.log*
 *.pem
 .envrc
 
+.envrc
+
 # Proxy packages
 
 packages/sdk/abis
@@ -73,3 +75,5 @@ packages/react-editor/extract-references
 packages/react-editor/hooks
 packages/react-editor/parser
 packages/react-editor/types
+
+packages/shared/ethereum-follow-protocol

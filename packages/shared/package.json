@@ -33,6 +33,11 @@
       "import": "./dist/esm/errors.js",
       "default": "./dist/cjs/errors.cjs"
     },
+    "./ethereum-follow-protocol": {
+      "types": "./dist/esm/ethereum-follow-protocol/index.d.ts",
+      "import": "./dist/esm/ethereum-follow-protocol/index.js",
+      "default": "./dist/cjs/ethereum-follow-protocol/index.cjs"
+    },
     "./helpers": {
       "types": "./dist/esm/helpers.d.ts",
       "import": "./dist/esm/helpers.js",

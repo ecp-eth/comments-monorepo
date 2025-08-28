@@ -51,6 +51,7 @@ export type EditorRef = {
 
 export type EditorProps = {
   className?: string;
+  wrapperClassName?: string;
   disabled?: boolean;
   defaultValue?: {
     content: string;
@@ -83,6 +84,7 @@ export type EditorProps = {
 
 export function Editor({
   className,
+  wrapperClassName,
   disabled = false,
   placeholder,
   autoFocus = false,
@@ -293,6 +295,7 @@ export function Editor({
         "relative",
         isDragging &&
           "after:absolute after:inset-0 after:bg-primary/10 after:border-2 after:border-dashed after:border-primary",
+        wrapperClassName,
       )}
     >
       <EditorContent editor={editor} />

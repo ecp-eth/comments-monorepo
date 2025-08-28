@@ -1,5 +1,5 @@
 import z from "zod";
-import { resolveNFTMetadata } from "../../../resolve-nft-metadata";
+import { resolveNFTMetadataAsResponse } from "../../../resolve-nft-metadata";
 import { config } from "../../../config";
 
 const paramsParser = z.object({
@@ -25,5 +25,9 @@ export async function GET(
     return Response.json({ message: "Chain not found" }, { status: 404 });
   }
 
-  return resolveNFTMetadata(chain, paramsResult.data.channelId, request.url);
+  return resolveNFTMetadataAsResponse(
+    chain,
+    paramsResult.data.channelId,
+    request.url,
+  );
 }
