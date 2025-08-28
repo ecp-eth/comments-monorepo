@@ -312,18 +312,23 @@ export const appWebhookDelivery = offchainSchema.table(
     id: bigserial({ mode: "bigint" }).primaryKey(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    appWebhookId: uuid().references(() => appWebhook.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    eventId: bigserial({ mode: "bigint" }).references(() => eventOutbox.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    status: text({ enum: ["pending", "success", "failed"] })
+    leaseUntil: timestamp({ withTimezone: true }),
+    appWebhookId: uuid()
+      .notNull()
+      .references(() => appWebhook.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    eventId: bigserial({ mode: "bigint" })
+      .notNull()
+      .references(() => eventOutbox.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    status: text({ enum: ["pending", "processing", "success", "failed"] })
       .notNull()
       .default("pending"),
-    attemtsCount: integer().notNull().default(0),
+    attemptsCount: integer().notNull().default(0),
     lastError: text(),
   },
   (table) => [
@@ -334,6 +339,14 @@ export const appWebhookDelivery = offchainSchema.table(
       table.nextAttemptAt,
     ),
     index("awd_by_webhook_idx").on(table.appWebhookId),
+    // this index is used to find the head of the queue for each subscription (FIFO)
+    index("aws_heads_per_subscription_idx")
+      .on(table.appWebhookId, table.nextAttemptAt, table.id)
+      .where(sql`${table.status} IN ('pending', 'processing')`),
+    // this index is used to find the inflight deliveries for a subscription
+    index("aws_inflight_idx")
+      .on(table.appWebhookId, table.status, table.leaseUntil)
+      .where(sql`${table.status} = 'processing'`),
   ],
 );
 
@@ -345,6 +358,10 @@ export const appWebhookDeliveryRelations = relations(
       references: [appWebhook.id],
     }),
     attempts: many(appWebhookDeliveryAttempt),
+    event: one(eventOutbox, {
+      fields: [appWebhookDelivery.eventId],
+      references: [eventOutbox.id],
+    }),
   }),
 );
 
@@ -353,13 +370,12 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
   {
     id: bigserial({ mode: "bigint" }).primaryKey(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    appWebhookDeliveryId: bigserial({ mode: "bigint" }).references(
-      () => appWebhookDelivery.id,
-      {
+    appWebhookDeliveryId: bigserial({ mode: "bigint" })
+      .notNull()
+      .references(() => appWebhookDelivery.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      },
-    ),
+      }),
     responseStatus: integer(),
     responseMs: integer(),
     error: text(),
