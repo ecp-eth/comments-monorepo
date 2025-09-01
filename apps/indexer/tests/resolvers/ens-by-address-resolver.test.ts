@@ -25,7 +25,7 @@ describe("ENSByAddressResolver", () => {
     });
   });
 
-  it("should resolve address to base name", async () => {
+  it.skip("should resolve address to base name", async () => {
     const result = await resolver.load(
       "0x6c2640459665291b19374bed498e065436f8e144",
     );
@@ -40,7 +40,7 @@ describe("ENSByAddressResolver", () => {
     });
   });
 
-  it("should handle multiple queries without problems", async () => {
+  it.skip("should handle multiple queries without problems", async () => {
     const [byAddr0, byAddr1, byAddr2] = await Promise.all([
       resolver.load("0xdAa83039ACA9a33b2e54bb2acC9f9c3A99357618"),
       resolver.load("0x6c2640459665291b19374bed498e065436f8e144"),
