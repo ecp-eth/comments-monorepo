@@ -39,6 +39,7 @@
     "@sentry/node": "^9.3.0",
     "@sentry/profiling-node": "^9.3.0",
     "@sentry/tracing": "^7.120.3",
+    "axios": "^1.11.0",
     "commander": "^13.1.0",
     "dataloader": "^2.2.3",
     "drizzle-kit": "^0.31.4",
