@@ -6,7 +6,6 @@ import {
 } from "../../../lib/schemas";
 import { HTTPException } from "hono/http-exception";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
-import { env } from "../../../env";
 
 export const UserMeResponseSchema = z.object({
   id: z.string().uuid(),
