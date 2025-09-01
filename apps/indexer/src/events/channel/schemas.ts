@@ -13,7 +13,7 @@ export const ChannelEvents = [
   "channel:updated",
   "channel:hook:status:updated",
   "channel:metadata:set",
-  "channel:transfer",
+  "channel:transferred",
 ] as const;
 
 export type ChannelEvent = (typeof ChannelEvents)[number];
@@ -121,7 +121,7 @@ export type ChannelMetadataSetEvent = z.infer<
 
 export const ChannelTransferEventSchema = z
   .object({
-    event: z.literal("channel:transfer" satisfies ChannelEvent),
+    event: z.literal("channel:transferred" satisfies ChannelEvent),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
