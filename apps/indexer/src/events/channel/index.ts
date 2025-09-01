@@ -137,10 +137,10 @@ export function ponderEventToUpdateChannelTransferEvent({
   event,
   context,
 }: IndexingFunctionArgs<"CommentsV1ChannelManager:Transfer">): ChannelTransferEvent {
-  const uid = `channel:transfer:${context.chain.id}:${event.block.number}:${event.transaction.hash}:${event.log.logIndex}:${event.args.tokenId}`;
+  const uid = `channel:transferred:${context.chain.id}:${event.block.number}:${event.transaction.hash}:${event.log.logIndex}:${event.args.tokenId}`;
 
   return ChannelTransferEventSchema.parse({
-    event: "channel:transfer",
+    event: "channel:transferred",
     version: 1,
     uid,
     blockNumber: event.block.number,

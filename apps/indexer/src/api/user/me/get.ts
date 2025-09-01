@@ -6,6 +6,7 @@ import {
 } from "../../../lib/schemas";
 import { HTTPException } from "hono/http-exception";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
+import { env } from "../../../env";
 
 export const UserMeResponseSchema = z.object({
   id: z.string().uuid(),
@@ -20,6 +21,7 @@ export const UserMeResponseSchema = z.object({
       method: z.enum(["siwe"]),
     }),
   ),
+  role: z.enum(["admin", "user"]),
 });
 
 export function setupUserMe(app: OpenAPIHono) {
@@ -70,6 +72,7 @@ export function setupUserMe(app: OpenAPIHono) {
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
           authMethods: user.authCredentials,
+          role: user.role,
         }),
         200,
       );

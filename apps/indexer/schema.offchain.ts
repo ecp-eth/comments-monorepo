@@ -118,6 +118,9 @@ export const user = offchainSchema.table("user", {
   id: uuid().primaryKey().defaultRandom(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  role: text({ enum: ["admin", "user"] })
+    .notNull()
+    .default("user"),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
@@ -370,6 +373,7 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
   {
     id: bigserial({ mode: "bigint" }).primaryKey(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    attemptNumber: integer().notNull().default(1),
     appWebhookDeliveryId: bigserial({ mode: "bigint" })
       .notNull()
       .references(() => appWebhookDelivery.id, {

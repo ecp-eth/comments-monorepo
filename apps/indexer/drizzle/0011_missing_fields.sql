@@ -1,0 +1,2 @@
+ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery_attempt" ADD COLUMN "attempt_number" integer DEFAULT 1 NOT NULL;--> statement-breakpoint
+ALTER TABLE "ecp_indexer_schema"."user" ADD COLUMN "role" text DEFAULT 'user' NOT NULL;
