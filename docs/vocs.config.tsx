@@ -58,6 +58,10 @@ export default defineConfig({
           text: "Smart Contracts",
           link: "/integration-options/contract-interactions",
         },
+        {
+          text: "Share to ECP",
+          link: "/integration-options/share-to-ecp",
+        },
       ],
     },
     {

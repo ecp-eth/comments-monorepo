@@ -128,7 +128,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/indexer/read-comments</loc>
-    <lastmod>2025-08-08T09:07:10.000Z</lastmod>
+    <lastmod>2025-08-18T14:09:20.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -147,6 +147,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/integration-options/react-integration</loc>
     <lastmod>2025-06-27T09:35:50.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/integration-options/share-to-ecp</loc>
+    <lastmod>2025-09-01T13:20:52.162Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
