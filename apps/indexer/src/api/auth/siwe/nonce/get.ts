@@ -11,7 +11,7 @@ export function setupAuthSiweNonce(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
-      path: "/auth/siwe/nonce",
+      path: "/api/auth/siwe/nonce",
       tags: ["auth", "siwe"],
       responses: {
         200: {

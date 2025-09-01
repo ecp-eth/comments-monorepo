@@ -22,7 +22,7 @@ export function setupAppCreate(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/apps",
+      path: "/api/apps",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {

@@ -22,7 +22,7 @@ export function setupAppDelete(app: OpenAPIHono) {
   app.openapi(
     {
       method: "delete",
-      path: "/apps/{id}",
+      path: "/api/apps/{id}",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {
