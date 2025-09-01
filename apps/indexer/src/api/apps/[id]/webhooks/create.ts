@@ -38,7 +38,7 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/apps/{id}/webhooks",
+      path: "/api/apps/{id}/webhooks",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {

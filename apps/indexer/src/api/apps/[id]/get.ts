@@ -23,7 +23,7 @@ export function setupAppGet(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
-      path: "/apps/{id}",
+      path: "/api/apps/{id}",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {

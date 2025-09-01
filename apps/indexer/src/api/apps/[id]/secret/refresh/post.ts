@@ -19,7 +19,7 @@ export function setupAppSecretRefresh(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/apps/{id}/secret/refresh",
+      path: "/api/apps/{id}/secret/refresh",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {

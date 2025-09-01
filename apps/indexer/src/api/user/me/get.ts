@@ -28,7 +28,7 @@ export function setupUserMe(app: OpenAPIHono) {
     {
       method: "get",
       middleware: siweMiddleware,
-      path: "/user/me",
+      path: "/api/user/me",
       tags: ["user"],
       responses: {
         200: {

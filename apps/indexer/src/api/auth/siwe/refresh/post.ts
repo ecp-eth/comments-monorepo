@@ -29,7 +29,7 @@ export function setupAuthSiweRefresh(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/auth/siwe/refresh",
+      path: "/api/auth/siwe/refresh",
       tags: ["auth", "siwe"],
       request: {
         headers: AuthSiweRefreshHeadersSchema,

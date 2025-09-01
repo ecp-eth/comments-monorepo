@@ -42,7 +42,7 @@ export function setupAppWebhookPatch(app: OpenAPIHono) {
   app.openapi(
     {
       method: "patch",
-      path: "/apps/{appId}/webhooks/{webhookId}",
+      path: "/api/apps/{appId}/webhooks/{webhookId}",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {

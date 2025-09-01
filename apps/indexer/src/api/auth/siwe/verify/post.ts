@@ -26,7 +26,7 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/auth/siwe/verify",
+      path: "/api/auth/siwe/verify",
       tags: ["auth", "siwe"],
       request: {
         body: {

@@ -33,7 +33,7 @@ export function setupAppWebhookGet(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
-      path: "/apps/{appId}/webhooks/{webhookId}",
+      path: "/api/apps/{appId}/webhooks/{webhookId}",
       tags: ["apps", "webhooks"],
       middleware: siweMiddleware,
       request: {
