@@ -113,6 +113,19 @@ jobs:
       SIM_API_KEY: "SIM_API_KEY"
       NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL: "https://basescan.org/tx/{txHash}"
 
+      # broadcast app / indexer
+      NEXT_PUBLIC_CHAIN_ID: 31337
+      NEXT_PUBLIC_RPC_URL: "http://localhost:8545"
+      PRIVATE_RPC_URL: "http://localhost:8545"
+      BROADCAST_APP_INDEXER_URL: "http://localhost:42069"
+      NEXT_PUBLIC_BROADCAST_HOOK_ADDRESS: "0x35bBcd0f8b148F2D6e7344488A862fb45772c66b"
+      FARCASTER_MINI_APP_MANIFEST_ACCOUNT_ASSOCIATION_HEADER: "Farcaster-Mini-App-Manifest-Account-Association"
+      FARCASTER_MINI_APP_MANIFEST_ACCOUNT_ASSOCIATION_PAYLOAD: "Farcaster-Mini-App-Manifest-Account-Association-Payload"
+      FARCASTER_MINI_APP_MANIFEST_ACCOUNT_ASSOCIATION_SIGNATURE: "Farcaster-Mini-App-Manifest-Account-Association-Signature"
+      FARCASTER_MINI_APP_NAME: "Broadcast"
+      FARCASTER_MINI_APP_WEBHOOK_URL: "https://example.com/webhook"
+      FARCASTER_MINI_APP_URL: "https://example.com"
+
     name: Build and Test on Node.js 22
     steps:
       - name: Check out code

@@ -1,3 +1,5 @@
+import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
+import { HexSchema } from "@ecp.eth/sdk/core";
 import { z } from "zod";
 
 const moderationNotificationsEnabledSchema = z.object({
@@ -46,6 +48,30 @@ const adminTelegramBotSchema = z.object({
   ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET: z.string().nonempty(),
   ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
 });
+
+type AllowedChainIds = keyof typeof SUPPORTED_CHAINS;
+
+const ChainConfigs = z.record(
+  z.coerce.number(),
+  z.object({
+    chainId: z.custom<AllowedChainIds>(
+      (val) => {
+        if (typeof val !== "number") {
+          return false;
+        }
+
+        return Object.keys(SUPPORTED_CHAINS).includes(val.toString());
+      },
+      {
+        message:
+          "Invalid chain ID. Must be one of: " +
+          Object.keys(SUPPORTED_CHAINS).join(", "),
+      },
+    ),
+    rpcUrl: z.string().url(),
+    startBlock: z.coerce.number().int().positive().optional(),
+  }),
+);
 
 const EnvSchema = z
   .object({
@@ -139,6 +165,11 @@ const EnvSchema = z
     ADMIN_TELEGRAM_BOT_WEBHOOK_URL: z.string().url().optional(),
     ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET: z.string().optional(),
     ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
+
+    CHAIN_CONFIGS: ChainConfigs,
+    CHAIN_ANVIL_START_BLOCK: z.coerce.number().int().positive().optional(),
+    CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
+    CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
   })
   .superRefine((vars, ctx) => {
     if (
@@ -184,7 +215,49 @@ const EnvSchema = z
     return true;
   });
 
-const _env = EnvSchema.safeParse(process.env);
+const _env = EnvSchema.safeParse({
+  ...process.env,
+  CHAIN_CONFIGS: Object.entries(process.env).reduce(
+    (acc, [key, value]) => {
+      if (!key.startsWith("PONDER_RPC_URL_")) {
+        return acc;
+      }
+
+      const chainId = z.coerce
+        .number()
+        .int()
+        .positive()
+        .parse(key.substring("PONDER_RPC_URL_".length), {
+          path: [key],
+        });
+      const startBlock = z.coerce
+        .number()
+        .int()
+        .positive()
+        .optional()
+        .parse(process.env[`PONDER_START_BLOCK_${chainId}`], {
+          path: [`PONDER_START_BLOCK_${chainId}`],
+        });
+
+      acc[chainId] = {
+        chainId,
+        startBlock,
+        rpcUrl: z
+          .string()
+          .url()
+          .parse(value, {
+            path: [key],
+          }),
+      };
+
+      return acc;
+    },
+    {} as Record<
+      number,
+      { chainId: number; rpcUrl: string; startBlock?: number }
+    >,
+  ),
+});
 
 if (!_env.success) {
   throw new Error(
