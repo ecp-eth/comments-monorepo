@@ -246,9 +246,20 @@ export class SiweAuthService implements ISiweAuthService {
           )
           .execute();
 
+        const user = await tx.query.user.findFirst({
+          where(fields, operators) {
+            return operators.eq(fields.id, updatedSession.userId);
+          },
+        });
+
+        if (!user) {
+          throw new SiweAuthService_InvalidSessionError();
+        }
+
         return {
           userId: updatedSession.userId,
           sessionId: updatedSession.id,
+          role: user.role,
         };
       });
     } catch (e) {
@@ -495,6 +506,7 @@ export type SiweAuthService_VerifyMessageAndIssueAuthTokensResult = {
 export type SiweAuthService_VerifyAccessTokenResult = {
   userId: string;
   sessionId: string;
+  role: "admin" | "user";
 };
 
 export type SiweAuthService_VerifyRefreshTokenAndIssueNewTokensResult = {

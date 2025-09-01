@@ -12,6 +12,7 @@ export type JWTMiddlewareContext = Env & {
     user: {
       id: string;
       sessionId: string;
+      role: "admin" | "user";
     };
   };
 };
@@ -42,6 +43,7 @@ export function createSiweMiddleware({
       c.set("user", {
         id: payload.userId,
         sessionId: payload.sessionId,
+        role: payload.role,
       });
 
       await next();
