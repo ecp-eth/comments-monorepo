@@ -1,7 +1,7 @@
 import {
   type RefreshAccessTokenResponse,
-  refreshAccessTokenResponseSchema,
-} from "@/app/api/schemas";
+  RefreshAccessTokenResponseSchema,
+} from "@/api/schemas/siwe";
 import type { AuthContextValue } from "@/components/auth-provider";
 
 let refreshAccessTokenPromise:
@@ -92,5 +92,5 @@ async function refreshAccessToken(
     throw new Error("Failed to refresh access token");
   }
 
-  return refreshAccessTokenResponseSchema.parse(await response.json());
+  return RefreshAccessTokenResponseSchema.parse(await response.json());
 }
