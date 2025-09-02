@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useDisconnectWalletAndLogout } from "@/hooks/useDisconnectWalletAndLogout";
+import { useDisconnectWalletAndLogout } from "@/hooks/use-disconnect-wallet-and-logout";
 import { Logo } from "./logo";
 
 export function AppSidebar() {
