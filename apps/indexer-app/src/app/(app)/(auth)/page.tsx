@@ -2,7 +2,10 @@
 
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
+import { ErrorScreen } from "@/components/error-screen";
+import { Button } from "@/components/ui/button";
 import { useMeQuery } from "@/queries/me";
+import { RotateCwIcon } from "lucide-react";
 
 export default function AuthDashboardPage() {
   const meQuery = useMeQuery();
@@ -13,8 +16,21 @@ export default function AuthDashboardPage() {
   }
 
   if (meQuery.status === "error") {
-    // @todo if error is different than UnauthorizedError, show error page
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
+        <ErrorScreen
+          title="Error fetching your identity"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button onClick={() => meQuery.refetch()} className="gap-2">
+              <RotateCwIcon className="h-4 w-4" />
+              Retry
+            </Button>
+          }
+        />
+      </>
+    );
   }
 
   // @todo render either statistics for all apps or empty screen if there are no apps
