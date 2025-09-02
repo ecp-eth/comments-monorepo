@@ -4,6 +4,8 @@ A React-based rich text editor for the Ethereum Comments Protocol.
 
 The ECP React Editor provides a powerful, customizable rich text editor built on top of TipTap that supports mentions, file uploads, and seamless integration with the Ethereum Comments Protocol. For comprehensive documentation and guides, visit our [documentation website](https://docs.ethcomments.xyz).
 
+See an example of the React Editor in action at [share.ethcomments.xyz](https://share.ethcomments.xyz).
+
 ## Installation
 
 ```bash

@@ -1,0 +1,65 @@
+# Share to ECP
+
+[share.ethcomments.xyz](https://share.ethcomments.xyz) is a ready-to-use posting tool for ECP.
+
+The easiest way to add commenting to your project is to link to share.ethcomments.xyz, prefilling the content via URL query parameters.
+
+```html
+<a
+  href="https://share.ethcomments.xyz/?targetUri=https://example.com&content=Check%20out%20this%20transaction"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <img
+    src="https://docs.ethcomments.xyz/logo-light.svg"
+    alt="ECP Logo"
+    width="20"
+    height="20"
+  />
+  Share
+</a>
+```
+
+## URL Structure
+
+Share.ethcomments.xyz accepts query parameters to prefill the comment form:
+
+### Basic Parameters (all optional)
+
+- `targetUri` - The target URL for the comment
+- `channelId` - The channel ID to select
+- `content` - The comment content/text
+- `metadata` - The comment metadata
+
+## Examples
+
+### Simple Comment with Target URL
+
+```
+https://share.ethcomments.xyz/?targetUri=https://example.com&content=Great%20article!
+```
+
+### Comment with Channel and Metadata
+
+```
+https://share.ethcomments.xyz/?targetUri=https://example.com&channelId=123&content=Amazing%20content&metadata=category:review:string
+```
+
+### Comment with Multiple Metadata Entries
+
+```
+https://share.ethcomments.xyz/?targetUri=https://example.com&metadata=category:review:string,rating:5:uint256,author:john:string
+```
+
+## URL Encoding
+
+Remember to URL encode your parameters, especially for:
+
+- URLs in `targetUri`
+- Special characters in content
+
+The form will automatically decode URL-encoded values.
+
+## Source code
+
+share.ethcomments.xyz is [MIT licensed and available on GitHub](https://github.com/ecp-eth/share.ethcomments.xyz)
