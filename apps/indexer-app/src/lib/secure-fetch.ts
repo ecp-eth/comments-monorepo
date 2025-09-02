@@ -3,6 +3,7 @@ import {
   RefreshAccessTokenResponseSchema,
 } from "@/api/schemas/siwe";
 import type { AuthContextValue } from "@/components/auth-provider";
+import { createFetchUrl } from "@/lib/utils";
 
 let refreshAccessTokenPromise:
   | Promise<false | RefreshAccessTokenResponse>
@@ -77,7 +78,7 @@ async function refreshAccessToken(
     return false;
   }
 
-  const response = await fetch("api/auth/siwe/refresh", {
+  const response = await fetch(createFetchUrl("/api/auth/siwe/refresh"), {
     method: "POST",
     headers: {
       Authorization: `Bearer ${authContext.refreshToken}`,
