@@ -7,7 +7,7 @@ import { appManager, siweMiddleware } from "../../services/index.ts";
 import { formatResponseUsingZodSchema } from "../../lib/response-formatters.ts";
 
 export const AppCreateRequestSchema = z.object({
-  name: z.string().nonempty().max(50),
+  name: z.string().trim().nonempty().max(50),
 });
 
 export const AppCreateResponseSchema = z.object({

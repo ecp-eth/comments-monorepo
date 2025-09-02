@@ -11,13 +11,32 @@ export const AppSchema = z.object({
 export type AppSchemaType = z.infer<typeof AppSchema>;
 
 export const ListAppsResponseSchema = z.object({
-  results: z.array(AppSchema),
+  results: z.array(
+    z.object({
+      id: z.string().uuid(),
+      createdAt: z.coerce.date(),
+      updatedAt: z.coerce.date(),
+      name: z.string(),
+    }),
+  ),
   pageInfo: z.object({
     totalPages: z.number().int().nonnegative(),
   }),
 });
 
 export type ListAppsResponseSchemaType = z.infer<typeof ListAppsResponseSchema>;
+
+export const AppCreateRequestSchema = z.object({
+  name: z.string().trim().nonempty().max(50),
+});
+
+export type AppCreateRequestSchemaType = z.infer<typeof AppCreateRequestSchema>;
+
+export const AppCreateResponseSchema = AppSchema;
+
+export type AppCreateResponseSchemaType = z.infer<
+  typeof AppCreateResponseSchema
+>;
 
 export const WebhookEventNamesSchema = z.enum([
   "approval:added",

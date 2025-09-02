@@ -1,6 +1,6 @@
 import {
   LayoutDashboardIcon,
-  TerminalIcon,
+  TerminalSquareIcon,
   ChevronUpIcon,
   LogOutIcon,
   User2Icon,
@@ -30,7 +30,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="flex flex-row items-center gap-2 text-base">
+      <SidebarHeader className="flex flex-row items-center gap-2 text-base h-16 px-4">
         <Logo width={24} height={24} />
         <span className="font-semibold">ECP Indexer</span>
       </SidebarHeader>
@@ -47,7 +47,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href="/apps">
-                  <TerminalIcon /> <span>Apps</span>
+                  <TerminalSquareIcon /> <span>Apps</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
