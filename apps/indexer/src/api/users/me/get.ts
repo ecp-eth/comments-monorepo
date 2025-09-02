@@ -23,12 +23,12 @@ export const UserMeResponseSchema = z.object({
   role: z.enum(["admin", "user"]),
 });
 
-export function setupUserMe(app: OpenAPIHono) {
+export function setupUsersMe(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
       middleware: siweMiddleware,
-      path: "/api/user/me",
+      path: "/api/users/me",
       tags: ["user"],
       responses: {
         200: {

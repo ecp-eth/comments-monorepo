@@ -22,7 +22,7 @@ import { setupAdminBotWebhook } from "./webhook/bot/post";
 import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
 import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
 import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
-import { setupUserMe } from "./user/me/get";
+import { setupUsersMe } from "./users/me/get";
 import { setupAppCreate } from "./apps/post";
 import { setupAppDelete } from "./apps/[id]/delete";
 import { setupAppSecretRefresh } from "./apps/[id]/secret/refresh/post";
@@ -59,7 +59,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAuthSiweNonce(app);
   setupAuthSiweVerify(app);
   setupAuthSiweRefresh(app);
-  setupUserMe(app);
+  setupUsersMe(app);
   setupAppCreate(app);
   setupAppDelete(app);
   setupAppSecretRefresh(app);
