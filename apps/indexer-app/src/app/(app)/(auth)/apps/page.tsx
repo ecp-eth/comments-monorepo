@@ -67,6 +67,8 @@ export default function AppsPage() {
   }
 
   if (appsQuery.status === "error") {
+    console.error(appsQuery.error);
+
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
