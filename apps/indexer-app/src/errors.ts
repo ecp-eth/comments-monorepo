@@ -1,21 +1,14 @@
-export class SubmitCommentMutationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "SubmitCommentMutationError";
-  }
-}
-
-export class ChannelNotFoundError extends Error {
+export class AppNotFoundError extends Error {
   constructor() {
-    super("Channel not found");
-    this.name = "ChannelNotFoundError";
+    super("App not found");
+    this.name = "AppNotFoundError";
   }
 }
 
-export class SignCommentError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "SignCommentError";
+export class WebhookNotFoundError extends Error {
+  constructor() {
+    super("Webhook not found");
+    this.name = "WebhookNotFoundError";
   }
 }
 

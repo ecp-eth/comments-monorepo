@@ -1,32 +1,32 @@
 import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
-import { createAppsQueryKey } from "./query-keys";
+import { createMeQueryKey } from "./query-keys";
 import { UnauthorizedError } from "@/errors";
 import { secureFetch } from "@/lib/secure-fetch";
 import { useAuth } from "@/components/auth-provider";
 import {
-  ListAppsResponseSchema,
-  type ListAppsResponseSchemaType,
-} from "@/api/schemas/apps";
+  UserResponseSchema,
+  type UserResponseSchemaType,
+} from "@/api/schemas/user";
 import { createFetchUrl } from "@/lib/utils";
 
-type UseAppsQueryOptions = Omit<
+type UseMeQueryOptions = Omit<
   UseQueryOptions<
-    ListAppsResponseSchemaType,
+    UserResponseSchemaType,
     Error,
-    ListAppsResponseSchemaType,
-    ReturnType<typeof createAppsQueryKey>
+    UserResponseSchemaType,
+    ReturnType<typeof createMeQueryKey>
   >,
   "queryKey" | "queryFn"
 >;
 
-export function useAppsQuery(options?: UseAppsQueryOptions) {
+export function useMeQuery(options?: UseMeQueryOptions) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAppsQueryKey(),
+    queryKey: createMeQueryKey(),
     queryFn: async ({ signal }) => {
       const listAppsResponse = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/apps"), {
+        return fetch(createFetchUrl("/api/users/me"), {
           signal,
           headers,
         });
@@ -42,7 +42,7 @@ export function useAppsQuery(options?: UseAppsQueryOptions) {
         );
       }
 
-      return ListAppsResponseSchema.parse(await listAppsResponse.json());
+      return UserResponseSchema.parse(await listAppsResponse.json());
     },
     ...options,
   });
