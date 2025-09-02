@@ -19,8 +19,7 @@ import {
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
-import { cn } from "@/lib/utils";
-import { publicEnv } from "@/env/public";
+import { cn, createFetchUrl } from "@/lib/utils";
 
 export default function SignInPage() {
   const auth = useAuth();
@@ -36,9 +35,7 @@ export default function SignInPage() {
         throw new Error("Could not connect to wallet");
       }
 
-      const nonceResponse = await fetch(
-        new URL("/api/auth/siwe/nonce", publicEnv.NEXT_PUBLIC_INDEXER_URL),
-      );
+      const nonceResponse = await fetch(createFetchUrl("/api/auth/siwe/nonce"));
 
       if (!nonceResponse.ok) {
         throw new Error("Failed to get nonce");
@@ -63,7 +60,7 @@ export default function SignInPage() {
       });
 
       const verifyResponse = await fetch(
-        new URL("/api/auth/siwe/verify", publicEnv.NEXT_PUBLIC_INDEXER_URL),
+        createFetchUrl("/api/auth/siwe/verify"),
         {
           method: "POST",
           headers: {
