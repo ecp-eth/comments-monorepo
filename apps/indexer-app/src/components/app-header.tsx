@@ -37,7 +37,7 @@ export function AppHeader({ breadcrumbs }: AppHeaderProps) {
 
     return [
       <BreadcrumbSeparator
-        className={cn(!isLast && "hidden md:block")}
+        className="hidden md:block"
         key={"separator-" + breadcrumb.href}
       />,
       item,
