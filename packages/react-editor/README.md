@@ -107,7 +107,7 @@ Provides suggestions for ENS, Farcaster, and ERC-20 mentions using the ECP Index
 import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
 
 const suggestions = useIndexerSuggestions({
-  indexerUrl: "https://indexer.ethcomments.xyz",
+  indexerUrl: "https://api.ethcomments.xyz",
 });
 ```
 
