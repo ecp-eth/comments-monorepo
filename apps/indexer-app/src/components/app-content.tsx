@@ -7,5 +7,5 @@ export function AppContent({
   className?: string;
   children: React.ReactNode;
 }) {
-  return <div className={cn("flex  flex-1 p-4", className)}>{children}</div>;
+  return <div className={cn("flex flex-1 p-4", className)}>{children}</div>;
 }
