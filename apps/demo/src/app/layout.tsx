@@ -28,17 +28,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100`}
       >
         <div className="min-h-screen flex flex-col">
-          <main className="flex-1">
+          <div className="flex flex-col flex-1 my-8 gap-6">
             <Providers>{children}</Providers>
-          </main>
-          <footer className="py-4 text-center text-xs text-gray-500 border-t border-gray-200">
-            <a href="/terms" className="hover:text-gray-700 transition-colors">
-              Demo App Terms & Conditions
-            </a>
-          </footer>
+            <footer className="text-center text-xs text-gray-500">
+              <a
+                href="/terms"
+                className="text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                Demo App Terms & Conditions
+              </a>
+            </footer>
+          </div>
         </div>
         <Toaster />
       </body>
