@@ -38,7 +38,7 @@ export type AppCreateResponseSchemaType = z.infer<
   typeof AppCreateResponseSchema
 >;
 
-export const WebhookEventNamesSchema = z.enum([
+export const WebhookEventNames = [
   "approval:added",
   "approval:removed",
   "channel:created",
@@ -52,11 +52,13 @@ export const WebhookEventNamesSchema = z.enum([
   "comment:edited",
   "comment:moderation:status:updated",
   "test",
-]);
+] as const;
+
+export const WebhookEventNamesSchema = z.enum(WebhookEventNames);
 
 export const WebhookAuthConfigSchema = z.discriminatedUnion("type", [
   z.object({
-    type: z.literal("http-basic-aut"),
+    type: z.literal("http-basic-auth"),
     headerName: z.string().default("Authorization"),
     username: z.string(),
     password: z.string(),
@@ -88,3 +90,33 @@ export const AppWebhookSchema = z.object({
 });
 
 export type AppWebhookSchemaType = z.infer<typeof AppWebhookSchema>;
+
+export const AppWebhookCreateRequestSchema = z.object({
+  url: z.string().url(),
+  events: z.array(WebhookEventNamesSchema).min(1),
+  auth: WebhookAuthConfigSchema,
+  name: z.string().trim().nonempty().max(50),
+});
+
+export type AppWebhookCreateRequestSchemaType = z.infer<
+  typeof AppWebhookCreateRequestSchema
+>;
+
+export const AppWebhookCreateResponseSchema = AppWebhookSchema.omit({
+  adminOnly: true,
+});
+
+export type AppWebhookCreateResponseSchemaType = z.infer<
+  typeof AppWebhookCreateResponseSchema
+>;
+
+export const AppWebhooksListResponseSchema = z.object({
+  results: z.array(AppWebhookSchema),
+  pageInfo: z.object({
+    totalPages: z.number().int().nonnegative(),
+  }),
+});
+
+export type AppWebhooksListResponseSchemaType = z.infer<
+  typeof AppWebhooksListResponseSchema
+>;
