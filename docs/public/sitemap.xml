@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://docs.ethcomments.xyz</loc>
-    <lastmod>2025-08-12T12:26:00.000Z</lastmod>
+    <lastmod>2025-09-02T08:32:06.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -152,7 +152,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/integration-options/share-to-ecp</loc>
-    <lastmod>2025-09-01T13:20:52.162Z</lastmod>
+    <lastmod>2025-09-02T08:32:06.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -206,7 +206,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/react-editor</loc>
-    <lastmod>2025-07-18T10:18:08.000Z</lastmod>
+    <lastmod>2025-09-03T09:59:17.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
