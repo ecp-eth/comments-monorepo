@@ -32,6 +32,12 @@ export const AppWebhooksGetResponseSchema = z.object({
       url: z.string().url(),
       auth: WebhookAuthConfigSchema,
       eventFilter: z.array(EventNamesSchema),
+      adminOnly: z
+        .object({
+          paused: z.boolean(),
+          pausedAt: OpenAPIDateStringSchema.nullable(),
+        })
+        .optional(),
     }),
   ),
   pageInfo: z.object({
@@ -112,7 +118,16 @@ export function setupAppWebhooksGet(app: OpenAPIHono) {
 
         return c.json(
           formatResponseUsingZodSchema(AppWebhooksGetResponseSchema, {
-            results: appWebhooks,
+            results: appWebhooks.map((appWebhook) => ({
+              ...appWebhook,
+              adminOnly:
+                c.get("user").role === "admin"
+                  ? {
+                      paused: appWebhook.paused,
+                      pausedAt: appWebhook.pausedAt,
+                    }
+                  : undefined,
+            })),
             pageInfo,
           }),
           200,
