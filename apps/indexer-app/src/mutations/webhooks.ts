@@ -2,6 +2,8 @@ import {
   type AppWebhookCreateRequestSchemaType,
   AppWebhookCreateResponseSchema,
   type AppWebhookCreateResponseSchemaType,
+  type AppWebhookDeleteResponseSchemaType,
+  AppWebhookDeleteResponseSchema,
   type AppWebhookUpdateRequestSchemaType,
   AppWebhookUpdateResponseSchema,
   type AppWebhookUpdateResponseSchemaType,
@@ -128,6 +130,62 @@ export function useUpdateWebhookMutation({
 
       return AppWebhookUpdateResponseSchema.parse(
         await appWebhookUpdateResponse.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseDeleteWebhookMutationOptions = Omit<
+  UseMutationOptions<AppWebhookDeleteResponseSchemaType, Error, void>,
+  "mutationFn"
+> & {
+  appId: string;
+  webhookId: string;
+};
+
+export function useDeleteWebhookMutation({
+  appId,
+  webhookId,
+  ...options
+}: UseDeleteWebhookMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      const appWebhookDeleteResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(
+            createFetchUrl(`/api/apps/${appId}/webhooks/${webhookId}`),
+            {
+              headers: {
+                ...headers,
+              },
+              method: "DELETE",
+            },
+          );
+        },
+      );
+
+      if (appWebhookDeleteResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appWebhookDeleteResponse.status === 400) {
+        throw new Error(
+          `Failed to delete webhook: ${appWebhookDeleteResponse.statusText}`,
+        );
+      }
+
+      if (!appWebhookDeleteResponse.ok) {
+        throw new Error(
+          `Failed to delete webhook: ${appWebhookDeleteResponse.statusText}`,
+        );
+      }
+
+      return AppWebhookDeleteResponseSchema.parse(
+        await appWebhookDeleteResponse.json(),
       );
     },
     ...options,

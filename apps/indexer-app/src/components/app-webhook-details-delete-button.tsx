@@ -1,4 +1,3 @@
-import { useDeleteAppMutation } from "@/mutations/apps";
 import {
   Dialog,
   DialogContent,
@@ -26,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import type { AppSchemaType } from "@/api/schemas/apps";
+import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
 import {
   Form,
   FormControl,
@@ -37,21 +36,29 @@ import {
   FormDescription,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { useDeleteWebhookMutation } from "@/mutations/webhooks";
 
-export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
+export function AppWebhookDetailsDeleteButton({
+  app,
+  webhook,
+}: {
+  app: AppSchemaType;
+  webhook: AppWebhookSchemaType;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const deleteAppMutation = useDeleteAppMutation({
+  const deleteWebhookMutation = useDeleteWebhookMutation({
     appId: app.id,
+    webhookId: webhook.id,
     onSuccess() {
-      toast.success("App deleted successfully");
+      toast.success("Webhook deleted successfully");
       setIsOpen(false);
 
-      router.replace("/apps");
+      router.replace(`/apps/${app.id}`);
     },
     onError(error) {
       console.error(error);
-      toast.error("Failed to delete app");
+      toast.error("Failed to delete webhook");
     },
   });
   const isMobile = useIsMobile();
@@ -89,19 +96,19 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <Form {...form}>
           <form
-            id="delete-app-form"
+            id="delete-webhook-form"
             onSubmit={form.handleSubmit(() => {
-              deleteAppMutation.mutate();
+              deleteWebhookMutation.mutate();
             })}
           >
             <DrawerTrigger asChild>
-              <Button variant="destructive">Delete App</Button>
+              <Button variant="destructive">Delete Webhook</Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
-                <DrawerTitle>Delete App</DrawerTitle>
+                <DrawerTitle>Delete Webhook</DrawerTitle>
                 <DrawerDescription>
-                  Are you sure you want to delete this app?
+                  Are you sure you want to delete this webhook?
                 </DrawerDescription>
               </DrawerHeader>
               <div className="flex flex-col gap-4 p-4 text-sm">
@@ -110,13 +117,13 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>App Name</FormLabel>
+                      <FormLabel>Webhook Name</FormLabel>
                       <FormControl>
                         <Input {...field} required />
                       </FormControl>
                       <FormDescription>
-                        Please enter the name <strong>{app.name}</strong> of the
-                        app to delete.
+                        Please enter the name <strong>{webhook.name}</strong> of
+                        the webhook to delete.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -125,19 +132,19 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
               </div>
               <DrawerFooter>
                 <Button
-                  disabled={deleteAppMutation.isPending}
+                  disabled={deleteWebhookMutation.isPending}
                   variant="destructive"
                   type="submit"
-                  form="delete-app-form"
+                  form="delete-webhook-form"
                 >
-                  {deleteAppMutation.isPending ? (
+                  {deleteWebhookMutation.isPending ? (
                     <Loader2Icon className="h-4 w-4 animate-spin" />
                   ) : (
                     "Delete"
                   )}
                 </Button>
                 <Button
-                  disabled={deleteAppMutation.isPending}
+                  disabled={deleteWebhookMutation.isPending}
                   variant="outline"
                   onClick={() => setIsOpen(false)}
                 >
@@ -155,7 +162,7 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
     <Dialog
       open={isOpen}
       onOpenChange={(open) => {
-        if (deleteAppMutation.isPending) {
+        if (deleteWebhookMutation.isPending) {
           return;
         }
 
@@ -164,19 +171,19 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
     >
       <Form {...form}>
         <form
-          id="delete-app-dialog-form"
+          id="delete-webhook-dialog-form"
           onSubmit={form.handleSubmit(() => {
-            deleteAppMutation.mutate();
+            deleteWebhookMutation.mutate();
           })}
         >
           <DialogTrigger asChild>
-            <Button variant="destructive">Delete App</Button>
+            <Button variant="destructive">Delete Webhook</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Delete App</DialogTitle>
+              <DialogTitle>Delete Webhook</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this app?
+                Are you sure you want to delete this webhook?
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-4">
@@ -185,13 +192,13 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>App Name</FormLabel>
+                    <FormLabel>Webhook Name</FormLabel>
                     <FormControl>
                       <Input {...field} required />
                     </FormControl>
                     <FormDescription>
-                      Please enter the name <strong>{app.name}</strong> of the
-                      app to delete.
+                      Please enter the name <strong>{webhook.name}</strong> of
+                      the webhook to delete.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -200,19 +207,19 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
             </div>
             <DialogFooter>
               <Button
-                disabled={deleteAppMutation.isPending}
+                disabled={deleteWebhookMutation.isPending}
                 variant="outline"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
               </Button>
               <Button
-                disabled={deleteAppMutation.isPending}
+                disabled={deleteWebhookMutation.isPending}
                 variant="destructive"
                 type="submit"
-                form="delete-app-dialog-form"
+                form="delete-webhook-dialog-form"
               >
-                {deleteAppMutation.isPending ? (
+                {deleteWebhookMutation.isPending ? (
                   <Loader2Icon className="h-4 w-4 animate-spin" />
                 ) : (
                   "Delete"

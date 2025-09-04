@@ -165,6 +165,12 @@ export type AppWebhookUpdateResponseSchemaType = z.infer<
   typeof AppWebhookUpdateResponseSchema
 >;
 
+export const AppWebhookDeleteResponseSchema = AppWebhookSchema;
+
+export type AppWebhookDeleteResponseSchemaType = z.infer<
+  typeof AppWebhookDeleteResponseSchema
+>;
+
 export const AppWebhooksListResponseSchema = z.object({
   results: z.array(AppWebhookSchema),
   pageInfo: z.object({

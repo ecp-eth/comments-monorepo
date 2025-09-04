@@ -3,6 +3,7 @@
 import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
+import { AppWebhookDetailsDeleteButton } from "@/components/app-webhook-details-delete-button";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
 import { ErrorScreen } from "@/components/error-screen";
@@ -174,6 +175,9 @@ function WebhookDetailsCard({
       <CardContent className="flex flex-col gap-4">
         <AppWebhookDetailsRenameForm app={app} webhook={webhook} />
         <AppWebhookDetailsUrlForm app={app} webhook={webhook} />
+        <div>
+          <AppWebhookDetailsDeleteButton app={app} webhook={webhook} />
+        </div>
       </CardContent>
     </Card>
   );
