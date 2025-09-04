@@ -11,7 +11,7 @@ import {
   SUPPORTED_CHAINS,
 } from "@ecp.eth/sdk";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { env } from "./src/env";
+import { env } from "./src/env.ts";
 
 const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
   (acc, [, chainConfig]) => {
