@@ -34,6 +34,7 @@ import { setupAppWebhookDelete } from "./apps/[id]/webhooks/[id]/delete";
 import { setupAppWebhookGet } from "./apps/[id]/webhooks/[id]/get";
 import { setupAppWebhookPatch } from "./apps/[id]/webhooks/[id]/patch";
 import { setupAppWebhookTest } from "./apps/[id]/webhooks/[id]/test/post";
+import { setupAppUpdate } from "./apps/[id]/patch";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -63,6 +64,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppCreate(app);
   setupAppDelete(app);
   setupAppSecretRefresh(app);
+  setupAppUpdate(app);
   setupAppsGet(app);
   setupAppGet(app);
   setupAppWebhookCreate(app);
