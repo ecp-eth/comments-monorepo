@@ -3,6 +3,7 @@
 import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
+import { AppWebhookDetailsAuthForm } from "@/components/app-webhook-details-auth-form";
 import { AppWebhookDetailsDeleteButton } from "@/components/app-webhook-details-delete-button";
 import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-events-form";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
@@ -177,6 +178,7 @@ function WebhookDetailsCard({
         <AppWebhookDetailsRenameForm app={app} webhook={webhook} />
         <AppWebhookDetailsUrlForm app={app} webhook={webhook} />
         <AppWebhookDetailsEventsForm app={app} webhook={webhook} />
+        <AppWebhookDetailsAuthForm app={app} webhook={webhook} />
         <div>
           <AppWebhookDetailsDeleteButton app={app} webhook={webhook} />
         </div>
