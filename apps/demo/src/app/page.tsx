@@ -18,7 +18,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("default");
 
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
+    <main>
       <div className="max-w-4xl mx-auto flex flex-row justify-between items-center py-2">
         <div className="flex flex-row gap-3">
           <Link
