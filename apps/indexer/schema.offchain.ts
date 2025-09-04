@@ -374,14 +374,20 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
     id: bigserial({ mode: "bigint" }).primaryKey(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     attemptNumber: integer().notNull().default(1),
+    appWebhookId: uuid()
+      .notNull()
+      .references(() => appWebhook.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     appWebhookDeliveryId: bigserial({ mode: "bigint" })
       .notNull()
       .references(() => appWebhookDelivery.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    responseStatus: integer(),
-    responseMs: integer(),
+    responseStatus: integer().notNull(),
+    responseMs: integer().notNull(),
     error: text(),
   },
 );
