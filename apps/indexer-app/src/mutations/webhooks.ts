@@ -2,6 +2,9 @@ import {
   type AppWebhookCreateRequestSchemaType,
   AppWebhookCreateResponseSchema,
   type AppWebhookCreateResponseSchemaType,
+  type AppWebhookUpdateRequestSchemaType,
+  AppWebhookUpdateResponseSchema,
+  type AppWebhookUpdateResponseSchemaType,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
@@ -62,6 +65,69 @@ export function useCreateWebhookMutation({
 
       return AppWebhookCreateResponseSchema.parse(
         await appWebhookCreateResponse.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseUpdateWebhookMutationOptions = Omit<
+  UseMutationOptions<
+    AppWebhookUpdateResponseSchemaType,
+    Error,
+    AppWebhookUpdateRequestSchemaType
+  >,
+  "mutationFn"
+> & {
+  appId: string;
+  webhookId: string;
+};
+
+export function useUpdateWebhookMutation({
+  appId,
+  webhookId,
+  ...options
+}: UseUpdateWebhookMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async (values) => {
+      const appWebhookUpdateResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(
+            createFetchUrl(`/api/apps/${appId}/webhooks/${webhookId}`),
+            {
+              headers: {
+                ...headers,
+                "Content-Type": "application/json",
+              },
+              method: "PATCH",
+              body: JSON.stringify(values),
+            },
+          );
+        },
+      );
+
+      if (appWebhookUpdateResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appWebhookUpdateResponse.status === 400) {
+        const data: SafeParseError<AppWebhookUpdateResponseSchemaType> =
+          await appWebhookUpdateResponse.json();
+
+        throw ZodError.create(data.error.issues);
+      }
+
+      if (!appWebhookUpdateResponse.ok) {
+        throw new Error(
+          `Failed to update webhook: ${appWebhookUpdateResponse.statusText}`,
+        );
+      }
+
+      return AppWebhookUpdateResponseSchema.parse(
+        await appWebhookUpdateResponse.json(),
       );
     },
     ...options,
