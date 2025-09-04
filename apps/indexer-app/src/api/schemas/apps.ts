@@ -55,6 +55,14 @@ export type AppUpdateResponseSchemaType = z.infer<
   typeof AppUpdateResponseSchema
 >;
 
+export const AppSecretRefreshResponseSchema = z.object({
+  secret: z.string().nonempty(),
+});
+
+export type AppSecretRefreshResponseSchemaType = z.infer<
+  typeof AppSecretRefreshResponseSchema
+>;
+
 export const WebhookEventNames = [
   "approval:added",
   "approval:removed",
