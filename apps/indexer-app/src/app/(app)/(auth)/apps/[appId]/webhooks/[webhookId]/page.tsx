@@ -7,6 +7,7 @@ import { AppWebhookDetailsAuthForm } from "@/components/app-webhook-details-auth
 import { AppWebhookDetailsDeleteButton } from "@/components/app-webhook-details-delete-button";
 import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-events-form";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
+import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-test-button";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
 import { ErrorScreen } from "@/components/error-screen";
 import { Button } from "@/components/ui/button";
@@ -179,8 +180,9 @@ function WebhookDetailsCard({
         <AppWebhookDetailsUrlForm app={app} webhook={webhook} />
         <AppWebhookDetailsEventsForm app={app} webhook={webhook} />
         <AppWebhookDetailsAuthForm app={app} webhook={webhook} />
-        <div>
+        <div className="flex flex-row gap-2 pt-4">
           <AppWebhookDetailsDeleteButton app={app} webhook={webhook} />
+          <AppWebhookDetailsTestButton app={app} webhook={webhook} />
         </div>
       </CardContent>
     </Card>
