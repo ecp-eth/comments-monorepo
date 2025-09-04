@@ -5,6 +5,8 @@ import {
   type AppUpdateRequestSchemaType,
   type AppUpdateResponseSchemaType,
   AppUpdateResponseSchema,
+  type AppSecretRefreshResponseSchemaType,
+  AppSecretRefreshResponseSchema,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
@@ -103,6 +105,57 @@ export function useRenameAppMutation({
       }
 
       return AppUpdateResponseSchema.parse(await appRenameResponse.json());
+    },
+    ...options,
+  });
+}
+
+type UseRefreshAppSecretMutationOptions = Omit<
+  UseMutationOptions<AppSecretRefreshResponseSchemaType, Error, void>,
+  "mutationFn"
+> & {
+  appId: string;
+};
+
+export function useRefreshAppSecretMutation({
+  appId,
+  ...options
+}: UseRefreshAppSecretMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      const appSecretRefreshResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(createFetchUrl(`/api/apps/${appId}/secret/refresh`), {
+            headers: {
+              ...headers,
+            },
+            method: "POST",
+          });
+        },
+      );
+
+      if (appSecretRefreshResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appSecretRefreshResponse.status === 400) {
+        throw new Error(
+          `Failed to refresh app secret: ${appSecretRefreshResponse.statusText}`,
+        );
+      }
+
+      if (!appSecretRefreshResponse.ok) {
+        throw new Error(
+          `Failed to refresh app secret: ${appSecretRefreshResponse.statusText}`,
+        );
+      }
+
+      return AppSecretRefreshResponseSchema.parse(
+        await appSecretRefreshResponse.json(),
+      );
     },
     ...options,
   });
