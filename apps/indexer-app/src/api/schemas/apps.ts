@@ -38,6 +38,23 @@ export type AppCreateResponseSchemaType = z.infer<
   typeof AppCreateResponseSchema
 >;
 
+export const AppUpdateRequestSchema = z.object({
+  name: z.string().trim().nonempty().max(50),
+});
+
+export type AppUpdateRequestSchemaType = z.infer<typeof AppUpdateRequestSchema>;
+
+export const AppUpdateResponseSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  name: z.string(),
+});
+
+export type AppUpdateResponseSchemaType = z.infer<
+  typeof AppUpdateResponseSchema
+>;
+
 export const WebhookEventNames = [
   "approval:added",
   "approval:removed",

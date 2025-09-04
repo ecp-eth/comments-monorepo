@@ -2,6 +2,9 @@ import {
   type AppCreateRequestSchemaType,
   AppCreateResponseSchema,
   type AppCreateResponseSchemaType,
+  type AppUpdateRequestSchemaType,
+  type AppUpdateResponseSchemaType,
+  AppUpdateResponseSchema,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
@@ -53,6 +56,53 @@ export function useCreateAppMutation(options?: UseCreateAppMutationOptions) {
       }
 
       return AppCreateResponseSchema.parse(await appCreateResponse.json());
+    },
+    ...options,
+  });
+}
+
+type UseRenameAppMutationOptions = Omit<
+  UseMutationOptions<
+    AppUpdateResponseSchemaType,
+    Error,
+    AppUpdateRequestSchemaType
+  >,
+  "mutationFn"
+> & {
+  appId: string;
+};
+
+export function useRenameAppMutation({
+  appId,
+  ...options
+}: UseRenameAppMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async (values) => {
+      const appRenameResponse = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl(`/api/apps/${appId}`), {
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
+          method: "PATCH",
+          body: JSON.stringify(values),
+        });
+      });
+
+      if (appRenameResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appRenameResponse.status === 400) {
+        const data: SafeParseError<AppUpdateResponseSchemaType> =
+          await appRenameResponse.json();
+
+        throw ZodError.create(data.error.issues);
+      }
+
+      return AppUpdateResponseSchema.parse(await appRenameResponse.json());
     },
     ...options,
   });

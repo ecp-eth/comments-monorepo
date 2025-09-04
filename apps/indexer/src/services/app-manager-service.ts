@@ -191,6 +191,25 @@ export class AppManager implements IAppManager {
     };
   }
 
+  async updateApp(params: IAppManager_UpdateAppParams) {
+    const { id, name } = UpdateAppParamsSchema.parse(params);
+
+    return await this.db.transaction(async (tx) => {
+      const [app] = await tx
+        .update(schema.app)
+        .set({ name, updatedAt: new Date() })
+        .where(eq(schema.app.id, id))
+        .returning()
+        .execute();
+
+      if (!app) {
+        throw new AppManagerAppNotFoundError();
+      }
+
+      return { app };
+    });
+  }
+
   private generateRandomAppSecret(): string {
     return crypto.randomBytes(32).toString("hex");
   }
@@ -259,6 +278,17 @@ type IAppManager_GetAppResult = {
   signingKey: AppSigningKeysSelectType;
 };
 
+const UpdateAppParamsSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().nonempty().max(50),
+});
+
+type IAppManager_UpdateAppParams = z.infer<typeof UpdateAppParamsSchema>;
+
+type IAppManager_UpdateAppResult = {
+  app: AppSelectType;
+};
+
 export interface IAppManager {
   createApp: (
     params: IAppManager_CreateAppParams,
@@ -279,6 +309,10 @@ export interface IAppManager {
   refreshAppSecret: (
     params: IAppManager_RefreshAppSecretParams,
   ) => Promise<IAppManager_RefreshAppSecretResult>;
+
+  updateApp: (
+    params: IAppManager_UpdateAppParams,
+  ) => Promise<IAppManager_UpdateAppResult>;
 }
 
 export class AppManagerError extends Error {
