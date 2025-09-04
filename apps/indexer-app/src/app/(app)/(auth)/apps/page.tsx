@@ -97,6 +97,7 @@ export default function AppsPage() {
     );
   }
 
+  // @todo add pagination
   return (
     <>
       <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
@@ -109,13 +110,11 @@ export default function AppsPage() {
             actions={<CreateAppDialogButton />}
           />
         ) : (
-          <>
-            <DataTable
-              data={appsQuery.data.results}
-              columns={columns}
-              tableActions={<CreateAppDialogButton />}
-            />
-          </>
+          <DataTable
+            data={appsQuery.data.results}
+            columns={columns}
+            tableActions={<CreateAppDialogButton />}
+          />
         )}
       </AppContent>
     </>

@@ -173,34 +173,39 @@ function WebhooksList({ appId }: { appId: string }) {
     console.error(webhooksQuery.error);
 
     return (
-      <ErrorScreen
-        title="Error fetching webhooks"
-        description="Please try again later. If the problem persists, please contact support."
-        actions={
-          <Button
-            disabled={webhooksQuery.isRefetching}
-            onClick={() => webhooksQuery.refetch()}
-            className="gap-2"
-          >
-            <RotateCwIcon className="h-4 w-4" />
-            Retry
-          </Button>
-        }
-      />
+      <div className="rounded-lg border w-full">
+        <ErrorScreen
+          title="Error fetching webhooks"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              disabled={webhooksQuery.isRefetching}
+              onClick={() => webhooksQuery.refetch()}
+              className="gap-2"
+            >
+              <RotateCwIcon className="h-4 w-4" />
+              Retry
+            </Button>
+          }
+        />
+      </div>
     );
   }
 
   if (webhooksQuery.data.results.length === 0) {
     return (
-      <EmptyScreen
-        icon={<WebhookIcon />}
-        title="No webhooks"
-        description="You don't have any webhooks yet"
-        actions={<CreateWebhookDialogButton appId={appId} />}
-      />
+      <div className="rounded-lg border w-full">
+        <EmptyScreen
+          icon={<WebhookIcon />}
+          title="No webhooks"
+          description="You don't have any webhooks yet"
+          actions={<CreateWebhookDialogButton appId={appId} />}
+        />
+      </div>
     );
   }
 
+  // @todo add pagination
   return (
     <DataTable
       data={webhooksQuery.data.results}
