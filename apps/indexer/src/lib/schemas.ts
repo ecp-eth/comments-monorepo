@@ -518,3 +518,11 @@ export const OpenAPIDateStringSchema = z
     description: "A date string in ISO 8601 format",
     type: "string",
   });
+
+export const OpenAPIBigintStringSchema = z
+  .bigint()
+  .transform((val) => val.toString())
+  .openapi({
+    description: "A bigint string",
+    type: "string",
+  });

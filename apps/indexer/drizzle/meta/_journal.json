@@ -85,6 +85,13 @@
       "when": 1756723447761,
       "tag": "0011_missing_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1756994032110,
+      "tag": "0012_easier_delivery_attempts",
+      "breakpoints": true
     }
   ]
 }
