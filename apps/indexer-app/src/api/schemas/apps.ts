@@ -63,6 +63,17 @@ export type AppSecretRefreshResponseSchemaType = z.infer<
   typeof AppSecretRefreshResponseSchema
 >;
 
+export const AppDeleteResponseSchema = z.object({
+  id: z.string().uuid(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  name: z.string(),
+});
+
+export type AppDeleteResponseSchemaType = z.infer<
+  typeof AppDeleteResponseSchema
+>;
+
 export const WebhookEventNames = [
   "approval:added",
   "approval:removed",

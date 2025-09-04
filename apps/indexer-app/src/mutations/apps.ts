@@ -7,6 +7,8 @@ import {
   AppUpdateResponseSchema,
   type AppSecretRefreshResponseSchemaType,
   AppSecretRefreshResponseSchema,
+  AppDeleteResponseSchema,
+  type AppDeleteResponseSchemaType,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
@@ -156,6 +158,52 @@ export function useRefreshAppSecretMutation({
       return AppSecretRefreshResponseSchema.parse(
         await appSecretRefreshResponse.json(),
       );
+    },
+    ...options,
+  });
+}
+
+type UseDeleteAppMutationOptions = Omit<
+  UseMutationOptions<AppDeleteResponseSchemaType, Error, void>,
+  "mutationFn"
+> & {
+  appId: string;
+};
+
+export function useDeleteAppMutation({
+  appId,
+  ...options
+}: UseDeleteAppMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      const appDeleteResponse = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl(`/api/apps/${appId}`), {
+          headers: {
+            ...headers,
+          },
+          method: "DELETE",
+        });
+      });
+
+      if (appDeleteResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appDeleteResponse.status === 400) {
+        throw new Error(
+          `Failed to delete app: ${appDeleteResponse.statusText}`,
+        );
+      }
+
+      if (!appDeleteResponse.ok) {
+        throw new Error(
+          `Failed to delete app: ${appDeleteResponse.statusText}`,
+        );
+      }
+
+      return AppDeleteResponseSchema.parse(await appDeleteResponse.json());
     },
     ...options,
   });
