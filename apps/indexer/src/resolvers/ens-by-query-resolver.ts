@@ -7,15 +7,8 @@ import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
-
-// this is a KNOWN LIMITATION in order to bundle the request:
-// we assume each address maximumly matches 30 domains, however if someone really registered tons of domain that exceed the count,
-// it might result other addresses mapped names to be pushed beyound the limit and causing searchEnsByExactAddressInBatch to return null
 const MAX_DOMAIN_PER_ADDRESS = 30;
-
-// for above mentioned reason, we need to limit the batch size to 3 to reduce the chance of the someone registering tons of domain that
-// push the other address out of the batch request
-const MAX_BATCH_SIZE = 3;
+const MAX_BATCH_SIZE = 5;
 
 export type ENSByQueryResolverKey = string;
 export type ENSByQueryResolver = DataLoader<
@@ -136,41 +129,46 @@ type ENSNodeResult = {
   }[];
 };
 
-const ensResultSchema = z
-  .object({
-    domains: z.array(
-      z.object({
+const ensResultDomainsSchema = z
+  .array(
+    z.object({
+      id: HexSchema,
+      name: z.string(),
+      expiryDate: z.coerce.number().nullable(),
+      resolvedAddress: z.object({
         id: HexSchema,
-        name: z.string(),
-        expiryDate: z.coerce.number().nullable(),
-        resolvedAddress: z.object({
-          id: HexSchema,
-        }),
-        resolver: z.object({
-          textChangeds: z.array(
-            z.object({
-              key: z.string().or(z.literal("avatar")),
-              value: z.string().nullable(),
-            }),
-          ),
-        }),
       }),
-    ),
-  })
+      resolver: z.object({
+        textChangeds: z.array(
+          z.object({
+            key: z.string().or(z.literal("avatar")),
+            value: z.string().nullable(),
+          }),
+        ),
+      }),
+    }),
+  )
   .transform((val) => {
-    return {
-      domains: val.domains.map((domain) => {
-        const avatarUrl = domain.resolver.textChangeds.find(
-          (t) => t.key === "avatar" && !!t.value,
-        )?.value;
+    return val.map((domain) => {
+      const avatarUrl = domain.resolver.textChangeds.find(
+        (t) => t.key === "avatar" && !!t.value,
+      )?.value;
 
-        return {
-          ...domain,
-          avatarUrl: avatarUrl ? normalizeAvatarUrl(avatarUrl) : null,
-        };
-      }),
-    };
+      return {
+        ...domain,
+        avatarUrl: avatarUrl ? normalizeAvatarUrl(avatarUrl) : null,
+      };
+    });
   });
+
+const ensResultByExactAddressSchema = z.record(
+  z.string(),
+  ensResultDomainsSchema,
+);
+
+const ensResultSchema = z.object({
+  domains: ensResultDomainsSchema,
+});
 
 const domainFragment = gql`
   fragment DomainFragment on Domain {
@@ -220,12 +218,16 @@ const searchByAddressStartsWithQuery = gql`
   }
 `;
 
-const searchByExactAddressInBatchQuery = gql`
+const searchByExactAddressQueryTemplate = `
+  domains(where: { resolvedAddressId_in: $addresses }, first: $count) {
+    ...DomainFragment
+  }
+`;
+
+const searchByExactAddressQueryContainerTemplate = `
   ${domainFragment}
-  query SearchByAddress($addresses: [String!]!, $count: Int!) {
-    domains(where: { resolvedAddressId_in: $addresses }, first: $count) {
-      ...DomainFragment
-    }
+  query SearchByExactAddress($addresses: [String!]!, $count: Int!) {
+    <<RECORDS>>
   }
 `;
 
@@ -301,16 +303,21 @@ async function searchEnsByExactAddressInBatch(
 ): Promise<ResolvedENSData[][] | null> {
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  const results = await graphqlRequest<ENSNodeResult>(
-    subgraphUrl,
-    searchByExactAddressInBatchQuery,
-    {
-      addresses: addresses,
-      count: addresses.length * MAX_DOMAIN_PER_ADDRESS,
-    },
+  const query = searchByExactAddressQueryContainerTemplate.replace(
+    "<<RECORDS>>",
+    addresses
+      .map(
+        (address) => address.slice(2) + ":" + searchByExactAddressQueryTemplate,
+      )
+      .join("\n"),
   );
 
-  const parsedResults = ensResultSchema.safeParse(results);
+  const results = await graphqlRequest<ENSNodeResult>(subgraphUrl, query, {
+    addresses: addresses,
+    count: addresses.length * MAX_DOMAIN_PER_ADDRESS,
+  });
+
+  const parsedResults = ensResultByExactAddressSchema.safeParse(results);
 
   if (!parsedResults.success) {
     Sentry.captureMessage("ENSNode subgraph returned invalid data", {
@@ -325,31 +332,31 @@ async function searchEnsByExactAddressInBatch(
     return null;
   }
 
-  if (parsedResults.data.domains.length === 0) {
-    return null;
-  }
-
   const resolvedEnsDataMap = new Map<Hex, ResolvedENSData[]>();
 
-  parsedResults.data.domains.forEach((domain) => {
-    // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
-    // one of the example is test.normx.eth
-    // so we need to filter them out manually rather than using expiryDate_gte
-    if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+  addresses.forEach((address) => {
+    const domains = parsedResults.data[address.slice(2)];
+    if (!domains || domains.length === 0) {
       return;
     }
 
-    const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
-    const existing = resolvedEnsDataMap.get(address) ?? [];
+    domains.forEach((domain) => {
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return;
+      }
 
-    existing.push({
-      address,
-      name: domain.name,
-      avatarUrl: domain.avatarUrl,
-      url: `https://app.ens.domains/${address}`,
+      const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
+      const existing = resolvedEnsDataMap.get(address) ?? [];
+
+      existing.push({
+        address,
+        name: domain.name,
+        avatarUrl: domain.avatarUrl,
+        url: `https://app.ens.domains/${address}`,
+      });
+
+      resolvedEnsDataMap.set(address, existing);
     });
-
-    resolvedEnsDataMap.set(address, existing);
   });
 
   return addresses.map(

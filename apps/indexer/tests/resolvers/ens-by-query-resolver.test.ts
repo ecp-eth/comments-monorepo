@@ -29,8 +29,6 @@ describe("ENSByQueryResolver", () => {
         resolver.load("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"),
       ]);
 
-      // console.log(111, byAddr0, byAddr1, byAddr2);
-
       expect(addrList0?.[0]).toEqual({
         address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
         name: "df.me.eth.id",
@@ -58,6 +56,7 @@ describe("ENSByQueryResolver", () => {
         ),
       });
 
+      // verify that the request is called exactly once with all the addresses
       expect(graphqlRequest.request).toHaveBeenCalledExactlyOnceWith(
         "https://api.alpha.ensnode.io/subgraph",
         expect.any(String),
