@@ -1,16 +1,15 @@
-import type { AppSchemaType } from "@/api/schemas/apps";
+import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  AppUpdateRequestSchema,
-  AppUpdateRequestSchemaType,
+  AppWebhookUpdateRequestSchema,
+  type AppWebhookUpdateRequestSchemaType,
 } from "@/api/schemas/apps";
-import { useRenameAppMutation } from "@/mutations/apps";
 import { toast } from "sonner";
 import { ZodError } from "zod";
-import { createAppQueryKey } from "@/queries/query-keys";
+import { createWebhookQueryKey } from "@/queries/query-keys";
 import {
   Form,
   FormControl,
@@ -23,32 +22,40 @@ import { Input } from "./ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Button } from "./ui/button";
 import { CheckIcon, Loader2Icon, PencilIcon } from "lucide-react";
+import { useUpdateWebhookMutation } from "@/mutations/webhooks";
 
-export function AppDetailsRenameForm({ app }: { app: AppSchemaType }) {
+export function AppWebhookDetailsRenameForm({
+  app,
+  webhook,
+}: {
+  app: AppSchemaType;
+  webhook: AppWebhookSchemaType;
+}) {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const form = useForm({
-    resolver: zodResolver(AppUpdateRequestSchema),
+    resolver: zodResolver(AppWebhookUpdateRequestSchema),
     defaultValues: {
-      name: app.name,
+      name: webhook.name,
     },
   });
-  const renameAppMutation = useRenameAppMutation({
+  const updateWebhookMutation = useUpdateWebhookMutation({
     appId: app.id,
+    webhookId: webhook.id,
     onSuccess() {
       setIsEditing(false);
-      toast.success("App renamed successfully");
+      toast.success("Webhook renamed successfully");
 
       queryClient.refetchQueries({
         exact: true,
-        queryKey: createAppQueryKey(app.id),
+        queryKey: createWebhookQueryKey(app.id, webhook.id),
       });
     },
     onError(error) {
       if (error instanceof ZodError) {
         error.issues.forEach((issue) => {
           form.setError(
-            issue.path.join(".") as keyof AppUpdateRequestSchemaType,
+            issue.path.join(".") as keyof AppWebhookUpdateRequestSchemaType,
             {
               message: issue.message,
             },
@@ -56,28 +63,28 @@ export function AppDetailsRenameForm({ app }: { app: AppSchemaType }) {
         });
       } else {
         console.error(error);
-        toast.error("Failed to rename app. Please try again.");
+        toast.error("Failed to rename webhook. Please try again.");
       }
     },
   });
 
   useEffect(() => {
     form.reset({
-      name: app.name,
+      name: webhook.name,
     });
-  }, [form, app.name]);
+  }, [form, webhook.name]);
 
   return (
     <Form {...form}>
       <form
         className="flex flex-col gap-2"
         onSubmit={form.handleSubmit((values) => {
-          if (values.name === app.name) {
+          if (values.name === webhook.name) {
             setIsEditing(false);
             return;
           }
 
-          renameAppMutation.mutate(values);
+          updateWebhookMutation.mutate(values);
         })}
       >
         <FormField
@@ -95,11 +102,11 @@ export function AppDetailsRenameForm({ app }: { app: AppSchemaType }) {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          disabled={renameAppMutation.isPending}
+                          disabled={updateWebhookMutation.isPending}
                           type="submit"
                           variant="secondary"
                         >
-                          {renameAppMutation.isPending ? (
+                          {updateWebhookMutation.isPending ? (
                             <Loader2Icon className="h-4 w-4 animate-spin" />
                           ) : (
                             <CheckIcon className="h-4 w-4" />

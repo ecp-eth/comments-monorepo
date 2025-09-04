@@ -146,6 +146,25 @@ export type AppWebhookCreateResponseSchemaType = z.infer<
   typeof AppWebhookCreateResponseSchema
 >;
 
+export const AppWebhookUpdateRequestSchema = z
+  .object({
+    name: z.string().trim().nonempty().max(50),
+    url: z.string().url(),
+    auth: WebhookAuthConfigSchema,
+    eventFilter: z.array(WebhookEventNamesSchema),
+  })
+  .partial();
+
+export type AppWebhookUpdateRequestSchemaType = z.infer<
+  typeof AppWebhookUpdateRequestSchema
+>;
+
+export const AppWebhookUpdateResponseSchema = AppWebhookSchema;
+
+export type AppWebhookUpdateResponseSchemaType = z.infer<
+  typeof AppWebhookUpdateResponseSchema
+>;
+
 export const AppWebhooksListResponseSchema = z.object({
   results: z.array(AppWebhookSchema),
   pageInfo: z.object({
