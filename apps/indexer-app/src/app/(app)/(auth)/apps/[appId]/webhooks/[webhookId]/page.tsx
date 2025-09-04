@@ -4,6 +4,7 @@ import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
+import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
 import { ErrorScreen } from "@/components/error-screen";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -145,6 +146,7 @@ export default function WebhookPage({
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
+
           <div className="bg-muted/50 aspect-video rounded-xl" />
           <div className="bg-muted/50 aspect-video rounded-xl" />
         </div>
@@ -171,6 +173,7 @@ function WebhookDetailsCard({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <AppWebhookDetailsRenameForm app={app} webhook={webhook} />
+        <AppWebhookDetailsUrlForm app={app} webhook={webhook} />
       </CardContent>
     </Card>
   );
