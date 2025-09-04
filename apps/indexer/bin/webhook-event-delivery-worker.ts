@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-strip-types
+#!/usr/bin/env node --experimental-transform-types
 
 import * as Sentry from "@sentry/node";
 import "./init.ts";
