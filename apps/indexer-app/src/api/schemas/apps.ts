@@ -181,3 +181,31 @@ export const AppWebhooksListResponseSchema = z.object({
 export type AppWebhooksListResponseSchemaType = z.infer<
   typeof AppWebhooksListResponseSchema
 >;
+
+export const AppWebhookListDeliveryAttemptsResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      id: z.coerce.bigint(),
+      attemptedAt: z.coerce.date(),
+      attemptNumber: z.number(),
+      responseStatus: z.number(),
+      responseMs: z.number(),
+      error: z.string().nullable(),
+      delivery: z.object({
+        event: z.object({
+          eventType: z.string(),
+        }),
+      }),
+    }),
+  ),
+  pageInfo: z.object({
+    hasPreviousPage: z.boolean(),
+    hasNextPage: z.boolean(),
+    startCursor: z.string().optional(),
+    endCursor: z.string().optional(),
+  }),
+});
+
+export type AppWebhookListDeliveryAttemptsResponseSchemaType = z.infer<
+  typeof AppWebhookListDeliveryAttemptsResponseSchema
+>;

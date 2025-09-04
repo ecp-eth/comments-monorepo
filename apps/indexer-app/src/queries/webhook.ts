@@ -6,8 +6,13 @@ import { UnauthorizedError, WebhookNotFoundError } from "@/errors";
 import {
   AppWebhookSchema,
   type AppWebhookSchemaType,
+  type AppWebhookListDeliveryAttemptsResponseSchemaType,
+  AppWebhookListDeliveryAttemptsResponseSchema,
 } from "@/api/schemas/apps";
-import { createWebhookQueryKey } from "./query-keys";
+import {
+  createWebhookDeliveryAttemptsQueryKey,
+  createWebhookQueryKey,
+} from "./query-keys";
 
 type UseWebhookQueryOptions = Omit<
   UseQueryOptions<
@@ -57,6 +62,63 @@ export function useWebhookQuery({
       }
 
       return AppWebhookSchema.parse(await webhookResponse.json());
+    },
+    ...options,
+  });
+}
+
+type UseWebhookDeliveryAttemptsQueryOptions = Omit<
+  UseQueryOptions<
+    AppWebhookListDeliveryAttemptsResponseSchemaType,
+    Error,
+    AppWebhookListDeliveryAttemptsResponseSchemaType,
+    ReturnType<typeof createWebhookDeliveryAttemptsQueryKey>
+  >,
+  "queryKey" | "queryFn"
+> & {
+  appId: string;
+  webhookId: string;
+};
+
+export function useWebhookDeliveryAttemptsQuery({
+  appId,
+  webhookId,
+  ...options
+}: UseWebhookDeliveryAttemptsQueryOptions) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createWebhookDeliveryAttemptsQueryKey(appId, webhookId),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          createFetchUrl(
+            `/api/apps/${appId}/webhooks/${webhookId}/deliveries/attempts`,
+          ),
+          {
+            signal,
+            headers,
+          },
+        );
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (response.status === 404) {
+        throw new WebhookNotFoundError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch webhook deliveries: ${response.statusText}`,
+        );
+      }
+
+      return AppWebhookListDeliveryAttemptsResponseSchema.parse(
+        await response.json(),
+      );
     },
     ...options,
   });

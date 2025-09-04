@@ -5,7 +5,7 @@ type EmptyScreenProps = {
   icon?: ReactElement<LucideProps>;
   title: ReactNode;
   description?: ReactNode;
-  actions: ReactNode;
+  actions?: ReactNode;
 };
 
 export function EmptyScreen({
