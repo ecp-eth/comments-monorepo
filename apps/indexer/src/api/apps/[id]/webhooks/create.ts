@@ -22,7 +22,7 @@ export const AppWebhookCreateRequestBodySchema = z.object({
   events: z
     .array(EventNamesSchema)
     .min(1)
-    .transform((val) => new Set(val)),
+    .transform((val) => Array.from(new Set([...val, "test" as const]))),
   auth: WebhookAuthConfigSchema,
   name: z.string().trim().nonempty().max(50),
 });
@@ -112,7 +112,7 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
           app: app.app,
           webhook: {
             url,
-            events: Array.from(events),
+            events,
             auth,
             name,
           },
