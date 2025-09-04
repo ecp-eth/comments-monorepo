@@ -1,6 +1,10 @@
 "use client";
 
-import type { AppSchemaType, AppWebhookSchemaType } from "@/api/schemas/apps";
+import type {
+  AppSchemaType,
+  AppWebhookListDeliveryAttemptsResponseSchemaType,
+  AppWebhookSchemaType,
+} from "@/api/schemas/apps";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
 import { AppWebhookDetailsAuthForm } from "@/components/app-webhook-details-auth-form";
@@ -9,16 +13,24 @@ import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-ev
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
 import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-test-button";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
+import { CreateWebhookDialogButton } from "@/components/create-webhook-dialog-button";
+import { DataTable } from "@/components/data-table";
+import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WebhookNotFoundError } from "@/errors";
 import { useProtectRoute } from "@/hooks/use-protect-route";
 import { useAppQuery } from "@/queries/app";
-import { useWebhookQuery } from "@/queries/webhook";
-import { RotateCwIcon } from "lucide-react";
+import {
+  useWebhookDeliveryAttemptsQuery,
+  useWebhookQuery,
+} from "@/queries/webhook";
+import type { ColumnDef } from "@tanstack/react-table";
+import { RotateCwIcon, WebhookIcon } from "lucide-react";
 import Link from "next/link";
-import { use } from "react";
+import { use, useMemo } from "react";
 
 export default function WebhookPage({
   params,
@@ -150,13 +162,12 @@ export default function WebhookPage({
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
-
           <div className="bg-muted/50 aspect-video rounded-xl" />
           <div className="bg-muted/50 aspect-video rounded-xl" />
         </div>
         <div className="flex flex-col flex-1 gap-4">
           <h2 className="text-lg font-medium">Deliveries</h2>
-          <div className="bg-muted/50 aspect-video rounded-xl" />
+          <WebhookDeliveryAttemptsList appId={appId} webhookId={webhookId} />
         </div>
       </AppContent>
     </>
@@ -187,4 +198,118 @@ function WebhookDetailsCard({
       </CardContent>
     </Card>
   );
+}
+
+function WebhookDeliveryAttemptsList({
+  appId,
+  webhookId,
+}: {
+  appId: string;
+  webhookId: string;
+}) {
+  const deliveriesQuery = useWebhookDeliveryAttemptsQuery({ appId, webhookId });
+  const columns = useMemo(
+    () => createWebhookDeliveryAttemptsDataTableColumns(),
+    [],
+  );
+
+  useProtectRoute(deliveriesQuery);
+
+  if (deliveriesQuery.status === "pending") {
+    // @todo loading screen
+    return null;
+  }
+
+  if (deliveriesQuery.status === "error") {
+    console.error(deliveriesQuery.error);
+
+    return (
+      <div className="rounded-lg border w-full">
+        <ErrorScreen
+          title="Error fetching deliveries"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              disabled={deliveriesQuery.isRefetching}
+              onClick={() => deliveriesQuery.refetch()}
+              className="gap-2"
+            >
+              <RotateCwIcon className="h-4 w-4" />
+              Retry
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
+
+  if (deliveriesQuery.data.results.length === 0) {
+    return (
+      <div className="rounded-lg border w-full">
+        <EmptyScreen
+          icon={<WebhookIcon />}
+          title="No deliveries"
+          description="There are no deliveries for this webhook yet"
+        />
+      </div>
+    );
+  }
+
+  // @todo add pagination
+  return <DataTable data={deliveriesQuery.data.results} columns={columns} />;
+}
+
+function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
+  AppWebhookListDeliveryAttemptsResponseSchemaType["results"][number]
+>[] {
+  return [
+    {
+      header: "Attempted At",
+      accessorKey: "attemptedAt",
+      cell: ({ row }) => {
+        return new Intl.DateTimeFormat(undefined, {
+          dateStyle: "short",
+          timeStyle: "short",
+        }).format(row.original.attemptedAt);
+      },
+    },
+    {
+      header: "Attempt Number",
+      accessorKey: "attemptNumber",
+    },
+    {
+      header: "Event Type",
+      accessorKey: "delivery.event.eventType",
+      cell: ({ row }) => {
+        return (
+          <Badge variant="secondary">
+            {row.original.delivery.event.eventType}
+          </Badge>
+        );
+      },
+    },
+    {
+      header: "Response Status",
+      accessorKey: "responseStatus",
+      cell: ({ row }) => {
+        if (
+          row.original.responseStatus >= 200 &&
+          row.original.responseStatus < 300
+        ) {
+          return <Badge variant="outline">{row.original.responseStatus}</Badge>;
+        }
+
+        return (
+          <Badge variant="destructive">{row.original.responseStatus}</Badge>
+        );
+      },
+    },
+    {
+      header: "Response Time",
+      accessorKey: "responseMs",
+      cell: ({ row }) => {
+        return `${row.original.responseMs}ms`;
+      },
+    },
+  ];
 }

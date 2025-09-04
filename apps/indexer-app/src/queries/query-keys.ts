@@ -17,3 +17,10 @@ export function createWebhookQueryKey(appId: string, webhookId: string) {
 export function createWebhooksQueryKey(appId: string) {
   return ["webhooks", appId] as const;
 }
+
+export function createWebhookDeliveryAttemptsQueryKey(
+  appId: string,
+  webhookId: string,
+) {
+  return ["webhook-delivery-attempts", appId, webhookId] as const;
+}

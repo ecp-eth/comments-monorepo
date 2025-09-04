@@ -58,7 +58,7 @@ export const AppWebhookDeliverySchema = z.object({
 
 export const AppWebhookDeliveriesCursorSchema = z
   .object({
-    id: z.bigint(),
+    id: OpenAPIBigintStringSchema,
   })
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
