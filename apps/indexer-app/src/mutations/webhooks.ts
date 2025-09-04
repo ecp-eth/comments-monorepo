@@ -191,3 +191,57 @@ export function useDeleteWebhookMutation({
     ...options,
   });
 }
+
+type UseSendTestWebhookEventMutationOptions = Omit<
+  UseMutationOptions<void, Error, void>,
+  "mutationFn"
+> & {
+  appId: string;
+  webhookId: string;
+};
+
+export function useSendTestWebhookEventMutation({
+  appId,
+  webhookId,
+  ...options
+}: UseSendTestWebhookEventMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      const appWebhookTestResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(
+            createFetchUrl(`/api/apps/${appId}/webhooks/${webhookId}/test`),
+            {
+              headers: {
+                ...headers,
+              },
+              method: "POST",
+            },
+          );
+        },
+      );
+
+      if (appWebhookTestResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appWebhookTestResponse.status === 400) {
+        throw new Error(
+          `Failed to send test webhook event: ${appWebhookTestResponse.statusText}`,
+        );
+      }
+
+      if (!appWebhookTestResponse.ok) {
+        throw new Error(
+          `Failed to send test webhook event: ${appWebhookTestResponse.statusText}`,
+        );
+      }
+
+      return;
+    },
+    ...options,
+  });
+}
