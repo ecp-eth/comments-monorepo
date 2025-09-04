@@ -8,6 +8,15 @@ import type { ResolvedENSData } from "./ens.types";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 
+// this is a KNOWN LIMITATION in order to bundle the request:
+// we assume each address maximumly matches 30 domains, however if someone really registered tons of domain that exceed the count,
+// it might result other addresses mapped names to be pushed beyound the limit and causing searchEnsByExactAddressInBatch to return null
+const MAX_DOMAIN_PER_ADDRESS = 30;
+
+// for above mentioned reason, we need to limit the batch size to 3 to reduce the chance of the someone registering tons of domain that
+// push the other address out of the batch request
+const MAX_BATCH_SIZE = 3;
+
 export type ENSByQueryResolverKey = string;
 export type ENSByQueryResolver = DataLoader<
   ENSByQueryResolverKey,
@@ -85,7 +94,7 @@ export function createENSByQueryResolver({
       return Promise.all(promises);
     },
     {
-      maxBatchSize: 5,
+      maxBatchSize: MAX_BATCH_SIZE,
       ...dataLoaderOptions,
     },
   );
@@ -133,6 +142,7 @@ const ensResultSchema = z
       z.object({
         id: HexSchema,
         name: z.string(),
+        expiryDate: z.coerce.number().nullable(),
         resolvedAddress: z.object({
           id: HexSchema,
         }),
@@ -180,21 +190,18 @@ const domainFragment = gql`
         value
       }
     }
+    expiryDate
   }
 `;
 
 const searchByNameQuery = gql`
   ${domainFragment}
-  query SearchByName($name: String!, $currentTimestamp: BigInt!) {
+  query SearchByName($name: String!) {
     domains(
       where: {
         name_contains: $name
         # make sure to exclude reverse records
         name_not_ends_with: ".addr.reverse"
-        # make sure to exclude empty labels
-        labelName_not: ""
-        # make sure to exclude expired domains
-        expiryDate_gte: $currentTimestamp
         resolvedAddress_not: ""
       }
       first: 20
@@ -206,15 +213,8 @@ const searchByNameQuery = gql`
 
 const searchByAddressStartsWithQuery = gql`
   ${domainFragment}
-  query SearchByAddress($address: String!, $currentTimestamp: BigInt!) {
-    domains(
-      where: {
-        resolvedAddressId_starts_with: $address
-        expiryDate_gte: $currentTimestamp
-        labelName_not: ""
-      }
-      first: 20
-    ) {
+  query SearchByAddress($address: String!) {
+    domains(where: { resolvedAddressId_starts_with: $address }, first: 20) {
       ...DomainFragment
     }
   }
@@ -222,15 +222,8 @@ const searchByAddressStartsWithQuery = gql`
 
 const searchByExactAddressInBatchQuery = gql`
   ${domainFragment}
-  query SearchByAddress($addresses: [String!]!, $currentTimestamp: BigInt!) {
-    domains(
-      where: {
-        resolvedAddressId_in: $addresses
-        expiryDate_gte: $currentTimestamp
-        labelName_not: ""
-      }
-      first: 20
-    ) {
+  query SearchByAddress($addresses: [String!]!, $count: Int!) {
+    domains(where: { resolvedAddressId_in: $addresses }, first: $count) {
       ...DomainFragment
     }
   }
@@ -253,7 +246,6 @@ async function searchEns(
       searchByAddressStartsWithQuery,
       {
         address: query,
-        currentTimestamp,
       },
     );
   } else {
@@ -262,7 +254,6 @@ async function searchEns(
       searchByNameQuery,
       {
         name: query,
-        currentTimestamp,
       },
     );
   }
@@ -285,12 +276,23 @@ async function searchEns(
     return null;
   }
 
-  return parsedResults.data.domains.map((domain) => ({
-    address: domain.resolvedAddress.id,
-    name: domain.name,
-    avatarUrl: domain.avatarUrl,
-    url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
-  }));
+  return parsedResults.data.domains
+    .filter((domain) => {
+      // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
+      // one of the example is test.normx.eth
+      // so we need to filter them out manually rather than using expiryDate_gte
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((domain) => ({
+      address: domain.resolvedAddress.id,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
+      url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
+    }));
 }
 
 async function searchEnsByExactAddressInBatch(
@@ -303,8 +305,8 @@ async function searchEnsByExactAddressInBatch(
     subgraphUrl,
     searchByExactAddressInBatchQuery,
     {
-      addresses,
-      currentTimestamp,
+      addresses: addresses,
+      count: addresses.length * MAX_DOMAIN_PER_ADDRESS,
     },
   );
 
@@ -319,6 +321,7 @@ async function searchEnsByExactAddressInBatch(
         error: parsedResults.error.flatten(),
       },
     });
+
     return null;
   }
 
@@ -329,6 +332,13 @@ async function searchEnsByExactAddressInBatch(
   const resolvedEnsDataMap = new Map<Hex, ResolvedENSData[]>();
 
   parsedResults.data.domains.forEach((domain) => {
+    // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
+    // one of the example is test.normx.eth
+    // so we need to filter them out manually rather than using expiryDate_gte
+    if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+      return;
+    }
+
     const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
     const existing = resolvedEnsDataMap.get(address) ?? [];
 
