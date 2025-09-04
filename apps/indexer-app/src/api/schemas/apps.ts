@@ -151,7 +151,7 @@ export const AppWebhookUpdateRequestSchema = z
     name: z.string().trim().nonempty().max(50),
     url: z.string().url(),
     auth: WebhookAuthConfigSchema,
-    eventFilter: z.array(WebhookEventNamesSchema),
+    eventFilter: z.array(WebhookEventNamesSchema).min(1),
   })
   .partial();
 
