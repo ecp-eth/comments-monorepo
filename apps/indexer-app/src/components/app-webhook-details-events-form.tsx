@@ -11,15 +11,7 @@ import {
 import { toast } from "sonner";
 import { ZodError } from "zod";
 import { createWebhookQueryKey } from "@/queries/query-keys";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
-import { Input } from "./ui/input";
+import { Form, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Button } from "./ui/button";
 import { CheckIcon, Loader2Icon, PencilIcon } from "lucide-react";
@@ -96,7 +88,26 @@ export function AppWebhookDetailsEventsForm({
           name="eventFilter"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Events</FormLabel>
+              <div className="flex flex-row items-center gap-2">
+                <FormLabel>Events</FormLabel>
+                {!isEditing ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="p-0 h-4"
+                        type="button"
+                        variant="link"
+                        onClick={() => setIsEditing(true)}
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Edit events</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ) : null}
+              </div>
               <div className="flex flex-row flex-wrap gap-2">
                 {WebhookEventNames.filter((event) =>
                   isEditing ? true : field.value?.includes(event),
@@ -152,22 +163,7 @@ export function AppWebhookDetailsEventsForm({
                       </TooltipContent>
                     </Tooltip>
                   </>
-                ) : (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => setIsEditing(true)}
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Edit events</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
+                ) : null}
               </div>
               <FormMessage />
             </FormItem>

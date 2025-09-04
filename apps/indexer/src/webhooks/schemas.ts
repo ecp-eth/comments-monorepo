@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const WebhookAuthConfigSchema = z.discriminatedUnion("type", [
   z.object({
-    type: z.literal("http-basic-aut"),
+    type: z.literal("http-basic-auth"),
     headerName: z.string().default("Authorization"),
     username: z.string(),
     password: z.string(),
