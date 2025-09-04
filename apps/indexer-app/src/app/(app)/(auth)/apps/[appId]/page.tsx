@@ -21,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type AppSchemaType } from "@/api/schemas/apps";
 import { AppDetailsSecretForm } from "@/components/app-details-secret-form";
 import { AppDetailsRenameForm } from "@/components/app-details-rename-form";
+import { AppDetailsDeleteButton } from "@/components/app-details-delete-button";
 
 export default function AppPage({
   params,
@@ -146,9 +147,8 @@ function AppDetailsCard({ app }: { app: AppSchemaType }) {
       <CardContent className="flex flex-col gap-4">
         <AppDetailsRenameForm app={app} />
         <AppDetailsSecretForm app={app} />
-
         <div>
-          <Button variant="destructive">Delete App</Button>
+          <AppDetailsDeleteButton app={app} />
         </div>
       </CardContent>
     </Card>

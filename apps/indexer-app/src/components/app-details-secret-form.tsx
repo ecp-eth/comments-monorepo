@@ -229,7 +229,7 @@ function AppDetailsSecretFormConfirmDialog({
         <DialogFooter>
           <Button
             disabled={renameAppMutation.isPending}
-            variant="secondary"
+            variant="outline"
             onClick={() => onClose()}
           >
             Cancel
