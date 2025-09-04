@@ -32,7 +32,7 @@ export function AppWebhookDetailsEventsForm({
       AppWebhookUpdateRequestSchema.required({ eventFilter: true }),
     ),
     defaultValues: {
-      eventFilter: webhook.eventFilter,
+      eventFilter: webhook.eventFilter.filter((event) => event !== "test"),
     },
   });
   const updateWebhookMutation = useUpdateWebhookMutation({
@@ -66,7 +66,7 @@ export function AppWebhookDetailsEventsForm({
 
   useEffect(() => {
     form.reset({
-      eventFilter: webhook.eventFilter,
+      eventFilter: webhook.eventFilter.filter((event) => event !== "test"),
     });
   }, [form, webhook.eventFilter]);
 
@@ -110,7 +110,9 @@ export function AppWebhookDetailsEventsForm({
               </div>
               <div className="flex flex-row flex-wrap gap-2">
                 {WebhookEventNames.filter((event) =>
-                  isEditing ? true : field.value?.includes(event),
+                  isEditing
+                    ? event !== "test"
+                    : field.value?.includes(event) && event !== "test",
                 ).map((event) => (
                   <FormField
                     control={form.control}

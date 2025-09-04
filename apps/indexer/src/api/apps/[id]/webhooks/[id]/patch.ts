@@ -22,7 +22,10 @@ export const AppWebhookPatchRequestParamsSchema = z.object({
 export const AppWebhookPatchRequestBodySchema = z
   .object({
     auth: WebhookAuthConfigSchema,
-    eventFilter: z.array(EventNamesSchema),
+    eventFilter: z
+      .array(EventNamesSchema)
+      .min(1)
+      .transform((val) => Array.from(new Set([...val, "test" as const]))),
     name: z.string().trim().nonempty().max(50),
     url: z.string().url(),
   })

@@ -209,39 +209,41 @@ export function CreateWebhookDialogButton({
                 </FormDescription>
               </div>
               <CollapsibleContent>
-                {WebhookEventNames.map((item) => (
-                  <FormField
-                    key={item}
-                    control={form.control}
-                    name="events"
-                    render={({ field }) => {
-                      return (
-                        <FormItem
-                          key={item}
-                          className="flex flex-row items-center gap-2 space-y-0"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item)}
-                              onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...field.value, item])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        (value) => value !== item,
-                                      ),
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            {item}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                {WebhookEventNames.filter((item) => item !== "test").map(
+                  (item) => (
+                    <FormField
+                      key={item}
+                      control={form.control}
+                      name="events"
+                      render={({ field }) => {
+                        return (
+                          <FormItem
+                            key={item}
+                            className="flex flex-row items-center gap-2 space-y-0"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value?.includes(item)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([...field.value, item])
+                                    : field.onChange(
+                                        field.value?.filter(
+                                          (value) => value !== item,
+                                        ),
+                                      );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                              {item}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ),
+                )}
               </CollapsibleContent>
               <FormMessage />
             </FormItem>
