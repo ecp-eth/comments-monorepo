@@ -1,0 +1,4 @@
+ALTER TABLE "ecp_indexer_schema"."event_outbox" ADD COLUMN "payload_size" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
+CREATE INDEX "awda_by_webhook_time_idx" ON "ecp_indexer_schema"."app_webhook_delivery_attempt" USING btree ("app_webhook_delivery_id","attempted_at");--> statement-breakpoint
+CREATE INDEX "awda_by_delivery_idx" ON "ecp_indexer_schema"."app_webhook_delivery_attempt" USING btree ("app_webhook_delivery_id","attempt_number");--> statement-breakpoint
+CREATE INDEX "awda_failed_partial_idx" ON "ecp_indexer_schema"."app_webhook_delivery_attempt" USING btree ("response_status") WHERE "ecp_indexer_schema"."app_webhook_delivery_attempt"."response_status" < 200 OR "ecp_indexer_schema"."app_webhook_delivery_attempt"."response_status" > 399;

@@ -50,6 +50,7 @@ export class EventOutboxService {
         eventType: event.event,
         eventUid: event.uid,
         payload: event,
+        payloadSize: Buffer.byteLength(JSON.stringify(event), "utf-8"),
       })
       // dedupe events, this can happen if a new version of indexer is deployed
       // and it reindexes on chain data
