@@ -209,3 +209,13 @@ export const AppWebhookListDeliveryAttemptsResponseSchema = z.object({
 export type AppWebhookListDeliveryAttemptsResponseSchemaType = z.infer<
   typeof AppWebhookListDeliveryAttemptsResponseSchema
 >;
+
+export const AppWebhookAnalyticsBacklogResponseSchema = z.object({
+  pendingDeliveries: z.coerce.bigint(),
+  nextDueAt: z.coerce.date().nullable(),
+  oldestAge: z.number().nullable(),
+});
+
+export type AppWebhookAnalyticsBacklogResponseSchemaType = z.infer<
+  typeof AppWebhookAnalyticsBacklogResponseSchema
+>;

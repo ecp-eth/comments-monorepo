@@ -13,17 +13,18 @@ import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-ev
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
 import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-test-button";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
-import { CreateWebhookDialogButton } from "@/components/create-webhook-dialog-button";
 import { DataTable } from "@/components/data-table";
 import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { WebhookNotFoundError } from "@/errors";
 import { useProtectRoute } from "@/hooks/use-protect-route";
 import { useAppQuery } from "@/queries/app";
 import {
+  useWebhookAnalyticsBacklogQuery,
   useWebhookDeliveryAttemptsQuery,
   useWebhookQuery,
 } from "@/queries/webhook";
@@ -162,7 +163,7 @@ export default function WebhookPage({
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
+          <WebhookAnalyticsBacklogCard appId={appId} webhookId={webhookId} />
           <div className="bg-muted/50 aspect-video rounded-xl" />
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -171,6 +172,107 @@ export default function WebhookPage({
         </div>
       </AppContent>
     </>
+  );
+}
+
+function WebhookAnalyticsBacklogCard({
+  appId,
+  webhookId,
+}: {
+  appId: string;
+  webhookId: string;
+}) {
+  const analyticsBacklogQuery = useWebhookAnalyticsBacklogQuery({
+    appId,
+    webhookId,
+  });
+
+  useProtectRoute(analyticsBacklogQuery);
+
+  if (analyticsBacklogQuery.status === "error") {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Webhook Backlog</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ErrorScreen
+            title="Error fetching analytics backlog"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={analyticsBacklogQuery.isRefetching}
+                onClick={() => analyticsBacklogQuery.refetch()}
+                className="gap-2"
+                type="button"
+              >
+                <RotateCwIcon className="h-4 w-4" />
+                Retry
+              </Button>
+            }
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Webhook Backlog</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2 items-center">
+                <span>Pending Deliveries: </span>
+                {analyticsBacklogQuery.status === "pending" ? (
+                  <Skeleton className="w-4 h-4" />
+                ) : (
+                  <span>{analyticsBacklogQuery.data.pendingDeliveries}</span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2 items-center">
+                <span>Next Due At: </span>
+                {analyticsBacklogQuery.status === "pending" ? (
+                  <Skeleton className="w-[10ch] h-4" />
+                ) : (
+                  <span>
+                    {analyticsBacklogQuery.data.nextDueAt
+                      ? new Intl.DateTimeFormat(undefined, {
+                          dateStyle: "short",
+                          timeStyle: "short",
+                        }).format(analyticsBacklogQuery.data.nextDueAt)
+                      : "N/A"}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2">
+                <span>Oldest Age</span>
+                {analyticsBacklogQuery.status === "pending" ? (
+                  <Skeleton className="w-[10ch] h-4" />
+                ) : (
+                  <span>
+                    {analyticsBacklogQuery.data.oldestAge
+                      ? `${analyticsBacklogQuery.data.oldestAge}s`
+                      : "N/A"}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -294,9 +396,17 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
       cell: ({ row }) => {
         if (
           row.original.responseStatus >= 200 &&
-          row.original.responseStatus < 300
+          row.original.responseStatus <= 399
         ) {
           return <Badge variant="outline">{row.original.responseStatus}</Badge>;
+        }
+
+        if (row.original.responseStatus === -1) {
+          return <Badge variant="destructive">Timeout</Badge>;
+        }
+
+        if (row.original.responseStatus === -2) {
+          return <Badge variant="destructive">Network Error</Badge>;
         }
 
         return (
