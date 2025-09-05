@@ -379,6 +379,10 @@ export const IndexerAPICommentReactionOutputSchema =
     reactionCounts: z.record(z.number()),
   });
 
+export type IndexerAPICommentReactionOutputSchemaType = z.infer<
+  typeof IndexerAPICommentReactionOutputSchema
+>;
+
 export const IndexerAPIPaginationSchema = z.object({
   limit: z.number().int(),
   offset: z.number().int(),
@@ -396,11 +400,20 @@ export const IndexerAPIExtraSchema = z.object({
 
 export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;
 
-export const IndexerAPICommentWithRepliesSchema =
+type IndexerAPICommentWithRepliesSchemaInnerType =
+  IndexerAPICommentReactionSchemaType & {
+    replies: {
+      extra: IndexerAPIExtraSchemaType;
+      results: IndexerAPICommentWithRepliesSchemaInnerType[];
+      pagination: IndexerAPICursorPaginationSchemaType;
+    };
+  };
+
+export const IndexerAPICommentWithRepliesSchema: z.ZodType<IndexerAPICommentWithRepliesSchemaInnerType> =
   IndexerAPICommentReactionSchema.extend({
     replies: z.object({
       extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentReactionSchema),
+      results: z.lazy(() => IndexerAPICommentWithRepliesSchema.array()),
       pagination: IndexerAPICursorPaginationSchema,
     }),
   });
@@ -409,14 +422,39 @@ export type IndexerAPICommentWithRepliesSchemaType = z.infer<
   typeof IndexerAPICommentWithRepliesSchema
 >;
 
-export const IndexerAPICommentWithRepliesOutputSchema =
-  IndexerAPICommentReactionOutputSchema.extend({
-    replies: z.object({
-      extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentReactionOutputSchema),
-      pagination: IndexerAPICursorPaginationSchema,
-    }),
-  });
+type IndexerAPICommentReactionOutputSchemaInputType = z.input<
+  typeof IndexerAPICommentReactionOutputSchema
+>;
+
+type IndexerAPICommentWithRepliesOutputSchemaInnerType =
+  IndexerAPICommentReactionOutputSchemaType & {
+    replies: {
+      extra: IndexerAPIExtraSchemaType;
+      results: IndexerAPICommentReactionOutputSchemaType[];
+      pagination: IndexerAPICursorPaginationSchemaType;
+    };
+  };
+
+type IndexerAPICommentWithRepliesOutputSchemaInnerInputType =
+  IndexerAPICommentReactionOutputSchemaInputType & {
+    replies: {
+      extra: IndexerAPIExtraSchemaType;
+      results: IndexerAPICommentWithRepliesOutputSchemaInnerInputType[];
+      pagination: IndexerAPICursorPaginationSchemaType;
+    };
+  };
+
+export const IndexerAPICommentWithRepliesOutputSchema: z.ZodType<
+  IndexerAPICommentWithRepliesOutputSchemaInnerType,
+  z.ZodObjectDef,
+  IndexerAPICommentWithRepliesOutputSchemaInnerInputType
+> = IndexerAPICommentReactionOutputSchema.extend({
+  replies: z.object({
+    extra: IndexerAPIExtraSchema,
+    results: z.lazy(() => IndexerAPICommentWithRepliesOutputSchema.array()),
+    pagination: IndexerAPICursorPaginationSchema,
+  }),
+});
 
 export type IndexerAPICommentWithRepliesOutputSchemaType = z.infer<
   typeof IndexerAPICommentWithRepliesOutputSchema
