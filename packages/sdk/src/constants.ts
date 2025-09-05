@@ -115,3 +115,9 @@ export const MAX_COMMENT_REPORT_MESSAGE_LENGTH = 200;
 
 export const DEFAULT_CHAIN_ID = 8453;
 export const DEFAULT_CHAIN_ID_DEV = 31337;
+
+/**
+ * Asset address used for representing native assets.
+ */
+export const NATIVE_ASSET_ADDRESS =
+  "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
