@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / indexerApiRetryCondition
+
+# Function: indexerApiRetryCondition()
+
+```ts
+function indexerApiRetryCondition(error): boolean;
+```
+
+Defined in: [packages/sdk/src/indexer/utils.ts:54](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/utils.ts#L54)
+
+Determine if a fetch error from the indexer API should be retried
+
+## Parameters
+
+### error
+
+`unknown`
+
+The error to check
+
+## Returns
+
+`boolean`
+
+True if the error should be retried, false otherwise
