@@ -1,6 +1,7 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { schema } from "../../../schema.ts";
 import { eq, sql } from "drizzle-orm";
+import isNetworkError from "is-network-error";
 
 type WebhookEventDeliveryService_DeliverEventsParams = {
   signal: AbortSignal;
@@ -167,6 +168,10 @@ export class WebhookEventDeliveryService {
           throw new WebhookDeliveryTimeoutError(this.requestTimeout);
         }
 
+        if (isNetworkError(e)) {
+          throw new WebhookDeliveryNetworkError(Date.now() - start);
+        }
+
         throw e;
       });
 
@@ -282,9 +287,15 @@ class WebhookDeliveryTimeoutError extends WebhookDeliveryError {
   constructor(timeoutMs: number) {
     super(
       "Webhook delivery timed out",
-      500,
+      -1,
       timeoutMs,
       "Webhook delivery timed out",
     );
+  }
+}
+
+class WebhookDeliveryNetworkError extends WebhookDeliveryError {
+  constructor(responseMs: number) {
+    super("Webhook delivery network error", -2, responseMs, "Network error");
   }
 }
