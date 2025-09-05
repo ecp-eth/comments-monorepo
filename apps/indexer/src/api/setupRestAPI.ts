@@ -36,6 +36,7 @@ import { setupAppWebhookPatch } from "./apps/[id]/webhooks/[id]/patch";
 import { setupAppWebhookTest } from "./apps/[id]/webhooks/[id]/test/post";
 import { setupAppUpdate } from "./apps/[id]/patch";
 import { setupAppWebhookDeliveryAttemptsGet } from "./apps/[id]/webhooks/[id]/deliveries/attempts/get";
+import { setupGetAppWebhookAnalyticsBacklog } from "./apps/[id]/webhooks/[id]/analytics/backlog/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -75,6 +76,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppWebhookPatch(app);
   setupAppWebhookTest(app);
   setupAppWebhookDeliveryAttemptsGet(app);
+  setupGetAppWebhookAnalyticsBacklog(app);
 
   return app;
 }

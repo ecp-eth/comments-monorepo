@@ -24,3 +24,10 @@ export function createWebhookDeliveryAttemptsQueryKey(
 ) {
   return ["webhook-delivery-attempts", appId, webhookId] as const;
 }
+
+export function createWebhookAnalyticsBacklogQueryKey(
+  appId: string,
+  webhookId: string,
+) {
+  return ["webhook-analytics-backlog", appId, webhookId] as const;
+}
