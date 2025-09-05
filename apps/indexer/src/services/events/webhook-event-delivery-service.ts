@@ -2,6 +2,7 @@ import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { schema } from "../../../schema.ts";
 import { eq, sql } from "drizzle-orm";
 import isNetworkError from "is-network-error";
+import { createHmac } from "node:crypto";
 
 type WebhookEventDeliveryService_DeliverEventsParams = {
   signal: AbortSignal;
@@ -132,7 +133,15 @@ export class WebhookEventDeliveryService {
         return operators.eq(fields.id, deliveryId);
       },
       with: {
-        appWebhook: true,
+        appWebhook: {
+          with: {
+            app: {
+              with: {
+                appSigningKeys: true,
+              },
+            },
+          },
+        },
         event: true,
       },
     });
@@ -155,10 +164,31 @@ export class WebhookEventDeliveryService {
 
     try {
       const rawBody = JSON.stringify(event.payload);
+      const signingKey = appWebhook.app.appSigningKeys[0];
+
+      if (!signingKey) {
+        throw new Error(`App with id ${appWebhook.app.id} has no signing key`);
+      }
+
+      const timestamp = Date.now();
+      const signature = createHmac("sha256", signingKey.secret)
+        .update(`${timestamp}.${rawBody}`)
+        .digest("hex");
       const response = await fetch(appWebhook.url, {
         method: "POST",
         headers: {
+          ...(appWebhook.auth.type === "http-basic-auth" && {
+            [appWebhook.auth.headerName]: `Basic ${Buffer.from(
+              `${appWebhook.auth.username}:${appWebhook.auth.password}`,
+            ).toString("base64")}`,
+          }),
+          ...(appWebhook.auth.type === "header" && {
+            [appWebhook.auth.headerName]: appWebhook.auth.headerValue,
+          }),
           "Content-Type": "application/json",
+          "X-ECP-Webhook-ID": appWebhook.id.toString(),
+          "X-ECP-Webhook-Timestamp": timestamp.toString(),
+          "X-ECP-Webhook-Signature": `v1=${signature}`,
         },
         redirect: "manual",
         body: rawBody,
