@@ -52,3 +52,39 @@ export function createWebhookAnalyticsVolumeQueryKey(
     params?.tz,
   ] as const;
 }
+
+export function createWebhookAnalyticsLatencyResponseQueryKey(
+  appId: string,
+  webhookId: string,
+  params?: Partial<{
+    from: Date;
+    to: Date;
+    bucket: string;
+  }>,
+) {
+  return [
+    "webhook-analytics-latency-response",
+    appId,
+    webhookId,
+    params?.bucket,
+    params?.from,
+    params?.to,
+  ] as const;
+}
+
+export function createWebhookAnalyticsLatencyResponseHistogramQueryKey(
+  appId: string,
+  webhookId: string,
+  params?: Partial<{
+    from: Date;
+    to: Date;
+  }>,
+) {
+  return [
+    "webhook-analytics-latency-response-histogram",
+    appId,
+    webhookId,
+    params?.from,
+    params?.to,
+  ] as const;
+}

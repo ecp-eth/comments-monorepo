@@ -8,6 +8,7 @@ import type {
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
 import { AppWebhookDetailsAuthForm } from "@/components/app-webhook-details-auth-form";
+import { AppWebhookDetailsChartCardBackendLatency } from "@/components/app-webhook-details-chart-card-backend-latency";
 import { AppWebhookDetailsDeleteButton } from "@/components/app-webhook-details-delete-button";
 import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-events-form";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
@@ -166,6 +167,10 @@ export default function WebhookPage({
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
           <WebhookAnalyticsBacklogCard appId={appId} webhookId={webhookId} />
           <AppWebhookDetailsVolumeChartCard
+            appId={appId}
+            webhookId={webhookId}
+          />
+          <AppWebhookDetailsChartCardBackendLatency
             appId={appId}
             webhookId={webhookId}
           />

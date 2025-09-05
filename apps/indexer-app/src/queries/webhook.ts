@@ -12,9 +12,15 @@ import {
   type AppWebhookAnalyticsBacklogResponseSchemaType,
   type AppWebhookAnalyticsVolumeResponseSchemaType,
   AppWebhookAnalyticsVolumeResponseSchema,
+  type AppWebhookAnalyticsLatencyResponseResponseSchemaType,
+  AppWebhookAnalyticsLatencyResponseResponseSchema,
+  type AppWebhookAnalyticsLatencyResponseHistogramResponseSchemaType,
+  AppWebhookAnalyticsLatencyResponseHistogramResponseSchema,
 } from "@/api/schemas/apps";
 import {
   createWebhookAnalyticsBacklogQueryKey,
+  createWebhookAnalyticsLatencyResponseHistogramQueryKey,
+  createWebhookAnalyticsLatencyResponseQueryKey,
   createWebhookAnalyticsVolumeQueryKey,
   createWebhookDeliveryAttemptsQueryKey,
   createWebhookQueryKey,
@@ -249,6 +255,144 @@ export function useWebhookAnalyticsVolumeQuery({
       }
 
       return AppWebhookAnalyticsVolumeResponseSchema.parse(
+        await response.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseWebhookAnalyticsLatencyResponseQueryOptions = Omit<
+  UseQueryOptions<
+    AppWebhookAnalyticsLatencyResponseResponseSchemaType,
+    Error,
+    AppWebhookAnalyticsLatencyResponseResponseSchemaType,
+    ReturnType<typeof createWebhookAnalyticsLatencyResponseQueryKey>
+  >,
+  "queryKey" | "queryFn"
+> & {
+  appId: string;
+  webhookId: string;
+  bucket: "7" | "30" | "90";
+};
+
+export function useWebhookAnalyticsLatencyResponseQuery({
+  appId,
+  webhookId,
+  bucket,
+  ...options
+}: UseWebhookAnalyticsLatencyResponseQueryOptions) {
+  const auth = useAuth();
+  const [now] = useState(() => new Date());
+  const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * Number(bucket));
+
+  return useQuery({
+    queryKey: createWebhookAnalyticsLatencyResponseQueryKey(appId, webhookId, {
+      bucket: "day",
+      from,
+      to: now,
+    }),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        const url = createFetchUrl(
+          `/api/apps/${appId}/webhooks/${webhookId}/analytics/latency-response`,
+        );
+
+        url.searchParams.set("bucket", "day");
+        url.searchParams.set("from", from.toISOString());
+        url.searchParams.set("to", now.toISOString());
+
+        return fetch(url, {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (response.status === 404) {
+        throw new WebhookNotFoundError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch webhook analytics latency response: ${response.statusText}`,
+        );
+      }
+
+      return AppWebhookAnalyticsLatencyResponseResponseSchema.parse(
+        await response.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseWebhookAnalyticsLatencyResponseHistogramQueryOptions = Omit<
+  UseQueryOptions<
+    AppWebhookAnalyticsLatencyResponseHistogramResponseSchemaType,
+    Error,
+    AppWebhookAnalyticsLatencyResponseHistogramResponseSchemaType,
+    ReturnType<typeof createWebhookAnalyticsLatencyResponseHistogramQueryKey>
+  >,
+  "queryKey" | "queryFn"
+> & {
+  appId: string;
+  webhookId: string;
+  bucket: "7" | "30" | "90";
+};
+
+export function useWebhookAnalyticsLatencyResponseHistogramQuery({
+  appId,
+  webhookId,
+  bucket,
+  ...options
+}: UseWebhookAnalyticsLatencyResponseHistogramQueryOptions) {
+  const auth = useAuth();
+  const [now] = useState(() => new Date());
+  const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * Number(bucket));
+
+  return useQuery({
+    queryKey: createWebhookAnalyticsLatencyResponseHistogramQueryKey(
+      appId,
+      webhookId,
+      {
+        from,
+        to: now,
+      },
+    ),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        const url = createFetchUrl(
+          `/api/apps/${appId}/webhooks/${webhookId}/analytics/latency-response/histogram`,
+        );
+
+        url.searchParams.set("from", from.toISOString());
+        url.searchParams.set("to", now.toISOString());
+
+        return fetch(url, {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (response.status === 404) {
+        throw new WebhookNotFoundError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch webhook analytics latency response histogram: ${response.statusText}`,
+        );
+      }
+
+      return AppWebhookAnalyticsLatencyResponseHistogramResponseSchema.parse(
         await response.json(),
       );
     },
