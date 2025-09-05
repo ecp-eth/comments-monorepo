@@ -390,6 +390,21 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
     responseMs: integer().notNull(),
     error: text(),
   },
+  (table) => [
+    index("awda_by_webhook_time_idx").on(
+      table.appWebhookDeliveryId,
+      table.attemptedAt,
+    ),
+    index("awda_by_delivery_idx").on(
+      table.appWebhookDeliveryId,
+      table.attemptNumber,
+    ),
+    index("awda_failed_partial_idx")
+      .on(table.responseStatus)
+      .where(
+        sql`${table.responseStatus} < 200 OR ${table.responseStatus} > 399`,
+      ),
+  ],
 );
 
 export const appWebhookDeliveryAttemptRelations = relations(
@@ -416,6 +431,7 @@ export const eventOutbox = offchainSchema.table(
     aggregateType: text().$type<EventOutboxAggregateType>().notNull(), // allows to find all the events produced by the same aggregate type
     aggregateId: text().notNull(), // allows to find all the events produced by the same aggregate
     payload: jsonb().$type<Events>().notNull(),
+    payloadSize: integer().notNull().default(0),
   },
   (table) => [index("event_outbox_by_processed_at_idx").on(table.processedAt)],
 );
