@@ -7,6 +7,8 @@ import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
+const MAX_DOMAIN_PER_ADDRESS = 30;
+const MAX_BATCH_SIZE = 5;
 
 export type ENSByQueryResolverKey = string;
 export type ENSByQueryResolver = DataLoader<
@@ -85,7 +87,7 @@ export function createENSByQueryResolver({
       return Promise.all(promises);
     },
     {
-      maxBatchSize: 5,
+      maxBatchSize: MAX_BATCH_SIZE,
       ...dataLoaderOptions,
     },
   );
@@ -127,40 +129,46 @@ type ENSNodeResult = {
   }[];
 };
 
-const ensResultSchema = z
-  .object({
-    domains: z.array(
-      z.object({
+const ensResultDomainsSchema = z
+  .array(
+    z.object({
+      id: HexSchema,
+      name: z.string(),
+      expiryDate: z.coerce.number().nullable(),
+      resolvedAddress: z.object({
         id: HexSchema,
-        name: z.string(),
-        resolvedAddress: z.object({
-          id: HexSchema,
-        }),
-        resolver: z.object({
-          textChangeds: z.array(
-            z.object({
-              key: z.string().or(z.literal("avatar")),
-              value: z.string().nullable(),
-            }),
-          ),
-        }),
       }),
-    ),
-  })
+      resolver: z.object({
+        textChangeds: z.array(
+          z.object({
+            key: z.string().or(z.literal("avatar")),
+            value: z.string().nullable(),
+          }),
+        ),
+      }),
+    }),
+  )
   .transform((val) => {
-    return {
-      domains: val.domains.map((domain) => {
-        const avatarUrl = domain.resolver.textChangeds.find(
-          (t) => t.key === "avatar" && !!t.value,
-        )?.value;
+    return val.map((domain) => {
+      const avatarUrl = domain.resolver.textChangeds.find(
+        (t) => t.key === "avatar" && !!t.value,
+      )?.value;
 
-        return {
-          ...domain,
-          avatarUrl: avatarUrl ? normalizeAvatarUrl(avatarUrl) : null,
-        };
-      }),
-    };
+      return {
+        ...domain,
+        avatarUrl: avatarUrl ? normalizeAvatarUrl(avatarUrl) : null,
+      };
+    });
   });
+
+const ensResultByExactAddressSchema = z.record(
+  z.string(),
+  ensResultDomainsSchema,
+);
+
+const ensResultSchema = z.object({
+  domains: ensResultDomainsSchema,
+});
 
 const domainFragment = gql`
   fragment DomainFragment on Domain {
@@ -180,21 +188,18 @@ const domainFragment = gql`
         value
       }
     }
+    expiryDate
   }
 `;
 
 const searchByNameQuery = gql`
   ${domainFragment}
-  query SearchByName($name: String!, $currentTimestamp: BigInt!) {
+  query SearchByName($name: String!) {
     domains(
       where: {
         name_contains: $name
         # make sure to exclude reverse records
         name_not_ends_with: ".addr.reverse"
-        # make sure to exclude empty labels
-        labelName_not: ""
-        # make sure to exclude expired domains
-        expiryDate_gte: $currentTimestamp
         resolvedAddress_not: ""
       }
       first: 20
@@ -206,33 +211,23 @@ const searchByNameQuery = gql`
 
 const searchByAddressStartsWithQuery = gql`
   ${domainFragment}
-  query SearchByAddress($address: String!, $currentTimestamp: BigInt!) {
-    domains(
-      where: {
-        resolvedAddressId_starts_with: $address
-        expiryDate_gte: $currentTimestamp
-        labelName_not: ""
-      }
-      first: 20
-    ) {
+  query SearchByAddress($address: String!) {
+    domains(where: { resolvedAddressId_starts_with: $address }, first: 20) {
       ...DomainFragment
     }
   }
 `;
 
-const searchByExactAddressInBatchQuery = gql`
+const searchByExactAddressQueryTemplate = `
+  domains(where: { resolvedAddressId_in: $addresses }, first: $count) {
+    ...DomainFragment
+  }
+`;
+
+const searchByExactAddressQueryContainerTemplate = `
   ${domainFragment}
-  query SearchByAddress($addresses: [String!]!, $currentTimestamp: BigInt!) {
-    domains(
-      where: {
-        resolvedAddressId_in: $addresses
-        expiryDate_gte: $currentTimestamp
-        labelName_not: ""
-      }
-      first: 20
-    ) {
-      ...DomainFragment
-    }
+  query SearchByExactAddress($addresses: [String!]!, $count: Int!) {
+    <<RECORDS>>
   }
 `;
 
@@ -253,7 +248,6 @@ async function searchEns(
       searchByAddressStartsWithQuery,
       {
         address: query,
-        currentTimestamp,
       },
     );
   } else {
@@ -262,7 +256,6 @@ async function searchEns(
       searchByNameQuery,
       {
         name: query,
-        currentTimestamp,
       },
     );
   }
@@ -285,12 +278,23 @@ async function searchEns(
     return null;
   }
 
-  return parsedResults.data.domains.map((domain) => ({
-    address: domain.resolvedAddress.id,
-    name: domain.name,
-    avatarUrl: domain.avatarUrl,
-    url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
-  }));
+  return parsedResults.data.domains
+    .filter((domain) => {
+      // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
+      // one of the example is test.normx.eth
+      // so we need to filter them out manually rather than using expiryDate_gte
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((domain) => ({
+      address: domain.resolvedAddress.id,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
+      url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
+    }));
 }
 
 async function searchEnsByExactAddressInBatch(
@@ -299,16 +303,21 @@ async function searchEnsByExactAddressInBatch(
 ): Promise<ResolvedENSData[][] | null> {
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
-  const results = await graphqlRequest<ENSNodeResult>(
-    subgraphUrl,
-    searchByExactAddressInBatchQuery,
-    {
-      addresses,
-      currentTimestamp,
-    },
+  const query = searchByExactAddressQueryContainerTemplate.replace(
+    "<<RECORDS>>",
+    addresses
+      .map(
+        (address) => address.slice(2) + ":" + searchByExactAddressQueryTemplate,
+      )
+      .join("\n"),
   );
 
-  const parsedResults = ensResultSchema.safeParse(results);
+  const results = await graphqlRequest<ENSNodeResult>(subgraphUrl, query, {
+    addresses: addresses,
+    count: addresses.length * MAX_DOMAIN_PER_ADDRESS,
+  });
+
+  const parsedResults = ensResultByExactAddressSchema.safeParse(results);
 
   if (!parsedResults.success) {
     Sentry.captureMessage("ENSNode subgraph returned invalid data", {
@@ -319,27 +328,35 @@ async function searchEnsByExactAddressInBatch(
         error: parsedResults.error.flatten(),
       },
     });
-    return null;
-  }
 
-  if (parsedResults.data.domains.length === 0) {
     return null;
   }
 
   const resolvedEnsDataMap = new Map<Hex, ResolvedENSData[]>();
 
-  parsedResults.data.domains.forEach((domain) => {
-    const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
-    const existing = resolvedEnsDataMap.get(address) ?? [];
+  addresses.forEach((address) => {
+    const domains = parsedResults.data[address.slice(2)];
+    if (!domains || domains.length === 0) {
+      return;
+    }
 
-    existing.push({
-      address,
-      name: domain.name,
-      avatarUrl: domain.avatarUrl,
-      url: `https://app.ens.domains/${address}`,
+    domains.forEach((domain) => {
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return;
+      }
+
+      const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
+      const existing = resolvedEnsDataMap.get(address) ?? [];
+
+      existing.push({
+        address,
+        name: domain.name,
+        avatarUrl: domain.avatarUrl,
+        url: `https://app.ens.domains/${address}`,
+      });
+
+      resolvedEnsDataMap.set(address, existing);
     });
-
-    resolvedEnsDataMap.set(address, existing);
   });
 
   return addresses.map(
