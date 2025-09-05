@@ -282,7 +282,7 @@ importers:
         version: 14.0.5
       vite-tsconfig-paths:
         specifier: 5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0))
+        version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(tsx@4.19.4)(yaml@2.8.0))
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(tsx@4.19.4)(yaml@2.8.0)
@@ -703,6 +703,9 @@ importers:
       hono-rate-limiter:
         specifier: ^0.4.2
         version: 0.4.2(hono@4.9.1)
+      is-network-error:
+        specifier: ^1.1.0
+        version: 1.1.0
       lru-cache:
         specifier: ^11.0.2
         version: 11.1.0
@@ -757,7 +760,7 @@ importers:
         version: 14.0.5
       vite-tsconfig-paths:
         specifier: 5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(tsx@4.19.4)(yaml@2.8.0))
+        version: 5.1.4(typescript@5.8.3)(vite@5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0))
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.29)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.40.0)(tsx@4.19.4)(yaml@2.8.0)
@@ -8617,6 +8620,10 @@ packages:
   is-negative-zero@2.0.3:
     resolution: {integrity: sha512-5KoIu2Ngpyek75jXodFvnafB6DJgr3u8uuK0LEZJjrU19DrMD3EVERaR8sjz8CCGgpZvxPl9SuE1GMVPFHx1mw==}
     engines: {node: '>= 0.4'}
+
+  is-network-error@1.1.0:
+    resolution: {integrity: sha512-tUdRRAnhT+OtCZR/LxZelH/C7QtjtFrTu5tXCA8pl55eTUElUHT+GPYV8MBMBvea/j+NxQqVt3LbWMRir7Gx9g==}
+    engines: {node: '>=16'}
 
   is-node-process@1.2.0:
     resolution: {integrity: sha512-Vg4o6/fqPxIjtxgUH5QLJhwZ7gW5diGCVlXpuUfELC62CuxM1iHcRe51f2W1FDy04Ai4KJkagKjx3XaqyfRKXw==}
@@ -21970,6 +21977,8 @@ snapshots:
   is-map@2.0.3: {}
 
   is-negative-zero@2.0.3: {}
+
+  is-network-error@1.1.0: {}
 
   is-node-process@1.2.0: {}
 
