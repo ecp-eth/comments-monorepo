@@ -237,3 +237,35 @@ export const AppWebhookAnalyticsVolumeResponseSchema = z.object({
 export type AppWebhookAnalyticsVolumeResponseSchemaType = z.infer<
   typeof AppWebhookAnalyticsVolumeResponseSchema
 >;
+
+export const AppWebhookAnalyticsLatencyResponseResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      bucket: z.coerce.date(),
+      responseMsPtiles: z.array(z.number()),
+    }),
+  ),
+});
+
+export type AppWebhookAnalyticsLatencyResponseResponseSchemaType = z.infer<
+  typeof AppWebhookAnalyticsLatencyResponseResponseSchema
+>;
+
+export const AppWebhookAnalyticsLatencyResponseHistogramResponseSchema =
+  z.object({
+    results: z.array(
+      z.object({
+        bin: z.number().int(),
+        startMs: z.number(),
+        endMs: z.number(),
+        centerMs: z.number(),
+        label: z.string(),
+        count: z.coerce.bigint(),
+        total: z.coerce.bigint(),
+        pctOfTotal: z.number(),
+      }),
+    ),
+  });
+
+export type AppWebhookAnalyticsLatencyResponseHistogramResponseSchemaType =
+  z.infer<typeof AppWebhookAnalyticsLatencyResponseHistogramResponseSchema>;

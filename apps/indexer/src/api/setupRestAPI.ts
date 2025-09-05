@@ -38,6 +38,8 @@ import { setupAppUpdate } from "./apps/[id]/patch";
 import { setupAppWebhookDeliveryAttemptsGet } from "./apps/[id]/webhooks/[id]/deliveries/attempts/get";
 import { setupGetAppWebhookAnalyticsBacklog } from "./apps/[id]/webhooks/[id]/analytics/backlog/get";
 import { setupAppWebhookAnalyticsVolumeGet } from "./apps/[id]/webhooks/[id]/analytics/volume/get";
+import { setupGetAppWebhookAnalyticsLatencyResponse } from "./apps/[id]/webhooks/[id]/analytics/latency-response/get";
+import { setupGetAppWebhookAnalyticsLatencyResponseHistogram } from "./apps/[id]/webhooks/[id]/analytics/latency-response/histogram/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -79,6 +81,8 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppWebhookDeliveryAttemptsGet(app);
   setupGetAppWebhookAnalyticsBacklog(app);
   setupAppWebhookAnalyticsVolumeGet(app);
+  setupGetAppWebhookAnalyticsLatencyResponse(app);
+  setupGetAppWebhookAnalyticsLatencyResponseHistogram(app);
 
   return app;
 }
