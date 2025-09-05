@@ -3,18 +3,18 @@ import type {
   ICommentReportsService,
   IReportsNotificationsService,
   TelegramCallbackQuery,
-} from "./types";
-import type { CommentReportStatus } from "../management/types";
-import type { DB } from "./db";
+} from "./types.ts";
+import type { CommentReportStatus } from "../management/types.ts";
+import type { DB } from "./db.ts";
 import { desc, eq } from "drizzle-orm";
-import { schema } from "../../schema";
+import { schema } from "../../schema.ts";
 import type { CommentSelectType } from "ponder:schema";
-import type { CommentReportSelectType } from "../../schema.offchain";
+import type { CommentReportSelectType } from "../../schema.offchain.ts";
 import {
   CommentNotFoundError,
   ReportNotFoundError,
   ReportStatusAlreadySetError,
-} from "./errors";
+} from "./errors.ts";
 
 type CommentReportsServiceOptions = {
   notificationService: IReportsNotificationsService;

@@ -6,9 +6,9 @@ import {
   type ICommentModerationClassifierService,
   CommentModerationLabel,
   type CommentModerationLabelsWithScore,
-  ModerationNotificationServicePendingComment,
-} from "./types";
-import { CommentSelectType } from "ponder:schema";
+  type ModerationNotificationServicePendingComment,
+} from "./types.ts";
+import type { CommentSelectType } from "ponder:schema";
 
 const responseSchema = z.object({
   status_code: z.literal(200),

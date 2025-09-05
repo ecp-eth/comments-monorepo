@@ -1,9 +1,9 @@
 import type {
   IAdminTelegramBotServiceCommand,
   IAdminTelegramBotServiceCommand_RegisterOptions,
-} from "../types";
-import { renderReport, reportCommandToPayload } from "./report-helpers";
-import { reportMenu } from "./report-menu";
+} from "../types.ts";
+import { renderReport, reportCommandToPayload } from "./report-helpers.ts";
+import { reportMenu } from "./report-menu.ts";
 
 /**
  * This command must be registered after ReportCommand because of menu registration.

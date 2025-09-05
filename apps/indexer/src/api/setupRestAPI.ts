@@ -19,6 +19,27 @@ import { setupGetReports } from "./reports/get";
 import { setupGetReport } from "./reports/[reportId]/get";
 import { setupPatchReport } from "./reports/[reportId]/patch";
 import { setupAdminBotWebhook } from "./webhook/bot/post";
+import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
+import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
+import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
+import { setupUsersMe } from "./users/me/get";
+import { setupAppCreate } from "./apps/post";
+import { setupAppDelete } from "./apps/[id]/delete";
+import { setupAppSecretRefresh } from "./apps/[id]/secret/refresh/post";
+import { setupAppsGet } from "./apps/get";
+import { setupAppGet } from "./apps/[id]/get";
+import { setupAppWebhookCreate } from "./apps/[id]/webhooks/create";
+import { setupAppWebhooksGet } from "./apps/[id]/webhooks/get";
+import { setupAppWebhookDelete } from "./apps/[id]/webhooks/[id]/delete";
+import { setupAppWebhookGet } from "./apps/[id]/webhooks/[id]/get";
+import { setupAppWebhookPatch } from "./apps/[id]/webhooks/[id]/patch";
+import { setupAppWebhookTest } from "./apps/[id]/webhooks/[id]/test/post";
+import { setupAppUpdate } from "./apps/[id]/patch";
+import { setupAppWebhookDeliveryAttemptsGet } from "./apps/[id]/webhooks/[id]/deliveries/attempts/get";
+import { setupGetAppWebhookAnalyticsBacklog } from "./apps/[id]/webhooks/[id]/analytics/backlog/get";
+import { setupAppWebhookAnalyticsVolumeGet } from "./apps/[id]/webhooks/[id]/analytics/volume/get";
+import { setupGetAppWebhookAnalyticsLatencyResponse } from "./apps/[id]/webhooks/[id]/analytics/latency-response/get";
+import { setupGetAppWebhookAnalyticsLatencyResponseHistogram } from "./apps/[id]/webhooks/[id]/analytics/latency-response/histogram/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -41,6 +62,27 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetReport(app);
   setupPatchReport(app);
   setupAdminBotWebhook(app);
+  setupAuthSiweNonce(app);
+  setupAuthSiweVerify(app);
+  setupAuthSiweRefresh(app);
+  setupUsersMe(app);
+  setupAppCreate(app);
+  setupAppDelete(app);
+  setupAppSecretRefresh(app);
+  setupAppUpdate(app);
+  setupAppsGet(app);
+  setupAppGet(app);
+  setupAppWebhookCreate(app);
+  setupAppWebhooksGet(app);
+  setupAppWebhookDelete(app);
+  setupAppWebhookGet(app);
+  setupAppWebhookPatch(app);
+  setupAppWebhookTest(app);
+  setupAppWebhookDeliveryAttemptsGet(app);
+  setupGetAppWebhookAnalyticsBacklog(app);
+  setupAppWebhookAnalyticsVolumeGet(app);
+  setupGetAppWebhookAnalyticsLatencyResponse(app);
+  setupGetAppWebhookAnalyticsLatencyResponseHistogram(app);
 
   return app;
 }

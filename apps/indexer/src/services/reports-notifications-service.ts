@@ -3,11 +3,11 @@ import type {
   ITelegramNotificationsService,
   ReportsNotificationsServiceNotifyReportParams,
   ReportsNotificationsServiceNotifyReportStatusChangeParams,
-} from "./types";
+} from "./types.ts";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
-import type { CommentReportSelectType } from "../../schema.offchain";
-import { CommentReportStatus } from "../management/types";
+import type { CommentReportSelectType } from "../../schema.offchain.ts";
+import type { CommentReportStatus } from "../management/types.ts";
 
 type ReportsNotificationServiceOptions = {
   enabled: boolean;

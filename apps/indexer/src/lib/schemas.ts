@@ -5,9 +5,9 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
-import { normalizeUrl } from "./utils";
-import { SUPPORTED_CHAIN_IDS } from "../env";
-import { CommentModerationLabel } from "../services/types";
+import { normalizeUrl } from "./utils.ts";
+import { SUPPORTED_CHAIN_IDS } from "../env.ts";
+import { CommentModerationLabel } from "../services/types.ts";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -510,3 +510,19 @@ export const ERC20Caip19Schema = z.custom<ERC20CAIP19>(
     message: "Invalid CAIP-19",
   },
 );
+
+export const OpenAPIDateStringSchema = z
+  .date()
+  .transform((val) => val.toISOString())
+  .openapi({
+    description: "A date string in ISO 8601 format",
+    type: "string",
+  });
+
+export const OpenAPIBigintStringSchema = z
+  .bigint()
+  .transform((val) => val.toString())
+  .openapi({
+    description: "A bigint string",
+    type: "string",
+  });
