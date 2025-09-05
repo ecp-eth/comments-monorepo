@@ -13,6 +13,7 @@ import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-ev
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
 import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-test-button";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
+import { AppWebhookDetailsVolumeChartCard } from "@/components/app-webhook-details-volume-chart-card";
 import { DataTable } from "@/components/data-table";
 import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
@@ -164,7 +165,10 @@ export default function WebhookPage({
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
           <WebhookAnalyticsBacklogCard appId={appId} webhookId={webhookId} />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
+          <AppWebhookDetailsVolumeChartCard
+            appId={appId}
+            webhookId={webhookId}
+          />
         </div>
         <div className="flex flex-col flex-1 gap-4">
           <h2 className="text-lg font-medium">Deliveries</h2>

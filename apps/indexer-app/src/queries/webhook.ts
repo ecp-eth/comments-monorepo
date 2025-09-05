@@ -10,12 +10,16 @@ import {
   AppWebhookListDeliveryAttemptsResponseSchema,
   AppWebhookAnalyticsBacklogResponseSchema,
   type AppWebhookAnalyticsBacklogResponseSchemaType,
+  type AppWebhookAnalyticsVolumeResponseSchemaType,
+  AppWebhookAnalyticsVolumeResponseSchema,
 } from "@/api/schemas/apps";
 import {
   createWebhookAnalyticsBacklogQueryKey,
+  createWebhookAnalyticsVolumeQueryKey,
   createWebhookDeliveryAttemptsQueryKey,
   createWebhookQueryKey,
 } from "./query-keys";
+import { useState } from "react";
 
 type UseWebhookQueryOptions = Omit<
   UseQueryOptions<
@@ -177,6 +181,74 @@ export function useWebhookAnalyticsBacklogQuery({
       }
 
       return AppWebhookAnalyticsBacklogResponseSchema.parse(
+        await response.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseWebhookAnalyticsVolumeQueryOptions = Omit<
+  UseQueryOptions<
+    AppWebhookAnalyticsVolumeResponseSchemaType,
+    Error,
+    AppWebhookAnalyticsVolumeResponseSchemaType,
+    ReturnType<typeof createWebhookAnalyticsVolumeQueryKey>
+  >,
+  "queryKey" | "queryFn"
+> & {
+  appId: string;
+  webhookId: string;
+  bucket: "7" | "30" | "90";
+};
+
+export function useWebhookAnalyticsVolumeQuery({
+  appId,
+  webhookId,
+  bucket,
+  ...options
+}: UseWebhookAnalyticsVolumeQueryOptions) {
+  const auth = useAuth();
+  const [now] = useState(() => new Date());
+  const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * Number(bucket));
+
+  return useQuery({
+    queryKey: createWebhookAnalyticsVolumeQueryKey(appId, webhookId, {
+      bucket: "day",
+      from,
+      to: now,
+    }),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        const url = createFetchUrl(
+          `/api/apps/${appId}/webhooks/${webhookId}/analytics/volume`,
+        );
+
+        url.searchParams.set("bucket", "day");
+        url.searchParams.set("from", from.toISOString());
+        url.searchParams.set("to", now.toISOString());
+
+        return fetch(url, {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (response.status === 404) {
+        throw new WebhookNotFoundError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch webhook analytics volume: ${response.statusText}`,
+        );
+      }
+
+      return AppWebhookAnalyticsVolumeResponseSchema.parse(
         await response.json(),
       );
     },

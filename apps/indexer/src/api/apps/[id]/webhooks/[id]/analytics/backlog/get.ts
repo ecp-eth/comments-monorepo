@@ -14,6 +14,7 @@ import { AppManagerAppNotFoundError } from "../../../../../../../services/app-ma
 import { formatResponseUsingZodSchema } from "../../../../../../../lib/response-formatters";
 import { sql } from "drizzle-orm";
 import { schema } from "../../../../../../../../schema";
+import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../../services/app-webhook-manager-service";
 
 export const AppWebhookAnalyticsBacklogGetRequestParamsSchema = z.object({
   appId: z.string().uuid(),
@@ -126,6 +127,10 @@ export function setupGetAppWebhookAnalyticsBacklog(app: OpenAPIHono) {
       } catch (error) {
         if (error instanceof AppManagerAppNotFoundError) {
           return c.json({ message: "App not found" }, 404);
+        }
+
+        if (error instanceof AppWebhookManagerAppWebhookNotFoundError) {
+          return c.json({ message: "Webhook not found" }, 404);
         }
 
         throw error;
