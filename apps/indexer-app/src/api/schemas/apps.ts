@@ -219,3 +219,21 @@ export const AppWebhookAnalyticsBacklogResponseSchema = z.object({
 export type AppWebhookAnalyticsBacklogResponseSchemaType = z.infer<
   typeof AppWebhookAnalyticsBacklogResponseSchema
 >;
+
+export const AppWebhookAnalyticsVolumeResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      bucket: z.coerce.date(),
+      attempts: z.number(),
+      successes: z.number(),
+      failures: z.number(),
+      transport: z.number(),
+      http4xx: z.number(),
+      http5xx: z.number(),
+    }),
+  ),
+});
+
+export type AppWebhookAnalyticsVolumeResponseSchemaType = z.infer<
+  typeof AppWebhookAnalyticsVolumeResponseSchema
+>;

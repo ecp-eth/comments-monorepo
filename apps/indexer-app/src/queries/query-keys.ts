@@ -31,3 +31,24 @@ export function createWebhookAnalyticsBacklogQueryKey(
 ) {
   return ["webhook-analytics-backlog", appId, webhookId] as const;
 }
+
+export function createWebhookAnalyticsVolumeQueryKey(
+  appId: string,
+  webhookId: string,
+  params?: Partial<{
+    from: Date;
+    to: Date;
+    tz: string;
+    bucket: string;
+  }>,
+) {
+  return [
+    "webhook-analytics-volume",
+    appId,
+    webhookId,
+    params?.bucket,
+    params?.from,
+    params?.to,
+    params?.tz,
+  ] as const;
+}

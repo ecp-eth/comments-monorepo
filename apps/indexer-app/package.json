@@ -38,6 +38,7 @@
     "react": "~19.1.0",
     "react-dom": "~19.1.0",
     "react-hook-form": "^7.60.0",
+    "recharts": "2.15.4",
     "siwe": "^3.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
