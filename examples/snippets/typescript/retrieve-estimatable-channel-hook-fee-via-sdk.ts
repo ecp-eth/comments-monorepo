@@ -3,7 +3,7 @@
  * !!! ATTENTION !!!
  * !!!!!!!!!!!!!!!!!
  *
- * Please note this is a snippet for demostration of manually calculating the estimated fee via FeeEstimatableHook.
+ * Please note this is a snippet for demostration of manually calculating the estimated fee via SDK.
  * We have implemented a generic helper function in the SDK to consolidate the fee retrieving logic.
  * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
  */
@@ -76,12 +76,31 @@ async function main() {
     transport: http(rpcUrl),
   });
 
-  const feeEstimation = await getFeeEstimation({
-    authorAddress: authorAccount.address,
-    appAddress: appAccount.address,
-    channelId: retrieveEstimatableHookFeeChannelId,
-    publicClient,
-  });
+  const commentEta = BigInt(Date.now() + 1000 * 30);
+
+  const commentData: CommentData = {
+    content: "Hello, world!",
+    targetUri: "https://example.com",
+    commentType: 0,
+    authMethod: AuthorAuthMethod.DIRECT_TX,
+    channelId,
+    parentId:
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    author: authorAddress,
+    app: appAddress,
+    createdAt: eta,
+    updatedAt: eta,
+  };
+  const metadata = [];
+  // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+  const msgSender = authorAddress;
+
+  // const feeEstimation = await getFeeEstimation({
+  //   authorAddress: authorAccount.address,
+  //   appAddress: appAccount.address,
+  //   channelId: retrieveEstimatableHookFeeChannelId,
+  //   publicClient,
+  // });
 
   console.log(
     "The estimated fee for posting a comment to the hook is:",

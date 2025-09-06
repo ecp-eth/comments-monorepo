@@ -22,10 +22,14 @@ import {
   withdrawFees,
   setBaseURI,
   getCommentCreationFee,
+  estimateChannelPostCommentFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
+import type { CommentData, MetadataEntry } from "../../comments/types.js";
+import { AuthorAuthMethod } from "../../comments/types.js";
+import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
 
 describe("channel", () => {
   let channelManagerAddress: Hex;
@@ -499,6 +503,68 @@ describe("channel", () => {
       });
 
       assert.equal(receipt.status, "success");
+    });
+  });
+
+  describe("estimateChannelPostCommentFee()", () => {
+    let channelId: bigint;
+
+    beforeEach(async () => {
+      const result = await createChannel({
+        name: "Test channel for fee estimation",
+        fee: parseEther("0.02"),
+        // flat fee hook address
+        hook: "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
+        writeContract: client.writeContract,
+        channelManagerAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      const logs = parseEventLogs({
+        abi: ChannelManagerABI,
+        logs: receipt.logs,
+        eventName: "ChannelCreated",
+      });
+
+      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+
+      channelId = logs[0]!.args.channelId;
+    });
+
+    it("estimates the fee for posting a comment", async () => {
+      const eta = BigInt(Date.now() + 1000 * 30);
+      const commentData: CommentData = {
+        content: "Hello, world!",
+        targetUri: "https://example.com",
+        commentType: 0,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+      const metadata: MetadataEntry[] = [];
+      // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+      const msgSender = account.address;
+
+      const fee = await estimateChannelPostCommentFee({
+        channelId,
+        metadata,
+        msgSender,
+        readContract: client.readContract,
+        commentData,
+      });
+
+      assert.equal(fee.amount, 900000000000000n);
+      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
     });
   });
 });

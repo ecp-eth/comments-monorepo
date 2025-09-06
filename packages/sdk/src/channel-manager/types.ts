@@ -4,10 +4,11 @@ import type {
   ReadContractReturnType,
 } from "viem";
 import type { Hex } from "../core/schemas.js";
-import type { ChannelManagerABI } from "../abis.js";
+import type { ChannelManagerABI, BaseHookABI } from "../abis.js";
 import type { MetadataEntry } from "../comments/types.js";
 
 export type ChannelManagerABIType = typeof ChannelManagerABI;
+export type BaseHookABIType = typeof BaseHookABI;
 
 export type ChannelPermissions = {
   onInitialize: boolean;
@@ -151,6 +152,20 @@ export type ContractReadFunctions = {
       ChannelManagerABIType,
       "deductProtocolHookTransactionFee"
     >
+  >;
+};
+
+export type HookContractReadFunctions = {
+  estimateAddCommentFee: (
+    args: ReadContractParameters<BaseHookABIType, "estimateAddCommentFee">,
+  ) => Promise<
+    ReadContractReturnType<BaseHookABIType, "estimateAddCommentFee">
+  >;
+
+  estimateEditCommentFee: (
+    args: ReadContractParameters<BaseHookABIType, "estimateEditCommentFee">,
+  ) => Promise<
+    ReadContractReturnType<BaseHookABIType, "estimateEditCommentFee">
   >;
 };
 

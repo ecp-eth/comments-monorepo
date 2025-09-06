@@ -1,24 +1,35 @@
 import { z } from "zod";
-import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
+import {
+  CHANNEL_MANAGER_ADDRESS,
+  NATIVE_ASSET_ADDRESS,
+  ZERO_ADDRESS,
+} from "../constants.js";
 import { HexSchema } from "../core/schemas.js";
 import type { Hex } from "../core/schemas.js";
 import type {
   WaitableWriteContractHelperResult,
   WriteContractHelperResult,
 } from "../core/types.js";
-import { ChannelManagerABI } from "../abis.js";
+import { BaseHookABI, ChannelManagerABI } from "../abis.js";
 import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
   ChannelManagerABIType,
   Channel,
+  HookContractReadFunctions,
+  FeeEstimation,
 } from "./types.js";
-import { type MetadataEntry, type MetadataEntryOp } from "../comments/types.js";
+import {
+  type CommentData,
+  type MetadataEntry,
+  type MetadataEntryOp,
+} from "../comments/types.js";
 import {
   MetadataArrayOpSchema,
   MetadataEntrySchema,
 } from "../comments/schemas.js";
+import { ContractFunctionExecutionError } from "viem";
 
 export type CreateChannelParams = {
   /**
@@ -603,4 +614,92 @@ export async function setBaseURI(
   return {
     txHash,
   };
+}
+
+type EstimateChannelPostCommentFeeParams = {
+  channelId: bigint;
+  commentData: CommentData;
+  metadata: MetadataEntry[];
+  msgSender: Hex;
+  readContract: HookContractReadFunctions["estimateAddCommentFee"] &
+    ContractReadFunctions["getChannel"];
+};
+
+/**
+ * Estimate the fee for posting a comment to a channel
+ *
+ * @param estimateChannelPostCommentFeeParams - The parameters for estimating the fee for posting a comment to a channel
+ * @returns The estimated fee for posting a comment to a channel
+ */
+export async function estimateChannelPostCommentFee({
+  channelId,
+  commentData,
+  metadata,
+  msgSender,
+  readContract,
+}: EstimateChannelPostCommentFeeParams): Promise<FeeEstimation> {
+  const channelInfo = await getChannel({
+    channelId,
+    readContract: readContract,
+  });
+
+  if (!channelInfo.hook) {
+    return {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "",
+      metadata: [],
+    };
+  }
+
+  return await readContract({
+    abi: BaseHookABI,
+    address: channelInfo.hook,
+    functionName: "estimateAddCommentFee",
+    args: [commentData, metadata, msgSender],
+  });
+}
+
+type EstimateChannelEditCommentFeeParams = {
+  channelId: bigint;
+  commentData: CommentData;
+  metadata: MetadataEntry[];
+  msgSender: Hex;
+  readContract: HookContractReadFunctions["estimateEditCommentFee"] &
+    ContractReadFunctions["getChannel"];
+};
+
+/**
+ * Estimate the fee for editing a comment to a channel
+ *
+ * @param estimateChannelEditCommentFeeParams - The parameters for estimating the fee for editing a comment to a channel
+ * @returns The estimated fee for editing a comment to a channel
+ */
+export async function estimateChannelEditCommentFee({
+  channelId,
+  commentData,
+  metadata,
+  msgSender,
+  readContract,
+}: EstimateChannelEditCommentFeeParams) {
+  const channelInfo = await getChannel({
+    channelId,
+    readContract: readContract,
+  });
+
+  if (!channelInfo.hook) {
+    return {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "",
+      metadata: [],
+    };
+  }
+
+  return await readContract({
+    abi: BaseHookABI,
+    address: channelInfo.hook,
+    functionName: "estimateEditCommentFee",
+    args: [commentData, metadata, msgSender],
+  });
 }
