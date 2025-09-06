@@ -33,9 +33,11 @@ import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
 
 describe("channel", () => {
   let channelManagerAddress: Hex;
+  let flatFeeHookAddress: Hex;
 
   before(async () => {
     channelManagerAddress = deployContracts().channelManagerAddress;
+    flatFeeHookAddress = deployContracts().flatFeeHookAddress;
   });
 
   // Test account setup
@@ -514,7 +516,8 @@ describe("channel", () => {
         name: "Test channel for fee estimation",
         fee: parseEther("0.02"),
         // flat fee hook address
-        hook: "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
+        hook: flatFeeHookAddress,
+        // hook: "0x0000000000000000000000000000000000000000",
         writeContract: client.writeContract,
         channelManagerAddress,
       });
@@ -556,11 +559,12 @@ describe("channel", () => {
       const msgSender = account.address;
 
       const fee = await estimateChannelPostCommentFee({
+        readContract: client.readContract,
         channelId,
+        commentData,
         metadata,
         msgSender,
-        readContract: client.readContract,
-        commentData,
+        channelManagerAddress,
       });
 
       assert.equal(fee.amount, 900000000000000n);

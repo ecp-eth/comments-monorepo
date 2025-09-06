@@ -623,6 +623,7 @@ type EstimateChannelPostCommentFeeParams = {
   msgSender: Hex;
   readContract: HookContractReadFunctions["estimateAddCommentFee"] &
     ContractReadFunctions["getChannel"];
+  channelManagerAddress?: Hex;
 };
 
 /**
@@ -637,9 +638,11 @@ export async function estimateChannelPostCommentFee({
   metadata,
   msgSender,
   readContract,
+  channelManagerAddress,
 }: EstimateChannelPostCommentFeeParams): Promise<FeeEstimation> {
   const channelInfo = await getChannel({
     channelId,
+    channelManagerAddress,
     readContract: readContract,
   });
 
