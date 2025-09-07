@@ -37,6 +37,7 @@ import {
 import { NATIVE_ASSET_ADDRESS } from "@ecp.eth/sdk";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import {
+  GetChannelResult,
   HookFeeEstimation,
   getChannel,
   getHookTransactionFee,
@@ -238,12 +239,21 @@ async function getFeeEstimation<
   );
 
   // Get channel information to find the hook contract address
-  const channelInfo = await getChannel({
-    channelId,
-    readContract: publicClient.readContract,
-  });
+  let channelInfo: GetChannelResult | undefined;
+  try {
+    channelInfo = await getChannel({
+      channelId,
+      readContract: publicClient.readContract,
+    });
+  } catch (error) {
+    if (error instanceof ContractFunctionExecutionError) {
+      throw new Error(
+        "Channel does not exist, please run create-channel.ts to create the test channel and remember to update .env file with the channel id",
+      );
+    }
+  }
 
-  if (!channelInfo.hook) {
+  if (!channelInfo?.hook) {
     throw new Error("Channel does not have a hook");
   }
 

@@ -12,7 +12,7 @@
  */
 
 import {
-  ContractFunctionRevertedError,
+  ContractFunctionExecutionError,
   createPublicClient,
   createWalletClient,
   http,
@@ -159,7 +159,7 @@ async function main() {
       fee: totalFeeEstimation.baseToken.amount - 1n, // Intentionally insufficient fee
     });
   } catch (error) {
-    if (error instanceof ContractFunctionRevertedError) {
+    if (error instanceof ContractFunctionExecutionError) {
       postCommentError = error;
     }
   }
