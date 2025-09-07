@@ -5,6 +5,8 @@ import "./Metadata.sol";
 
 /// @title FeeEstimatable - types used by fee-estimatable hooks
 library FeeEstimatable {
+  address constant NATIVE_TOKEN_ADDRESS =
+    0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
   /// @notice Details of a fee estimation
   /// @param amount The fee required for the specific comment action
   /// @param asset The address of the asset, use 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE for the native token

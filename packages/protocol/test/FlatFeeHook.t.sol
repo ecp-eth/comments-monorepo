@@ -23,6 +23,7 @@ contract FlatFeeHook is BaseHook {
 
   address public feeCollector;
   uint256 public totalFeesCollected;
+  bool public shouldChargeOnEdit;
 
   event FeeCollected(address indexed author, uint256 amount);
   event FeeWithdrawn(address indexed collector, uint256 amount);
@@ -30,6 +31,7 @@ contract FlatFeeHook is BaseHook {
 
   constructor(address _feeCollector) {
     feeCollector = _feeCollector;
+    shouldChargeOnEdit = false;
   }
 
   function _getHookPermissions()
@@ -43,7 +45,7 @@ contract FlatFeeHook is BaseHook {
         onInitialize: false,
         onCommentAdd: true,
         onCommentDelete: false,
-        onCommentEdit: false,
+        onCommentEdit: true,
         onChannelUpdate: false,
         onCommentHookDataUpdate: false
       });
@@ -55,6 +57,27 @@ contract FlatFeeHook is BaseHook {
     address,
     bytes32
   ) internal override returns (Metadata.MetadataEntry[] memory) {
+    _collectHookFee(commentData);
+
+    return new Metadata.MetadataEntry[](0);
+  }
+
+  function _onCommentEdit(
+    Comments.Comment calldata commentData,
+    Metadata.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
+    if (!shouldChargeOnEdit) {
+      return new Metadata.MetadataEntry[](0);
+    }
+
+    _collectHookFee(commentData);
+
+    return new Metadata.MetadataEntry[](0);
+  }
+
+  function _collectHookFee(Comments.Comment calldata commentData) internal {
     require(msg.value >= HOOK_FEE, "Insufficient fee");
 
     totalFeesCollected += HOOK_FEE;
@@ -69,7 +92,10 @@ contract FlatFeeHook is BaseHook {
         emit RefundIssued(commentData.author, refundAmount);
       }
     }
-    return new Metadata.MetadataEntry[](0);
+  }
+
+  function setShouldChargeOnEdit(bool _shouldChargeOnEdit) external {
+    shouldChargeOnEdit = _shouldChargeOnEdit;
   }
 
   function estimateAddCommentFee(
@@ -78,8 +104,8 @@ contract FlatFeeHook is BaseHook {
     address
   ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
     feeEstimation.amount = HOOK_FEE;
-    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    feeEstimation.description = "Flat fee";
+    feeEstimation.asset = FeeEstimatable.NATIVE_TOKEN_ADDRESS;
+    feeEstimation.description = "Flat fee for adding a comment";
     feeEstimation.metadata = new Metadata.MetadataEntry[](0);
 
     return feeEstimation;
@@ -89,10 +115,14 @@ contract FlatFeeHook is BaseHook {
     Comments.Comment calldata,
     Metadata.MetadataEntry[] calldata,
     address
-  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
-    feeEstimation.amount = 0;
-    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
-    feeEstimation.description = "Flat fee";
+  ) external view returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    if (shouldChargeOnEdit) {
+      feeEstimation.amount = HOOK_FEE;
+    } else {
+      feeEstimation.amount = 0;
+    }
+    feeEstimation.asset = FeeEstimatable.NATIVE_TOKEN_ADDRESS;
+    feeEstimation.description = "Flat fee for editing a comment";
     feeEstimation.metadata = new Metadata.MetadataEntry[](0);
 
     return feeEstimation;
@@ -115,6 +145,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
   ChannelManager public channelManager;
   FlatFeeHook public feeHook;
+  FlatFeeHook public feeHookWithEdit;
   CommentManager public comments;
   address public commentsContract;
 
@@ -144,6 +175,8 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     // Deploy fee hook
     feeHook = new FlatFeeHook(feeCollector);
+    feeHookWithEdit = new FlatFeeHook(feeCollector);
+    feeHookWithEdit.setShouldChargeOnEdit(true);
 
     (comments, channelManager) = TestUtils.createContracts(owner);
 
@@ -158,9 +191,13 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
   function _signAppSignature(
     Comments.CreateComment memory commentData
   ) internal view returns (bytes memory) {
-    bytes32 digest = comments.getCommentId(commentData);
-    (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
-    return abi.encodePacked(r, s, v);
+    return
+      TestUtils.generateAppSignature(
+        vm,
+        commentData,
+        comments,
+        user2PrivateKey
+      );
   }
 
   function test_FlatFeeHookCollectsExactFee() public {
@@ -204,6 +241,83 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(user1BalanceBefore - user1.balance, TOTAL_FEE_WITH_PROTOCOL);
     // Check that the hook recorded the fee
     assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
+  }
+
+  function test_FlatFeeHookCollectsExactFeeOnEdit() public {
+    // Create channel with fee hook
+    uint256 channelId = channelManager.createChannel{
+      value: CHANNEL_CREATION_FEE
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHookWithEdit)
+    );
+
+    Comments.CreateComment memory commentData = Comments.CreateComment({
+      content: "Test comment",
+      metadata: new Metadata.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    bytes memory appSignature = _signAppSignature(commentData);
+
+    // Post comment as user1 with exact fee plus protocol fee
+    vm.prank(user1);
+    comments.postComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
+      commentData,
+      appSignature
+    );
+
+    uint256 nonce = comments.getNonce(user1, user2);
+    bytes32 commentId = comments.getCommentId(commentData);
+    Comments.EditComment memory editCommentData = Comments.EditComment({
+      app: user2,
+      nonce: nonce,
+      deadline: block.timestamp + 1 days,
+      content: "Test comment",
+      metadata: new Metadata.MetadataEntry[](0)
+    });
+
+    bytes memory appSignatureForEdit = TestUtils.generateAppSignatureForEdit(
+      vm,
+      commentId,
+      user1,
+      editCommentData,
+      comments,
+      user2PrivateKey
+    );
+
+    uint256 hookBalanceBefore = address(feeHookWithEdit).balance;
+    uint256 user1BalanceBefore = user1.balance;
+
+    vm.prank(user1);
+    comments.editComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
+      commentId,
+      editCommentData,
+      appSignatureForEdit
+    );
+
+    // Check that the hook received the hook fee (after protocol fee)
+    assertEq(
+      address(feeHookWithEdit).balance - hookBalanceBefore,
+      HOOK_FEE,
+      "Hook balance was not collected accurately"
+    );
+    // Check that user1 paid the total fee (including protocol fee)
+    assertEq(
+      user1BalanceBefore - user1.balance,
+      TOTAL_FEE_WITH_PROTOCOL,
+      "User1 balance did not change accordingly"
+    );
+    // Check that the hook recorded the fee
+    assertEq(feeHookWithEdit.totalFeesCollected(), HOOK_FEE * 2);
   }
 
   function test_FlatFeeHookRefundsExcessPaymentExceptProtocolFee() public {
