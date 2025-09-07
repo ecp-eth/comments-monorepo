@@ -4417,11 +4417,6 @@ export const BaseHookABI = [
   },
   {
     type: "error",
-    name: "EstimatorNotImplemented",
-    inputs: [],
-  },
-  {
-    type: "error",
     name: "HookNotImplemented",
     inputs: [],
   },
