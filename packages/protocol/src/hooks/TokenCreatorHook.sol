@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { BaseHook } from "./BaseHook.sol";
+import { NoFeeHook } from "./NoFeeHook.sol";
 import { Hooks } from "../types/Hooks.sol";
 import { Comments } from "../types/Comments.sol";
 import { Channels } from "../types/Channels.sol";
@@ -14,7 +14,7 @@ import {
 /// @title TokenCreatorHook
 /// @notice Hook that gates channels to only allow token creators to post top-level comments. Similar to telegram channels.
 /// @dev Requires channel metadata to contain tokenAddress and tokenCreator fields
-contract TokenCreatorHook is BaseHook {
+contract TokenCreatorHook is NoFeeHook {
   using LibString for string;
   using LibString for uint256;
   using EnumerableMap for EnumerableMap.UintToAddressMap;

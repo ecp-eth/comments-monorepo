@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import { Test, console } from "forge-std/Test.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -25,7 +25,7 @@ struct TipInfo {
 
 /// @title TipHook - A hook for processing ETH tips in reply comments
 /// @notice This hook allows users to send ETH tips to comment authors by mentioning a tip amount in their reply
-contract TipHook is BaseHook {
+contract TipHook is NoFeeHook {
   using Strings for uint256;
   using TestUtils for string;
 

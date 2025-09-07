@@ -3,10 +3,9 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../types/Comments.sol";
-import { IHook } from "./IHook.sol";
 import { FeeEstimatable } from "../types/FeeEstimatable.sol";
 
-interface IFeeEstimatableHook is IERC165, IHook {
+interface IFeeEstimatableHook is IERC165 {
   /// @notice Should return the fee estimation for adding a comment
   /// @param commentData The comment data that will be processed
   /// @param metadata The metadata entries for the comment

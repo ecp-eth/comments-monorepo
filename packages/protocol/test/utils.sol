@@ -13,7 +13,7 @@ import { ChannelManager } from "../src/ChannelManager.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
@@ -396,7 +396,7 @@ library TestUtils {
 }
 
 // Mock hook contract for testing
-contract MockHook is BaseHook {
+contract MockHook is NoFeeHook {
   string public returningHookData;
 
   function setReturningHookData(string memory _returningHookData) external {
@@ -437,7 +437,7 @@ contract MockHook is BaseHook {
   }
 }
 
-contract AlwaysReturningDataHook is BaseHook {
+contract AlwaysReturningDataHook is NoFeeHook {
   function getHookPermissions()
     external
     pure

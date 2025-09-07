@@ -7,7 +7,7 @@ import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import { TestUtils } from "./utils.sol";
@@ -22,7 +22,7 @@ error GasGriefingAttempted();
  * @title Malicious Hook for Fee Manipulation Testing
  * @notice This hook attempts various fee manipulation attacks
  */
-contract FeeManipulationHook is BaseHook {
+contract FeeManipulationHook is NoFeeHook {
   uint256 public constant FAKE_FEE = 0.1 ether;
   uint256 public constant ACTUAL_REQUIRED_FEE = 0.5 ether;
   bool public shouldManipulateFees;
@@ -91,7 +91,7 @@ contract FeeManipulationHook is BaseHook {
  * @title Gas Griefing Hook
  * @notice This hook consumes excessive gas to test gas griefing protection
  */
-contract GasGriefingHook is BaseHook {
+contract GasGriefingHook is NoFeeHook {
   bool public shouldGrief;
   uint256 public gasToConsume;
   mapping(uint256 => uint256) public wasteStorage;
@@ -171,7 +171,7 @@ contract GasGriefingHook is BaseHook {
  * @title Fee Overflow Hook
  * @notice This hook tests fee calculation overflow scenarios
  */
-contract FeeOverflowHook is BaseHook {
+contract FeeOverflowHook is NoFeeHook {
   bool public shouldCauseOverflow;
 
   function _getHookPermissions()

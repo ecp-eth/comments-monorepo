@@ -7,7 +7,7 @@ import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import { TestUtils } from "./utils.sol";
@@ -19,7 +19,7 @@ import {
  * @title Malicious Hook for State Corruption Testing
  * @notice This hook attempts various state corruption attacks
  */
-contract StateCorruptionHook is BaseHook {
+contract StateCorruptionHook is NoFeeHook {
   bool public shouldCorruptState;
   bool public shouldReturnMaliciousMetadata;
   bool public shouldCauseLargeGasUsage;

@@ -10,7 +10,7 @@ import {
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { TestUtils } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
@@ -23,7 +23,7 @@ contract TestToken is ERC20 {
 }
 
 // Token gating hook contract
-contract TokenGatedHook is BaseHook {
+contract TokenGatedHook is NoFeeHook {
   ERC20 public token;
   uint256 public requiredBalance;
   error NotEnoughTokens();

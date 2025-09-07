@@ -13,13 +13,13 @@ import {
   SafeERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { TestUtils } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 
 // Fee charging hook contract based on comment length
-contract LengthFeeHook is BaseHook {
+contract LengthFeeHook is NoFeeHook {
   using SafeERC20 for IERC20;
 
   // Token used for fee payment

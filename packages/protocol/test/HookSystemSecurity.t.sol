@@ -7,7 +7,7 @@ import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import { Channels } from "../src/types/Channels.sol";
@@ -24,7 +24,7 @@ error UnauthorizedHookAccess();
  * @title Malicious Revert Hook
  * @notice This hook always reverts to test failure handling
  */
-contract MaliciousRevertHook is BaseHook {
+contract MaliciousRevertHook is NoFeeHook {
   bool public shouldRevert;
   bool public shouldRevertOnInit;
   string public revertMessage;
@@ -134,7 +134,7 @@ contract MaliciousRevertHook is BaseHook {
  * @title State Manipulation Hook
  * @notice This hook attempts to manipulate global state maliciously
  */
-contract StateManipulationHook is BaseHook {
+contract StateManipulationHook is NoFeeHook {
   CommentManager public commentManager;
   ChannelManager public channelManager;
   bool public shouldAttemptStateManipulation;
@@ -214,7 +214,7 @@ contract StateManipulationHook is BaseHook {
  * @title Gas Griefing Hook
  * @notice This hook consumes excessive gas
  */
-contract GasGriefingHook is BaseHook {
+contract GasGriefingHook is NoFeeHook {
   bool public shouldGrief;
   mapping(uint256 => bytes32) public gasWaste;
 
@@ -259,7 +259,7 @@ contract GasGriefingHook is BaseHook {
  * @title Permission Escalation Hook
  * @notice This hook claims permissions it shouldn't have
  */
-contract PermissionEscalationHook is BaseHook {
+contract PermissionEscalationHook is NoFeeHook {
   bool public shouldClaimAllPermissions;
 
   function _getHookPermissions()

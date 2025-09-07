@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { BaseHook } from "./BaseHook.sol";
+import { NoFeeHook } from "./NoFeeHook.sol";
 import { Hooks } from "../types/Hooks.sol";
 import { Comments } from "../types/Comments.sol";
 import { Channels } from "../types/Channels.sol";
@@ -11,11 +11,12 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+import { FeeEstimatable } from "../types/FeeEstimatable.sol";
 
 /// @title BroadcastHook
 /// @notice Hook that gates channels to only allow whitelisted creators to create channels and post top-level comments.
 /// @dev Similar to TokenCreatorHook but uses a whitelist instead of token ownership
-contract BroadcastHook is BaseHook, Ownable, IERC721Receiver {
+contract BroadcastHook is NoFeeHook, Ownable, IERC721Receiver {
   /// @notice Error thrown when caller is not whitelisted
   error NotWhitelisted();
   /// @notice Error thrown when commenter is not the channel creator

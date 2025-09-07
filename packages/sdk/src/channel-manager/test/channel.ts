@@ -517,7 +517,6 @@ describe("channel", () => {
         fee: parseEther("0.02"),
         // flat fee hook address
         hook: flatFeeHookAddress,
-        // hook: "0x0000000000000000000000000000000000000000",
         writeContract: client.writeContract,
         channelManagerAddress,
       });

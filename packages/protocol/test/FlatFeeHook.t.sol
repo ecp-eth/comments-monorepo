@@ -72,17 +72,25 @@ contract FlatFeeHook is BaseHook {
     return new Metadata.MetadataEntry[](0);
   }
 
-  function _estimateAddCommentFee(
+  function estimateAddCommentFee(
     Comments.Comment calldata,
     Metadata.MetadataEntry[] calldata,
     address
-  )
-    internal
-    pure
-    override
-    returns (FeeEstimatable.FeeEstimation memory feeEstimation)
-  {
+  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
     feeEstimation.amount = HOOK_FEE;
+    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    feeEstimation.description = "Flat fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
+  }
+
+  function estimateEditCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    feeEstimation.amount = 0;
     feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     feeEstimation.description = "Flat fee";
     feeEstimation.metadata = new Metadata.MetadataEntry[](0);
