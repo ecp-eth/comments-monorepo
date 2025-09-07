@@ -58,6 +58,8 @@ Core functionality for managing comment channels
 | ------ | ------ |
 | [channelExists](/sdk-reference/channel-manager/functions/channelExists.mdx) | Check if a channel exists |
 | [deductProtocolHookTransactionFee](/sdk-reference/channel-manager/functions/deductProtocolHookTransactionFee.mdx) | Calculates the hook transaction fee by deducting the protocol fee |
+| [estimateChannelEditCommentFee](/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee.mdx) | Estimate the fee for editing a comment to a channel |
+| [estimateChannelPostCommentFee](/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee.mdx) | Estimate the fee for posting a comment to a channel |
 | [getChannel](/sdk-reference/channel-manager/functions/getChannel.mdx) | Get a channel |
 | [getChannelCreationFee](/sdk-reference/channel-manager/functions/getChannelCreationFee.mdx) | Get the creation fee from channel manager |
 | [getChannelMetadata](/sdk-reference/channel-manager/functions/getChannelMetadata.mdx) | Get channel metadata |
@@ -72,6 +74,12 @@ Core functionality for managing comment channels
 | [withdrawFees](/sdk-reference/channel-manager/functions/withdrawFees.mdx) | Withdraws accumulated fees to a specified address |
 
 ## References
+
+### BaseHookABIType
+
+Re-exports [BaseHookABIType](/sdk-reference/channel-manager/types/type-aliases/BaseHookABIType.mdx)
+
+***
 
 ### Channel
 
@@ -100,3 +108,15 @@ Re-exports [ContractReadFunctions](/sdk-reference/channel-manager/types/type-ali
 ### ContractWriteFunctions
 
 Re-exports [ContractWriteFunctions](/sdk-reference/channel-manager/types/type-aliases/ContractWriteFunctions.mdx)
+
+***
+
+### FeeEstimation
+
+Re-exports [FeeEstimation](/sdk-reference/channel-manager/types/type-aliases/FeeEstimation.mdx)
+
+***
+
+### HookContractReadFunctions
+
+Re-exports [HookContractReadFunctions](/sdk-reference/channel-manager/types/type-aliases/HookContractReadFunctions.mdx)

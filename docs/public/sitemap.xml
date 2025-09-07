@@ -235,6 +235,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee</loc>
+    <lastmod>2025-09-07T13:45:42.796Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee</loc>
+    <lastmod>2025-09-07T13:45:42.797Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getChannel</loc>
     <lastmod>2025-06-22T15:31:35.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -841,6 +853,12 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/BaseHookABIType</loc>
+    <lastmod>2025-09-07T13:45:42.808Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/Channel</loc>
     <lastmod>2025-06-14T15:20:57.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -867,6 +885,18 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractWriteFunctions</loc>
     <lastmod>2025-08-06T12:19:27.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/FeeEstimation</loc>
+    <lastmod>2025-09-07T13:45:42.811Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/HookContractReadFunctions</loc>
+    <lastmod>2025-09-07T13:45:42.811Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2401,6 +2431,12 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/BaseHookABI</loc>
+    <lastmod>2025-09-07T13:45:42.889Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/CHANNEL_MANAGER_ADDRESS</loc>
     <lastmod>2025-07-30T09:05:23.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -2493,6 +2529,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/MAX_COMMENT_REPORT_MESSAGE_LENGTH</loc>
     <lastmod>2025-07-30T09:05:23.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/NATIVE_ASSET_ADDRESS</loc>
+    <lastmod>2025-09-07T13:45:42.893Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

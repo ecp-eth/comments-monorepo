@@ -1,0 +1,59 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / estimateChannelEditCommentFee
+
+# Function: estimateChannelEditCommentFee()
+
+```ts
+function estimateChannelEditCommentFee(estimateChannelEditCommentFeeParams): Promise<
+  | {
+  amount: bigint;
+  asset: `0x${string}`;
+  description: string;
+  metadata: readonly {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+}
+  | {
+  amount: bigint;
+  asset: string;
+  description: string;
+  metadata: never[];
+}>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:681](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L681)
+
+Estimate the fee for editing a comment to a channel
+
+## Parameters
+
+### estimateChannelEditCommentFeeParams
+
+`EstimateChannelEditCommentFeeParams`
+
+The parameters for estimating the fee for editing a comment to a channel
+
+## Returns
+
+`Promise`\<
+  \| \{
+  `amount`: `bigint`;
+  `asset`: `` `0x${string}` ``;
+  `description`: `string`;
+  `metadata`: readonly \{
+     `key`: `` `0x${string}` ``;
+     `value`: `` `0x${string}` ``;
+  \}[];
+\}
+  \| \{
+  `amount`: `bigint`;
+  `asset`: `string`;
+  `description`: `string`;
+  `metadata`: `never`[];
+\}\>
+
+The estimated fee for editing a comment to a channel

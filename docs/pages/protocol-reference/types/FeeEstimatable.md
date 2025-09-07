@@ -22,7 +22,7 @@ Details of a fee estimation
 
 
 
-- **asset:** (address) The address of the asset, use 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee for the native token
+- **asset:** (address) The address of the asset, use 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE for the native token
 
 
 

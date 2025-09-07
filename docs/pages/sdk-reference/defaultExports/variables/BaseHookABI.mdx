@@ -1,0 +1,783 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [defaultExports](/sdk-reference/defaultExports/index.mdx) / BaseHookABI
+
+# Variable: BaseHookABI
+
+```ts
+const BaseHookABI: readonly [{
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+  }];
+  name: "estimateAddCommentFee";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "uint256";
+        name: "amount";
+        type: "uint256";
+      }, {
+        internalType: "address";
+        name: "asset";
+        type: "address";
+      }, {
+        internalType: "string";
+        name: "description";
+        type: "string";
+      }, {
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Metadata.MetadataEntry[]";
+        name: "metadata";
+        type: "tuple[]";
+     }];
+     internalType: "struct FeeEstimatable.FeeEstimation";
+     name: "feeEstimation";
+     type: "tuple";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+  }];
+  name: "estimateEditCommentFee";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "uint256";
+        name: "amount";
+        type: "uint256";
+      }, {
+        internalType: "address";
+        name: "asset";
+        type: "address";
+      }, {
+        internalType: "string";
+        name: "description";
+        type: "string";
+      }, {
+        components: readonly [{
+           internalType: "bytes32";
+           name: "key";
+           type: "bytes32";
+         }, {
+           internalType: "bytes";
+           name: "value";
+           type: "bytes";
+        }];
+        internalType: "struct Metadata.MetadataEntry[]";
+        name: "metadata";
+        type: "tuple[]";
+     }];
+     internalType: "struct FeeEstimatable.FeeEstimation";
+     name: "feeEstimation";
+     type: "tuple";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "getHookPermissions";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bool";
+        name: "onInitialize";
+        type: "bool";
+      }, {
+        internalType: "bool";
+        name: "onCommentAdd";
+        type: "bool";
+      }, {
+        internalType: "bool";
+        name: "onCommentDelete";
+        type: "bool";
+      }, {
+        internalType: "bool";
+        name: "onCommentEdit";
+        type: "bool";
+      }, {
+        internalType: "bool";
+        name: "onChannelUpdate";
+        type: "bool";
+      }, {
+        internalType: "bool";
+        name: "onCommentHookDataUpdate";
+        type: "bool";
+     }];
+     internalType: "struct Hooks.Permissions";
+     name: "";
+     type: "tuple";
+  }];
+  stateMutability: "pure";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "channel";
+     type: "address";
+   }, {
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     components: readonly [{
+        internalType: "string";
+        name: "name";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "description";
+        type: "string";
+      }, {
+        internalType: "address";
+        name: "hook";
+        type: "address";
+      }, {
+        components: readonly [{
+           internalType: "bool";
+           name: "onInitialize";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentAdd";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentDelete";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentEdit";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onChannelUpdate";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentHookDataUpdate";
+           type: "bool";
+        }];
+        internalType: "struct Hooks.Permissions";
+        name: "permissions";
+        type: "tuple";
+     }];
+     internalType: "struct Channels.Channel";
+     name: "channelData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+  }];
+  name: "onChannelUpdate";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+   }, {
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "onCommentAdd";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "hookMetadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+   }, {
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "onCommentDelete";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+   }, {
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "onCommentEdit";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "payable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     components: readonly [{
+        internalType: "address";
+        name: "author";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "createdAt";
+        type: "uint88";
+      }, {
+        internalType: "enum Comments.AuthorAuthMethod";
+        name: "authMethod";
+        type: "uint8";
+      }, {
+        internalType: "address";
+        name: "app";
+        type: "address";
+      }, {
+        internalType: "uint88";
+        name: "updatedAt";
+        type: "uint88";
+      }, {
+        internalType: "uint8";
+        name: "commentType";
+        type: "uint8";
+      }, {
+        internalType: "uint256";
+        name: "channelId";
+        type: "uint256";
+      }, {
+        internalType: "bytes32";
+        name: "parentId";
+        type: "bytes32";
+      }, {
+        internalType: "string";
+        name: "content";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "targetUri";
+        type: "string";
+     }];
+     internalType: "struct Comments.Comment";
+     name: "commentData";
+     type: "tuple";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "hookMetadata";
+     type: "tuple[]";
+   }, {
+     internalType: "address";
+     name: "msgSender";
+     type: "address";
+   }, {
+     internalType: "bytes32";
+     name: "commentId";
+     type: "bytes32";
+  }];
+  name: "onCommentHookDataUpdate";
+  outputs: readonly [{
+     components: readonly [{
+        internalType: "enum Metadata.MetadataOperation";
+        name: "operation";
+        type: "uint8";
+      }, {
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntryOp[]";
+     name: "";
+     type: "tuple[]";
+  }];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "address";
+     name: "channelManager";
+     type: "address";
+   }, {
+     components: readonly [{
+        internalType: "string";
+        name: "name";
+        type: "string";
+      }, {
+        internalType: "string";
+        name: "description";
+        type: "string";
+      }, {
+        internalType: "address";
+        name: "hook";
+        type: "address";
+      }, {
+        components: readonly [{
+           internalType: "bool";
+           name: "onInitialize";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentAdd";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentDelete";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentEdit";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onChannelUpdate";
+           type: "bool";
+         }, {
+           internalType: "bool";
+           name: "onCommentHookDataUpdate";
+           type: "bool";
+        }];
+        internalType: "struct Hooks.Permissions";
+        name: "permissions";
+        type: "tuple";
+     }];
+     internalType: "struct Channels.Channel";
+     name: "channelData";
+     type: "tuple";
+   }, {
+     internalType: "uint256";
+     name: "channelId";
+     type: "uint256";
+   }, {
+     components: readonly [{
+        internalType: "bytes32";
+        name: "key";
+        type: "bytes32";
+      }, {
+        internalType: "bytes";
+        name: "value";
+        type: "bytes";
+     }];
+     internalType: "struct Metadata.MetadataEntry[]";
+     name: "metadata";
+     type: "tuple[]";
+  }];
+  name: "onInitialize";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "nonpayable";
+  type: "function";
+}, {
+  inputs: readonly [{
+     internalType: "bytes4";
+     name: "interfaceId";
+     type: "bytes4";
+  }];
+  name: "supportsInterface";
+  outputs: readonly [{
+     internalType: "bool";
+     name: "";
+     type: "bool";
+  }];
+  stateMutability: "view";
+  type: "function";
+}, {
+  inputs: readonly [];
+  name: "EstimatorNotImplemented";
+  type: "error";
+}, {
+  inputs: readonly [];
+  name: "HookNotImplemented";
+  type: "error";
+}];
+```
+
+Defined in: [packages/sdk/src/abis.ts:3432](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/abis.ts#L3432)
+
+ABI of the BaseHook contract.
