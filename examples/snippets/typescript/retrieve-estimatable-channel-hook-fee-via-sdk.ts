@@ -1,25 +1,21 @@
 /**
- * !!!!!!!!!!!!!!!!!
- * !!! ATTENTION !!!
- * !!!!!!!!!!!!!!!!!
+ * This example shows how to retrieve total estimated fee for posting a comment to a channel with a fee estimatable hook.
+ * This example uses the SDK helper function to retrieve the estimated fee.
+ * The estimated fee is an "best-effort" estimation of the fee required to post a comment to the hook.
+ * Depending on the hook implementation, the estimated fee may not be accurate.
+ * In reality, you may want to add buffer fee amount or retry logic to handle the case where the estimated fee is not accurate.
  *
- * Please note this is a snippet for demostration of manually calculating the estimated fee via SDK.
- * We have implemented a generic helper function in the SDK to consolidate the fee retrieving logic.
  * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
+ *
+ * To run this example, you may want to deploy your own contracts and run create-channel.ts to create the
+ * test channel.
  */
 
 import {
-  Account,
-  Address,
-  Chain,
+  ContractFunctionRevertedError,
   createPublicClient,
   createWalletClient,
   http,
-  parseAbi,
-  ParseAccount,
-  PublicClient,
-  RpcSchema,
-  Transport,
 } from "viem";
 import { parseEnv } from "./util";
 import {
@@ -29,23 +25,9 @@ import {
   createCommentTypedData,
   postComment,
 } from "@ecp.eth/sdk/comments";
-import { NATIVE_ASSET_ADDRESS } from "@ecp.eth/sdk";
-import { Hex } from "@ecp.eth/sdk/core/schemas";
-import {
-  FeeEstimation,
-  getChannel,
-  getHookTransactionFee,
-} from "@ecp.eth/sdk/channel-manager";
-import { BaseHookABI } from "@ecp.eth/sdk/abis";
+
+import { estimateChannelPostCommentFee } from "@ecp.eth/sdk/channel-manager";
 import { privateKeyToAccount } from "viem/accounts";
-
-const erc165InterfaceId = "0x01ffc9a7";
-const erc721InterfaceId = "0x80ac58cd";
-const erc1155InterfaceId = "0xd9b67a26";
-
-const ERC165_ABI = parseAbi([
-  "function supportsInterface(bytes4 interfaceId) view returns (bool)",
-]);
 
 const {
   authorPrivateKey,
@@ -59,75 +41,87 @@ const {
  * This example shows how to retrieve estimated fee for posting a comment to a channel implemented a fee estimatable hook.
  */
 async function main() {
-  // public client for read only operations
+  // ========================================
+  // STEP 1: Setup clients and accounts
+  // ========================================
+
+  // Create a public client for read-only blockchain operations (like estimating fees)
   const publicClient = createPublicClient({
     chain,
     transport: http(rpcUrl),
   });
 
-  // Initialize account
+  // Initialize accounts from private keys
+  // The author account will be the one posting the comment
   const authorAccount = privateKeyToAccount(authorPrivateKey);
+  // The app account represents the application that manages the channel
   const appAccount = privateKeyToAccount(appPrivateKey);
 
-  // wallet client for write operations
+  // Create a wallet client for write operations (like posting comments)
   const walletClient = createWalletClient({
     account: authorAccount,
     chain: chain,
     transport: http(rpcUrl),
   });
 
-  const commentEta = BigInt(Date.now() + 1000 * 30);
+  // ========================================
+  // STEP 2: Prepare comment data
+  // ========================================
 
+  // Set expiration time to 30 seconds from now, this is a rough estimation of the arrival time of the comment.
+  // most hooks do not use the field to calculate the fee, but in case they do, these are required and potentially
+  // the estimation can be off so be prepared for that (you mway want to add buffer fee amount or retry logic)
+  const eta = BigInt(Date.now() + 1000 * 30);
+
+  // Create the comment data structure with all required fields
   const commentData: CommentData = {
-    content: "Hello, world!",
-    targetUri: "https://example.com",
-    commentType: 0,
-    authMethod: AuthorAuthMethod.DIRECT_TX,
-    channelId,
+    content: "Hello, world!", // The actual comment text
+    targetUri: "https://example.com", // URL this comment is about
+    commentType: 0, // Type of comment (0 = regular comment)
+    authMethod: AuthorAuthMethod.DIRECT_TX, // Author will sign and send transaction directly
+    channelId: retrieveEstimatableHookFeeChannelId, // Channel that has fee estimation
     parentId:
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    author: authorAddress,
-    app: appAddress,
-    createdAt: eta,
-    updatedAt: eta,
+      "0x0000000000000000000000000000000000000000000000000000000000000000", // No parent (top-level comment)
+    author: authorAccount.address, // Who is posting the comment
+    app: appAccount.address, // Which app manages this channel
+    createdAt: eta, // When comment was created
+    updatedAt: eta, // When comment was last updated
   };
+
+  // No additional metadata for this example
   const metadata = [];
-  // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
-  const msgSender = authorAddress;
 
-  // const feeEstimation = await getFeeEstimation({
-  //   authorAddress: authorAccount.address,
-  //   appAddress: appAccount.address,
-  //   channelId: retrieveEstimatableHookFeeChannelId,
-  //   publicClient,
-  // });
+  // Since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+  const msgSender = authorAccount.address;
 
-  console.log(
-    "The estimated fee for posting a comment to the hook is:",
-    feeEstimation,
-  );
+  // ========================================
+  // STEP 3: Estimate the fee for posting a comment
+  // ========================================
 
-  const feeType = await getFeeType({
-    feeEstimation,
-    publicClient,
-  });
-
-  console.log("The fee type is:", feeType);
-
-  const { fee: transactionHookFee } = await getHookTransactionFee({
+  // Call the SDK function to estimate the total fee required to post a comment
+  // This will query the channel's hook to determine the exact fee amount
+  const totalFeeEstimation = await estimateChannelPostCommentFee({
+    commentData,
+    metadata,
+    msgSender,
     readContract: publicClient.readContract,
+    channelId: retrieveEstimatableHookFeeChannelId,
   });
 
-  const totalFee =
-    (feeEstimation.amount * 10000n) / BigInt(10000 - transactionHookFee);
+  // ========================================
+  // Done: we've retrieved the estimated total fee for posting a comment to the hook
+  // ========================================
 
   console.log(
-    "The total fee for posting a comment:",
-    totalFee,
-    feeType,
-    "token",
+    "The estimated total fee for posting a comment to the hook is:",
+    totalFeeEstimation,
   );
 
+  // ========================================
+  // VERIFY STEP 1: Prepare comment data for actual posting
+  // ========================================
+
+  // Create comment data for the actual posting (slightly different structure)
   const addCommentData = createCommentData({
     content: "Hello, world!",
     targetUri: "https://example.com",
@@ -139,188 +133,58 @@ async function main() {
     app: appAccount.address,
   });
 
+  // Create typed data for EIP-712 signature (required for comment posting)
   const typedCommentData = createCommentTypedData({
     commentData: addCommentData,
     chainId: chain.id,
   });
 
+  // The app must sign the comment data to authorize the comment
   const appSignature = await appAccount.signTypedData(typedCommentData);
+
+  // ========================================
+  // VERIFY STEP 2: Test with not enough fee
+  // ========================================
 
   let postCommentError: unknown;
 
-  // try to post the comment with the fee minus 1 to see if it reverts
+  // First, try to post the comment with insufficient fee to demonstrate validation
+  // This should fail because the fee is 1 wei less than required
   try {
     console.log("posting comment with not enough fee to see it fail...");
     await postComment({
       comment: addCommentData,
       appSignature,
       writeContract: walletClient.writeContract,
-      fee: totalFee - 1n,
+      fee: totalFeeEstimation.baseToken.amount - 1n, // Intentionally insufficient fee
     });
   } catch (error) {
-    postCommentError = error;
+    if (error instanceof ContractFunctionRevertedError) {
+      postCommentError = error;
+    }
   }
 
+  // Verify that the transaction failed as expected
   if (!postCommentError) {
     throw new Error("post comment should have failed");
   }
 
   console.log("post comment with not enough fee failed as expected");
 
-  // now post the comment with the fee to see if it succeeds
+  // ========================================
+  // VERIFY STEP 3: Post comment with the estimated fee
+  // ========================================
+
+  // Now post the comment with the exact fee amount required
   console.log("posting comment with required fee...");
   await postComment({
     comment: addCommentData,
     appSignature,
     writeContract: walletClient.writeContract,
-    fee: totalFee,
+    fee: totalFeeEstimation.baseToken.amount, // Use the exact estimated fee
   });
-  console.log("comment posted!");
+  console.log("comment posted successfully!");
 }
 
-async function getFeeEstimation<
-  transport extends Transport,
-  chain extends Chain | undefined = undefined,
-  accountOrAddress extends Account | Address | undefined = undefined,
-  rpcSchema extends RpcSchema | undefined = undefined,
->({
-  authorAddress,
-  appAddress,
-  channelId = 0n,
-  publicClient,
-}: {
-  authorAddress: Hex;
-  appAddress: Hex;
-  channelId?: bigint;
-  publicClient: PublicClient<
-    transport,
-    chain,
-    ParseAccount<accountOrAddress>,
-    rpcSchema
-  >;
-}): Promise<FeeEstimation> {
-  console.log(
-    `getting estimated fee for author address: ${authorAddress}\n`,
-    `app address: ${appAddress}\n`,
-    `channel id: ${channelId}`,
-  );
-
-  const channelInfo = await getChannel({
-    channelId,
-    readContract: publicClient.readContract,
-  });
-
-  if (!channelInfo.hook) {
-    throw new Error("channel does not have a hook");
-  }
-
-  console.log("channel info: ", channelInfo);
-
-  // Rough ETA of comment landing on chain
-  const eta = BigInt(Date.now() + 1000 * 30);
-
-  const commentData: CommentData = {
-    content: "Hello, world!",
-    targetUri: "https://example.com",
-    commentType: 0,
-    authMethod: AuthorAuthMethod.DIRECT_TX,
-    channelId,
-    parentId:
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    author: authorAddress,
-    app: appAddress,
-    createdAt: eta,
-    updatedAt: eta,
-  };
-  const metadata = [];
-  // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
-  const msgSender = authorAddress;
-
-  console.log("getting estimated fee for comment data: ", commentData);
-
-  const feeEstimation = await publicClient.readContract({
-    abi: BaseHookABI,
-    address: channelInfo.hook,
-    functionName: "estimateAddCommentFee",
-    args: [commentData, metadata, msgSender],
-  });
-
-  console.log("estimated fee struct: ", feeEstimation);
-
-  return feeEstimation;
-}
-
-async function getFeeType<
-  transport extends Transport,
-  chain extends Chain | undefined = undefined,
-  accountOrAddress extends Account | Address | undefined = undefined,
-  rpcSchema extends RpcSchema | undefined = undefined,
->({
-  feeEstimation,
-  publicClient,
-}: {
-  feeEstimation: FeeEstimation;
-  publicClient: PublicClient<
-    transport,
-    chain,
-    ParseAccount<accountOrAddress>,
-    rpcSchema
-  >;
-}): Promise<"native" | "erc20" | "erc721" | "erc1155"> {
-  if (
-    feeEstimation.asset.toLowerCase() === NATIVE_ASSET_ADDRESS.toLowerCase()
-  ) {
-    return "native";
-  }
-
-  try {
-    const isErc165 = await publicClient.readContract({
-      abi: ERC165_ABI,
-      address: feeEstimation.asset,
-      functionName: "supportsInterface",
-      args: [erc165InterfaceId],
-    });
-
-    if (!isErc165) {
-      console.log(
-        "asset supports erc165 but saying it is not an ERC165 contract, something is wrong with the contract",
-      );
-      throw new Error("unsupported asset");
-    }
-
-    const isErc721 = await publicClient.readContract({
-      abi: ERC165_ABI,
-      address: feeEstimation.asset,
-      functionName: "supportsInterface",
-      args: [erc721InterfaceId],
-    });
-
-    if (isErc721) {
-      return "erc721";
-    }
-
-    const isErc1155 = await publicClient.readContract({
-      abi: ERC165_ABI,
-      address: feeEstimation.asset,
-      functionName: "supportsInterface",
-      args: [erc1155InterfaceId],
-    });
-
-    if (isErc1155) {
-      return "erc1155";
-    }
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes("call revert exception")
-    ) {
-      return "erc20";
-    }
-    throw error;
-  }
-
-  console.log("unsupported asset");
-  throw new Error("unsupported asset");
-}
-
+// Execute the main function
 main();

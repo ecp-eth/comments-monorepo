@@ -720,7 +720,7 @@ export async function getEstimatedChannelEditCommentHookFee({
   });
 }
 
-type EstimatedChannelCommentActionFeeParams<
+type EstimateChannelCommentActionFeeParams<
   CommentActionFunc extends
     | typeof getEstimatedChannelPostCommentHookFee
     | typeof getEstimatedChannelEditCommentHookFee,
@@ -749,7 +749,7 @@ async function estimatedChannelCommentActionFee<
   readContract,
   commentActionFunc,
   ...restOpts
-}: EstimatedChannelCommentActionFeeParams<CommentActionFunc>): Promise<TotalFeeEstimation> {
+}: EstimateChannelCommentActionFeeParams<CommentActionFunc>): Promise<TotalFeeEstimation> {
   const hookEstimatedFee = await commentActionFunc({
     ...restOpts,
     readContract,
@@ -795,10 +795,10 @@ async function estimatedChannelCommentActionFee<
  * @param estimatedChannelPostCommentHookFeeParams - The parameters for estimating the fee for posting a comment to a channel
  * @returns The estimated fee for posting a comment to a channel
  */
-export async function estimatedChannelPostCommentFee({
+export async function estimateChannelPostCommentFee({
   ...restOpts
 }: Omit<
-  EstimatedChannelCommentActionFeeParams<
+  EstimateChannelCommentActionFeeParams<
     typeof getEstimatedChannelPostCommentHookFee
   >,
   "commentActionFunc"
@@ -815,10 +815,10 @@ export async function estimatedChannelPostCommentFee({
  * @param estimatedChannelEditCommentHookFeeParams - The parameters for estimating the fee for editing a comment to a channel
  * @returns The estimated fee for editing a comment to a channel
  */
-export async function estimatedChannelEditCommentFee({
+export async function estimateChannelEditCommentFee({
   ...restOpts
 }: Omit<
-  EstimatedChannelCommentActionFeeParams<
+  EstimateChannelCommentActionFeeParams<
     typeof getEstimatedChannelEditCommentHookFee
   >,
   "commentActionFunc"

@@ -7,12 +7,16 @@
  * direction interaction with FeeEstimatableHook contract.
  * We have implemented a generic helper function in the SDK to consolidate the fee retrieving logic.
  * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
+ *
+ * To run this example, you may want to deploy your own contracts and run create-channel.ts to create the
+ * test channel.
  */
 
 import {
   Account,
   Address,
   Chain,
+  ContractFunctionExecutionError,
   createPublicClient,
   createWalletClient,
   http,
@@ -33,7 +37,7 @@ import {
 import { NATIVE_ASSET_ADDRESS } from "@ecp.eth/sdk";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import {
-  FeeEstimation,
+  HookFeeEstimation,
   getChannel,
   getHookTransactionFee,
 } from "@ecp.eth/sdk/channel-manager";
@@ -57,26 +61,38 @@ const {
 } = parseEnv();
 
 /**
- * This example shows how to retrieve estimated fee for posting a comment to a channel implemented a fee estimatable hook.
+ * This example shows how to retrieve estimated fee for posting a comment to a channel with a fee estimatable hook.
+ * This approach directly interacts with the FeeEstimatableHook contract instead of using the SDK helper.
  */
 async function main() {
-  // public client for read only operations
+  // ========================================
+  // STEP 1: Setup clients and accounts
+  // ========================================
+
+  // Create a public client for read-only blockchain operations (like estimating fees)
   const publicClient = createPublicClient({
     chain,
     transport: http(rpcUrl),
   });
 
-  // Initialize account
+  // Initialize accounts from private keys
+  // The author account will be the one posting the comment
   const authorAccount = privateKeyToAccount(authorPrivateKey);
+  // The app account represents the application that manages the channel
   const appAccount = privateKeyToAccount(appPrivateKey);
 
-  // wallet client for write operations
+  // Create a wallet client for write operations (like posting comments)
   const walletClient = createWalletClient({
     account: authorAccount,
     chain: chain,
     transport: http(rpcUrl),
   });
 
+  // ========================================
+  // STEP 2: Get fee estimation from the hook contract
+  // ========================================
+
+  // Directly call the hook contract to estimate the fee for posting a comment
   const feeEstimation = await getFeeEstimation({
     authorAddress: authorAccount.address,
     appAddress: appAccount.address,
@@ -89,6 +105,11 @@ async function main() {
     feeEstimation,
   );
 
+  // ========================================
+  // STEP 3: Determine the fee token type
+  // ========================================
+
+  // Check what type of token the fee is paid in (native, ERC20, ERC721, or ERC1155)
   const feeType = await getFeeType({
     feeEstimation,
     publicClient,
@@ -96,10 +117,17 @@ async function main() {
 
   console.log("The fee type is:", feeType);
 
+  // ========================================
+  // STEP 4: Calculate total fee including protocol fee
+  // ========================================
+
+  // Get the protocol's transaction fee percentage
   const { fee: transactionHookFee } = await getHookTransactionFee({
     readContract: publicClient.readContract,
   });
 
+  // Calculate the total fee by adding the protocol fee to the hook fee
+  // Formula: totalFee = hookFee / (1 - protocolFeePercentage)
   const totalFee =
     (feeEstimation.amount * 10000n) / BigInt(10000 - transactionHookFee);
 
@@ -110,6 +138,11 @@ async function main() {
     "token",
   );
 
+  // ========================================
+  // VERIFY STEP 1: Prepare comment data for actual posting
+  // ========================================
+
+  // Create comment data for the actual posting (slightly different structure)
   const addCommentData = createCommentData({
     content: "Hello, world!",
     targetUri: "https://example.com",
@@ -121,45 +154,61 @@ async function main() {
     app: appAccount.address,
   });
 
+  // Create typed data for EIP-712 signature (required for comment posting)
   const typedCommentData = createCommentTypedData({
     commentData: addCommentData,
     chainId: chain.id,
   });
 
+  // The app must sign the comment data to authorize the comment
   const appSignature = await appAccount.signTypedData(typedCommentData);
+
+  // ========================================
+  // VERIFY STEP 2: Test with not enough fee
+  // ========================================
 
   let postCommentError: unknown;
 
-  // try to post the comment with the fee minus 1 to see if it reverts
+  // First, try to post the comment with insufficient fee to demonstrate validation
+  // This should fail because the fee is 1 wei less than required
   try {
     console.log("posting comment with not enough fee to see it fail...");
     await postComment({
       comment: addCommentData,
       appSignature,
       writeContract: walletClient.writeContract,
-      fee: totalFee - 1n,
+      fee: totalFee - 1n, // Intentionally insufficient fee
     });
   } catch (error) {
     postCommentError = error;
   }
 
+  // Verify that the transaction failed as expected
   if (!postCommentError) {
     throw new Error("post comment should have failed");
   }
 
   console.log("post comment with not enough fee failed as expected");
 
-  // now post the comment with the fee to see if it succeeds
+  // ========================================
+  // VERIFY STEP 3: Post comment with the calculated fee
+  // ========================================
+
+  // Now post the comment with the exact fee amount required
   console.log("posting comment with required fee...");
   await postComment({
     comment: addCommentData,
     appSignature,
     writeContract: walletClient.writeContract,
-    fee: totalFee,
+    fee: totalFee, // Use the calculated total fee
   });
-  console.log("comment posted!");
+  console.log("comment posted successfully!");
 }
 
+/**
+ * Helper function to get fee estimation directly from the hook contract
+ * This demonstrates the manual approach vs using the SDK helper
+ */
 async function getFeeEstimation<
   transport extends Transport,
   chain extends Chain | undefined = undefined,
@@ -180,46 +229,55 @@ async function getFeeEstimation<
     ParseAccount<accountOrAddress>,
     rpcSchema
   >;
-}): Promise<FeeEstimation> {
+}): Promise<HookFeeEstimation> {
   console.log(
-    `getting estimated fee for author address: ${authorAddress}\n`,
-    `app address: ${appAddress}\n`,
-    `channel id: ${channelId}`,
+    `Getting estimated fee for:\n`,
+    `  Author address: ${authorAddress}\n`,
+    `  App address: ${appAddress}\n`,
+    `  Channel ID: ${channelId}`,
   );
 
+  // Get channel information to find the hook contract address
   const channelInfo = await getChannel({
     channelId,
     readContract: publicClient.readContract,
   });
 
   if (!channelInfo.hook) {
-    throw new Error("channel does not have a hook");
+    throw new Error("Channel does not have a hook");
   }
 
-  console.log("channel info: ", channelInfo);
+  console.log("Channel info: ", channelInfo);
 
-  // Rough ETA of comment landing on chain
+  // Set expiration time to 30 seconds from now, this is a rough estimation of the arrival time of the comment.
+  // Most hooks do not use the field to calculate the fee, but in case they do, these are required and potentially
+  // the estimation can be off so be prepared for that (you may want to add buffer fee amount or retry logic)
   const eta = BigInt(Date.now() + 1000 * 30);
 
+  // Create the comment data structure with all required fields
   const commentData: CommentData = {
-    content: "Hello, world!",
-    targetUri: "https://example.com",
-    commentType: 0,
-    authMethod: AuthorAuthMethod.DIRECT_TX,
+    content: "Hello, world!", // The actual comment text
+    targetUri: "https://example.com", // URL this comment is about
+    commentType: 0, // Type of comment (0 = regular comment)
+    authMethod: AuthorAuthMethod.DIRECT_TX, // Author will sign and send transaction directly
     channelId,
     parentId:
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-    author: authorAddress,
-    app: appAddress,
-    createdAt: eta,
-    updatedAt: eta,
+      "0x0000000000000000000000000000000000000000000000000000000000000000", // No parent (top-level comment)
+    author: authorAddress, // Who is posting the comment
+    app: appAddress, // Which app manages this channel
+    createdAt: eta, // When comment was created
+    updatedAt: eta, // When comment was last updated
   };
+
+  // No additional metadata for this example
   const metadata = [];
-  // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+
+  // Since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
   const msgSender = authorAddress;
 
-  console.log("getting estimated fee for comment data: ", commentData);
+  console.log("Getting estimated fee for comment data: ", commentData);
 
+  // Call the hook contract's estimateAddCommentFee function directly
   const feeEstimation = await publicClient.readContract({
     abi: BaseHookABI,
     address: channelInfo.hook,
@@ -227,11 +285,15 @@ async function getFeeEstimation<
     args: [commentData, metadata, msgSender],
   });
 
-  console.log("estimated fee struct: ", feeEstimation);
+  console.log("Estimated fee struct: ", feeEstimation);
 
   return feeEstimation;
 }
 
+/**
+ * Helper function to determine the type of token used for fees
+ * Uses ERC-165 interface detection to identify token standards
+ */
 async function getFeeType<
   transport extends Transport,
   chain extends Chain | undefined = undefined,
@@ -241,7 +303,7 @@ async function getFeeType<
   feeEstimation,
   publicClient,
 }: {
-  feeEstimation: FeeEstimation;
+  feeEstimation: HookFeeEstimation;
   publicClient: PublicClient<
     transport,
     chain,
@@ -249,6 +311,7 @@ async function getFeeType<
     rpcSchema
   >;
 }): Promise<"native" | "erc20" | "erc721" | "erc1155"> {
+  // Check if the fee is paid in the native token (ETH, MATIC, etc.)
   if (
     feeEstimation.asset.toLowerCase() === NATIVE_ASSET_ADDRESS.toLowerCase()
   ) {
@@ -256,6 +319,7 @@ async function getFeeType<
   }
 
   try {
+    // Check if the asset supports ERC-165 (interface detection standard)
     const isErc165 = await publicClient.readContract({
       abi: ERC165_ABI,
       address: feeEstimation.asset,
@@ -270,6 +334,7 @@ async function getFeeType<
       throw new Error("unsupported asset");
     }
 
+    // Check if it's an ERC-721 (NFT) token
     const isErc721 = await publicClient.readContract({
       abi: ERC165_ABI,
       address: feeEstimation.asset,
@@ -281,6 +346,7 @@ async function getFeeType<
       return "erc721";
     }
 
+    // Check if it's an ERC-1155 (multi-token) token
     const isErc1155 = await publicClient.readContract({
       abi: ERC165_ABI,
       address: feeEstimation.asset,
@@ -291,18 +357,17 @@ async function getFeeType<
     if (isErc1155) {
       return "erc1155";
     }
+
+    // If it supports ERC-165 but not ERC-721 or ERC-1155, assume it's ERC-20
+    return "erc20";
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes("call revert exception")
-    ) {
+    // If the contract call fails, it's likely an ERC-20 token without ERC-165 support
+    if (error instanceof ContractFunctionExecutionError) {
       return "erc20";
     }
     throw error;
   }
-
-  console.log("unsupported asset");
-  throw new Error("unsupported asset");
 }
 
+// Execute the main function
 main();
