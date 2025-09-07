@@ -170,11 +170,43 @@ export type HookContractReadFunctions = {
 };
 
 /**
- * FeeEstimation struct returned from fee estimator functions
+ * HookFeeEstimation struct returned from hook fee estimator functions
  */
-export type FeeEstimation = {
+export type HookFeeEstimation = {
   amount: bigint;
   asset: Hex;
   description: string;
+  metadata: readonly MetadataEntry[];
+};
+
+export type ContractBasedAssetERCType =
+  | "erc20"
+  | "erc721"
+  | "erc1155"
+  | "unknown";
+export type ContractBasedAssetType = {
+  type: ContractBasedAssetERCType;
+  address: Hex;
+  amount: bigint;
+};
+
+export type TotalFeeEstimation = {
+  /**
+   * The amount of the base token to be paid
+   */
+  baseToken: {
+    amount: bigint;
+  };
+  /**
+   * The contract based asset to be paid, such as ERC20, ERC721, ERC1155
+   */
+  contractAsset?: ContractBasedAssetType;
+  /**
+   * The description of the fee
+   */
+  description: string;
+  /**
+   * The metadata of the fee estimation
+   */
   metadata: readonly MetadataEntry[];
 };

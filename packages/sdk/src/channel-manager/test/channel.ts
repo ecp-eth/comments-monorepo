@@ -22,7 +22,8 @@ import {
   withdrawFees,
   setBaseURI,
   getCommentCreationFee,
-  estimateChannelPostCommentFee,
+  getEstimatedChannelPostCommentHookFee,
+  getEstimatedChannelEditCommentHookFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
@@ -557,7 +558,39 @@ describe("channel", () => {
       // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
       const msgSender = account.address;
 
-      const fee = await estimateChannelPostCommentFee({
+      const fee = await getEstimatedChannelPostCommentHookFee({
+        readContract: client.readContract,
+        channelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(fee.amount, 900000000000000n);
+      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+    });
+
+    it("estimates the fee for editing a comment", async () => {
+      const eta = BigInt(Date.now() + 1000 * 30);
+      const commentData: CommentData = {
+        content: "Hello, world!",
+        targetUri: "https://example.com",
+        commentType: 0,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+      const metadata: MetadataEntry[] = [];
+      // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+      const msgSender = account.address;
+
+      const fee = await getEstimatedChannelEditCommentHookFee({
         readContract: client.readContract,
         channelId,
         commentData,

@@ -121,3 +121,16 @@ export const DEFAULT_CHAIN_ID_DEV = 31337;
  */
 export const NATIVE_ASSET_ADDRESS =
   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
+/**
+ * The ERC165 interface ID for the ERC165 contracts.
+ */
+export const INTERFACE_ID_ERC165 = "0x01ffc9a7";
+/**
+ * The ERC165 interface ID for the ERC721 contracts.
+ */
+export const INTERFACE_ID_ERC721 = "0x80ac58cd";
+/**
+ * The ERC165 interface ID for the ERC1155 contracts.
+ */
+export const INTERFACE_ID_ERC1155 = "0xd9b67a26";
