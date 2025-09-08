@@ -747,14 +747,17 @@ async function estimateChannelCommentActionFee<
 >({
   readContract,
   commentActionFunc,
+  channelManagerAddress,
   ...restOpts
 }: EstimateChannelCommentActionFeeParams<CommentActionFunc>): Promise<TotalFeeEstimation> {
   const hookEstimatedFee = await commentActionFunc({
     ...restOpts,
+    channelManagerAddress,
     readContract,
   });
 
   const { fee: transactionHookFee } = await getHookTransactionFee({
+    channelManagerAddress,
     readContract,
   });
 
