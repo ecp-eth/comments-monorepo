@@ -47,3 +47,11 @@ export const AnalyticsKpiBacklogResponseSchema = z.object({
 export type AnalyticsKpiBacklogResponseSchemaType = z.infer<
   typeof AnalyticsKpiBacklogResponseSchema
 >;
+
+export const AnalyticsKpiDeliveredUnderMinuteResponseSchema = z.object({
+  rate: z.coerce.number(),
+});
+
+export type AnalyticsKpiDeliveredUnderMinuteResponseSchemaType = z.infer<
+  typeof AnalyticsKpiDeliveredUnderMinuteResponseSchema
+>;

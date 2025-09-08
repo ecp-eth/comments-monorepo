@@ -108,3 +108,7 @@ export function createAnalyticsKpiE2ELatencyQueryKey() {
 export function createAnalyticsKpiBacklogQueryKey() {
   return ["analytics-kpi-backlog"] as const;
 }
+
+export function createAnalyticsKpiDeliveredUnderMinuteQueryKey() {
+  return ["analytics-kpi-delivered-under-minute"] as const;
+}

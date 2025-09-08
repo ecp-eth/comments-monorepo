@@ -12,8 +12,10 @@ import {
   AnalyticsKpiFirstAttemptSuccessResponseSchema,
   type AnalyticsKpiE2ELatencyResponseSchemaType,
   AnalyticsKpiE2ELatencyResponseSchema,
-  AnalyticsKpiBacklogResponseSchemaType,
+  type AnalyticsKpiBacklogResponseSchemaType,
   AnalyticsKpiBacklogResponseSchema,
+  type AnalyticsKpiDeliveredUnderMinuteResponseSchemaType,
+  AnalyticsKpiDeliveredUnderMinuteResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -21,6 +23,7 @@ import {
   createAnalyticsKpiEventualSuccessQueryKey,
   createAnalyticsKpiFirstAttemptSuccessQueryKey,
   createAnalyticsKpiBacklogQueryKey,
+  createAnalyticsKpiDeliveredUnderMinuteQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -228,6 +231,52 @@ export function useAnalyticsKpiBacklogQuery(
       }
 
       return AnalyticsKpiBacklogResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsKpiDeliveredUnderMinuteQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsKpiDeliveredUnderMinuteResponseSchemaType,
+    Error,
+    AnalyticsKpiDeliveredUnderMinuteResponseSchemaType,
+    ReturnType<typeof createAnalyticsKpiDeliveredUnderMinuteQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsKpiDeliveredUnderMinuteQuery(
+  options?: UseAnalyticsKpiDeliveredUnderMinuteQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsKpiDeliveredUnderMinuteQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          createFetchUrl("/api/analytics/kpi/delivered-under-minute"),
+          {
+            signal,
+            headers,
+          },
+        );
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch delivered under minute KPI: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsKpiDeliveredUnderMinuteResponseSchema.parse(
+        await response.json(),
+      );
     },
     ...options,
   });
