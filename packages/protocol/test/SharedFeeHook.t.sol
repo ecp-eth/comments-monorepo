@@ -13,13 +13,15 @@ import {
   SafeERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { TestUtils } from "./utils.sol";
-import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
+import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
+import { FeeEstimatable } from "../src/types/FeeEstimatable.sol";
+
 /// @title SharedFeeHook - A hook that splits comment fees between channel owners and parent comment authors
 /// @notice This hook charges 0.001 ETH per comment and splits it between channel owners and parent comment authors
-contract SharedFeeHook is NoFeeHook {
+contract SharedFeeHook is BaseHook {
   using SafeERC20 for IERC20;
 
   // Token used for fee payment
@@ -103,6 +105,32 @@ contract SharedFeeHook is NoFeeHook {
     _distributeFees(hookFee);
 
     return new Metadata.MetadataEntry[](0);
+  }
+
+  function estimateAddCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external view returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    feeEstimation.amount = feeAmount;
+    feeEstimation.asset = address(paymentToken);
+    feeEstimation.description = "SharedFeeHook fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
+  }
+
+  function estimateEditCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    feeEstimation.amount = 0;
+    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    feeEstimation.description = "SharedFeeHook fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
   }
 
   function addRecipient(address _recipient, uint256 _share) external {
@@ -475,6 +503,31 @@ contract SharedFeeHookTest is Test, IERC721Receiver {
     address nonExistentRecipient = makeAddr("nonExistent");
     vm.expectRevert("Recipient not found");
     feeHook.updateRecipientShare(nonExistentRecipient, 1000);
+  }
+
+  function test_EstimatorReturnsCorrectFee() public view {
+    FeeEstimatable.FeeEstimation memory feeEstimation = feeHook
+      .estimateAddCommentFee(
+        Comments.Comment({
+          author: address(this),
+          createdAt: uint88(block.timestamp + 30 seconds),
+          authMethod: Comments.AuthorAuthMethod.DIRECT_TX,
+          app: user2,
+          updatedAt: uint88(block.timestamp + 30 seconds),
+          commentType: 0,
+          channelId: 0,
+          parentId: bytes32(0),
+          content: "Test comment",
+          targetUri: ""
+        }),
+        new Metadata.MetadataEntry[](0),
+        address(0)
+      );
+
+    assertEq(feeEstimation.amount, FEE_AMOUNT);
+    assertEq(feeEstimation.asset, address(paymentToken));
+    assertEq(feeEstimation.description, "SharedFeeHook fee");
+    assertEq(feeEstimation.metadata.length, 0);
   }
 
   function onERC721Received(

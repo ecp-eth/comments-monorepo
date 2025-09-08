@@ -13,13 +13,14 @@ import {
   SafeERC20
 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { TestUtils } from "./utils.sol";
-import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
+import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
+import { FeeEstimatable } from "../src/types/FeeEstimatable.sol";
 
 // Fee charging hook contract based on comment length
-contract LengthFeeHook is NoFeeHook {
+contract LengthFeeHook is BaseHook {
   using SafeERC20 for IERC20;
 
   // Token used for fee payment
@@ -80,6 +81,36 @@ contract LengthFeeHook is NoFeeHook {
     emit FeeCollected(commentData.author, hookFee);
 
     return new Metadata.MetadataEntry[](0);
+  }
+
+  function estimateAddCommentFee(
+    Comments.Comment calldata commentData,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external view returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    // Calculate protocol fee
+    uint256 contentLength = bytes(commentData.content).length;
+    uint256 totalFee = contentLength * tokensPerCharacter;
+
+    feeEstimation.amount = totalFee;
+    feeEstimation.asset = address(paymentToken);
+    feeEstimation.description = "SharedFeeHook fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
+  }
+
+  function estimateEditCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    feeEstimation.amount = 0;
+    feeEstimation.asset = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+    feeEstimation.description = "SharedFeeHook fee";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
   }
 
   function withdrawFees() external {

@@ -3,8 +3,8 @@
  * !!! ATTENTION !!!
  * !!!!!!!!!!!!!!!!!
  *
- * Please note this is a snippet for demostration of manually calculating the total fee.
- * We have implemented a generic helper function in the SDK to consolidate the fee retrieving logic.
+ * Please note this snippet demonstrates manually calculating the total fee.
+ * We have implemented a generic helper in the SDK that consolidates the fee retrieval logic.
  * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
  *
  * To run this example, please make sure:
