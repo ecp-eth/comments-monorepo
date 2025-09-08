@@ -10,9 +10,12 @@ import {
   type AnalyticsKpiDeliveriesResponseSchemaType,
   type AnalyticsKpiFirstAttemptSuccessResponseSchemaType,
   AnalyticsKpiFirstAttemptSuccessResponseSchema,
+  type AnalyticsKpiE2ELatencyResponseSchemaType,
+  AnalyticsKpiE2ELatencyResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
+  createAnalyticsKpiE2ELatencyQueryKey,
   createAnalyticsKpiEventualSuccessQueryKey,
   createAnalyticsKpiFirstAttemptSuccessQueryKey,
 } from "./query-keys";
@@ -142,6 +145,47 @@ export function useAnalyticsKpiFirstAttemptSuccessQuery(
       return AnalyticsKpiFirstAttemptSuccessResponseSchema.parse(
         await response.json(),
       );
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsKpiE2ELatencyQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsKpiE2ELatencyResponseSchemaType,
+    Error,
+    AnalyticsKpiE2ELatencyResponseSchemaType,
+    ReturnType<typeof createAnalyticsKpiE2ELatencyQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsKpiE2ELatencyQuery(
+  options?: UseAnalyticsKpiE2ELatencyQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsKpiE2ELatencyQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/kpi/e2e-latency"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch e2e latency KPI: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsKpiE2ELatencyResponseSchema.parse(await response.json());
     },
     ...options,
   });

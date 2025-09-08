@@ -43,6 +43,7 @@ import { setupGetAppWebhookAnalyticsLatencyResponseHistogram } from "./apps/[id]
 import { setupAnalyticsKpiDeliveriesGet } from "./analytics/kpi/deliveries/get";
 import { setupAnalyticsKpiEventualSuccessGet } from "./analytics/kpi/eventual-success/get";
 import { setupAnalyticsKpiFirstAttemptSuccessGet } from "./analytics/kpi/first-attempt-success/get";
+import { setupAnalyticsKpiE2ELatencyGet } from "./analytics/kpi/e2e-latency/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -89,6 +90,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAnalyticsKpiDeliveriesGet(app);
   setupAnalyticsKpiEventualSuccessGet(app);
   setupAnalyticsKpiFirstAttemptSuccessGet(app);
+  setupAnalyticsKpiE2ELatencyGet(app);
 
   return app;
 }

@@ -100,3 +100,7 @@ export function createAnalyticsKpiEventualSuccessQueryKey() {
 export function createAnalyticsKpiFirstAttemptSuccessQueryKey() {
   return ["analytics-kpi-first-attempt-success"] as const;
 }
+
+export function createAnalyticsKpiE2ELatencyQueryKey() {
+  return ["analytics-kpi-e2e-latency"] as const;
+}

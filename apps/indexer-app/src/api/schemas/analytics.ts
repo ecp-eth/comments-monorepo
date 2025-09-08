@@ -27,3 +27,11 @@ export const AnalyticsKpiFirstAttemptSuccessResponseSchema = z.object({
 export type AnalyticsKpiFirstAttemptSuccessResponseSchemaType = z.infer<
   typeof AnalyticsKpiFirstAttemptSuccessResponseSchema
 >;
+
+export const AnalyticsKpiE2ELatencyResponseSchema = z.object({
+  p95: z.coerce.number(),
+});
+
+export type AnalyticsKpiE2ELatencyResponseSchemaType = z.infer<
+  typeof AnalyticsKpiE2ELatencyResponseSchema
+>;
