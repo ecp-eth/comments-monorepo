@@ -2,33 +2,95 @@
 
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
+import { CreateAppDialogButton } from "@/components/create-app-dialog-button";
+import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useAppsQuery } from "@/queries/apps";
 import { useMeQuery } from "@/queries/me";
 import { RotateCwIcon } from "lucide-react";
 
 export default function AuthDashboardPage() {
   const meQuery = useMeQuery();
+  const appsQuery = useAppsQuery({
+    refetchOnMount: true,
+  });
 
-  if (meQuery.status === "pending") {
+  if (meQuery.status === "pending" || appsQuery.status === "pending") {
     // @todo loading screen
     return null;
+  }
+
+  if (appsQuery.status === "error") {
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching your apps"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={appsQuery.isRefetching}
+                onClick={() => appsQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon
+                  className={cn(
+                    "h-4 w-4",
+                    appsQuery.isRefetching && "animate-spin",
+                  )}
+                />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
+      </>
+    );
   }
 
   if (meQuery.status === "error") {
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
-        <ErrorScreen
-          title="Error fetching your identity"
-          description="Please try again later. If the problem persists, please contact support."
-          actions={
-            <Button onClick={() => meQuery.refetch()} className="gap-2">
-              <RotateCwIcon className="h-4 w-4" />
-              Retry
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching your identity"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={meQuery.isRefetching}
+                onClick={() => meQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon
+                  className={cn(
+                    "h-4 w-4",
+                    meQuery.isRefetching && "animate-spin",
+                  )}
+                />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
+      </>
+    );
+  }
+
+  if (appsQuery.data.results.length === 0) {
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
+        <AppContent className="flex-col gap-4">
+          <EmptyScreen
+            title="No apps"
+            description="You don't have any apps yet"
+            actions={<CreateAppDialogButton />}
+          />
+        </AppContent>
       </>
     );
   }
