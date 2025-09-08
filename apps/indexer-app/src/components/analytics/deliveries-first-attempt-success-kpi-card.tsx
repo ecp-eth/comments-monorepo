@@ -1,4 +1,4 @@
-import { TrendingDownIcon, TrendingUpIcon } from "lucide-react";
+import { RotateCwIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import {
   Card,
   CardDescription,
@@ -6,15 +6,64 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { useAnalyticsKpiFirstAttemptSuccessQuery } from "@/queries/analytics";
+import { Skeleton } from "../ui/skeleton";
+import { ErrorScreen } from "../error-screen";
+import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 export function DeliveriesFirstAttemptSuccessKpiCard() {
+  const analyticsKpiFirstAttemptSuccessQuery =
+    useAnalyticsKpiFirstAttemptSuccessQuery();
+
+  if (analyticsKpiFirstAttemptSuccessQuery.status === "pending") {
+    return <Skeleton className="w-full h-full" />;
+  }
+
+  if (analyticsKpiFirstAttemptSuccessQuery.status === "error") {
+    return (
+      <Card>
+        <ErrorScreen
+          title="Error fetching first attempt success KPI"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              disabled={analyticsKpiFirstAttemptSuccessQuery.isRefetching}
+              onClick={() => analyticsKpiFirstAttemptSuccessQuery.refetch()}
+              className="gap-2"
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsKpiFirstAttemptSuccessQuery.isRefetching &&
+                    "animate-spin",
+                )}
+              />
+              Retry
+            </Button>
+          }
+        />
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardDescription>First attempt success %</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums flex items-center gap-2">
-          <TrendingUpIcon />
-          0%
+          {analyticsKpiFirstAttemptSuccessQuery.data.delta > 0 ? (
+            <TrendingUpIcon className="h-4 w-4 text-green-500" />
+          ) : null}
+          {analyticsKpiFirstAttemptSuccessQuery.data.delta < 0 ? (
+            <TrendingDownIcon className="h-4 w-4 text-red-500" />
+          ) : null}
+          <span>
+            {analyticsKpiFirstAttemptSuccessQuery.data.firstSuccessRate.toFixed(
+              2,
+            )}
+            %
+          </span>
         </CardTitle>
       </CardHeader>
       <CardFooter className="text-sm">

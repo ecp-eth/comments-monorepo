@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const AnalyticsKpiDeliveriesResponseSchema = z.object({
-  deliveries: z.coerce.bigint(),
+  deliveries: z.coerce.number(),
 });
 
 export type AnalyticsKpiDeliveriesResponseSchemaType = z.infer<
@@ -16,4 +16,14 @@ export const AnalyticsKpiEventualSuccessResponseSchema = z.object({
 
 export type AnalyticsKpiEventualSuccessResponseSchemaType = z.infer<
   typeof AnalyticsKpiEventualSuccessResponseSchema
+>;
+
+export const AnalyticsKpiFirstAttemptSuccessResponseSchema = z.object({
+  firstSuccessRate: z.coerce.number(),
+  previousFirstSuccessRate: z.coerce.number(),
+  delta: z.coerce.number(),
+});
+
+export type AnalyticsKpiFirstAttemptSuccessResponseSchemaType = z.infer<
+  typeof AnalyticsKpiFirstAttemptSuccessResponseSchema
 >;

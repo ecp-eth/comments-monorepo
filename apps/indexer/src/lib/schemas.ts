@@ -535,7 +535,7 @@ export const OpenAPIBigintStringSchema = z
   });
 
 export const OpenAPIFloatFromDbSchema = z.preprocess((v, ctx) => {
-  const result = z.number().safeParse(v);
+  const result = z.coerce.number().safeParse(v);
 
   if (!result.success) {
     ctx.addIssue({

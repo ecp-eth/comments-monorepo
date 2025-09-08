@@ -8,10 +8,13 @@ import {
   AnalyticsKpiEventualSuccessResponseSchema,
   type AnalyticsKpiEventualSuccessResponseSchemaType,
   type AnalyticsKpiDeliveriesResponseSchemaType,
+  type AnalyticsKpiFirstAttemptSuccessResponseSchemaType,
+  AnalyticsKpiFirstAttemptSuccessResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
   createAnalyticsKpiEventualSuccessQueryKey,
+  createAnalyticsKpiFirstAttemptSuccessQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -91,6 +94,52 @@ export function useAnalyticsKpiEventualSuccessQuery(
       }
 
       return AnalyticsKpiEventualSuccessResponseSchema.parse(
+        await response.json(),
+      );
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsKpiFirstAttemptSuccessQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsKpiFirstAttemptSuccessResponseSchemaType,
+    Error,
+    AnalyticsKpiFirstAttemptSuccessResponseSchemaType,
+    ReturnType<typeof createAnalyticsKpiFirstAttemptSuccessQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsKpiFirstAttemptSuccessQuery(
+  options?: UseAnalyticsKpiFirstAttemptSuccessQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsKpiFirstAttemptSuccessQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(
+          createFetchUrl("/api/analytics/kpi/first-attempt-success"),
+          {
+            signal,
+            headers,
+          },
+        );
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch first attempt success KPI: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsKpiFirstAttemptSuccessResponseSchema.parse(
         await response.json(),
       );
     },

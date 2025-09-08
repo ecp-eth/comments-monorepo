@@ -96,3 +96,7 @@ export function createAnalyticsKpiDeliveriesQueryKey() {
 export function createAnalyticsKpiEventualSuccessQueryKey() {
   return ["analytics-kpi-eventual-success"] as const;
 }
+
+export function createAnalyticsKpiFirstAttemptSuccessQueryKey() {
+  return ["analytics-kpi-first-attempt-success"] as const;
+}
