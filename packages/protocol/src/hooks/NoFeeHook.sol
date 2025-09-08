@@ -16,10 +16,18 @@ import { FeeEstimatable } from "../types/FeeEstimatable.sol";
 
 /**
  * @title FeeEstimatableHook
- * @notice Abstract base contract for hooks do not need a fee
- * @dev Only derive from this contract if the hook absolutely does not need a fee
+ * @notice Abstract base contract for hooks that do not require a fee.
+ * @dev Only derive from this contract if the hook absolutely does not require a fee.
  */
 abstract contract NoFeeHook is BaseHook {
+  function supportsInterface(
+    bytes4 interfaceId
+  ) public view virtual override returns (bool) {
+    return
+      interfaceId == type(IFeeEstimatableHook).interfaceId ||
+      super.supportsInterface(interfaceId);
+  }
+
   function estimateAddCommentFee(
     Comments.Comment calldata,
     Metadata.MetadataEntry[] calldata,

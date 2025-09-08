@@ -95,6 +95,7 @@ contract FlatFeeHook is BaseHook {
   }
 
   function setShouldChargeOnEdit(bool _shouldChargeOnEdit) external {
+    require(msg.sender == feeCollector, "Only fee collector");
     shouldChargeOnEdit = _shouldChargeOnEdit;
   }
 
@@ -176,6 +177,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     // Deploy fee hook
     feeHook = new FlatFeeHook(feeCollector);
     feeHookWithEdit = new FlatFeeHook(feeCollector);
+    vm.prank(feeCollector);
     feeHookWithEdit.setShouldChargeOnEdit(true);
 
     (comments, channelManager) = TestUtils.createContracts(owner);
