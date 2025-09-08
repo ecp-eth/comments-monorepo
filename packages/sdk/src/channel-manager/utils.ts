@@ -87,7 +87,7 @@ export async function getERCType({
             functionName: method,
           });
 
-          if (!result) {
+          if (result == null) {
             return "unknown";
           }
         } catch {

@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../types/Comments.sol";
+import "../types/Metadata.sol";
 import { FeeEstimatable } from "../types/FeeEstimatable.sol";
 
 interface IFeeEstimatableHook is IERC165 {

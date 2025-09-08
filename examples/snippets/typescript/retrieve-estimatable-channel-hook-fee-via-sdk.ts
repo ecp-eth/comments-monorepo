@@ -71,7 +71,7 @@ async function main() {
   // Set expiration time to 30 seconds from now, this is a rough estimation of the arrival time of the comment.
   // most hooks do not use the field to calculate the fee, but in case they do, these are required and potentially
   // the estimation can be off so be prepared for that (you mway want to add buffer fee amount or retry logic)
-  const eta = BigInt(Date.now() + 1000 * 30);
+  const eta = BigInt(Math.floor(Date.now() / 1000) + 30);
 
   // Create the comment data structure with all required fields
   const commentData: CommentData = {

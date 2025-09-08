@@ -634,8 +634,8 @@ type GetEstimatedChannelPostCommentHookFeeParams = {
 };
 
 /**
- * Call the estimateAddCommentFee function on the hook to retrieve the estimated fee for posting a comment to a channel
- * For estimation of total fee, use the `estimatedChannelPostCommentFee` helper
+ * It calls the `estimateAddCommentFee` function on the hook to retrieve the estimated fee for posting a comment to a channel.
+ * For estimation of total fee, use the `estimateChannelPostCommentFee` helper
  *
  * @param getEstimatedChannelPostCommentHookFeeParams - The parameters for estimating the fee for posting a comment to a channel
  * @returns The estimated fee for posting a comment to a channel
@@ -682,8 +682,8 @@ type GetEstimatedChannelEditCommentHookFeeParams = {
 };
 
 /**
- * Call the estimateAddCommentFee function on the hook to retrieve the estimated fee for editing a comment to a channel
- * For estimation of total fee, use the `estimatedChannelEditCommentFee` helper
+ * It calls the `estimateEditCommentFee` function on the hook to retrieve the estimated fee for editing a comment to a channel.
+ * For estimation of total fee, use the `estimateChannelEditCommentFee` helper
  *
  * @param getEstimateChannelEditCommentHookFeeParams - The parameters for estimating the fee for editing a comment to a channel
  * @returns The estimated fee for editing a comment to a channel
@@ -757,6 +757,10 @@ async function estimateChannelCommentActionFee<
   const { fee: transactionHookFee } = await getHookTransactionFee({
     readContract,
   });
+
+  if (transactionHookFee > 10000) {
+    throw new Error("Transaction hook fee is greater than 100%");
+  }
 
   const baseTokenAmount =
     hookEstimatedFee.asset === NATIVE_ASSET_ADDRESS

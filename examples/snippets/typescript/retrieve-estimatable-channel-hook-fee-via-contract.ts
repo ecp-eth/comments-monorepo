@@ -3,8 +3,8 @@
  * !!! ATTENTION !!!
  * !!!!!!!!!!!!!!!!!
  *
- * Please note this is a snippet for demostration of manually calculating the estimated fee via
- * direction interaction with FeeEstimatableHook contract.
+ * Please note this is a snippet for demonstration of manually calculating the estimated fee via
+ * direct interaction with FeeEstimatableHook contract.
  * We have implemented a generic helper function in the SDK to consolidate the fee retrieving logic.
  * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
  *
@@ -262,7 +262,7 @@ async function getFeeEstimation<
   // Set expiration time to 30 seconds from now, this is a rough estimation of the arrival time of the comment.
   // Most hooks do not use the field to calculate the fee, but in case they do, these are required and potentially
   // the estimation can be off so be prepared for that (you may want to add buffer fee amount or retry logic)
-  const eta = BigInt(Date.now() + 1000 * 30);
+  const eta = BigInt(Math.floor(Date.now() / 1000) + 30);
 
   // Create the comment data structure with all required fields
   const commentData: CommentData = {

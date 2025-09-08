@@ -37,8 +37,7 @@ describe("channel", () => {
   let flatFeeHookAddress: Hex;
 
   before(async () => {
-    channelManagerAddress = deployContracts().channelManagerAddress;
-    flatFeeHookAddress = deployContracts().flatFeeHookAddress;
+    ({ channelManagerAddress, flatFeeHookAddress } = deployContracts());
   });
 
   // Test account setup
@@ -540,7 +539,7 @@ describe("channel", () => {
     });
 
     it("estimates the fee for posting a comment", async () => {
-      const eta = BigInt(Date.now() + 1000 * 30);
+      const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
       const commentData: CommentData = {
         content: "Hello, world!",
         targetUri: "https://example.com",
@@ -572,7 +571,7 @@ describe("channel", () => {
     });
 
     it("estimates the fee for editing a comment", async () => {
-      const eta = BigInt(Date.now() + 1000 * 30);
+      const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
       const commentData: CommentData = {
         content: "Hello, world!",
         targetUri: "https://example.com",
