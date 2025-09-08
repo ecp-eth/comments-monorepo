@@ -1,5 +1,11 @@
 "use client";
 
+import { DeliveriesKpiCard } from "@/components/analytics/deliveries-kpi-card";
+import { DeliveriesEventualSuccessKpiCard } from "@/components/analytics/deliveries-eventual-success-kpi-card";
+import { DeliveriesFirstAttemptSuccessKpiCard } from "@/components/analytics/deliveries-first-attempt-success-kpi-card";
+import { EndToEndLatencyKpiCard } from "@/components/analytics/end-to-end-latency-kpi-card";
+import { BacklogSizeKpiCard } from "@/components/analytics/backlog-size-kpi-card";
+import { DeliveriesInMinuteKpiCard } from "@/components/analytics/deliveries-in-minute-kpi-card";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
 import { CreateAppDialogButton } from "@/components/create-app-dialog-button";
@@ -10,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { useAppsQuery } from "@/queries/apps";
 import { useMeQuery } from "@/queries/me";
 import { RotateCwIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AuthDashboardPage() {
   const meQuery = useMeQuery();
@@ -18,8 +25,21 @@ export default function AuthDashboardPage() {
   });
 
   if (meQuery.status === "pending" || appsQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
+        <AppContent className="flex-col gap-4">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <Skeleton className="rounded-xl min-h-[160px]" />
+            <Skeleton className="rounded-xl min-h-[160px]" />
+            <Skeleton className="rounded-xl min-h-[160px]" />
+            <Skeleton className="rounded-xl min-h-[160px]" />
+            <Skeleton className="rounded-xl min-h-[160px]" />
+            <Skeleton className="rounded-xl min-h-[160px]" />
+          </div>
+        </AppContent>
+      </>
+    );
   }
 
   if (appsQuery.status === "error") {
@@ -95,16 +115,17 @@ export default function AuthDashboardPage() {
     );
   }
 
-  // @todo render either statistics for all apps or empty screen if there are no apps
-
   return (
     <>
       <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
+          <DeliveriesKpiCard />
+          <DeliveriesEventualSuccessKpiCard />
+          <DeliveriesFirstAttemptSuccessKpiCard />
+          <EndToEndLatencyKpiCard />
+          <BacklogSizeKpiCard />
+          <DeliveriesInMinuteKpiCard />
         </div>
         <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
       </AppContent>

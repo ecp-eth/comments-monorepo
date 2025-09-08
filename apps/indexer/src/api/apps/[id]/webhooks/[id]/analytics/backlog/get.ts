@@ -117,10 +117,7 @@ export function setupGetAppWebhookAnalyticsBacklog(app: OpenAPIHono) {
         return c.json(
           formatResponseUsingZodSchema(
             AppWebhookAnalyticsBacklogGetResponseSchema,
-            {
-              ...row,
-              pendingDeliveries: BigInt(row.pendingDeliveries),
-            },
+            row,
           ),
           200,
         );

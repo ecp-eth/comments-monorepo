@@ -40,6 +40,7 @@ import { setupGetAppWebhookAnalyticsBacklog } from "./apps/[id]/webhooks/[id]/an
 import { setupAppWebhookAnalyticsVolumeGet } from "./apps/[id]/webhooks/[id]/analytics/volume/get";
 import { setupGetAppWebhookAnalyticsLatencyResponse } from "./apps/[id]/webhooks/[id]/analytics/latency-response/get";
 import { setupGetAppWebhookAnalyticsLatencyResponseHistogram } from "./apps/[id]/webhooks/[id]/analytics/latency-response/histogram/get";
+import { setupAnalyticsKpiDeliveriesGet } from "./analytics/kpi/deliveries/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -83,6 +84,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppWebhookAnalyticsVolumeGet(app);
   setupGetAppWebhookAnalyticsLatencyResponse(app);
   setupGetAppWebhookAnalyticsLatencyResponseHistogram(app);
+  setupAnalyticsKpiDeliveriesGet(app);
 
   return app;
 }

@@ -520,9 +520,31 @@ export const OpenAPIDateStringSchema = z
   });
 
 export const OpenAPIBigintStringSchema = z
-  .bigint()
-  .transform((val) => val.toString())
+  .custom<string | bigint>(
+    (v: string) => {
+      return z.coerce.bigint().safeParse(v).success;
+    },
+    {
+      message: "Could not parse bigint",
+    },
+  )
+  .transform((v) => z.coerce.bigint().parse(v).toString())
   .openapi({
     description: "A bigint string",
     type: "string",
   });
+
+export const OpenAPIFloatFromDbSchema = z.preprocess((v, ctx) => {
+  const result = z.number().safeParse(v);
+
+  if (!result.success) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid float",
+    });
+
+    return z.NEVER;
+  }
+
+  return result.data;
+}, z.number());

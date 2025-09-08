@@ -13,6 +13,7 @@ import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../../.
 import {
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
+  OpenAPIFloatFromDbSchema,
 } from "../../../../../../../../lib/schemas";
 
 export const AppWebhookAnalyticsLatencyResponseHistogramGetRequestParamsSchema =
@@ -32,22 +33,6 @@ export const AppWebhookAnalyticsLatencyResponseHistogramGetRequestQuerySchema =
       .transform((val) => `1 ${val}`),
   });
 
-const OpenAPIDbBigIntSchema = z.preprocess((v) => {
-  if (typeof v === "string" || typeof v === "bigint" || typeof v === "number") {
-    return BigInt(v);
-  }
-
-  return v;
-}, OpenAPIBigintStringSchema);
-
-const OpenAPIDbFloatSchema = z.preprocess((v) => {
-  if (typeof v === "string" || typeof v === "number") {
-    return Number(v);
-  }
-
-  return v;
-}, z.number());
-
 export const AppWebhookAnalyticsLatencyResponseHistogramGetResponseSchema =
   z.object({
     results: z.array(
@@ -57,9 +42,9 @@ export const AppWebhookAnalyticsLatencyResponseHistogramGetResponseSchema =
         endMs: z.number(),
         centerMs: z.number(),
         label: z.string(),
-        count: OpenAPIDbBigIntSchema,
-        total: OpenAPIDbBigIntSchema,
-        pctOfTotal: OpenAPIDbFloatSchema,
+        count: OpenAPIBigintStringSchema,
+        total: OpenAPIBigintStringSchema,
+        pctOfTotal: OpenAPIFloatFromDbSchema,
       }),
     ),
   });

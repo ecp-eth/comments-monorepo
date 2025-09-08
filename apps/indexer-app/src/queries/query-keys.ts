@@ -88,3 +88,7 @@ export function createWebhookAnalyticsLatencyResponseHistogramQueryKey(
     params?.to,
   ] as const;
 }
+
+export function createAnalyticsKpiDeliveriesQueryKey() {
+  return ["analytics-kpi-deliveries"] as const;
+}
