@@ -1,8 +1,13 @@
 import type { ReadContractParameters, ReadContractReturnType } from "viem";
-import { ERC165_ABI, ERC20_ABI } from "./ercs.js";
+import {
+  ERC165_ABI,
+  ERC20_ABI,
+  LEGACY_TAKES_CHANNEL_ABI,
+} from "./extraABIs.js";
 
 type ERC20Type = typeof ERC20_ABI;
 type ERC165Type = typeof ERC165_ABI;
+type LegacyTakesChannelType = typeof LEGACY_TAKES_CHANNEL_ABI;
 
 export type ERC165ContractReadFunctions = {
   supportsInterface: (
@@ -23,4 +28,10 @@ export type ERC20ContractReadFunctions = {
   totalSupply: (
     args: ReadContractParameters<ERC20Type, "totalSupply">,
   ) => Promise<ReadContractReturnType<ERC20Type, "totalSupply">>;
+};
+
+export type LegacyTakesChannelContractReadFunctions = {
+  commentFee: (
+    args: ReadContractParameters<LegacyTakesChannelType, "commentFee">,
+  ) => Promise<ReadContractReturnType<LegacyTakesChannelType, "commentFee">>;
 };

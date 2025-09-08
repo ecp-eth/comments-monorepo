@@ -1,5 +1,5 @@
 import { ContractFunctionExecutionError, type Hex } from "viem";
-import { ERC165_ABI, ERC20_ABI } from "../ercs.js";
+import { ERC165_ABI, ERC20_ABI } from "../extraABIs.js";
 import type {
   ERC165ContractReadFunctions,
   ERC20ContractReadFunctions,

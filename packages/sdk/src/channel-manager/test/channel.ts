@@ -538,7 +538,7 @@ describe("channel", () => {
       channelId = logs[0]!.args.channelId;
     });
 
-    it("estimates the fee for posting a comment", async () => {
+    it("estimates the fee for posting a comment from hooks impelement IFeeEstimatable", async () => {
       const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
       const commentData: CommentData = {
         content: "Hello, world!",
@@ -570,7 +570,7 @@ describe("channel", () => {
       assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
     });
 
-    it("estimates the fee for editing a comment", async () => {
+    it("estimates the fee for editing a comment from hooks impelement IFeeEstimatable", async () => {
       const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
       const commentData: CommentData = {
         content: "Hello, world!",

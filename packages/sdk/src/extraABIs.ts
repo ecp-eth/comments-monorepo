@@ -2,6 +2,8 @@
  * This file contains the ABIs for the other known ERC contracts that are used in the SDK.
  */
 
+import { parseAbi } from "viem";
+
 export const ERC165_ABI = [
   {
     inputs: [
@@ -248,3 +250,7 @@ export const ERC20_ABI = [
     type: "event",
   },
 ];
+
+export const LEGACY_TAKES_CHANNEL_ABI = parseAbi([
+  "function commentFee() view returns (uint256)",
+]);
