@@ -27,10 +27,12 @@ The protocol implements several fee mechanisms:
 
 ## Calculating fee required for posting a comment
 
-> ⚠️ Before you dive into the details, please note that we already implemented a helper function to calculate the total fee required for posting/editing a comment on a channel.
->
-> You can find [the helpers here]:
-> [estimateChannelPostCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee) > [estimateChannelEditCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee)
+⚠️ Before you dive into the details, please note that we've implemented helper functions to calculate the total fee required for posting/editing a comment on a channel.
+
+You can find the helpers here:
+
+- [estimateChannelPostCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee)
+- [estimateChannelEditCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee)
 
 When posting a comment (including replies), the fee consists of the `comment creation fee` and the `total fee passed to the hook`.
 
