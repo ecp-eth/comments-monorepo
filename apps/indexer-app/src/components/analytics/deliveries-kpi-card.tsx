@@ -50,7 +50,9 @@ export function DeliveriesKpiCard() {
       <CardHeader>
         <CardDescription>Deliveries</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums">
-          {analyticsKpiDeliveriesQuery.data.deliveries}
+          {new Intl.NumberFormat(undefined, {
+            style: "decimal",
+          }).format(analyticsKpiDeliveriesQuery.data.deliveries)}
         </CardTitle>
       </CardHeader>
       <CardFooter className="text-sm">

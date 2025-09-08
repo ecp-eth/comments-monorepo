@@ -59,10 +59,13 @@ export function DeliveriesEventualSuccessKpiCard() {
             <TrendingDownIcon className="h-4 w-4 text-red-500" />
           ) : null}
           <span>
-            {analyticsKpiEventualSuccessQuery.data.eventualSuccessRate.toFixed(
-              2,
+            {new Intl.NumberFormat(undefined, {
+              style: "percent",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(
+              analyticsKpiEventualSuccessQuery.data.eventualSuccessRate,
             )}
-            %
           </span>
         </CardTitle>
       </CardHeader>

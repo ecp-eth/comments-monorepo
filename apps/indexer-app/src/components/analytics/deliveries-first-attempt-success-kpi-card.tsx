@@ -59,10 +59,13 @@ export function DeliveriesFirstAttemptSuccessKpiCard() {
             <TrendingDownIcon className="h-4 w-4 text-red-500" />
           ) : null}
           <span>
-            {analyticsKpiFirstAttemptSuccessQuery.data.firstSuccessRate.toFixed(
-              2,
+            {new Intl.NumberFormat(undefined, {
+              style: "percent",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(
+              analyticsKpiFirstAttemptSuccessQuery.data.firstSuccessRate,
             )}
-            %
           </span>
         </CardTitle>
       </CardHeader>

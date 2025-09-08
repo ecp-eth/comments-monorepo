@@ -51,7 +51,9 @@ export function BacklogSizeKpiCard() {
       <CardHeader>
         <CardDescription>Backlog size</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums flex items-center gap-2">
-          {analyticsKpiBacklogQuery.data.inProgress}
+          {new Intl.NumberFormat(undefined, {
+            style: "decimal",
+          }).format(analyticsKpiBacklogQuery.data.inProgress)}
         </CardTitle>
       </CardHeader>
       <CardFooter className="text-sm">
