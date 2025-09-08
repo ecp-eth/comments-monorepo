@@ -5,9 +5,14 @@ import { createFetchUrl } from "@/lib/utils";
 import { UnauthorizedError } from "@/errors";
 import {
   AnalyticsKpiDeliveriesResponseSchema,
+  AnalyticsKpiEventualSuccessResponseSchema,
+  type AnalyticsKpiEventualSuccessResponseSchemaType,
   type AnalyticsKpiDeliveriesResponseSchemaType,
 } from "@/api/schemas/analytics";
-import { createAnalyticsKpiDeliveriesQueryKey } from "./query-keys";
+import {
+  createAnalyticsKpiDeliveriesQueryKey,
+  createAnalyticsKpiEventualSuccessQueryKey,
+} from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
   UseQueryOptions<
@@ -38,7 +43,56 @@ export function useAnalyticsKpiDeliveriesQuery(
         throw new UnauthorizedError();
       }
 
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch deliveries KPI: ${response.statusText}`,
+        );
+      }
+
       return AnalyticsKpiDeliveriesResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsKpiEventualSuccessQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsKpiEventualSuccessResponseSchemaType,
+    Error,
+    AnalyticsKpiEventualSuccessResponseSchemaType,
+    ReturnType<typeof createAnalyticsKpiEventualSuccessQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsKpiEventualSuccessQuery(
+  options?: UseAnalyticsKpiEventualSuccessQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsKpiEventualSuccessQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/kpi/eventual-success"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch eventual success KPI: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsKpiEventualSuccessResponseSchema.parse(
+        await response.json(),
+      );
     },
     ...options,
   });

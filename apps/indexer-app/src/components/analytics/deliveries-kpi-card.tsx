@@ -21,25 +21,27 @@ export function DeliveriesKpiCard() {
 
   if (analyticsKpiDeliveriesQuery.status === "error") {
     return (
-      <ErrorScreen
-        title="Error fetching analytics"
-        description="Please try again later. If the problem persists, please contact support."
-        actions={
-          <Button
-            className="gap-2"
-            disabled={analyticsKpiDeliveriesQuery.isRefetching}
-            onClick={() => analyticsKpiDeliveriesQuery.refetch()}
-          >
-            <RotateCwIcon
-              className={cn(
-                "h-4 w-4",
-                analyticsKpiDeliveriesQuery.isRefetching && "animate-spin",
-              )}
-            />{" "}
-            Retry
-          </Button>
-        }
-      />
+      <Card>
+        <ErrorScreen
+          title="Error fetching analytics"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              className="gap-2"
+              disabled={analyticsKpiDeliveriesQuery.isRefetching}
+              onClick={() => analyticsKpiDeliveriesQuery.refetch()}
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsKpiDeliveriesQuery.isRefetching && "animate-spin",
+                )}
+              />{" "}
+              Retry
+            </Button>
+          }
+        />
+      </Card>
     );
   }
 

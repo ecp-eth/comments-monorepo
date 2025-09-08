@@ -92,3 +92,7 @@ export function createWebhookAnalyticsLatencyResponseHistogramQueryKey(
 export function createAnalyticsKpiDeliveriesQueryKey() {
   return ["analytics-kpi-deliveries"] as const;
 }
+
+export function createAnalyticsKpiEventualSuccessQueryKey() {
+  return ["analytics-kpi-eventual-success"] as const;
+}
