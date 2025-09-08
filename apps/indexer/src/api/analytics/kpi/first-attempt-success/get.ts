@@ -147,8 +147,6 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
           FROM previous_first_success_rate, first_success_rate
       `);
 
-      console.log(rows);
-
       if (!rows[0]) {
         return c.json(
           formatResponseUsingZodSchema(

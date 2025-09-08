@@ -104,3 +104,7 @@ export function createAnalyticsKpiFirstAttemptSuccessQueryKey() {
 export function createAnalyticsKpiE2ELatencyQueryKey() {
   return ["analytics-kpi-e2e-latency"] as const;
 }
+
+export function createAnalyticsKpiBacklogQueryKey() {
+  return ["analytics-kpi-backlog"] as const;
+}

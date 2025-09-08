@@ -12,12 +12,15 @@ import {
   AnalyticsKpiFirstAttemptSuccessResponseSchema,
   type AnalyticsKpiE2ELatencyResponseSchemaType,
   AnalyticsKpiE2ELatencyResponseSchema,
+  AnalyticsKpiBacklogResponseSchemaType,
+  AnalyticsKpiBacklogResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
   createAnalyticsKpiE2ELatencyQueryKey,
   createAnalyticsKpiEventualSuccessQueryKey,
   createAnalyticsKpiFirstAttemptSuccessQueryKey,
+  createAnalyticsKpiBacklogQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -186,6 +189,45 @@ export function useAnalyticsKpiE2ELatencyQuery(
       }
 
       return AnalyticsKpiE2ELatencyResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsKpiBacklogQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsKpiBacklogResponseSchemaType,
+    Error,
+    AnalyticsKpiBacklogResponseSchemaType,
+    ReturnType<typeof createAnalyticsKpiBacklogQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsKpiBacklogQuery(
+  options?: UseAnalyticsKpiBacklogQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsKpiBacklogQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/kpi/backlog"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch backlog KPI: ${response.statusText}`);
+      }
+
+      return AnalyticsKpiBacklogResponseSchema.parse(await response.json());
     },
     ...options,
   });

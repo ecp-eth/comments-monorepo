@@ -35,3 +35,15 @@ export const AnalyticsKpiE2ELatencyResponseSchema = z.object({
 export type AnalyticsKpiE2ELatencyResponseSchemaType = z.infer<
   typeof AnalyticsKpiE2ELatencyResponseSchema
 >;
+
+export const AnalyticsKpiBacklogResponseSchema = z.object({
+  inProgress: z.coerce.number(),
+  pending: z.coerce.number(),
+  processing: z.coerce.number(),
+  nextDueAt: z.coerce.date().nullable(),
+  oldestAgeSec: z.number().int().nonnegative().nullable(),
+});
+
+export type AnalyticsKpiBacklogResponseSchemaType = z.infer<
+  typeof AnalyticsKpiBacklogResponseSchema
+>;
