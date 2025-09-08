@@ -2,11 +2,27 @@
  * This file contains the ABIs for the other known ERC contracts that are used in the SDK.
  */
 
-import { parseAbi } from "viem";
-
-export const ERC165_ABI = parseAbi([
-  "function supportsInterface(bytes4 interfaceId) view returns (bool)",
-]);
+export const ERC165_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "bytes4",
+        name: "interfaceId",
+        type: "bytes4",
+      },
+    ],
+    name: "supportsInterface",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
 export const ERC20_ABI = [
   {

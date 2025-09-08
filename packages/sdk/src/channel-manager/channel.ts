@@ -31,9 +31,8 @@ import {
   MetadataArrayOpSchema,
   MetadataEntrySchema,
 } from "../comments/schemas.js";
-import { ContractFunctionExecutionError } from "viem";
 import { getHookTransactionFee } from "./hook.js";
-import {
+import type {
   ERC165ContractReadFunctions,
   ERC20ContractReadFunctions,
 } from "../types.js";
@@ -741,7 +740,7 @@ type EstimateChannelCommentActionFeeParams<
  * @param param0
  * @returns
  */
-async function estimatedChannelCommentActionFee<
+async function estimateChannelCommentActionFee<
   CommentActionFunc extends
     | typeof getEstimatedChannelPostCommentHookFee
     | typeof getEstimatedChannelEditCommentHookFee,
@@ -803,7 +802,7 @@ export async function estimateChannelPostCommentFee({
   >,
   "commentActionFunc"
 >): Promise<TotalFeeEstimation> {
-  return await estimatedChannelCommentActionFee({
+  return await estimateChannelCommentActionFee({
     ...restOpts,
     commentActionFunc: getEstimatedChannelPostCommentHookFee,
   });
@@ -823,7 +822,7 @@ export async function estimateChannelEditCommentFee({
   >,
   "commentActionFunc"
 >): Promise<TotalFeeEstimation> {
-  return await estimatedChannelCommentActionFee({
+  return await estimateChannelCommentActionFee({
     ...restOpts,
     commentActionFunc: getEstimatedChannelEditCommentHookFee,
   });

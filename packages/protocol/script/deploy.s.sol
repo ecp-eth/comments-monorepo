@@ -96,6 +96,7 @@ contract DeployScript is Script {
 
       // Deploy FlatFeeHook for testing
       flatFeeHook = new FlatFeeHook(ownerAddress);
+      flatFeeHook.setShouldChargeOnEdit(true);
 
       console.log("FlatFeeHook deployed at", address(flatFeeHook));
     }

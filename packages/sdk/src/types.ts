@@ -1,5 +1,5 @@
-import { ReadContractParameters, ReadContractReturnType } from "viem";
-import { ERC165_ABI, ERC20_ABI } from "./otherABIs";
+import type { ReadContractParameters, ReadContractReturnType } from "viem";
+import { ERC165_ABI, ERC20_ABI } from "./ercs.js";
 
 type ERC20Type = typeof ERC20_ABI;
 type ERC165Type = typeof ERC165_ABI;

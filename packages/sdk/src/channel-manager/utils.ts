@@ -1,15 +1,15 @@
+import { ContractFunctionExecutionError, type Hex } from "viem";
+import { ERC165_ABI, ERC20_ABI } from "../ercs.js";
+import type {
+  ERC165ContractReadFunctions,
+  ERC20ContractReadFunctions,
+} from "../types.js";
 import {
   INTERFACE_ID_ERC1155,
   INTERFACE_ID_ERC165,
   INTERFACE_ID_ERC721,
   NATIVE_ASSET_ADDRESS,
-} from "../constants";
-import { ERC165_ABI, ERC20_ABI } from "../otherABIs";
-import {
-  ERC165ContractReadFunctions,
-  ERC20ContractReadFunctions,
-} from "../types";
-import { ContractFunctionExecutionError, Hex } from "viem";
+} from "../constants.js";
 
 const erc20ProbeMethods: (keyof ERC20ContractReadFunctions)[] = [
   "name",
