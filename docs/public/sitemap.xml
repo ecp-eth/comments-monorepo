@@ -271,6 +271,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getEstimatedChannelEditCommentHookFee</loc>
+    <lastmod>2025-09-08T00:01:28.352Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getEstimatedChannelPostCommentHookFee</loc>
+    <lastmod>2025-09-08T00:01:28.352Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getHookTransactionFee</loc>
     <lastmod>2025-05-19T15:00:00.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -877,6 +889,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetERCType</loc>
+    <lastmod>2025-09-08T00:01:28.370Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetType</loc>
+    <lastmod>2025-09-08T00:01:28.370Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractReadFunctions</loc>
     <lastmod>2025-09-07T13:59:45.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -889,14 +913,20 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/FeeEstimation</loc>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/HookContractReadFunctions</loc>
     <lastmod>2025-09-07T13:59:45.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/HookContractReadFunctions</loc>
-    <lastmod>2025-09-07T13:59:45.000Z</lastmod>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/HookFeeEstimation</loc>
+    <lastmod>2025-09-08T00:01:28.372Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/TotalFeeEstimation</loc>
+    <lastmod>2025-09-08T00:01:28.372Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2523,6 +2553,24 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INDEXER_API_URL</loc>
     <lastmod>2025-07-30T09:05:23.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INTERFACE_ID_ERC1155</loc>
+    <lastmod>2025-09-08T00:01:28.455Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INTERFACE_ID_ERC165</loc>
+    <lastmod>2025-09-08T00:01:28.455Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INTERFACE_ID_ERC721</loc>
+    <lastmod>2025-09-08T00:01:28.456Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

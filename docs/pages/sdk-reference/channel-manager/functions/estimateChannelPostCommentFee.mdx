@@ -7,23 +7,23 @@
 # Function: estimateChannelPostCommentFee()
 
 ```ts
-function estimateChannelPostCommentFee(estimateChannelPostCommentFeeParams): Promise<FeeEstimation>;
+function estimateChannelPostCommentFee(estimatedChannelPostCommentHookFeeParams): Promise<TotalFeeEstimation>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:635](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L635)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:797](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L797)
 
-Estimate the fee for posting a comment to a channel
+Best-effort estimation of the total fee for posting a comment to a channel
 
 ## Parameters
 
-### estimateChannelPostCommentFeeParams
+### estimatedChannelPostCommentHookFeeParams
 
-`EstimateChannelPostCommentFeeParams`
+`Omit`\<`EstimateChannelCommentActionFeeParams`\<*typeof* [`getEstimatedChannelPostCommentHookFee`](/sdk-reference/channel-manager/functions/getEstimatedChannelPostCommentHookFee.mdx)\>, `"commentActionFunc"`\>
 
 The parameters for estimating the fee for posting a comment to a channel
 
 ## Returns
 
-`Promise`\<[`FeeEstimation`](/sdk-reference/channel-manager/types/type-aliases/FeeEstimation.mdx)\>
+`Promise`\<[`TotalFeeEstimation`](/sdk-reference/channel-manager/types/type-aliases/TotalFeeEstimation.mdx)\>
 
 The estimated fee for posting a comment to a channel

@@ -7,53 +7,23 @@
 # Function: estimateChannelEditCommentFee()
 
 ```ts
-function estimateChannelEditCommentFee(estimateChannelEditCommentFeeParams): Promise<
-  | {
-  amount: bigint;
-  asset: `0x${string}`;
-  description: string;
-  metadata: readonly {
-     key: `0x${string}`;
-     value: `0x${string}`;
-  }[];
-}
-  | {
-  amount: bigint;
-  asset: string;
-  description: string;
-  metadata: never[];
-}>;
+function estimateChannelEditCommentFee(estimatedChannelEditCommentHookFeeParams): Promise<TotalFeeEstimation>;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/channel.ts:681](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L681)
+Defined in: [packages/sdk/src/channel-manager/channel.ts:817](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L817)
 
-Estimate the fee for editing a comment to a channel
+Best-effort estimation of the total fee for editing a comment to a channel
 
 ## Parameters
 
-### estimateChannelEditCommentFeeParams
+### estimatedChannelEditCommentHookFeeParams
 
-`EstimateChannelEditCommentFeeParams`
+`Omit`\<`EstimateChannelCommentActionFeeParams`\<*typeof* [`getEstimatedChannelEditCommentHookFee`](/sdk-reference/channel-manager/functions/getEstimatedChannelEditCommentHookFee.mdx)\>, `"commentActionFunc"`\>
 
 The parameters for estimating the fee for editing a comment to a channel
 
 ## Returns
 
-`Promise`\<
-  \| \{
-  `amount`: `bigint`;
-  `asset`: `` `0x${string}` ``;
-  `description`: `string`;
-  `metadata`: readonly \{
-     `key`: `` `0x${string}` ``;
-     `value`: `` `0x${string}` ``;
-  \}[];
-\}
-  \| \{
-  `amount`: `bigint`;
-  `asset`: `string`;
-  `description`: `string`;
-  `metadata`: `never`[];
-\}\>
+`Promise`\<[`TotalFeeEstimation`](/sdk-reference/channel-manager/types/type-aliases/TotalFeeEstimation.mdx)\>
 
 The estimated fee for editing a comment to a channel
