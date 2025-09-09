@@ -120,7 +120,7 @@ const EnvSchema = z
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
     MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     PONDER_RPC_URL_8453: z.string().url().optional(),
-    PONDER_START_BLOCK_8453: z.coerce.number().min(0).optional(),
+    PONDER_START_BLOCK_8453: z.coerce.number().int().min(0).optional(),
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
@@ -233,6 +233,7 @@ const _env = EnvSchema.safeParse({
       const startBlock = z.coerce
         .number()
         .int()
+        .min(0)
         .optional()
         .parse(process.env[`PONDER_START_BLOCK_${chainId}`], {
           path: [`PONDER_START_BLOCK_${chainId}`],
