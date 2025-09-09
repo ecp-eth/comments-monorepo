@@ -5,8 +5,11 @@ import { Script, console } from "forge-std/Script.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { NoopHook } from "../src/hooks/NoopHook.sol";
-import { FlatFeeHook } from "../test/FlatFeeHook.t.sol";
 import { BroadcastHook } from "../src/hooks/BroadcastHook.sol";
+import { FlatFeeHook } from "../test/FlatFeeHook.t.sol";
+import {
+  LegacyTakeChannelFeeHook
+} from "../test/LegacyTakeChannelFeeHook.t.sol";
 
 contract DeployScript is Script {
   enum Env {
@@ -18,8 +21,9 @@ contract DeployScript is Script {
   CommentManager public comments;
   ChannelManager public channelManager;
   NoopHook public noopHook;
-  FlatFeeHook public flatFeeHook;
   BroadcastHook public broadcastHook;
+  FlatFeeHook public flatFeeHook;
+  LegacyTakeChannelFeeHook public legacyTakeChannelFeeHook;
 
   function setUp() public {}
 
@@ -99,6 +103,17 @@ contract DeployScript is Script {
       flatFeeHook.setShouldChargeOnEdit(true);
 
       console.log("FlatFeeHook deployed at", address(flatFeeHook));
+
+      // Deploy FlatFeeHook for testing
+      legacyTakeChannelFeeHook = new LegacyTakeChannelFeeHook(
+        100,
+        ownerAddress
+      );
+
+      console.log(
+        "LegacyTakeChannelFeeHook deployed at",
+        address(legacyTakeChannelFeeHook)
+      );
     }
 
     // Deploy CommentManager first

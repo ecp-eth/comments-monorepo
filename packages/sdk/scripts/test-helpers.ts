@@ -10,6 +10,7 @@ export function deployContracts(): {
   channelManagerAddress: Hex;
   noopHookAddress: Hex;
   flatFeeHookAddress: Hex;
+  legacyTakeChannelFeeHookAddress: Hex;
 } {
   const deployProcessRawOutput = execSync("pnpm run deploy:test", {
     cwd,
@@ -28,6 +29,7 @@ export async function deployContractsAsync(
   channelManagerAddress: Hex;
   noopHookAddress: Hex;
   flatFeeHookAddress: Hex;
+  legacyTakeChannelFeeHookAddress: Hex;
 }> {
   const deployProcessRawOutput = await promisify(exec)(
     "pnpm run deploy:" + deployEnv + (isSimulation ? ":simulation" : ""),
@@ -56,6 +58,9 @@ export function extractContractAddresses(output: string, hasNoopHook: boolean) {
   const flatFeeHookAddress = output.match(
     /FlatFeeHook deployed at (0x[a-fA-F0-9]{40})/,
   )?.[1];
+  const legacyTakeChannelFeeHookAddress = output.match(
+    /LegacyTakeChannelFeeHook deployed at (0x[a-fA-F0-9]{40})/,
+  )?.[1];
 
   if (
     !commentsAddress ||
@@ -70,5 +75,6 @@ export function extractContractAddresses(output: string, hasNoopHook: boolean) {
     channelManagerAddress: channelManagerAddress as Hex,
     noopHookAddress: noopHookAddress as Hex,
     flatFeeHookAddress: flatFeeHookAddress as Hex,
+    legacyTakeChannelFeeHookAddress: legacyTakeChannelFeeHookAddress as Hex,
   };
 }

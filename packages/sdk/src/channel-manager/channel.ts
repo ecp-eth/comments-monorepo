@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   CHANNEL_MANAGER_ADDRESS,
+  COMMENT_TYPE_COMMENT,
   EMPTY_PARENT_ID,
   NATIVE_ASSET_ADDRESS,
   ZERO_ADDRESS,
@@ -694,8 +695,11 @@ export async function getEstimatedChannelPostCommentHookFee({
       });
 
       // sucessfully got the comment fee, so it is very likely to be a legacy takes channel hook
-
-      amount = commentData.parentId === EMPTY_PARENT_ID ? commentFee : 0n;
+      amount =
+        commentData.parentId === EMPTY_PARENT_ID &&
+        commentData.commentType === COMMENT_TYPE_COMMENT
+          ? commentFee
+          : 0n;
     } catch (error) {
       if (!(error instanceof ContractFunctionExecutionError)) {
         throw error;
