@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.28
+
+### Patch Changes
+
+- c747e78: feat(sdk): add helpers for channel/hook fee estimation
+
 ## 0.0.27
 
 ### Patch Changes
