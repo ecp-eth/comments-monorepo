@@ -116,3 +116,7 @@ export function createAnalyticsKpiDeliveredUnderMinuteQueryKey() {
 export function createAnalyticsVolumeQueryKey() {
   return ["analytics-volume"] as const;
 }
+
+export function createAnalyticsTerminalQueryKey() {
+  return ["analytics-terminal"] as const;
+}

@@ -18,6 +18,8 @@ import {
   AnalyticsKpiDeliveredUnderMinuteResponseSchema,
   type AnalyticsVolumeResponseSchemaType,
   AnalyticsVolumeResponseSchema,
+  type AnalyticsTerminalResponseSchemaType,
+  AnalyticsTerminalResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -27,6 +29,7 @@ import {
   createAnalyticsKpiBacklogQueryKey,
   createAnalyticsKpiDeliveredUnderMinuteQueryKey,
   createAnalyticsVolumeQueryKey,
+  createAnalyticsTerminalQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -321,6 +324,47 @@ export function useAnalyticsVolumeQuery(
       }
 
       return AnalyticsVolumeResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsTerminalQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsTerminalResponseSchemaType,
+    Error,
+    AnalyticsTerminalResponseSchemaType,
+    ReturnType<typeof createAnalyticsTerminalQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsTerminalQuery(
+  options?: UseAnalyticsTerminalQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsTerminalQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/terminal"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics terminal: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsTerminalResponseSchema.parse(await response.json());
     },
     ...options,
   });

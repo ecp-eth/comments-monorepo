@@ -78,3 +78,23 @@ export const AnalyticsVolumeResponseSchema = z.object({
 export type AnalyticsVolumeResponseSchemaType = z.infer<
   typeof AnalyticsVolumeResponseSchema
 >;
+
+export const AnalyticsTerminalResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      time: z.coerce.date(),
+      deliveries: z.coerce.number(),
+      successes: z.coerce.number(),
+      failures: z.coerce.number(),
+    }),
+  ),
+  info: z.object({
+    bucket: z.enum(["hour", "day", "week", "month"]),
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
+});
+
+export type AnalyticsTerminalResponseSchemaType = z.infer<
+  typeof AnalyticsTerminalResponseSchema
+>;
