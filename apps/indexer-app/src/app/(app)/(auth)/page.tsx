@@ -17,6 +17,12 @@ import { useAppsQuery } from "@/queries/apps";
 import { useMeQuery } from "@/queries/me";
 import { RotateCwIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AttemptsOverTimeChartCard } from "@/components/analytics/attempts-over-time-chart-card";
+import { TerminalOutcomesChartCard } from "@/components/analytics/terminal-outcomes-chart-card";
+import { SuccessRatesChartCard } from "@/components/analytics/success-rates-chart-card";
+import { E2ELatencyChartCard } from "@/components/analytics/e2e-latency-chart-card";
+import { ErrorBreakdownChartCard } from "@/components/analytics/error-breakdown-chart-card";
+import { SlaBandsChartCard } from "@/components/analytics/sla-bands-chart-card";
 
 export default function AuthDashboardPage() {
   const meQuery = useMeQuery();
@@ -36,6 +42,11 @@ export default function AuthDashboardPage() {
             <Skeleton className="rounded-xl min-h-[160px]" />
             <Skeleton className="rounded-xl min-h-[160px]" />
             <Skeleton className="rounded-xl min-h-[160px]" />
+          </div>
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <Skeleton className="rounded-xl aspect-video" />
+            <Skeleton className="rounded-xl aspect-video" />
+            <Skeleton className="rounded-xl aspect-video" />
           </div>
         </AppContent>
       </>
@@ -127,7 +138,14 @@ export default function AuthDashboardPage() {
           <BacklogSizeKpiCard />
           <DeliveriesInMinuteKpiCard />
         </div>
-        <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
+        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+          <AttemptsOverTimeChartCard />
+          <TerminalOutcomesChartCard />
+          <SuccessRatesChartCard />
+          <E2ELatencyChartCard />
+          <ErrorBreakdownChartCard />
+          <SlaBandsChartCard />
+        </div>
       </AppContent>
     </>
   );
