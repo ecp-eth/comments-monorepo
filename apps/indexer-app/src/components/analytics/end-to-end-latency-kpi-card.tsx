@@ -16,10 +16,11 @@ export function EndToEndLatencyKpiCard() {
   const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery();
 
   if (analyticsKpiE2ELatencyQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiE2ELatencyQuery.status === "error") {
+    console.error(analyticsKpiE2ELatencyQuery.error);
     return (
       <Card>
         <ErrorScreen

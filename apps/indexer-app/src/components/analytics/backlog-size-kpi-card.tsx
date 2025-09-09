@@ -17,10 +17,11 @@ export function BacklogSizeKpiCard() {
   const analyticsKpiBacklogQuery = useAnalyticsKpiBacklogQuery();
 
   if (analyticsKpiBacklogQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiBacklogQuery.status === "error") {
+    console.error(analyticsKpiBacklogQuery.error);
     return (
       <Card>
         <ErrorScreen

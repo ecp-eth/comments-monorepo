@@ -16,10 +16,11 @@ export function DeliveriesKpiCard() {
   const analyticsKpiDeliveriesQuery = useAnalyticsKpiDeliveriesQuery();
 
   if (analyticsKpiDeliveriesQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiDeliveriesQuery.status === "error") {
+    console.error(analyticsKpiDeliveriesQuery.error);
     return (
       <Card>
         <ErrorScreen

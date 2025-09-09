@@ -17,10 +17,11 @@ export function DeliveriesFirstAttemptSuccessKpiCard() {
     useAnalyticsKpiFirstAttemptSuccessQuery();
 
   if (analyticsKpiFirstAttemptSuccessQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiFirstAttemptSuccessQuery.status === "error") {
+    console.error(analyticsKpiFirstAttemptSuccessQuery.error);
     return (
       <Card>
         <ErrorScreen

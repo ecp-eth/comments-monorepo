@@ -17,10 +17,11 @@ export function DeliveriesEventualSuccessKpiCard() {
     useAnalyticsKpiEventualSuccessQuery();
 
   if (analyticsKpiEventualSuccessQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiEventualSuccessQuery.status === "error") {
+    console.error(analyticsKpiEventualSuccessQuery.error);
     return (
       <Card>
         <ErrorScreen

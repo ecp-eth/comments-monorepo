@@ -17,10 +17,11 @@ export function DeliveriesInMinuteKpiCard() {
     useAnalyticsKpiDeliveredUnderMinuteQuery();
 
   if (analyticsKpiDeliveredUnderMinuteQuery.status === "pending") {
-    return <Skeleton className="w-full h-full" />;
+    return <Skeleton className="w-full h-full rounded-xl" />;
   }
 
   if (analyticsKpiDeliveredUnderMinuteQuery.status === "error") {
+    console.error(analyticsKpiDeliveredUnderMinuteQuery.error);
     return (
       <Card>
         <ErrorScreen
