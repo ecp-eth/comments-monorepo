@@ -1,5 +1,13 @@
 # @ecp.eth/react-editor
 
+## 0.0.8
+
+### Patch Changes
+
+- 67d6da1: feat(react-editor): allow to override wrapper css classnames
+- Updated dependencies [67d6da1]
+  - @ecp.eth/shared@0.0.13
+
 ## 0.0.7
 
 ### Patch Changes

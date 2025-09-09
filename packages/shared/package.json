@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/shared",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "type": "module",
   "license": "MIT",
   "main": "./dist/cjs/index.cjs",
