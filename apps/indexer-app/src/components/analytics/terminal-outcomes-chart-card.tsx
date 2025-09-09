@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 import { useAnalyticsTerminalQuery } from "@/queries/analytics";
 import { Skeleton } from "../ui/skeleton";
 import { ErrorScreen } from "../error-screen";
@@ -15,13 +21,13 @@ import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const chartConfig = {
-  success: {
+  successes: {
     label: "Successes",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-success)",
   },
-  failure: {
+  failures: {
     label: "Failures",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-failure)",
   },
 };
 
@@ -94,15 +100,16 @@ export function TerminalOutcomesChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <Bar
               dataKey="successes"
-              fill="var(--chart-success)"
+              fill="var(--color-successes)"
               fillOpacity={0.4}
               stackId="a"
             />
             <Bar
               dataKey="failures"
-              fill="var(--chart-failure)"
+              fill="var(--color-failures)"
               fillOpacity={0.4}
               stackId="a"
             />

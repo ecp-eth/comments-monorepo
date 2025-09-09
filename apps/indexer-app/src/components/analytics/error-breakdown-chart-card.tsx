@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 
 const chartConfig = {
   http4xx: {
@@ -94,6 +100,7 @@ export function ErrorBreakdownChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <Bar
               dataKey="http4xx"
               fill="var(--color-http4xx)"

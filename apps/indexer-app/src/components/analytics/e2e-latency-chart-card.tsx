@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegendContent,
+  ChartLegend,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 
 function CustomTooltip({
   payload,
@@ -106,6 +112,7 @@ export function E2ELatencyChartCard() {
               }}
             />
             <ChartTooltip cursor={false} content={<CustomTooltip />} />
+            <ChartLegend content={<ChartLegendContent />} />
             <defs>
               <linearGradient id="ribbonFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.18} />

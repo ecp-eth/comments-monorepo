@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 import { useAnalyticsVolumeQuery } from "@/queries/analytics";
 import { ErrorScreen } from "../error-screen";
 import { Skeleton } from "../ui/skeleton";
@@ -15,11 +21,11 @@ import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const chartConfig = {
-  success: {
+  successes: {
     label: "Successes",
     color: "var(--chart-success)",
   },
-  failure: {
+  failures: {
     label: "Failures",
     color: "var(--chart-failure)",
   },
@@ -94,6 +100,7 @@ export function AttemptsOverTimeChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <defs>
               <linearGradient id="fillSuccesses" x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -125,7 +132,7 @@ export function AttemptsOverTimeChartCard() {
               type="natural"
               fill="url(#fillSuccesses)"
               fillOpacity={0.4}
-              stroke="var(--color-success)"
+              stroke="var(--color-successes)"
               stackId="a"
             />
             <Area
@@ -133,7 +140,7 @@ export function AttemptsOverTimeChartCard() {
               type="natural"
               fill="url(#fillFailures)"
               fillOpacity={0.4}
-              stroke="var(--color-failure)"
+              stroke="var(--color-failures)"
               stackId="a"
             />
           </AreaChart>
