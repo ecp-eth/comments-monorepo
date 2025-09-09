@@ -20,6 +20,8 @@ import {
   AnalyticsVolumeResponseSchema,
   type AnalyticsTerminalResponseSchemaType,
   AnalyticsTerminalResponseSchema,
+  type AnalyticsSuccessRatesResponseSchemaType,
+  AnalyticsSuccessRatesResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -30,6 +32,7 @@ import {
   createAnalyticsKpiDeliveredUnderMinuteQueryKey,
   createAnalyticsVolumeQueryKey,
   createAnalyticsTerminalQueryKey,
+  createAnalyticsSuccessRatesQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -365,6 +368,47 @@ export function useAnalyticsTerminalQuery(
       }
 
       return AnalyticsTerminalResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsSuccessRatesQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsSuccessRatesResponseSchemaType,
+    Error,
+    AnalyticsSuccessRatesResponseSchemaType,
+    ReturnType<typeof createAnalyticsSuccessRatesQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsSuccessRatesQuery(
+  options?: UseAnalyticsSuccessRatesQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsSuccessRatesQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/success-rates"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics success rates: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsSuccessRatesResponseSchema.parse(await response.json());
     },
     ...options,
   });

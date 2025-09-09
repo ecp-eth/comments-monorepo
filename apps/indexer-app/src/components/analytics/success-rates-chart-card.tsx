@@ -6,49 +6,65 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
+import { useAnalyticsSuccessRatesQuery } from "@/queries/analytics";
+import { Skeleton } from "../ui/skeleton";
+import { ErrorScreen } from "../error-screen";
+import { Button } from "../ui/button";
+import { RotateCwIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
-  firstAttemptSuccesses: {
+  firstSuccessRate: {
     label: "First attempt rate",
     color: "hsl(var(--chart-2))",
   },
-  eventualSuccesses: {
+  eventualSuccessRate: {
     label: "Eventual attempt rate",
     color: "hsl(var(--chart-3))",
   },
 };
 
-const data = [
-  {
-    time: new Date().toISOString(),
-    firstAttemptSuccesses: 100,
-    eventualSuccesses: 10,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 1,
-    ).toISOString(),
-    firstAttemptSuccesses: 70,
-    eventualSuccesses: 30,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 2,
-    ).toISOString(),
-    firstAttemptSuccesses: 60,
-    eventualSuccesses: 50,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 3,
-    ).toISOString(),
-    firstAttemptSuccesses: 40,
-    eventualSuccesses: 30,
-  },
-];
-
 export function SuccessRatesChartCard() {
+  const analyticsSuccessRatesQuery = useAnalyticsSuccessRatesQuery();
+
+  if (analyticsSuccessRatesQuery.status === "pending") {
+    return <Skeleton className="w-full h-full rounded-xl" />;
+  }
+
+  if (analyticsSuccessRatesQuery.status === "error") {
+    console.error(analyticsSuccessRatesQuery.error);
+    return (
+      <Card className="flex">
+        <ErrorScreen
+          title="Error fetching success rates"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              onClick={() => analyticsSuccessRatesQuery.refetch()}
+              className="gap-2"
+              disabled={analyticsSuccessRatesQuery.isRefetching}
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsSuccessRatesQuery.isRefetching && "animate-spin",
+                )}
+              />
+              Retry
+            </Button>
+          }
+        />
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -59,7 +75,7 @@ export function SuccessRatesChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <LineChart data={data}>
+          <LineChart data={analyticsSuccessRatesQuery.data.results}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -78,19 +94,20 @@ export function SuccessRatesChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <Line
-              dataKey="firstAttemptSuccesses"
+              dataKey="firstSuccessRate"
               type="natural"
-              fill="var(--color-firstAttemptSuccesses)"
+              fill="var(--color-firstSuccessRate)"
               fillOpacity={0.4}
-              stroke="var(--color-firstAttemptSuccesses)"
+              stroke="var(--color-firstSuccessRate)"
             />
             <Line
-              dataKey="eventualSuccesses"
+              dataKey="eventualSuccessRate"
               type="natural"
-              fill="var(--color-eventualSuccesses)"
+              fill="var(--color-eventualSuccessRate)"
               fillOpacity={0.4}
-              stroke="var(--color-eventualSuccesses)"
+              stroke="var(--color-eventualSuccessRate)"
             />
           </LineChart>
         </ChartContainer>

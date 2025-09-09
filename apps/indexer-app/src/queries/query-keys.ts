@@ -120,3 +120,7 @@ export function createAnalyticsVolumeQueryKey() {
 export function createAnalyticsTerminalQueryKey() {
   return ["analytics-terminal"] as const;
 }
+
+export function createAnalyticsSuccessRatesQueryKey() {
+  return ["analytics-success-rates"] as const;
+}

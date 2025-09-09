@@ -98,3 +98,17 @@ export const AnalyticsTerminalResponseSchema = z.object({
 export type AnalyticsTerminalResponseSchemaType = z.infer<
   typeof AnalyticsTerminalResponseSchema
 >;
+
+export const AnalyticsSuccessRatesResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      time: z.coerce.date(),
+      eventualSuccessRate: z.coerce.number(),
+      firstSuccessRate: z.coerce.number(),
+    }),
+  ),
+});
+
+export type AnalyticsSuccessRatesResponseSchemaType = z.infer<
+  typeof AnalyticsSuccessRatesResponseSchema
+>;
