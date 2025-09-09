@@ -512,8 +512,21 @@ export const ERC20Caip19Schema = z.custom<ERC20CAIP19>(
 );
 
 export const OpenAPIDateStringSchema = z
-  .date()
-  .transform((val) => val.toISOString())
+  .custom<string | Date>(
+    (v: unknown) => {
+      const result = z.coerce.date().safeParse(v);
+
+      if (!result.success) {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message: "Could not parse date",
+    },
+  )
+  .transform((val) => z.coerce.date().parse(val).toISOString())
   .openapi({
     description: "A date string in ISO 8601 format",
     type: "string",
@@ -521,7 +534,7 @@ export const OpenAPIDateStringSchema = z
 
 export const OpenAPIBigintStringSchema = z
   .custom<string | bigint>(
-    (v: string) => {
+    (v: unknown) => {
       return z.coerce.bigint().safeParse(v).success;
     },
     {

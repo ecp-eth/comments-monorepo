@@ -112,3 +112,7 @@ export function createAnalyticsKpiBacklogQueryKey() {
 export function createAnalyticsKpiDeliveredUnderMinuteQueryKey() {
   return ["analytics-kpi-delivered-under-minute"] as const;
 }
+
+export function createAnalyticsVolumeQueryKey() {
+  return ["analytics-volume"] as const;
+}

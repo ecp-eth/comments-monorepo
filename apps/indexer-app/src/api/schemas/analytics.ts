@@ -55,3 +55,26 @@ export const AnalyticsKpiDeliveredUnderMinuteResponseSchema = z.object({
 export type AnalyticsKpiDeliveredUnderMinuteResponseSchemaType = z.infer<
   typeof AnalyticsKpiDeliveredUnderMinuteResponseSchema
 >;
+
+export const AnalyticsVolumeResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      time: z.coerce.date(),
+      attempts: z.coerce.number(),
+      successes: z.coerce.number(),
+      failures: z.coerce.number(),
+      transport: z.coerce.number(),
+      http4xx: z.coerce.number(),
+      http5xx: z.coerce.number(),
+    }),
+  ),
+  info: z.object({
+    bucket: z.enum(["hour", "day", "week", "month"]),
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
+});
+
+export type AnalyticsVolumeResponseSchemaType = z.infer<
+  typeof AnalyticsVolumeResponseSchema
+>;

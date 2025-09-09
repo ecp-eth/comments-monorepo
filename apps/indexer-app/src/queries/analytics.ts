@@ -16,6 +16,8 @@ import {
   AnalyticsKpiBacklogResponseSchema,
   type AnalyticsKpiDeliveredUnderMinuteResponseSchemaType,
   AnalyticsKpiDeliveredUnderMinuteResponseSchema,
+  type AnalyticsVolumeResponseSchemaType,
+  AnalyticsVolumeResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -24,6 +26,7 @@ import {
   createAnalyticsKpiFirstAttemptSuccessQueryKey,
   createAnalyticsKpiBacklogQueryKey,
   createAnalyticsKpiDeliveredUnderMinuteQueryKey,
+  createAnalyticsVolumeQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -277,6 +280,47 @@ export function useAnalyticsKpiDeliveredUnderMinuteQuery(
       return AnalyticsKpiDeliveredUnderMinuteResponseSchema.parse(
         await response.json(),
       );
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsVolumeQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsVolumeResponseSchemaType,
+    Error,
+    AnalyticsVolumeResponseSchemaType,
+    ReturnType<typeof createAnalyticsVolumeQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsVolumeQuery(
+  options?: UseAnalyticsVolumeQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsVolumeQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/volume"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics volume: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsVolumeResponseSchema.parse(await response.json());
     },
     ...options,
   });
