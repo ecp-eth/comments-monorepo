@@ -1,0 +1,76 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager/types](/sdk-reference/channel-manager/types/index.mdx) / TotalFeeEstimation
+
+# Type Alias: TotalFeeEstimation
+
+```ts
+type TotalFeeEstimation = {
+  baseToken: {
+     amount: bigint;
+  };
+  contractAsset?: ContractBasedAssetType;
+  description: string;
+  metadata: readonly MetadataEntry[];
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L193)
+
+## Properties
+
+### baseToken
+
+```ts
+baseToken: {
+  amount: bigint;
+};
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:197](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L197)
+
+The amount of the base token to be paid
+
+#### amount
+
+```ts
+amount: bigint;
+```
+
+***
+
+### contractAsset?
+
+```ts
+optional contractAsset: ContractBasedAssetType;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:203](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L203)
+
+The contract based asset to be paid, such as ERC20, ERC721, ERC1155
+
+***
+
+### description
+
+```ts
+description: string;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:207](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L207)
+
+The description of the fee
+
+***
+
+### metadata
+
+```ts
+metadata: readonly MetadataEntry[];
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:211](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L211)
+
+The metadata of the fee estimation

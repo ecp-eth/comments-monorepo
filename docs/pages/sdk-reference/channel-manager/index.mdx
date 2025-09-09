@@ -58,10 +58,14 @@ Core functionality for managing comment channels
 | ------ | ------ |
 | [channelExists](/sdk-reference/channel-manager/functions/channelExists.mdx) | Check if a channel exists |
 | [deductProtocolHookTransactionFee](/sdk-reference/channel-manager/functions/deductProtocolHookTransactionFee.mdx) | Calculates the hook transaction fee by deducting the protocol fee |
+| [estimateChannelEditCommentFee](/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee.mdx) | Best-effort estimation of the total fee for editing a comment to a channel |
+| [estimateChannelPostCommentFee](/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee.mdx) | Best-effort estimation of the total fee for posting a comment to a channel |
 | [getChannel](/sdk-reference/channel-manager/functions/getChannel.mdx) | Get a channel |
 | [getChannelCreationFee](/sdk-reference/channel-manager/functions/getChannelCreationFee.mdx) | Get the creation fee from channel manager |
 | [getChannelMetadata](/sdk-reference/channel-manager/functions/getChannelMetadata.mdx) | Get channel metadata |
 | [getCommentCreationFee](/sdk-reference/channel-manager/functions/getCommentCreationFee.mdx) | Get the creation fee from channel manager |
+| [getEstimatedChannelEditCommentHookFee](/sdk-reference/channel-manager/functions/getEstimatedChannelEditCommentHookFee.mdx) | It calls the `estimateEditCommentFee` function on the hook to retrieve the estimated fee for editing a comment to a channel. It also tries to probe if the hook is any known legacy hook and return corresponding fee estimation. For estimation of total fee, use the `estimateChannelEditCommentFee` helper |
+| [getEstimatedChannelPostCommentHookFee](/sdk-reference/channel-manager/functions/getEstimatedChannelPostCommentHookFee.mdx) | It calls the `estimateAddCommentFee` function on the hook to retrieve the estimated fee for posting a comment to a channel. It also tries to probe if the hook is any known legacy hook and return corresponding fee estimation. For estimation of total fee, use the `estimateChannelPostCommentFee` helper |
 | [getHookTransactionFee](/sdk-reference/channel-manager/functions/getHookTransactionFee.mdx) | Get the hook transaction fee from channel manager |
 | [ownerOf](/sdk-reference/channel-manager/functions/ownerOf.mdx) | Get the owner of a channel |
 | [setBaseURI](/sdk-reference/channel-manager/functions/setBaseURI.mdx) | Sets the base URI for NFT metadata |
@@ -72,6 +76,12 @@ Core functionality for managing comment channels
 | [withdrawFees](/sdk-reference/channel-manager/functions/withdrawFees.mdx) | Withdraws accumulated fees to a specified address |
 
 ## References
+
+### BaseHookABIType
+
+Re-exports [BaseHookABIType](/sdk-reference/channel-manager/types/type-aliases/BaseHookABIType.mdx)
+
+***
 
 ### Channel
 
@@ -91,6 +101,18 @@ Re-exports [ChannelPermissions](/sdk-reference/channel-manager/types/type-aliase
 
 ***
 
+### ContractBasedAssetERCType
+
+Re-exports [ContractBasedAssetERCType](/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetERCType.mdx)
+
+***
+
+### ContractBasedAssetType
+
+Re-exports [ContractBasedAssetType](/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetType.mdx)
+
+***
+
 ### ContractReadFunctions
 
 Re-exports [ContractReadFunctions](/sdk-reference/channel-manager/types/type-aliases/ContractReadFunctions.mdx)
@@ -100,3 +122,21 @@ Re-exports [ContractReadFunctions](/sdk-reference/channel-manager/types/type-ali
 ### ContractWriteFunctions
 
 Re-exports [ContractWriteFunctions](/sdk-reference/channel-manager/types/type-aliases/ContractWriteFunctions.mdx)
+
+***
+
+### HookContractReadFunctions
+
+Re-exports [HookContractReadFunctions](/sdk-reference/channel-manager/types/type-aliases/HookContractReadFunctions.mdx)
+
+***
+
+### HookFeeEstimation
+
+Re-exports [HookFeeEstimation](/sdk-reference/channel-manager/types/type-aliases/HookFeeEstimation.mdx)
+
+***
+
+### TotalFeeEstimation
+
+Re-exports [TotalFeeEstimation](/sdk-reference/channel-manager/types/type-aliases/TotalFeeEstimation.mdx)

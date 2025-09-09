@@ -14,7 +14,7 @@ import { Comments } from "../src/types/Comments.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Channels } from "../src/types/Channels.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 
 // Invalid hook that doesn't support the interface
@@ -24,7 +24,7 @@ contract InvalidHook {
   }
 }
 
-contract RejectChannelUpdateHook is BaseHook {
+contract RejectChannelUpdateHook is NoFeeHook {
   function getHookPermissions()
     external
     pure

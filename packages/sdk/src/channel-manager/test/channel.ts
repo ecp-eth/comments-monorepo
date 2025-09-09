@@ -22,16 +22,28 @@ import {
   withdrawFees,
   setBaseURI,
   getCommentCreationFee,
+  getEstimatedChannelPostCommentHookFee,
+  getEstimatedChannelEditCommentHookFee,
+  estimateChannelPostCommentFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
+import type { CommentData, MetadataEntry } from "../../comments/types.js";
+import { AuthorAuthMethod } from "../../comments/types.js";
+import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
 
 describe("channel", () => {
   let channelManagerAddress: Hex;
+  let flatFeeHookAddress: Hex;
+  let legacyTakeChannelFeeHookAddress: Hex;
 
   before(async () => {
-    channelManagerAddress = deployContracts().channelManagerAddress;
+    ({
+      channelManagerAddress,
+      flatFeeHookAddress,
+      legacyTakeChannelFeeHookAddress,
+    } = deployContracts());
   });
 
   // Test account setup
@@ -499,6 +511,190 @@ describe("channel", () => {
       });
 
       assert.equal(receipt.status, "success");
+    });
+  });
+
+  describe("getEstimatedChannelPostCommentHookFee(), getEstimatedChannelEditCommentHookFee(), estimateChannelPostCommentFee(), estimateChannelEditCommentFee", () => {
+    let channelId: bigint;
+    let legacyTakeChannelId: bigint;
+
+    async function createChannelWithHook(hookAddress: Hex) {
+      const result = await createChannel({
+        name: "Test channel for fee estimation",
+        fee: parseEther("0.02"),
+        // flat fee hook address
+        hook: hookAddress,
+        writeContract: client.writeContract,
+        channelManagerAddress,
+      });
+
+      const receipt = await client.waitForTransactionReceipt({
+        hash: result.txHash,
+      });
+
+      assert.equal(receipt.status, "success");
+
+      const logs = parseEventLogs({
+        abi: ChannelManagerABI,
+        logs: receipt.logs,
+        eventName: "ChannelCreated",
+      });
+
+      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+
+      return logs[0]!.args.channelId;
+    }
+
+    beforeEach(async () => {
+      channelId = await createChannelWithHook(flatFeeHookAddress);
+      legacyTakeChannelId = await createChannelWithHook(
+        legacyTakeChannelFeeHookAddress,
+      );
+    });
+
+    it("estimates the fee for posting a comment from hooks impelement IFeeEstimatable", async () => {
+      const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
+      const commentData: CommentData = {
+        content: "Hello, world!",
+        targetUri: "https://example.com",
+        commentType: 0,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+      const metadata: MetadataEntry[] = [];
+      // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+      const msgSender = account.address;
+
+      const fee = await getEstimatedChannelPostCommentHookFee({
+        readContract: client.readContract,
+        channelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(fee.amount, 900000000000000n);
+      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+    });
+
+    it("estimates the fee for editing a comment from hooks impelement IFeeEstimatable", async () => {
+      const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
+      const commentData: CommentData = {
+        content: "Hello, world!",
+        targetUri: "https://example.com",
+        commentType: 0,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+      const metadata: MetadataEntry[] = [];
+      // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+      const msgSender = account.address;
+
+      const fee = await getEstimatedChannelEditCommentHookFee({
+        readContract: client.readContract,
+        channelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(fee.amount, 900000000000000n);
+      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+    });
+
+    it("estimates the fee for posting a comment from legacy take channel fee hooks", async () => {
+      const eta = BigInt(Math.floor(Date.now() / 1000)) + 30n;
+      const commentData: CommentData = {
+        content: "Hello, world!",
+        targetUri: "https://example.com",
+        commentType: 0,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId: legacyTakeChannelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+      const metadata: MetadataEntry[] = [];
+      // since we set authMethod to DIRECT_TX, the comment will be posted directly by the author
+      const msgSender = account.address;
+
+      const fee = await getEstimatedChannelPostCommentHookFee({
+        readContract: client.readContract,
+        channelId: legacyTakeChannelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(fee.amount, 100n);
+      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+
+      const editFee = await getEstimatedChannelEditCommentHookFee({
+        readContract: client.readContract,
+        channelId: legacyTakeChannelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(editFee.amount, 0n);
+      assert.equal(editFee.asset, NATIVE_ASSET_ADDRESS);
+
+      const reactionData: CommentData = {
+        content: "like",
+        targetUri: "",
+        commentType: 1,
+        authMethod: AuthorAuthMethod.DIRECT_TX,
+        channelId: legacyTakeChannelId,
+        parentId:
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+        author: account.address,
+        app: account2.address,
+        createdAt: eta,
+        updatedAt: eta,
+      };
+
+      const reactionFee = await getEstimatedChannelPostCommentHookFee({
+        readContract: client.readContract,
+        channelId: legacyTakeChannelId,
+        commentData: reactionData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(reactionFee.amount, 0n);
+      assert.equal(reactionFee.asset, NATIVE_ASSET_ADDRESS);
+
+      const estimatedTotalFee = await estimateChannelPostCommentFee({
+        readContract: client.readContract,
+        channelId: legacyTakeChannelId,
+        commentData,
+        metadata,
+        msgSender,
+        channelManagerAddress,
+      });
+
+      assert.equal(estimatedTotalFee.baseToken.amount, 102n);
     });
   });
 });

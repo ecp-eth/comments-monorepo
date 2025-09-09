@@ -4,10 +4,11 @@ import type {
   ReadContractReturnType,
 } from "viem";
 import type { Hex } from "../core/schemas.js";
-import type { ChannelManagerABI } from "../abis.js";
+import type { ChannelManagerABI, BaseHookABI } from "../abis.js";
 import type { MetadataEntry } from "../comments/types.js";
 
 export type ChannelManagerABIType = typeof ChannelManagerABI;
+export type BaseHookABIType = typeof BaseHookABI;
 
 export type ChannelPermissions = {
   onInitialize: boolean;
@@ -152,4 +153,60 @@ export type ContractReadFunctions = {
       "deductProtocolHookTransactionFee"
     >
   >;
+};
+
+export type HookContractReadFunctions = {
+  estimateAddCommentFee: (
+    args: ReadContractParameters<BaseHookABIType, "estimateAddCommentFee">,
+  ) => Promise<
+    ReadContractReturnType<BaseHookABIType, "estimateAddCommentFee">
+  >;
+
+  estimateEditCommentFee: (
+    args: ReadContractParameters<BaseHookABIType, "estimateEditCommentFee">,
+  ) => Promise<
+    ReadContractReturnType<BaseHookABIType, "estimateEditCommentFee">
+  >;
+};
+
+/**
+ * HookFeeEstimation struct returned from hook fee estimator functions
+ */
+export type HookFeeEstimation = {
+  amount: bigint;
+  asset: Hex;
+  description: string;
+  metadata: readonly MetadataEntry[];
+};
+
+export type ContractBasedAssetERCType =
+  | "erc20"
+  | "erc721"
+  | "erc1155"
+  | "unknown";
+export type ContractBasedAssetType = {
+  type: ContractBasedAssetERCType;
+  address: Hex;
+  amount: bigint;
+};
+
+export type TotalFeeEstimation = {
+  /**
+   * The amount of the base token to be paid
+   */
+  baseToken: {
+    amount: bigint;
+  };
+  /**
+   * The contract based asset to be paid, such as ERC20, ERC721, ERC1155
+   */
+  contractAsset?: ContractBasedAssetType;
+  /**
+   * The description of the fee
+   */
+  description: string;
+  /**
+   * The metadata of the fee estimation
+   */
+  metadata: readonly MetadataEntry[];
 };

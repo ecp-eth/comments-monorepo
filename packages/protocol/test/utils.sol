@@ -13,7 +13,7 @@ import { ChannelManager } from "../src/ChannelManager.sol";
 import { IHook } from "../src/interfaces/IHook.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
@@ -251,6 +251,42 @@ library TestUtils {
     return appSignature;
   }
 
+  function generateAppSignature(
+    Vm vm,
+    Comments.CreateComment memory commentData,
+    ICommentManager comments,
+    uint256 appPrivateKey
+  ) internal view returns (bytes memory) {
+    address app = vm.addr(appPrivateKey);
+
+    commentData.app = app;
+    bytes32 commentId = comments.getCommentId(commentData);
+    bytes memory appSignature = signEIP712(vm, appPrivateKey, commentId);
+
+    return appSignature;
+  }
+
+  function generateAppSignatureForEdit(
+    Vm vm,
+    bytes32 commentId,
+    address author,
+    Comments.EditComment memory editCommentData,
+    ICommentManager comments,
+    uint256 appPrivateKey
+  ) internal view returns (bytes memory) {
+    address app = vm.addr(appPrivateKey);
+
+    editCommentData.app = app;
+    bytes32 editCommentHash = comments.getEditCommentHash(
+      commentId,
+      author,
+      editCommentData
+    );
+    bytes memory appSignature = signEIP712(vm, appPrivateKey, editCommentHash);
+
+    return appSignature;
+  }
+
   // will generate identical commentIds
   function generateDummyCreateComment(
     address author,
@@ -396,7 +432,7 @@ library TestUtils {
 }
 
 // Mock hook contract for testing
-contract MockHook is BaseHook {
+contract MockHook is NoFeeHook {
   string public returningHookData;
 
   function setReturningHookData(string memory _returningHookData) external {
@@ -437,7 +473,7 @@ contract MockHook is BaseHook {
   }
 }
 
-contract AlwaysReturningDataHook is BaseHook {
+contract AlwaysReturningDataHook is NoFeeHook {
   function getHookPermissions()
     external
     pure

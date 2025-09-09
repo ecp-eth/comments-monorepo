@@ -1,0 +1,31 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / getEstimatedChannelEditCommentHookFee
+
+# Function: getEstimatedChannelEditCommentHookFee()
+
+```ts
+function getEstimatedChannelEditCommentHookFee(getEstimateChannelEditCommentHookFeeParams): Promise<HookFeeEstimation>;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:742](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L742)
+
+It calls the `estimateEditCommentFee` function on the hook to retrieve the estimated fee for editing a comment to a channel.
+It also tries to probe if the hook is any known legacy hook and return corresponding fee estimation.
+For estimation of total fee, use the `estimateChannelEditCommentFee` helper
+
+## Parameters
+
+### getEstimateChannelEditCommentHookFeeParams
+
+`GetEstimatedChannelEditCommentHookFeeParams`
+
+The parameters for estimating the fee for editing a comment to a channel
+
+## Returns
+
+`Promise`\<[`HookFeeEstimation`](/sdk-reference/channel-manager/types/type-aliases/HookFeeEstimation.mdx)\>
+
+The estimated fee for editing a comment to a channel

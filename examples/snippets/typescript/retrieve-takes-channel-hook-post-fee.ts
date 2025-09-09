@@ -1,3 +1,17 @@
+/**
+ * !!!!!!!!!!!!!!!!!
+ * !!! ATTENTION !!!
+ * !!!!!!!!!!!!!!!!!
+ *
+ * Please note this snippet demonstrates manually calculating the total fee.
+ * We have implemented a generic helper in the SDK that consolidates the fee retrieval logic.
+ * Please refer to the [protocol-fee](https://docs.ethcomments.xyz/protocol-fee) for more details.
+ *
+ * To run this example, please make sure:
+ * 1. .env is setup to correctly to use base mainnet
+ * 2. build sdk in prod mode
+ */
+
 import {
   getChannel,
   getCommentCreationFee,

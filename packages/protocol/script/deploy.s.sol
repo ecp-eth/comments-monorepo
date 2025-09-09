@@ -6,6 +6,10 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { NoopHook } from "../src/hooks/NoopHook.sol";
 import { BroadcastHook } from "../src/hooks/BroadcastHook.sol";
+import { FlatFeeHook } from "../test/FlatFeeHook.t.sol";
+import {
+  LegacyTakeChannelFeeHook
+} from "../test/LegacyTakeChannelFeeHook.t.sol";
 
 contract DeployScript is Script {
   enum Env {
@@ -18,6 +22,8 @@ contract DeployScript is Script {
   ChannelManager public channelManager;
   NoopHook public noopHook;
   BroadcastHook public broadcastHook;
+  FlatFeeHook public flatFeeHook;
+  LegacyTakeChannelFeeHook public legacyTakeChannelFeeHook;
 
   function setUp() public {}
 
@@ -91,6 +97,23 @@ contract DeployScript is Script {
       noopHook = new NoopHook();
 
       console.log("NoopHook deployed at", address(noopHook));
+
+      // Deploy FlatFeeHook for testing
+      flatFeeHook = new FlatFeeHook(ownerAddress);
+      flatFeeHook.setShouldChargeOnEdit(true);
+
+      console.log("FlatFeeHook deployed at", address(flatFeeHook));
+
+      // Deploy FlatFeeHook for testing
+      legacyTakeChannelFeeHook = new LegacyTakeChannelFeeHook(
+        100,
+        ownerAddress
+      );
+
+      console.log(
+        "LegacyTakeChannelFeeHook deployed at",
+        address(legacyTakeChannelFeeHook)
+      );
     }
 
     // Deploy CommentManager first

@@ -5,7 +5,7 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import {
@@ -798,7 +798,7 @@ contract CommentsTest is Test, IERC721Receiver {
   }
 }
 
-contract RejectEditHook is BaseHook {
+contract RejectEditHook is NoFeeHook {
   function getHookPermissions()
     external
     pure

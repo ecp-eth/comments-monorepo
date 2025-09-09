@@ -10,13 +10,14 @@ import { Hooks } from "../types/Hooks.sol";
 import { Comments } from "../types/Comments.sol";
 import { Channels } from "../types/Channels.sol";
 import { Metadata } from "../types/Metadata.sol";
+import { IFeeEstimatableHook } from "../interfaces/IFeeEstimatableHook.sol";
 
 /**
  * @title BaseHook
  * @notice Abstract base contract for all hook implementations
  * @dev Provides default implementations that throw HookNotImplemented if not overridden
  */
-abstract contract BaseHook is IHook, ERC165 {
+abstract contract BaseHook is ERC165, IFeeEstimatableHook, IHook {
   /// @notice Error thrown when a hook function is not implemented
   error HookNotImplemented();
 
@@ -30,6 +31,7 @@ abstract contract BaseHook is IHook, ERC165 {
   ) public view virtual override(ERC165, IERC165) returns (bool) {
     return
       interfaceId == type(IHook).interfaceId ||
+      interfaceId == type(IFeeEstimatableHook).interfaceId ||
       super.supportsInterface(interfaceId);
   }
 

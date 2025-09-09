@@ -1,24 +1,47 @@
 import { z } from "zod";
-import { CHANNEL_MANAGER_ADDRESS, ZERO_ADDRESS } from "../constants.js";
+import {
+  CHANNEL_MANAGER_ADDRESS,
+  COMMENT_TYPE_COMMENT,
+  EMPTY_PARENT_ID,
+  NATIVE_ASSET_ADDRESS,
+  ZERO_ADDRESS,
+} from "../constants.js";
 import { HexSchema } from "../core/schemas.js";
 import type { Hex } from "../core/schemas.js";
 import type {
   WaitableWriteContractHelperResult,
   WriteContractHelperResult,
 } from "../core/types.js";
-import { ChannelManagerABI } from "../abis.js";
+import { BaseHookABI, ChannelManagerABI } from "../abis.js";
 import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
   ChannelManagerABIType,
   Channel,
+  HookContractReadFunctions,
+  HookFeeEstimation,
+  TotalFeeEstimation,
+  ContractBasedAssetType,
 } from "./types.js";
-import { type MetadataEntry, type MetadataEntryOp } from "../comments/types.js";
+import {
+  type CommentData,
+  type MetadataEntry,
+  type MetadataEntryOp,
+} from "../comments/types.js";
 import {
   MetadataArrayOpSchema,
   MetadataEntrySchema,
 } from "../comments/schemas.js";
+import { getHookTransactionFee } from "./hook.js";
+import type {
+  ERC165ContractReadFunctions,
+  ERC20ContractReadFunctions,
+  LegacyTakesChannelContractReadFunctions,
+} from "../types.js";
+import { getERCType } from "./utils.js";
+import { LEGACY_TAKES_CHANNEL_ABI } from "../extraABIs.js";
+import { ContractFunctionExecutionError } from "viem";
 
 export type CreateChannelParams = {
   /**
@@ -603,4 +626,296 @@ export async function setBaseURI(
   return {
     txHash,
   };
+}
+
+type GetEstimatedChannelPostCommentHookFeeParams = {
+  channelId: bigint;
+  commentData: CommentData;
+  metadata: MetadataEntry[];
+  msgSender: Hex;
+  readContract: HookContractReadFunctions["estimateAddCommentFee"] &
+    ContractReadFunctions["getChannel"] &
+    LegacyTakesChannelContractReadFunctions["commentFee"];
+  channelManagerAddress?: Hex;
+};
+
+/**
+ * It calls the `estimateAddCommentFee` function on the hook to retrieve the estimated fee for posting a comment to a channel.
+ * It also tries to probe if the hook is any known legacy hook and return corresponding fee estimation.
+ * For estimation of total fee, use the `estimateChannelPostCommentFee` helper
+ *
+ * @param getEstimatedChannelPostCommentHookFeeParams - The parameters for estimating the fee for posting a comment to a channel
+ * @returns The estimated fee for posting a comment to a channel
+ */
+export async function getEstimatedChannelPostCommentHookFee({
+  channelId,
+  commentData,
+  metadata,
+  msgSender,
+  readContract,
+  channelManagerAddress,
+}: GetEstimatedChannelPostCommentHookFeeParams): Promise<HookFeeEstimation> {
+  const channelInfo = await getChannel({
+    channelId,
+    channelManagerAddress,
+    readContract: readContract,
+  });
+
+  if (!channelInfo.hook) {
+    return {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "",
+      metadata: [],
+    };
+  }
+
+  let estimation: HookFeeEstimation | undefined;
+  try {
+    estimation = await readContract({
+      abi: BaseHookABI,
+      address: channelInfo.hook,
+      functionName: "estimateAddCommentFee",
+      args: [commentData, metadata, msgSender],
+    });
+  } catch (error) {
+    if (!(error instanceof ContractFunctionExecutionError)) {
+      throw error;
+    }
+  }
+
+  if (!estimation) {
+    let amount = 0n;
+    // see if it is known legacy takes channel hook
+    try {
+      const commentFee = await readContract({
+        abi: LEGACY_TAKES_CHANNEL_ABI,
+        address: channelInfo.hook,
+        functionName: "commentFee",
+      });
+
+      // sucessfully got the comment fee, so it is very likely to be a legacy takes channel hook
+      amount =
+        commentData.parentId === EMPTY_PARENT_ID &&
+        commentData.commentType === COMMENT_TYPE_COMMENT
+          ? commentFee
+          : 0n;
+    } catch (error) {
+      if (!(error instanceof ContractFunctionExecutionError)) {
+        throw error;
+      }
+
+      // exhuasted all options, assume 0 fee
+      amount = 0n;
+    }
+
+    estimation = {
+      amount,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "Legacy Takes Channel Hook",
+      metadata: [],
+    };
+  }
+
+  return estimation;
+}
+
+type GetEstimatedChannelEditCommentHookFeeParams = {
+  channelId: bigint;
+  commentData: CommentData;
+  metadata: MetadataEntry[];
+  msgSender: Hex;
+  readContract: HookContractReadFunctions["estimateEditCommentFee"] &
+    ContractReadFunctions["getChannel"] &
+    LegacyTakesChannelContractReadFunctions["commentFee"];
+  channelManagerAddress?: Hex;
+};
+
+/**
+ * It calls the `estimateEditCommentFee` function on the hook to retrieve the estimated fee for editing a comment to a channel.
+ * It also tries to probe if the hook is any known legacy hook and return corresponding fee estimation.
+ * For estimation of total fee, use the `estimateChannelEditCommentFee` helper
+ *
+ * @param getEstimateChannelEditCommentHookFeeParams - The parameters for estimating the fee for editing a comment to a channel
+ * @returns The estimated fee for editing a comment to a channel
+ */
+export async function getEstimatedChannelEditCommentHookFee({
+  channelId,
+  commentData,
+  metadata,
+  msgSender,
+  readContract,
+  channelManagerAddress,
+}: GetEstimatedChannelEditCommentHookFeeParams): Promise<HookFeeEstimation> {
+  const channelInfo = await getChannel({
+    channelId,
+    channelManagerAddress,
+    readContract: readContract,
+  });
+
+  if (!channelInfo.hook) {
+    return {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "",
+      metadata: [],
+    };
+  }
+
+  let estimation: HookFeeEstimation;
+  try {
+    estimation = await readContract({
+      abi: BaseHookABI,
+      address: channelInfo.hook,
+      functionName: "estimateEditCommentFee",
+      args: [commentData, metadata, msgSender],
+    });
+  } catch (error) {
+    if (!(error instanceof ContractFunctionExecutionError)) {
+      throw error;
+    }
+
+    // none of the known hooks requires fee for editing comment fee estimation
+    estimation = {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "Legacy Takes Channel Hook",
+      metadata: [],
+    };
+  }
+
+  return estimation;
+}
+
+type EstimateChannelCommentActionFeeParams<
+  CommentActionFunc extends
+    | typeof getEstimatedChannelPostCommentHookFee
+    | typeof getEstimatedChannelEditCommentHookFee,
+> = {
+  readContract: ContractReadFunctions["getHookTransactionFee"] &
+    ERC165ContractReadFunctions["supportsInterface"] &
+    ERC20ContractReadFunctions["name"] &
+    ERC20ContractReadFunctions["symbol"] &
+    ERC20ContractReadFunctions["decimals"] &
+    ERC20ContractReadFunctions["totalSupply"];
+  commentActionFunc: CommentActionFunc;
+} & (CommentActionFunc extends typeof getEstimatedChannelPostCommentHookFee
+  ? GetEstimatedChannelPostCommentHookFeeParams
+  : GetEstimatedChannelEditCommentHookFeeParams);
+
+/**
+ * Base function for best-effort estimation of the total fee for a comment action to a channel
+ * @param param0
+ * @returns
+ */
+async function estimateChannelCommentActionFee<
+  CommentActionFunc extends
+    | typeof getEstimatedChannelPostCommentHookFee
+    | typeof getEstimatedChannelEditCommentHookFee,
+>({
+  readContract,
+  commentActionFunc,
+  channelManagerAddress,
+  ...restOpts
+}: EstimateChannelCommentActionFeeParams<CommentActionFunc>): Promise<TotalFeeEstimation> {
+  let hookEstimatedFee: HookFeeEstimation;
+
+  try {
+    hookEstimatedFee = await commentActionFunc({
+      ...restOpts,
+      channelManagerAddress,
+      readContract,
+    });
+  } catch (error) {
+    if (!(error instanceof ContractFunctionExecutionError)) {
+      throw error;
+    }
+
+    // if the hook estimation fails, that means the hook is old legacy hook
+    // assume it does not need to be paid
+    hookEstimatedFee = {
+      amount: 0n,
+      asset: NATIVE_ASSET_ADDRESS,
+      description: "",
+      metadata: [],
+    };
+  }
+
+  const { fee: transactionHookFee } = await getHookTransactionFee({
+    channelManagerAddress,
+    readContract,
+  });
+
+  if (transactionHookFee > 10000) {
+    throw new Error("Transaction hook fee is greater than 100%");
+  }
+
+  const baseTokenAmount =
+    hookEstimatedFee.asset === NATIVE_ASSET_ADDRESS
+      ? hookEstimatedFee.amount
+      : 0n;
+
+  const totalFee =
+    (baseTokenAmount * 10000n) / BigInt(10000 - transactionHookFee);
+
+  const contractAsset: ContractBasedAssetType | undefined =
+    hookEstimatedFee.asset === NATIVE_ASSET_ADDRESS
+      ? undefined
+      : {
+          amount: hookEstimatedFee.amount,
+          address: hookEstimatedFee.asset as Hex,
+          type: await getERCType({
+            contractAssetAddress: hookEstimatedFee.asset,
+            readContract,
+          }),
+        };
+
+  return {
+    baseToken: {
+      amount: totalFee,
+    },
+    contractAsset,
+    description: hookEstimatedFee.description,
+    metadata: hookEstimatedFee.metadata,
+  };
+}
+
+/**
+ * Best-effort estimation of the total fee for posting a comment to a channel
+ *
+ * @param estimatedChannelPostCommentHookFeeParams - The parameters for estimating the fee for posting a comment to a channel
+ * @returns The estimated fee for posting a comment to a channel
+ */
+export async function estimateChannelPostCommentFee({
+  ...restOpts
+}: Omit<
+  EstimateChannelCommentActionFeeParams<
+    typeof getEstimatedChannelPostCommentHookFee
+  >,
+  "commentActionFunc"
+>): Promise<TotalFeeEstimation> {
+  return await estimateChannelCommentActionFee({
+    ...restOpts,
+    commentActionFunc: getEstimatedChannelPostCommentHookFee,
+  });
+}
+
+/**
+ * Best-effort estimation of the total fee for editing a comment to a channel
+ *
+ * @param estimatedChannelEditCommentHookFeeParams - The parameters for estimating the fee for editing a comment to a channel
+ * @returns The estimated fee for editing a comment to a channel
+ */
+export async function estimateChannelEditCommentFee({
+  ...restOpts
+}: Omit<
+  EstimateChannelCommentActionFeeParams<
+    typeof getEstimatedChannelEditCommentHookFee
+  >,
+  "commentActionFunc"
+>): Promise<TotalFeeEstimation> {
+  return await estimateChannelCommentActionFee({
+    ...restOpts,
+    commentActionFunc: getEstimatedChannelEditCommentHookFee,
+  });
 }

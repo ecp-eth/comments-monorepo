@@ -10,11 +10,11 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils, AlwaysReturningDataHook } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 
-contract NoHook is BaseHook {
+contract NoHook is NoFeeHook {
   function getHookPermissions()
     external
     pure
@@ -33,7 +33,7 @@ contract NoHook is BaseHook {
   }
 }
 
-contract FeeRequiringHook is BaseHook {
+contract FeeRequiringHook is NoFeeHook {
   uint256 public constant REQUIRED_FEE = 0.001 ether;
 
   function _getHookPermissions()

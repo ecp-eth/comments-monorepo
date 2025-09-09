@@ -25,7 +25,10 @@ The protocol implements several fee mechanisms:
    - There is currently no standard way to retrieve the hook fee value
    - **We are working on an SDK helper function** to estimate the required fee based on known hook contracts
 
-## Example: Calculating fee required for posting a comment
+## Calculating fee required for posting a comment
+
+> ⚠️ Before you dive into the details, please note that we've implemented helper functions to calculate the total fee required for posting/editing a comment on a channel.
+> Please see the links at the end of this section.
 
 When posting a comment (including replies), the fee consists of the `comment creation fee` and the `total fee passed to the hook`.
 
@@ -38,6 +41,17 @@ The `total fee passed to the hook` is calculated as follows:
 ```
 Total fee passed to the hook = fee required by the hook / (1 - Hook transaction fee)
 ```
+
+## SDK Helper Functions
+
+We’ve added helper functions to simplify fee calculations when posting or editing comments in a channel. Instead of manually gathering all the required details, these helpers handle the logic for you and return the total fee directly.
+
+- [estimateChannelPostCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee)
+- [estimateChannelEditCommentFee](https://comments-monorepo-docs-git-feat-estimatable-hook-discove.vercel.app/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee)
+
+Example of using the helper functions can be found in the [examples](https://github.com/ecp-eth/comments-monorepo/tree/main/examples/snippets/typescript/retrieve-estimatable-channel-hook-fee-via-sdk.ts)
+
+### Example: Calculating fee required for posting a comment on the "Takes" channel
 
 Let's use the "Takes" channel used by [interface.social](https://interface.social) as an example. Here are the steps required to calculate the total fee needed to post a comment:
 

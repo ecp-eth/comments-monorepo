@@ -10,7 +10,7 @@ import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { TestUtils } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 
@@ -460,7 +460,7 @@ contract CommentsTest is Test, IERC721Receiver {
 }
 
 // Mock malicious fee collector that reverts on collection
-contract MaliciousFeeCollector is BaseHook {
+contract MaliciousFeeCollector is NoFeeHook {
   function _onCommentAdd(
     Comments.Comment calldata,
     Metadata.MetadataEntry[] calldata,
@@ -489,7 +489,7 @@ contract MaliciousFeeCollector is BaseHook {
 }
 
 // Mock hook that demonstrates SET and DELETE operations for updateCommentHookData
-contract TestHookUpdater is BaseHook {
+contract TestHookUpdater is NoFeeHook {
   function _onCommentAdd(
     Comments.Comment calldata,
     Metadata.MetadataEntry[] calldata,

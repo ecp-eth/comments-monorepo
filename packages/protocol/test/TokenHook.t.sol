@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "../src/hooks/BaseHook.sol";
+import "../src/hooks/NoFeeHook.sol";
 import "../src/interfaces/IHook.sol";
 import "../src/types/Comments.sol";
 import "../src/types/Hooks.sol";
@@ -73,7 +73,7 @@ interface IClankerDeployer {
  * @notice Hook that deploys tokens via Clanker when specific metadata is provided in comments
  * @dev Looks for token deployment metadata in comment metadata and calls Clanker deployment contract
  */
-contract TokenHook is BaseHook {
+contract TokenHook is NoFeeHook {
   /// @notice The Clanker deployment contract address on Base
   address public constant CLANKER_DEPLOYER =
     0x2A787b2362021cC3eEa3C24C4748a6cD5B687382;

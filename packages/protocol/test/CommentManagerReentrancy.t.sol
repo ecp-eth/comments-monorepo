@@ -6,7 +6,7 @@ import { CommentManager } from "../src/CommentManager.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { ICommentManager } from "../src/interfaces/ICommentManager.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
+import { NoFeeHook } from "../src/hooks/NoFeeHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Metadata } from "../src/types/Metadata.sol";
 import { Channels } from "../src/types/Channels.sol";
@@ -22,7 +22,7 @@ error ReentrancyAttempted();
  * @title Malicious Hook for Reentrancy Testing
  * @notice This hook attempts various reentrancy attacks during comment operations
  */
-contract ReentrantHook is BaseHook {
+contract ReentrantHook is NoFeeHook {
   CommentManager public commentManager;
   address public attacker;
   uint256 public reentrantCallCount;

@@ -5,15 +5,17 @@ import { Test } from "forge-std/Test.sol";
 import { ChannelManager } from "../src/ChannelManager.sol";
 import { CommentManager } from "../src/CommentManager.sol";
 import { IChannelManager } from "../src/interfaces/IChannelManager.sol";
+import { IProtocolFees } from "../src/interfaces/IProtocolFees.sol";
 import {
   IERC721Receiver
 } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 import { TestUtils } from "./utils.sol";
-import { BaseHook } from "../src/hooks/BaseHook.sol";
 import { Hooks } from "../src/types/Hooks.sol";
 import { Comments } from "../src/types/Comments.sol";
 import { Metadata } from "../src/types/Metadata.sol";
+import { FeeEstimatable } from "../src/types/FeeEstimatable.sol";
+import { BaseHook } from "../src/hooks/BaseHook.sol";
 
 // Fee charging hook contract
 contract FlatFeeHook is BaseHook {
@@ -21,6 +23,7 @@ contract FlatFeeHook is BaseHook {
 
   address public feeCollector;
   uint256 public totalFeesCollected;
+  bool public shouldChargeOnEdit;
 
   event FeeCollected(address indexed author, uint256 amount);
   event FeeWithdrawn(address indexed collector, uint256 amount);
@@ -28,6 +31,7 @@ contract FlatFeeHook is BaseHook {
 
   constructor(address _feeCollector) {
     feeCollector = _feeCollector;
+    shouldChargeOnEdit = false;
   }
 
   function _getHookPermissions()
@@ -41,7 +45,7 @@ contract FlatFeeHook is BaseHook {
         onInitialize: false,
         onCommentAdd: true,
         onCommentDelete: false,
-        onCommentEdit: false,
+        onCommentEdit: true,
         onChannelUpdate: false,
         onCommentHookDataUpdate: false
       });
@@ -53,6 +57,27 @@ contract FlatFeeHook is BaseHook {
     address,
     bytes32
   ) internal override returns (Metadata.MetadataEntry[] memory) {
+    _collectHookFee(commentData);
+
+    return new Metadata.MetadataEntry[](0);
+  }
+
+  function _onCommentEdit(
+    Comments.Comment calldata commentData,
+    Metadata.MetadataEntry[] calldata,
+    address,
+    bytes32
+  ) internal override returns (Metadata.MetadataEntry[] memory) {
+    if (!shouldChargeOnEdit) {
+      return new Metadata.MetadataEntry[](0);
+    }
+
+    _collectHookFee(commentData);
+
+    return new Metadata.MetadataEntry[](0);
+  }
+
+  function _collectHookFee(Comments.Comment calldata commentData) internal {
     require(msg.value >= HOOK_FEE, "Insufficient fee");
 
     totalFeesCollected += HOOK_FEE;
@@ -67,7 +92,41 @@ contract FlatFeeHook is BaseHook {
         emit RefundIssued(commentData.author, refundAmount);
       }
     }
-    return new Metadata.MetadataEntry[](0);
+  }
+
+  function setShouldChargeOnEdit(bool _shouldChargeOnEdit) external {
+    require(msg.sender == feeCollector, "Only fee collector");
+    shouldChargeOnEdit = _shouldChargeOnEdit;
+  }
+
+  function estimateAddCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external pure returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    feeEstimation.amount = HOOK_FEE;
+    feeEstimation.asset = FeeEstimatable.NATIVE_TOKEN_ADDRESS;
+    feeEstimation.description = "Flat fee for adding a comment";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
+  }
+
+  function estimateEditCommentFee(
+    Comments.Comment calldata,
+    Metadata.MetadataEntry[] calldata,
+    address
+  ) external view returns (FeeEstimatable.FeeEstimation memory feeEstimation) {
+    if (shouldChargeOnEdit) {
+      feeEstimation.amount = HOOK_FEE;
+    } else {
+      feeEstimation.amount = 0;
+    }
+    feeEstimation.asset = FeeEstimatable.NATIVE_TOKEN_ADDRESS;
+    feeEstimation.description = "Flat fee for editing a comment";
+    feeEstimation.metadata = new Metadata.MetadataEntry[](0);
+
+    return feeEstimation;
   }
 
   function withdrawFees() external {
@@ -87,6 +146,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
   ChannelManager public channelManager;
   FlatFeeHook public feeHook;
+  FlatFeeHook public feeHookWithEdit;
   CommentManager public comments;
   address public commentsContract;
 
@@ -116,6 +176,9 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
 
     // Deploy fee hook
     feeHook = new FlatFeeHook(feeCollector);
+    feeHookWithEdit = new FlatFeeHook(feeCollector);
+    vm.prank(feeCollector);
+    feeHookWithEdit.setShouldChargeOnEdit(true);
 
     (comments, channelManager) = TestUtils.createContracts(owner);
 
@@ -130,12 +193,16 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
   function _signAppSignature(
     Comments.CreateComment memory commentData
   ) internal view returns (bytes memory) {
-    bytes32 digest = comments.getCommentId(commentData);
-    (uint8 v, bytes32 r, bytes32 s) = vm.sign(user2PrivateKey, digest);
-    return abi.encodePacked(r, s, v);
+    return
+      TestUtils.generateAppSignature(
+        vm,
+        commentData,
+        comments,
+        user2PrivateKey
+      );
   }
 
-  function test_FeeHookCollectsExactFee() public {
+  function test_FlatFeeHookCollectsExactFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -178,7 +245,84 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
   }
 
-  function test_FeeHookRefundsExcessPaymentExceptProtocolFee() public {
+  function test_FlatFeeHookCollectsExactFeeOnEdit() public {
+    // Create channel with fee hook
+    uint256 channelId = channelManager.createChannel{
+      value: CHANNEL_CREATION_FEE
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHookWithEdit)
+    );
+
+    Comments.CreateComment memory commentData = Comments.CreateComment({
+      content: "Test comment",
+      metadata: new Metadata.MetadataEntry[](0),
+      targetUri: "",
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    bytes memory appSignature = _signAppSignature(commentData);
+
+    // Post comment as user1 with exact fee plus protocol fee
+    vm.prank(user1);
+    comments.postComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
+      commentData,
+      appSignature
+    );
+
+    uint256 nonce = comments.getNonce(user1, user2);
+    bytes32 commentId = comments.getCommentId(commentData);
+    Comments.EditComment memory editCommentData = Comments.EditComment({
+      app: user2,
+      nonce: nonce,
+      deadline: block.timestamp + 1 days,
+      content: "Test comment",
+      metadata: new Metadata.MetadataEntry[](0)
+    });
+
+    bytes memory appSignatureForEdit = TestUtils.generateAppSignatureForEdit(
+      vm,
+      commentId,
+      user1,
+      editCommentData,
+      comments,
+      user2PrivateKey
+    );
+
+    uint256 hookBalanceBefore = address(feeHookWithEdit).balance;
+    uint256 user1BalanceBefore = user1.balance;
+
+    vm.prank(user1);
+    comments.editComment{ value: TOTAL_FEE_WITH_PROTOCOL }(
+      commentId,
+      editCommentData,
+      appSignatureForEdit
+    );
+
+    // Check that the hook received the hook fee (after protocol fee)
+    assertEq(
+      address(feeHookWithEdit).balance - hookBalanceBefore,
+      HOOK_FEE,
+      "Hook balance was not collected accurately"
+    );
+    // Check that user1 paid the total fee (including protocol fee)
+    assertEq(
+      user1BalanceBefore - user1.balance,
+      TOTAL_FEE_WITH_PROTOCOL,
+      "User1 balance did not change accordingly"
+    );
+    // Check that the hook recorded the fee
+    assertEq(feeHookWithEdit.totalFeesCollected(), HOOK_FEE * 2);
+  }
+
+  function test_FlatFeeHookRefundsExcessPaymentExceptProtocolFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -225,7 +369,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
   }
 
-  function test_FeeHookRejectsInsufficientFee() public {
+  function test_FlatFeeHookRejectsInsufficientFee() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -257,7 +401,7 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     comments.postComment{ value: 0.0005 ether }(commentData, appSignature);
   }
 
-  function test_FeeWithdrawal() public {
+  function test_FlatFeeHookFeeWithdrawal() public {
     // Create channel with fee hook
     uint256 channelId = channelManager.createChannel{
       value: CHANNEL_CREATION_FEE
@@ -337,17 +481,106 @@ contract FlatFeeHookTest is Test, IERC721Receiver {
     assertEq(feeHook.totalFeesCollected(), 0);
   }
 
-  function test_OnlyFeeCollectorCanWithdraw() public {
+  function test_FlatFeeHookOnlyFeeCollectorCanWithdraw() public {
     // Try to withdraw as non-fee collector
     vm.prank(user1);
     vm.expectRevert("Only fee collector");
     feeHook.withdrawFees();
   }
 
-  function test_CannotWithdrawWithNoFees() public {
+  function test_FlatFeeHookCannotWithdrawWithNoFees() public {
     vm.prank(feeCollector);
     vm.expectRevert("No fees to withdraw");
     feeHook.withdrawFees();
+  }
+
+  function test_FlatFeeHookEstimatedAddCommentFeeIsAccurate() public {
+    // Create channel with fee hook
+    uint256 channelId = channelManager.createChannel{
+      value: CHANNEL_CREATION_FEE
+    }(
+      "Fee Channel",
+      "Pay 0.001 ETH to comment",
+      new Metadata.MetadataEntry[](0),
+      address(feeHook)
+    );
+
+    string memory content = "Test comment";
+    string memory targetUri = "";
+    Metadata.MetadataEntry[] memory metadata = new Metadata.MetadataEntry[](0);
+
+    Comments.CreateComment memory createCommentData = Comments.CreateComment({
+      content: content,
+      metadata: metadata,
+      targetUri: targetUri,
+      commentType: 0, // COMMENT_TYPE_COMMENT
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      deadline: block.timestamp + 1 days,
+      parentId: bytes32(0)
+    });
+
+    // Create a corresponding comment data object for estimating the fee
+    Comments.Comment memory commentData = Comments.Comment({
+      content: content,
+      targetUri: targetUri,
+      commentType: 0,
+      author: user1,
+      app: user2,
+      channelId: channelId,
+      parentId: bytes32(0),
+      createdAt: uint88(block.timestamp),
+      updatedAt: uint88(block.timestamp),
+      authMethod: Comments.AuthorAuthMethod.DIRECT_TX
+    });
+
+    bytes memory appSignature = _signAppSignature(createCommentData);
+
+    uint256 hookBalanceBefore = address(feeHook).balance;
+    uint256 user1BalanceBefore = user1.balance;
+
+    FeeEstimatable.FeeEstimation memory feeEstimation = feeHook
+      .estimateAddCommentFee(commentData, metadata, user1);
+
+    assertEq(feeEstimation.asset, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+
+    IProtocolFees protocolFees = IProtocolFees(channelManager);
+
+    uint256 totalFeeIncludingProtocolFee = protocolFees
+      .getCommentCreationFee() +
+      (feeEstimation.amount / (10000 - protocolFees.getHookTransactionFee())) *
+      10000;
+
+    assertEq(totalFeeIncludingProtocolFee, TOTAL_FEE_WITH_PROTOCOL);
+
+    // Post comment as user1 with exact fee plus protocol fee
+    vm.prank(user1);
+    comments.postComment{ value: totalFeeIncludingProtocolFee }(
+      createCommentData,
+      appSignature
+    );
+
+    // Check that the hook received the hook fee (after protocol fee)
+    assertEq(address(feeHook).balance - hookBalanceBefore, HOOK_FEE);
+    // Check that user1 paid the total fee (including protocol fee)
+    assertEq(user1BalanceBefore - user1.balance, TOTAL_FEE_WITH_PROTOCOL);
+    // Check that the hook recorded the fee
+    assertEq(feeHook.totalFeesCollected(), HOOK_FEE);
+
+    emit log_named_uint("feeEstimation.amount", feeEstimation.amount);
+    emit log_named_uint(
+      "protocolFees.getCommentCreationFee()",
+      protocolFees.getCommentCreationFee()
+    );
+    emit log_named_uint(
+      "protocolFees.getHookTransactionFee()",
+      protocolFees.getHookTransactionFee()
+    );
+    emit log_named_uint(
+      "totalFeeIncludingProtocolFee",
+      totalFeeIncludingProtocolFee
+    );
   }
 
   function onERC721Received(
