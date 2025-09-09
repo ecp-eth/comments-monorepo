@@ -21,8 +21,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@ecp.eth/build-tools": "workspace:^",
     "@changesets/cli": "^2.27.12",
+    "@ecp.eth/build-tools": "workspace:^",
     "eslint": "^9.19.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
@@ -53,8 +53,8 @@
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
       "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
       "@wagmi/connectors": "patches/@wagmi__connectors.patch",
-      "ponder": "patches/ponder.patch",
-      "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch"
+      "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch",
+      "ponder": "patches/ponder.patch"
     }
   },
   "lint-staged": {
