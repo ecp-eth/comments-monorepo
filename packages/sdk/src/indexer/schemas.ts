@@ -253,7 +253,12 @@ export const IndexerAPICommentReferenceURLWebPageSchema = z.object({
     .object({
       title: z.string(),
       description: z.string().nullable(),
-      image: z.string().url(),
+      image: z.union([
+        z.string().url(),
+        z
+          .string()
+          .regex(/^\/[^/\s]+$/, "Must be a valid file path starting with /"),
+      ]),
       url: z.string().url(),
     })
     .nullable(),
