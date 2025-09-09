@@ -13,6 +13,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../ui/chart";
+import { useAnalyticsE2ELatencyQuery } from "@/queries/analytics";
+import { Skeleton } from "../ui/skeleton";
+import { ErrorScreen } from "../error-screen";
+import { Button } from "../ui/button";
+import { RotateCwIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function CustomTooltip({
   payload,
@@ -48,44 +54,48 @@ const chartConfig = {
   },
 };
 
-const data = [
-  {
-    time: new Date().toISOString(),
-    p50: 1100,
-    p90: 2700,
-    p95: 3500,
-    p99: 5000,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 1,
-    ).toISOString(),
-    p50: 1200,
-    p90: 2700,
-    p95: 3600,
-    p99: 5000,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 2,
-    ).toISOString(),
-    p50: 900,
-    p90: 2700,
-    p95: 3300,
-    p99: 5000,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 3,
-    ).toISOString(),
-    p50: 1600,
-    p90: 2700,
-    p95: 3500,
-    p99: 5000,
-  },
-];
-
 export function E2ELatencyChartCard() {
+  const analyticsE2ELatencyQuery = useAnalyticsE2ELatencyQuery();
+
+  if (analyticsE2ELatencyQuery.status === "pending") {
+    return <Skeleton className="w-full h-full rounded-xl" />;
+  }
+
+  if (analyticsE2ELatencyQuery.status === "error") {
+    console.error(analyticsE2ELatencyQuery.error);
+    return (
+      <Card className="flex">
+        <ErrorScreen
+          title="Error fetching end to end latency chart"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              onClick={() => analyticsE2ELatencyQuery.refetch()}
+              className="gap-2"
+              disabled={analyticsE2ELatencyQuery.isRefetching}
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsE2ELatencyQuery.isRefetching && "animate-spin",
+                )}
+              />
+              Retry
+            </Button>
+          }
+        />
+      </Card>
+    );
+  }
+
+  const data = analyticsE2ELatencyQuery.data.results.map((result) => ({
+    time: result.time,
+    p50: result.latencies.p50,
+    p90: result.latencies.p90,
+    p95: result.latencies.p95,
+    p99: result.latencies.p99,
+  }));
+
   return (
     <Card>
       <CardHeader>

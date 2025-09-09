@@ -124,3 +124,7 @@ export function createAnalyticsTerminalQueryKey() {
 export function createAnalyticsSuccessRatesQueryKey() {
   return ["analytics-success-rates"] as const;
 }
+
+export function createAnalyticsE2ELatencyQueryKey() {
+  return ["analytics-e2e-latency"] as const;
+}

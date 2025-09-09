@@ -112,3 +112,26 @@ export const AnalyticsSuccessRatesResponseSchema = z.object({
 export type AnalyticsSuccessRatesResponseSchemaType = z.infer<
   typeof AnalyticsSuccessRatesResponseSchema
 >;
+
+export const AnalyticsE2ELatencyResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      time: z.coerce.date(),
+      latencies: z.object({
+        p50: z.coerce.number(),
+        p90: z.coerce.number(),
+        p95: z.coerce.number(),
+        p99: z.coerce.number(),
+      }),
+    }),
+  ),
+  info: z.object({
+    bucket: z.enum(["hour", "day", "week", "month"]),
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
+});
+
+export type AnalyticsE2ELatencyResponseSchemaType = z.infer<
+  typeof AnalyticsE2ELatencyResponseSchema
+>;

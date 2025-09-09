@@ -6,7 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 
 const chartConfig = {
   "10s": {
@@ -100,6 +106,7 @@ export function SlaBandsChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <Line
               dataKey="percentiles.10s"
               name="10s"

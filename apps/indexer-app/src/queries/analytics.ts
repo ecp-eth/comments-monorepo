@@ -22,6 +22,8 @@ import {
   AnalyticsTerminalResponseSchema,
   type AnalyticsSuccessRatesResponseSchemaType,
   AnalyticsSuccessRatesResponseSchema,
+  type AnalyticsE2ELatencyResponseSchemaType,
+  AnalyticsE2ELatencyResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -33,6 +35,7 @@ import {
   createAnalyticsVolumeQueryKey,
   createAnalyticsTerminalQueryKey,
   createAnalyticsSuccessRatesQueryKey,
+  createAnalyticsE2ELatencyQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -409,6 +412,47 @@ export function useAnalyticsSuccessRatesQuery(
       }
 
       return AnalyticsSuccessRatesResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsE2ELatencyQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsE2ELatencyResponseSchemaType,
+    Error,
+    AnalyticsE2ELatencyResponseSchemaType,
+    ReturnType<typeof createAnalyticsE2ELatencyQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsE2ELatencyQuery(
+  options?: UseAnalyticsE2ELatencyQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsE2ELatencyQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/e2e-latency"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics e2e latency: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsE2ELatencyResponseSchema.parse(await response.json());
     },
     ...options,
   });

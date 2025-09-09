@@ -49,6 +49,7 @@ import { setupAnalyticsKpiDeliveredUnderMinuteGet } from "./analytics/kpi/delive
 import { setupAnalyticsVolumeGet } from "./analytics/volume/get";
 import { setupAnalyticsTerminalGet } from "./analytics/terminal/get";
 import { setupAnalyticsSuccessRatesGet } from "./analytics/success-rates/get";
+import { setupAnalyticsE2ELatencyGet } from "./analytics/e2e-latency/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -101,6 +102,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAnalyticsVolumeGet(app);
   setupAnalyticsTerminalGet(app);
   setupAnalyticsSuccessRatesGet(app);
+  setupAnalyticsE2ELatencyGet(app);
 
   return app;
 }
