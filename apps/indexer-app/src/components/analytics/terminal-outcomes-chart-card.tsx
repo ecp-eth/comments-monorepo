@@ -82,14 +82,12 @@ export function TerminalOutcomesChartCard() {
               dataKey="successes"
               fill="var(--chart-success)"
               fillOpacity={0.4}
-              stroke="var(--chart-success)"
               stackId="a"
             />
             <Bar
               dataKey="failures"
               fill="var(--chart-failure)"
               fillOpacity={0.4}
-              stroke="var(--chart-failure)"
               stackId="a"
             />
           </BarChart>

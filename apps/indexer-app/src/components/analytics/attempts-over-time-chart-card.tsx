@@ -11,11 +11,11 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../ui/chart";
 const chartConfig = {
   success: {
     label: "Successes",
-    color: "hsl(var(--chart-2))",
+    color: "var(--chart-success)",
   },
   failure: {
     label: "Failures",
-    color: "hsl(var(--chart-3))",
+    color: "var(--chart-failure)",
   },
 };
 
@@ -78,20 +78,46 @@ export function AttemptsOverTimeChartCard() {
               cursor={false}
               content={<ChartTooltipContent indicator="dot" hideLabel />}
             />
+            <defs>
+              <linearGradient id="fillSuccesses" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-success)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-success)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="fillFailures" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-failure)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-failure)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
             <Area
               dataKey="successes"
               type="natural"
-              fill="var(--chart-success)"
+              fill="url(#fillSuccesses)"
               fillOpacity={0.4}
-              stroke="var(--chart-success)"
+              stroke="var(--color-success)"
               stackId="a"
             />
             <Area
               dataKey="failures"
               type="natural"
-              fill="var(--chart-failure)"
+              fill="url(#fillFailures)"
               fillOpacity={0.4}
-              stroke="var(--chart-failure)"
+              stroke="var(--color-failure)"
               stackId="a"
             />
           </AreaChart>

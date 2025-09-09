@@ -98,28 +98,24 @@ export function ErrorBreakdownChartCard() {
               dataKey="http4xx"
               fill="var(--color-http4xx)"
               fillOpacity={0.4}
-              stroke="var(--color-http4xx)"
               stackId="a"
             />
             <Bar
               dataKey="http5xx"
               fill="var(--color-http5xx)"
               fillOpacity={0.4}
-              stroke="var(--color-http5xx)"
               stackId="a"
             />
             <Bar
               dataKey="timeout"
               fill="var(--color-timeout)"
               fillOpacity={0.4}
-              stroke="var(--color-timeout)"
               stackId="a"
             />
             <Bar
               dataKey="other"
               fill="var(--color-other)"
               fillOpacity={0.4}
-              stroke="var(--color-other)"
               stackId="a"
             />
           </BarChart>
