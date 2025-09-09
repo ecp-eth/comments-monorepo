@@ -1,5 +1,13 @@
 # @ecp.eth/shared
 
+## 0.0.13
+
+### Patch Changes
+
+- 67d6da1: feat(shared): add efp utils
+- Updated dependencies [c747e78]
+  - @ecp.eth/sdk@0.0.28
+
 ## 0.0.12
 
 ### Patch Changes
