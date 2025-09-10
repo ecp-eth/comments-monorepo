@@ -3,6 +3,8 @@
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
 import { useEffect } from "react";
+import { ErrorScreen } from "@/components/error-screen";
+import { Button } from "@/components/ui/button";
 
 export default function Error({
   error,
@@ -24,9 +26,10 @@ export default function Error({
   }, [error, auth]);
 
   return (
-    <div>
-      <h2>Something went wrong!</h2>
-      <button onClick={() => reset()}>Try again</button>
-    </div>
+    <ErrorScreen
+      title="Something went wrong!"
+      description="Please try again later. If the problem persists, please contact support."
+      actions={<Button onClick={() => reset()}>Try again</Button>}
+    />
   );
 }
