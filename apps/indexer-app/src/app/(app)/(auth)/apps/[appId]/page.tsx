@@ -181,7 +181,12 @@ function WebhooksList({ appId }: { appId: string }) {
     pageIndex: 0,
     pageSize: 10,
   });
-  const webhooksQuery = useWebhooksQuery({ appId, refetchOnMount: true });
+  const webhooksQuery = useWebhooksQuery({
+    appId,
+    refetchOnMount: true,
+    page: paginationState.pageIndex + 1,
+    limit: paginationState.pageSize,
+  });
   const columns = useMemo(
     () => createWebhooksDataTableColumns({ appId }),
     [appId],
