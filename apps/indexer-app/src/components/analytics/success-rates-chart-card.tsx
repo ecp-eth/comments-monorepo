@@ -114,14 +114,14 @@ export function SuccessRatesChartCard() {
             <ChartLegend content={<ChartLegendContent />} />
             <Line
               dataKey="firstSuccessRate"
-              type="natural"
+              type="monotone"
               fill="var(--color-firstSuccessRate)"
               fillOpacity={0.4}
               stroke="var(--color-firstSuccessRate)"
             />
             <Line
               dataKey="eventualSuccessRate"
-              type="natural"
+              type="monotone"
               fill="var(--color-eventualSuccessRate)"
               fillOpacity={0.4}
               stroke="var(--color-eventualSuccessRate)"

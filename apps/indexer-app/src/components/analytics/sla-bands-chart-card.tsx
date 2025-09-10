@@ -124,7 +124,7 @@ export function SlaBandsChartCard() {
             <Line
               dataKey="10s"
               name="10s"
-              type="natural"
+              type="monotone"
               fill="var(--color-10s)"
               fillOpacity={0.4}
               stroke="var(--color-10s)"
@@ -132,7 +132,7 @@ export function SlaBandsChartCard() {
             <Line
               dataKey="30s"
               name="30s"
-              type="natural"
+              type="monotone"
               fill="var(--color-30s)"
               fillOpacity={0.4}
               stroke="var(--color-30s)"
@@ -140,7 +140,7 @@ export function SlaBandsChartCard() {
             <Line
               dataKey="60s"
               name="60s"
-              type="natural"
+              type="monotone"
               fill="var(--color-60s)"
               fillOpacity={0.4}
               stroke="var(--color-60s)"
@@ -148,7 +148,7 @@ export function SlaBandsChartCard() {
             <Line
               dataKey="300s"
               name="300s"
-              type="natural"
+              type="monotone"
               fill="var(--color-300s)"
               fillOpacity={0.4}
               stroke="var(--color-300s)"
