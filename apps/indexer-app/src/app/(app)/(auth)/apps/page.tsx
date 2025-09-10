@@ -33,8 +33,6 @@ export default function AppsPage() {
     limit: paginationState.pageSize,
   });
 
-  console.log(paginationState);
-
   useProtectRoute(meQuery);
   useProtectRoute(appsQuery);
 
