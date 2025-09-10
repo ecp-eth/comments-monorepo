@@ -113,7 +113,7 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
           )
 
           SELECT
-            EXTRACT(EPOCH FROM PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY fa.attempted_at - sa.attempted_at)) * 1000 AS "p95"
+            EXTRACT(EPOCH FROM PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY fa.attempted_at - e.created_at)) * 1000 AS "p95"
           FROM ${schema.appWebhookDelivery} d
           JOIN ${schema.eventOutbox} e ON e.id = d.event_id
           JOIN first_attempts fa ON fa.app_webhook_delivery_id = d.id

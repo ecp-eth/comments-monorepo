@@ -53,15 +53,37 @@ export function EndToEndLatencyKpiCard() {
     );
   }
 
+  let value = "0 ms";
+
+  if ("DurationFormat" in Intl) {
+    const valueMs = analyticsKpiE2ELatencyQuery.data.p95;
+    const hours = Math.floor(valueMs / 3_600_000);
+    const minutes = Math.floor((valueMs % 3_600_000) / 60_000);
+    const seconds = Math.floor((valueMs % 60_000) / 1000);
+    const milliseconds = Math.round(valueMs % 1000);
+
+    // @ts-expect-error - DurationFormat is not supported in all browsers
+    value = new Intl.DurationFormat(undefined, {
+      style: "short",
+    }).format({
+      hours,
+      minutes,
+      seconds,
+      milliseconds,
+    });
+  } else {
+    value = new Intl.NumberFormat(undefined, {
+      unit: "millisecond",
+      style: "unit",
+    }).format(analyticsKpiE2ELatencyQuery.data.p95);
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardDescription>End to end latency (p95)</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums flex items-center gap-2">
-          {new Intl.NumberFormat(undefined, {
-            unit: "millisecond",
-            style: "unit",
-          }).format(analyticsKpiE2ELatencyQuery.data.p95)}
+          {value}
         </CardTitle>
       </CardHeader>
       <CardFooter className="text-sm">
