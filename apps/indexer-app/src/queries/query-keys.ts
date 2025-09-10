@@ -168,26 +168,104 @@ export function createAnalyticsKpiDeliveredUnderMinuteQueryKey(
   ] as const;
 }
 
-export function createAnalyticsVolumeQueryKey() {
-  return ["analytics-volume"] as const;
+type AnalyticsVolumeQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsVolumeQueryKey(
+  params?: AnalyticsVolumeQueryParams,
+) {
+  return [
+    "analytics-volume",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsTerminalQueryKey() {
-  return ["analytics-terminal"] as const;
+type AnalyticsTerminalQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsTerminalQueryKey(
+  params?: AnalyticsTerminalQueryParams,
+) {
+  return [
+    "analytics-terminal",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsSuccessRatesQueryKey() {
-  return ["analytics-success-rates"] as const;
+type AnalyticsSuccessRatesQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsSuccessRatesQueryKey(
+  params?: AnalyticsSuccessRatesQueryParams,
+) {
+  return [
+    "analytics-success-rates",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsE2ELatencyQueryKey() {
-  return ["analytics-e2e-latency"] as const;
+type AnalyticsE2ELatencyQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsE2ELatencyQueryKey(
+  params?: AnalyticsE2ELatencyQueryParams,
+) {
+  return [
+    "analytics-e2e-latency",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsSlaBandsQueryKey() {
-  return ["analytics-sla-bands"] as const;
+type AnalyticsSlaBandsQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsSlaBandsQueryKey(
+  params?: AnalyticsSlaBandsQueryParams,
+) {
+  return [
+    "analytics-sla-bands",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsErrorsQueryKey() {
-  return ["analytics-errors"] as const;
+type AnalyticsErrorsQueryParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+export function createAnalyticsErrorsQueryKey(
+  params?: AnalyticsErrorsQueryParams,
+) {
+  return [
+    "analytics-errors",
+    params?.bucket,
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }

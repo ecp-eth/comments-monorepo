@@ -42,7 +42,13 @@ const chartConfig = {
 
 export function ErrorBreakdownChartCard() {
   const { params } = useAnalyticsContext();
-  const analyticsErrorsQuery = useAnalyticsErrorsQuery();
+  const analyticsErrorsQuery = useAnalyticsErrorsQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+      bucket: params.bucket,
+    },
+  });
 
   if (analyticsErrorsQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;

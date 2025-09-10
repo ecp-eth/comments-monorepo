@@ -34,7 +34,13 @@ const chartConfig = {
 
 export function TerminalOutcomesChartCard() {
   const { params } = useAnalyticsContext();
-  const analyticsTerminalQuery = useAnalyticsTerminalQuery();
+  const analyticsTerminalQuery = useAnalyticsTerminalQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+      bucket: params.bucket,
+    },
+  });
 
   if (analyticsTerminalQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;

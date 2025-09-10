@@ -352,18 +352,23 @@ type UseAnalyticsVolumeQueryOptions = Omit<
     ReturnType<typeof createAnalyticsVolumeQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsVolumeQuery(
-  options?: UseAnalyticsVolumeQueryOptions,
-) {
+export function useAnalyticsVolumeQuery({
+  params,
+  ...options
+}: UseAnalyticsVolumeQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsVolumeQueryKey(),
+    queryKey: createAnalyticsVolumeQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/volume"), {
+        const url = createFetchUrl("/api/analytics/volume");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -393,18 +398,23 @@ type UseAnalyticsTerminalQueryOptions = Omit<
     ReturnType<typeof createAnalyticsTerminalQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsTerminalQuery(
-  options?: UseAnalyticsTerminalQueryOptions,
-) {
+export function useAnalyticsTerminalQuery({
+  params,
+  ...options
+}: UseAnalyticsTerminalQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsTerminalQueryKey(),
+    queryKey: createAnalyticsTerminalQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/terminal"), {
+        const url = createFetchUrl("/api/analytics/terminal");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -434,18 +444,23 @@ type UseAnalyticsSuccessRatesQueryOptions = Omit<
     ReturnType<typeof createAnalyticsSuccessRatesQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsSuccessRatesQuery(
-  options?: UseAnalyticsSuccessRatesQueryOptions,
-) {
+export function useAnalyticsSuccessRatesQuery({
+  params,
+  ...options
+}: UseAnalyticsSuccessRatesQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsSuccessRatesQueryKey(),
+    queryKey: createAnalyticsSuccessRatesQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/success-rates"), {
+        const url = createFetchUrl("/api/analytics/success-rates");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -475,18 +490,23 @@ type UseAnalyticsE2ELatencyQueryOptions = Omit<
     ReturnType<typeof createAnalyticsE2ELatencyQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsE2ELatencyQuery(
-  options?: UseAnalyticsE2ELatencyQueryOptions,
-) {
+export function useAnalyticsE2ELatencyQuery({
+  params,
+  ...options
+}: UseAnalyticsE2ELatencyQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsE2ELatencyQueryKey(),
+    queryKey: createAnalyticsE2ELatencyQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/e2e-latency"), {
+        const url = createFetchUrl("/api/analytics/e2e-latency");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -516,18 +536,23 @@ type UseAnalyticsSlaBandsQueryOptions = Omit<
     ReturnType<typeof createAnalyticsSlaBandsQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsSlaBandsQuery(
-  options?: UseAnalyticsSlaBandsQueryOptions,
-) {
+export function useAnalyticsSlaBandsQuery({
+  params,
+  ...options
+}: UseAnalyticsSlaBandsQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsSlaBandsQueryKey(),
+    queryKey: createAnalyticsSlaBandsQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/sla-bands"), {
+        const url = createFetchUrl("/api/analytics/sla-bands");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -557,18 +582,23 @@ type UseAnalyticsErrorsQueryOptions = Omit<
     ReturnType<typeof createAnalyticsErrorsQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: AnalyticsParams;
+};
 
-export function useAnalyticsErrorsQuery(
-  options?: UseAnalyticsErrorsQueryOptions,
-) {
+export function useAnalyticsErrorsQuery({
+  params,
+  ...options
+}: UseAnalyticsErrorsQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsErrorsQueryKey(),
+    queryKey: createAnalyticsErrorsQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/errors"), {
+        const url = createFetchUrl("/api/analytics/errors");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });

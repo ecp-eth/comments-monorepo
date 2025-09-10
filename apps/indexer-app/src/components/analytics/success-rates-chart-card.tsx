@@ -34,7 +34,13 @@ const chartConfig = {
 
 export function SuccessRatesChartCard() {
   const { params } = useAnalyticsContext();
-  const analyticsSuccessRatesQuery = useAnalyticsSuccessRatesQuery();
+  const analyticsSuccessRatesQuery = useAnalyticsSuccessRatesQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+      bucket: params.bucket,
+    },
+  });
 
   if (analyticsSuccessRatesQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;

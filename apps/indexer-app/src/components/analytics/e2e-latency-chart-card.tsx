@@ -57,7 +57,13 @@ const chartConfig = {
 
 export function E2ELatencyChartCard() {
   const { params } = useAnalyticsContext();
-  const analyticsE2ELatencyQuery = useAnalyticsE2ELatencyQuery();
+  const analyticsE2ELatencyQuery = useAnalyticsE2ELatencyQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+      bucket: params.bucket,
+    },
+  });
 
   if (analyticsE2ELatencyQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;

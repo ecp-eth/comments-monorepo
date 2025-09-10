@@ -34,7 +34,13 @@ const chartConfig = {
 
 export function AttemptsOverTimeChartCard() {
   const { params } = useAnalyticsContext();
-  const volumeQuery = useAnalyticsVolumeQuery();
+  const volumeQuery = useAnalyticsVolumeQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+      bucket: params.bucket,
+    },
+  });
 
   if (volumeQuery.status === "pending") {
     return <Skeleton className="h-full w-full rounded-xl" />;
