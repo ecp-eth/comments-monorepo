@@ -69,7 +69,7 @@ const ChainConfigs = z.record(
       },
     ),
     rpcUrl: z.string().url(),
-    startBlock: z.coerce.number().int().positive().optional(),
+    startBlock: z.coerce.number().int().min(0).optional(),
   }),
 );
 
@@ -120,7 +120,7 @@ const EnvSchema = z
     MODERATION_TELEGRAM_WEBHOOK_URL: z.string().url().optional(),
     MODERATION_TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     PONDER_RPC_URL_8453: z.string().url().optional(),
-    PONDER_START_BLOCK_8453: z.coerce.number().optional(),
+    PONDER_START_BLOCK_8453: z.coerce.number().int().min(0).optional(),
     ENS_RPC_URL: z.string().url(),
     ENSNODE_SUBGRAPH_URL: z.string().url().optional(),
     SIM_API_KEY: z.string().nonempty(),
@@ -167,7 +167,7 @@ const EnvSchema = z
     ADMIN_TELEGRAM_BOT_API_ROOT_URL: z.string().url().optional(),
 
     CHAIN_CONFIGS: ChainConfigs,
-    CHAIN_ANVIL_START_BLOCK: z.coerce.number().int().positive().optional(),
+    CHAIN_ANVIL_START_BLOCK: z.coerce.number().int().min(0).optional(),
     CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
     CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
   })
@@ -233,7 +233,7 @@ const _env = EnvSchema.safeParse({
       const startBlock = z.coerce
         .number()
         .int()
-        .positive()
+        .min(0)
         .optional()
         .parse(process.env[`PONDER_START_BLOCK_${chainId}`], {
           path: [`PONDER_START_BLOCK_${chainId}`],
