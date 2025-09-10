@@ -28,7 +28,7 @@ patchedDependencies:
     hash: fa635ef184b19333685f9558a75691cbb42ca6d8a1cac03c5315f3afc2074483
     path: patches/@walletconnect__keyvaluestorage.patch
   ponder:
-    hash: dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac
+    hash: 01c192aa66b97719b56a0aad1ebb7a69911cc744670918eadbb52d26709c42d9
     path: patches/ponder.patch
 
 importers:
@@ -220,8 +220,8 @@ importers:
         specifier: ^2.44.0
         version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@ponder/client':
-        specifier: 0.11.32
-        version: 0.11.32(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)
+        specifier: 0.12.21
+        version: 0.12.21(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)
       '@sentry/node':
         specifier: ^9.3.0
         version: 9.25.1
@@ -253,8 +253,8 @@ importers:
         specifier: ^8.11.3
         version: 8.16.0
       ponder:
-        specifier: 0.11.26
-        version: 0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+        specifier: 0.12.21
+        version: 0.12.21(patch_hash=01c192aa66b97719b56a0aad1ebb7a69911cc744670918eadbb52d26709c42d9)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(bufferutil@4.0.9)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
       viem:
         specifier: ~2.29.2
         version: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
@@ -665,8 +665,8 @@ importers:
         specifier: ^2.2.3
         version: 2.2.3
       '@ponder/client':
-        specifier: 0.11.32
-        version: 0.11.32(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)
+        specifier: 0.12.21
+        version: 0.12.21(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)
       '@sentry/node':
         specifier: ^9.3.0
         version: 9.25.1
@@ -716,8 +716,8 @@ importers:
         specifier: ^8.11.3
         version: 8.16.0
       ponder:
-        specifier: 0.11.26
-        version: 0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
+        specifier: 0.12.21
+        version: 0.12.21(patch_hash=01c192aa66b97719b56a0aad1ebb7a69911cc744670918eadbb52d26709c42d9)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(bufferutil@4.0.9)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
       promise-deferred:
         specifier: ^2.0.4
         version: 2.0.4
@@ -3245,16 +3245,16 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@ponder/client@0.11.32':
-    resolution: {integrity: sha512-nYpVxs4MdcSfOjjsO2+lcq+ow3kqImHGzNlZUBGwd3KgehVmxEZERXg9XD8TsJMbLm9KzlJVsAoB6mX6OiCEtA==}
+  '@ponder/client@0.12.21':
+    resolution: {integrity: sha512-+KKhpz8LbVBiWcIlt1wDg6I6bw28k3XHrqkAXgvgDeE2C4R7VMBest9LFxQsXc0z/2U/gLIBCireSns9/psndg==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:
       typescript:
         optional: true
 
-  '@ponder/utils@0.2.8':
-    resolution: {integrity: sha512-eI3ijbE/eLeA4tEYA7QoIDPRsf+qhTKs1oTW33Ik4CaJPmTAxsYN5KZYxQwNqGwOPFHQn60QvAQ7+Ti2n9ql6Q==}
+  '@ponder/utils@0.2.12':
+    resolution: {integrity: sha512-pIlunpEoXXJlqSucidJl4r4s66DOnPRbqPY3lZ02uhBr6e2GYK7iNRg4IW7v4WnIhVoSugnWIRiEQYWA0yNLiw==}
     peerDependencies:
       typescript: '>=5.0.4'
       viem: ~2.29.2
@@ -10016,8 +10016,8 @@ packages:
   points-on-path@0.2.1:
     resolution: {integrity: sha512-25ClnWWuw7JbWZcgqY/gJ4FQWadKxGWk+3kR/7kD0tCaDtPPMj7oHu2ToLaVhfpnHrZzYby2w6tUA0eOIuUg8g==}
 
-  ponder@0.11.26:
-    resolution: {integrity: sha512-BZVzfvt3MvRKoTbaNxvMj4XDLsEGzNXGnRdJ7Wamc+O+oY7ixaBfhQmHARU1p7zzFZjdIVpHQZQjMCSSKJ1isg==}
+  ponder@0.12.21:
+    resolution: {integrity: sha512-PlaoG0AIP3T6ucjIVTBIBb5BpA7ut65u+MpMQHfoy4CyTNf0FsxbEidRCJZSieW5XWZ5ULIqWI5DUCYiJH5GFQ==}
     engines: {node: '>=18.14'}
     hasBin: true
     peerDependencies:
@@ -12325,6 +12325,18 @@ packages:
       utf-8-validate:
         optional: true
 
+  ws@8.18.3:
+    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   xml-but-prettier@1.0.1:
     resolution: {integrity: sha512-C2CJaadHrZTqESlH03WOyw0oZTtoy2uEg6dSDF6YRg+9GnYNub53RRemLpnvtbHDFelxMx4LajiFsYeR6XJHgQ==}
 
@@ -14595,7 +14607,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@ponder/client@0.11.32(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)':
+  '@ponder/client@0.12.21(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)':
     dependencies:
       drizzle-orm: 0.41.0(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)
       eventsource: 3.0.7
@@ -14632,7 +14644,7 @@ snapshots:
       - sql.js
       - sqlite3
 
-  '@ponder/utils@0.2.8(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@ponder/utils@0.2.12(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
       viem: 2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
     optionalDependencies:
@@ -23732,7 +23744,7 @@ snapshots:
       path-data-parser: 0.1.0
       points-on-curve: 0.2.0
 
-  ponder@0.11.26(patch_hash=dec41e464b638daab797e119752ab3b340f220a75f67b10de3f251728da5efac)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76):
+  ponder@0.12.21(patch_hash=01c192aa66b97719b56a0aad1ebb7a69911cc744670918eadbb52d26709c42d9)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(bufferutil@4.0.9)(hono@4.9.1)(lightningcss@1.30.1)(terser@5.40.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76):
     dependencies:
       '@babel/code-frame': 7.27.1
       '@commander-js/extra-typings': 12.1.0(commander@12.1.0)
@@ -23741,7 +23753,7 @@ snapshots:
       '@escape.tech/graphql-armor-max-depth': 2.4.0
       '@escape.tech/graphql-armor-max-tokens': 2.5.0
       '@hono/node-server': 1.13.3(hono@4.9.1)
-      '@ponder/utils': 0.2.8(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+      '@ponder/utils': 0.2.12(typescript@5.8.3)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       abitype: 0.10.3(typescript@5.8.3)(zod@3.25.76)
       ansi-escapes: 7.0.0
       commander: 12.1.0
@@ -23771,6 +23783,7 @@ snapshots:
       vite: 5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0)
       vite-node: 1.0.2(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0)
       vite-tsconfig-paths: 4.3.1(typescript@5.8.3)(vite@5.0.7(@types/node@22.15.29)(lightningcss@1.30.1)(terser@5.40.0))
+      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
       typescript: 5.8.3
     transitivePeerDependencies:
@@ -23791,6 +23804,7 @@ snapshots:
       - '@vercel/postgres'
       - '@xata.io/client'
       - better-sqlite3
+      - bufferutil
       - bun-types
       - expo-sqlite
       - gel
@@ -23808,6 +23822,7 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+      - utf-8-validate
       - zod
 
   pony-cause@2.1.11: {}
@@ -26779,6 +26794,11 @@ snapshots:
       utf-8-validate: 5.0.10
 
   ws@8.18.2(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+    optionalDependencies:
+      bufferutil: 4.0.9
+      utf-8-validate: 5.0.10
+
+  ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     optionalDependencies:
       bufferutil: 4.0.9
       utf-8-validate: 5.0.10
