@@ -11,7 +11,6 @@ import {
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
 } from "../ui/chart";
 import { useAnalyticsSuccessRatesQuery } from "@/queries/analytics";
 import { Skeleton } from "../ui/skeleton";
@@ -20,6 +19,7 @@ import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
+import { CustomChartTooltipContent } from "../ui/chart-custom";
 
 const chartConfig = {
   firstSuccessRate: {
@@ -109,11 +109,22 @@ export function SuccessRatesChartCard() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" hideLabel />}
+              content={
+                <CustomChartTooltipContent
+                  indicator="line"
+                  hideLabel
+                  formatValue={(item) =>
+                    item.value!.toLocaleString(undefined, {
+                      style: "percent",
+                    })
+                  }
+                />
+              }
             />
             <ChartLegend content={<ChartLegendContent />} />
             <Line
               dataKey="firstSuccessRate"
+              name="firstSuccessRate"
               type="monotone"
               fill="var(--color-firstSuccessRate)"
               fillOpacity={0.4}

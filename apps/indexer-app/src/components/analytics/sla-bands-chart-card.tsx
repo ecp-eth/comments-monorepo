@@ -11,7 +11,6 @@ import {
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
 } from "../ui/chart";
 import { useAnalyticsSlaBandsQuery } from "@/queries/analytics";
 import { ErrorScreen } from "../error-screen";
@@ -20,6 +19,7 @@ import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
+import { CustomChartTooltipContent } from "../ui/chart-custom";
 
 const chartConfig = {
   "10s": {
@@ -118,7 +118,17 @@ export function SlaBandsChartCard() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" hideLabel />}
+              content={
+                <CustomChartTooltipContent
+                  indicator="line"
+                  hideLabel
+                  formatValue={(item) =>
+                    item.value!.toLocaleString(undefined, {
+                      style: "percent",
+                    })
+                  }
+                />
+              }
             />
             <ChartLegend content={<ChartLegendContent />} />
             <Line

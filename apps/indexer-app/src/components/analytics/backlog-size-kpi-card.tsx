@@ -63,27 +63,38 @@ export function BacklogSizeKpiCard() {
             analyticsKpiBacklogQuery.data.oldestAgeSec != null && (
               <Fragment key="oldest-age">
                 Oldest:{" "}
-                {new Intl.NumberFormat(undefined, {
-                  unit: "second",
-                  style: "unit",
-                }).format(analyticsKpiBacklogQuery.data.oldestAgeSec)}{" "}
-                minutes,{" "}
+                {analyticsKpiBacklogQuery.data.oldestAgeSec.toLocaleString(
+                  undefined,
+                  {
+                    unit: "second",
+                    style: "unit",
+                  },
+                )}{" "}
               </Fragment>
             ),
             analyticsKpiBacklogQuery.data.nextDueAt != null && (
               <Fragment key="next-due-at">
                 Next due at:{" "}
                 {analyticsKpiBacklogQuery.data.nextDueAt
-                  ? new Intl.DateTimeFormat(undefined, {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(analyticsKpiBacklogQuery.data.nextDueAt)
+                  ? analyticsKpiBacklogQuery.data.nextDueAt.toLocaleString(
+                      undefined,
+                      {
+                        timeStyle: "short",
+                        dateStyle: "short",
+                      },
+                    )
                   : "N/A"}
               </Fragment>
             ),
           ]
             .filter(Boolean)
-            .join(", ")}
+            .flatMap((item, index, items) => {
+              if (index < items.length - 1) {
+                return [item, ", "];
+              }
+
+              return item;
+            })}
         </div>
       </CardFooter>
     </Card>
