@@ -1,9 +1,6 @@
 // !!! DO NOT MODIFY !!!
 // THIS FILE IS COPIED DIRECTLY FROM DEMO APP
 // Run script instead: `pnpm run api:schema:sync`
-// !!! DO NOT MODIFY !!!
-// THIS FILE IS COPIED DIRECTLY FROM DEMO APP
-// Run script instead: `pnpm run api:schema:sync`
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   AddApprovalTypedDataSchema,

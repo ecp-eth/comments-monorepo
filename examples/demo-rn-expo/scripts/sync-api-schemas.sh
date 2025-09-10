@@ -14,7 +14,9 @@ echo "Syncing API schemas..."
 
 echo "PWD: $(pwd)"
 
-cp "../demo/src/lib/schemas.ts" ${TARGET_PATHNAME}
+rm ${TARGET_PATHNAME}
+
+cp "../../apps/demo/src/lib/schemas.ts" ${TARGET_PATHNAME}
 
 { echo -e "${WARNING_MESSAGE}"; cat $TARGET_PATHNAME; } > temp 
 
