@@ -91,7 +91,7 @@ export function ErrorBreakdownChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart data={analyticsErrorsQuery.data.results}>
+          <BarChart data={analyticsErrorsQuery.data.results} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -100,16 +100,16 @@ export function ErrorBreakdownChartCard() {
               tickMargin={8}
               tickFormatter={(value) => {
                 if (analyticsErrorsQuery.data.info.bucket === "hour") {
-                  return new Intl.DateTimeFormat(undefined, {
+                  return value.toLocaleTimeString(undefined, {
                     hour: "numeric",
                     minute: "numeric",
-                  }).format(value);
+                  });
                 }
 
-                return new Intl.DateTimeFormat(undefined, {
+                return value.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(value);
+                });
               }}
             />
             <ChartTooltip

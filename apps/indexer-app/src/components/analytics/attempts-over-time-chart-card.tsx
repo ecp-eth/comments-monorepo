@@ -83,7 +83,7 @@ export function AttemptsOverTimeChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <AreaChart data={volumeQuery.data.results}>
+          <AreaChart data={volumeQuery.data.results} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -92,21 +92,21 @@ export function AttemptsOverTimeChartCard() {
               tickMargin={8}
               tickFormatter={(value: Date) => {
                 if (volumeQuery.data.info.bucket === "hour") {
-                  return new Intl.DateTimeFormat(undefined, {
+                  return value.toLocaleTimeString(undefined, {
                     hour: "numeric",
                     minute: "numeric",
-                  }).format(value);
+                  });
                 }
 
-                return new Intl.DateTimeFormat(undefined, {
+                return value.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(value);
+                });
               }}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent indicator="dot" hideLabel />}
+              content={<ChartTooltipContent indicator="line" hideLabel />}
             />
             <ChartLegend content={<ChartLegendContent />} />
             <defs>

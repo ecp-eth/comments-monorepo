@@ -83,7 +83,10 @@ export function TerminalOutcomesChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart data={analyticsTerminalQuery.data.results}>
+          <BarChart
+            data={analyticsTerminalQuery.data.results}
+            accessibilityLayer
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -92,16 +95,16 @@ export function TerminalOutcomesChartCard() {
               tickMargin={8}
               tickFormatter={(value: Date) => {
                 if (analyticsTerminalQuery.data.info.bucket === "hour") {
-                  return new Intl.DateTimeFormat(undefined, {
+                  return value.toLocaleTimeString(undefined, {
                     hour: "numeric",
                     minute: "numeric",
-                  }).format(value);
+                  });
                 }
 
-                return new Intl.DateTimeFormat(undefined, {
+                return value.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(value);
+                });
               }}
             />
             <ChartTooltip

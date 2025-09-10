@@ -95,7 +95,7 @@ export function SlaBandsChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <LineChart data={data}>
+          <LineChart data={data} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -104,16 +104,16 @@ export function SlaBandsChartCard() {
               tickMargin={8}
               tickFormatter={(value) => {
                 if (analyticsSlaBandsQuery.data.info.bucket === "hour") {
-                  return new Intl.DateTimeFormat(undefined, {
+                  return value.toLocaleTimeString(undefined, {
                     hour: "numeric",
                     minute: "numeric",
-                  }).format(value);
+                  });
                 }
 
-                return new Intl.DateTimeFormat(undefined, {
+                return value.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(value);
+                });
               }}
             />
             <ChartTooltip

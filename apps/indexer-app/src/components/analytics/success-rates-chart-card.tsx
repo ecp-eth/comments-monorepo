@@ -83,7 +83,10 @@ export function SuccessRatesChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <LineChart data={analyticsSuccessRatesQuery.data.results}>
+          <LineChart
+            data={analyticsSuccessRatesQuery.data.results}
+            accessibilityLayer
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -92,16 +95,16 @@ export function SuccessRatesChartCard() {
               tickMargin={8}
               tickFormatter={(value) => {
                 if (analyticsSuccessRatesQuery.data.info.bucket === "hour") {
-                  return new Intl.DateTimeFormat(undefined, {
+                  return value.toLocaleTimeString(undefined, {
                     hour: "numeric",
                     minute: "numeric",
-                  }).format(value);
+                  });
                 }
 
-                return new Intl.DateTimeFormat(undefined, {
+                return value.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(value);
+                });
               }}
             />
             <ChartTooltip
