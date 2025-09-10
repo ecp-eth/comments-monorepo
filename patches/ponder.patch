@@ -1,23 +1,17 @@
 diff --git a/dist/esm/graphql/middleware.js b/dist/esm/graphql/middleware.js
-index db3820a08f9d305d7cc97cbd01d7402b89fbb454..d42fcef854acffced2c802e122ff56d7a75d0d1f 100644
+index 605ee4f3fb2a64dc823191c3b13dfbe9a2fbf01c..e81c2dafbca9f210bcc58ce956c9f3ea5019f32f 100644
 --- a/dist/esm/graphql/middleware.js
 +++ b/dist/esm/graphql/middleware.js
-@@ -24,12 +24,13 @@ import { buildDataLoaderCache, buildGraphQLSchema } from "./index.js";
+@@ -24,7 +24,7 @@ import { buildDataLoaderCache, buildGraphQLSchema } from "./index.js";
   * export default app;
   *
   */
--export const graphql = ({ db, schema }, { maxOperationTokens = 1000, maxOperationDepth = 100, maxOperationAliases = 30, } = {
-+export const graphql = ({ db, schema }, { maxOperationTokens = 1000, maxOperationDepth = 100, maxOperationAliases = 30, plugins = [] } = {
+-export const graphql = ({ schema }, { maxOperationTokens = 1000, maxOperationDepth = 100, maxOperationAliases = 30, } = {
++export const graphql = ({ schema }, { maxOperationTokens = 1000, maxOperationDepth = 100, maxOperationAliases = 30, plugins = [] } = {
      // Default limits are from Apollo:
      // https://www.apollographql.com/blog/prevent-graph-misuse-with-operation-size-and-complexity-limit
      maxOperationTokens: 1000,
-     maxOperationDepth: 100,
-     maxOperationAliases: 30,
-+    plugins: [],
- }) => {
-     const graphqlSchema = buildGraphQLSchema({ schema });
-     generateSchema({ graphqlSchema }).catch(() => { });
-@@ -52,6 +53,7 @@ export const graphql = ({ db, schema }, { maxOperationTokens = 1000, maxOperatio
+@@ -48,6 +48,7 @@ export const graphql = ({ schema }, { maxOperationTokens = 1000, maxOperationDep
              maxTokensPlugin({ n: maxOperationTokens }),
              maxDepthPlugin({ n: maxOperationDepth, ignoreIntrospection: false }),
              maxAliasesPlugin({ n: maxOperationAliases, allowList: [] }),
@@ -25,124 +19,27 @@ index db3820a08f9d305d7cc97cbd01d7402b89fbb454..d42fcef854acffced2c802e122ff56d7
          ],
      });
      return createMiddleware(async (c) => {
-diff --git a/dist/esm/utils/serialize.js b/dist/esm/utils/serialize.js
-index e16f723b658efbd16b78fe330b07f7b9fc88ad63..100cf0d604ad575d7dd06e0b3b49875997965280 100644
---- a/dist/esm/utils/serialize.js
-+++ b/dist/esm/utils/serialize.js
-@@ -7,8 +7,29 @@
-  * @returns the stringified output
-  */
- export function serialize(value) {
--    return JSON.stringify(value, (_, v) => typeof v === "bigint" ? { __type: "bigint", value: v.toString() } : v);
-+  return JSON.stringify(value, (_, v) => {
-+    if (typeof v === "bigint") {
-+      return { __type: "bigint", value: v.toString() };
-+    }
-+    
-+    // JSON.stringify always attempt to call value.toJSON on the value and then passing the result to the replacer function
-+    // so in order to catch Date object in raw form, we need to handle it on its parent level.
-+    // that means calling serialize(new Date()) will not format the date accordingly but it is not a use case within the lib.
-+    if (v !== null && typeof v === "object") {
-+      return Object.fromEntries(
-+        Object.entries(v).map(([key, value]) => {
-+          if (value instanceof Date) {
-+            return [key, { __type: "date", value: value.getTime() }];
-+          }
-+          return [key, value];
-+        }),
-+      );
-+    }
-+
-+    return v;
-+  });
- }
-+
- /**
-  * Deserialize function that handles BigInt.
-  *
-@@ -18,6 +39,17 @@ export function serialize(value) {
-  * @returns the output object
-  */
- export function deserialize(value) {
--    return JSON.parse(value, (_, value_) => value_?.__type === "bigint" ? BigInt(value_.value) : value_);
-+  return JSON.parse(value, (_, value_) => {
-+    if (value_?.__type === "bigint") {
-+      return BigInt(value_.value);
-+    }
-+
-+    if (value_?.__type === "date") {
-+      return new Date(value_.value);
-+    }
-+
-+    return value_;
-+  });
- }
-+
- //# sourceMappingURL=serialize.js.map
-\ No newline at end of file
 diff --git a/dist/types/graphql/middleware.d.ts b/dist/types/graphql/middleware.d.ts
-index bdc5b0bb30e42ee15bd473a15718dce6ff99bf88..aa56a5e06182354fd1cb1a16c00299f9695232ff 100644
+index 6f8b37a2cd37b2ea62ade04f0b935af1efcf1f5a..b357347d68cd47a7775bef88ef22feb684187a90 100644
 --- a/dist/types/graphql/middleware.d.ts
 +++ b/dist/types/graphql/middleware.d.ts
 @@ -1,5 +1,7 @@
  import type { Schema } from '../internal/types.js';
  import type { ReadonlyDrizzle } from '../types/db.js';
-+import type { Plugin } from 'graphql-yoga';
++import { type Plugin, createYoga } from "graphql-yoga";
 +
  /**
   * Middleware for GraphQL with an interactive web view.
   *
 @@ -21,9 +23,10 @@ import type { ReadonlyDrizzle } from '../types/db.js';
- export declare const graphql: ({ db, schema }: {
+ export declare const graphql: ({ schema }: {
      db: ReadonlyDrizzle<Schema>;
      schema: Schema;
 -}, { maxOperationTokens, maxOperationDepth, maxOperationAliases, }?: {
-+}, { maxOperationTokens, maxOperationDepth, maxOperationAliases, plugins }?: {
++}, { maxOperationTokens, maxOperationDepth, maxOperationAliases }?: {
      maxOperationTokens?: number | undefined;
      maxOperationDepth?: number | undefined;
      maxOperationAliases?: number | undefined;
 +    plugins?: Plugin[] | undefined;
  }) => import("hono").MiddlewareHandler<any, string, {}>;
  //# sourceMappingURL=middleware.d.ts.map
-\ No newline at end of file
-diff --git a/src/graphql/middleware.ts b/src/graphql/middleware.ts
-index 14597aca6e4caa44979e0759a6076e5934fd3559..608649fde6bdb74d2aa8d5347fe6a51422229ef9 100644
---- a/src/graphql/middleware.ts
-+++ b/src/graphql/middleware.ts
-@@ -5,7 +5,7 @@ import { maxAliasesPlugin } from "@escape.tech/graphql-armor-max-aliases";
- import { maxDepthPlugin } from "@escape.tech/graphql-armor-max-depth";
- import { maxTokensPlugin } from "@escape.tech/graphql-armor-max-tokens";
- import { type GraphQLSchema, printSchema } from "graphql";
--import { createYoga } from "graphql-yoga";
-+import { createYoga, type Plugin } from "graphql-yoga";
- import { createMiddleware } from "hono/factory";
- import { buildDataLoaderCache, buildGraphQLSchema } from "./index.js";
- 
-@@ -33,16 +33,19 @@ export const graphql = (
-     maxOperationTokens = 1000,
-     maxOperationDepth = 100,
-     maxOperationAliases = 30,
-+    plugins = [],
-   }: {
-     maxOperationTokens?: number;
-     maxOperationDepth?: number;
-     maxOperationAliases?: number;
-+    plugins?: Plugin[];
-   } = {
-     // Default limits are from Apollo:
-     // https://www.apollographql.com/blog/prevent-graph-misuse-with-operation-size-and-complexity-limit
-     maxOperationTokens: 1000,
-     maxOperationDepth: 100,
-     maxOperationAliases: 30,
-+    plugins: [],
-   },
- ) => {
-   const graphqlSchema = buildGraphQLSchema({ schema });
-@@ -69,6 +72,7 @@ export const graphql = (
-       maxTokensPlugin({ n: maxOperationTokens }),
-       maxDepthPlugin({ n: maxOperationDepth, ignoreIntrospection: false }),
-       maxAliasesPlugin({ n: maxOperationAliases, allowList: [] }),
-+      ...plugins,
-     ],
-   });
- 
