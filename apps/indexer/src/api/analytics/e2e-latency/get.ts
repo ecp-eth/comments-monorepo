@@ -49,14 +49,14 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/analytics/e2e-latency",
       tags: ["analytics", "e2e-latency"],
-      description: "Get the analytics e2e latency",
+      description: "Get the analytics end to end latency in ms",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsE2ELatencyGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics e2e latency",
+          description: "The analytics end to end latency in ms",
           content: {
             "application/json": {
               schema: AnalyticsE2ELatencyGetResponseSchema,
@@ -98,7 +98,7 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
 
       const { rows } = await db.execute<{
         time: Date;
-        percentiles: string[] | null;
+        percentiles: string | null;
       }>(sql`
         WITH
           attempts AS (
@@ -135,7 +135,7 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
           latencies AS (
             SELECT
               date_bin(${bucketToUse}::interval, fa.first_attempt_at, '1970-01-01'::timestamptz) AS bucket,
-              (sa.success_at - e.created_at) AS latency
+              EXTRACT(EPOCH FROM (sa.success_at - e.created_at)) * 1000 AS latency
             FROM ${schema.appWebhookDelivery} d
             JOIN ${schema.eventOutbox} e ON e.id = d.event_id
             JOIN first_attempts fa ON fa.app_webhook_delivery_id = d.id
@@ -170,15 +170,17 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
 
       return c.json(
         formatResponseUsingZodSchema(AnalyticsE2ELatencyGetResponseSchema, {
-          results: rows.map((row) => ({
-            time: row.time,
-            latencies: {
-              p50: row.percentiles?.[0] ?? 0,
-              p90: row.percentiles?.[1] ?? 0,
-              p95: row.percentiles?.[2] ?? 0,
-              p99: row.percentiles?.[3] ?? 0,
-            },
-          })),
+          results: rows.map((row) => {
+            return {
+              time: row.time,
+              latencies: {
+                p50: row.percentiles?.[0] ?? 0,
+                p90: row.percentiles?.[1] ?? 0,
+                p95: row.percentiles?.[2] ?? 0,
+                p99: row.percentiles?.[3] ?? 0,
+              },
+            };
+          }),
           info: {
             bucket,
             from: fromToUse,
