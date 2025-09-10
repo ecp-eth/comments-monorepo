@@ -35,7 +35,7 @@ const chartConfig = {
     color: "hsl(var(--chart-4))",
   },
   "300s": {
-    label: "≤300s",
+    label: "≤5min",
     color: "hsl(var(--chart-5))",
   },
 };
