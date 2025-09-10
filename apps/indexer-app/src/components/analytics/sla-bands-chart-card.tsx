@@ -13,6 +13,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../ui/chart";
+import { useAnalyticsSlaBandsQuery } from "@/queries/analytics";
+import { ErrorScreen } from "../error-screen";
+import { Skeleton } from "../ui/skeleton";
+import { Button } from "../ui/button";
+import { RotateCwIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
   "10s": {
@@ -33,52 +39,44 @@ const chartConfig = {
   },
 };
 
-const data = [
-  {
-    time: new Date().toISOString(),
-    percentiles: {
-      "10s": 15,
-      "30s": 30,
-      "60s": 50,
-      "300s": 51,
-    },
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 1,
-    ).toISOString(),
-    percentiles: {
-      "10s": 30,
-      "30s": 30,
-      "60s": 50,
-      "300s": 50,
-    },
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 2,
-    ).toISOString(),
-    percentiles: {
-      "10s": 15,
-      "30s": 30,
-      "60s": 50,
-      "300s": 51,
-    },
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 3,
-    ).toISOString(),
-    percentiles: {
-      "10s": 5,
-      "30s": 51,
-      "60s": 51,
-      "300s": 51,
-    },
-  },
-];
-
 export function SlaBandsChartCard() {
+  const analyticsSlaBandsQuery = useAnalyticsSlaBandsQuery();
+
+  if (analyticsSlaBandsQuery.status === "pending") {
+    return <Skeleton className="w-full h-full rounded-xl" />;
+  }
+
+  if (analyticsSlaBandsQuery.status === "error") {
+    return (
+      <Card className="flex">
+        <ErrorScreen
+          title="Error fetching SLA bands"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              onClick={() => analyticsSlaBandsQuery.refetch()}
+              disabled={analyticsSlaBandsQuery.isRefetching}
+              className="gap-2"
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsSlaBandsQuery.isRefetching && "animate-spin",
+                )}
+              />
+              Retry
+            </Button>
+          }
+        />
+      </Card>
+    );
+  }
+
+  const data = analyticsSlaBandsQuery.data.results.map((result) => ({
+    time: result.time,
+    ...result.bands,
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -95,11 +93,17 @@ export function SlaBandsChartCard() {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                const date = new Date(value);
+                if (analyticsSlaBandsQuery.data.info.bucket === "hour") {
+                  return new Intl.DateTimeFormat(undefined, {
+                    hour: "numeric",
+                    minute: "numeric",
+                  }).format(value);
+                }
+
                 return new Intl.DateTimeFormat(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(date);
+                }).format(value);
               }}
             />
             <ChartTooltip
@@ -108,7 +112,7 @@ export function SlaBandsChartCard() {
             />
             <ChartLegend content={<ChartLegendContent />} />
             <Line
-              dataKey="percentiles.10s"
+              dataKey="10s"
               name="10s"
               type="natural"
               fill="var(--color-10s)"
@@ -116,7 +120,7 @@ export function SlaBandsChartCard() {
               stroke="var(--color-10s)"
             />
             <Line
-              dataKey="percentiles.30s"
+              dataKey="30s"
               name="30s"
               type="natural"
               fill="var(--color-30s)"
@@ -124,7 +128,7 @@ export function SlaBandsChartCard() {
               stroke="var(--color-30s)"
             />
             <Line
-              dataKey="percentiles.60s"
+              dataKey="60s"
               name="60s"
               type="natural"
               fill="var(--color-60s)"
@@ -132,7 +136,7 @@ export function SlaBandsChartCard() {
               stroke="var(--color-60s)"
             />
             <Line
-              dataKey="percentiles.300s"
+              dataKey="300s"
               name="300s"
               type="natural"
               fill="var(--color-300s)"

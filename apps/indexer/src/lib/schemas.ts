@@ -547,17 +547,21 @@ export const OpenAPIBigintStringSchema = z
     type: "string",
   });
 
-export const OpenAPIFloatFromDbSchema = z.preprocess((v, ctx) => {
-  const result = z.coerce.number().safeParse(v);
+export const OpenAPIFloatFromDbSchema = z
+  .preprocess((v, ctx) => {
+    const result = z.coerce.number().safeParse(v);
 
-  if (!result.success) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Invalid float",
-    });
+    if (!result.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid float",
+      });
 
-    return z.NEVER;
-  }
+      return z.NEVER;
+    }
 
-  return result.data;
-}, z.number());
+    return result.data;
+  }, z.number())
+  .openapi({
+    type: "number",
+  });

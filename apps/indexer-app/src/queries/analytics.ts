@@ -24,6 +24,8 @@ import {
   AnalyticsSuccessRatesResponseSchema,
   type AnalyticsE2ELatencyResponseSchemaType,
   AnalyticsE2ELatencyResponseSchema,
+  type AnalyticsSlaBandsResponseSchemaType,
+  AnalyticsSlaBandsResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -36,6 +38,7 @@ import {
   createAnalyticsTerminalQueryKey,
   createAnalyticsSuccessRatesQueryKey,
   createAnalyticsE2ELatencyQueryKey,
+  createAnalyticsSlaBandsQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -453,6 +456,47 @@ export function useAnalyticsE2ELatencyQuery(
       }
 
       return AnalyticsE2ELatencyResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsSlaBandsQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsSlaBandsResponseSchemaType,
+    Error,
+    AnalyticsSlaBandsResponseSchemaType,
+    ReturnType<typeof createAnalyticsSlaBandsQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsSlaBandsQuery(
+  options?: UseAnalyticsSlaBandsQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsSlaBandsQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/sla-bands"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics sla bands: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsSlaBandsResponseSchema.parse(await response.json());
     },
     ...options,
   });

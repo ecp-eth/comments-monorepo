@@ -128,3 +128,7 @@ export function createAnalyticsSuccessRatesQueryKey() {
 export function createAnalyticsE2ELatencyQueryKey() {
   return ["analytics-e2e-latency"] as const;
 }
+
+export function createAnalyticsSlaBandsQueryKey() {
+  return ["analytics-sla-bands"] as const;
+}
