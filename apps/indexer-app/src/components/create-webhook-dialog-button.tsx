@@ -74,7 +74,7 @@ export function CreateWebhookDialogButton({
     defaultValues: {
       name: "",
       auth: { type: "no-auth" },
-      events: [],
+      events: WebhookEventNames.filter((item) => item !== "test"),
       url: "",
     },
   });
