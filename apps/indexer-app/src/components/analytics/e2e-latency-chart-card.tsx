@@ -20,18 +20,43 @@ import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
+import { CustomChartTooltipContent } from "../ui/chart-custom";
 
 function CustomTooltip({
   payload,
   ...props
 }: React.ComponentProps<typeof ChartTooltipContent>) {
   return (
-    <ChartTooltipContent
+    <CustomChartTooltipContent
       {...props}
       // remove first 2 items because they are used only to render a band
       payload={payload?.slice(2)}
-      indicator="dot"
+      indicator="line"
       hideLabel
+      formatValue={(value) => {
+        if ("DurationFormat" in Intl) {
+          const valueMs = value.value! as number;
+          const hours = Math.floor(valueMs / 3_600_000);
+          const minutes = Math.floor((valueMs % 3_600_000) / 60_000);
+          const seconds = Math.floor((valueMs % 60_000) / 1000);
+          const milliseconds = Math.round(valueMs % 1000);
+
+          // @ts-expect-error - DurationFormat is not supported in all browsers
+          return new Intl.DurationFormat(undefined, {
+            style: "short",
+          }).format({
+            seconds,
+            minutes,
+            hours,
+            milliseconds,
+          });
+        }
+
+        return value.value?.toLocaleString(undefined, {
+          style: "unit",
+          unit: "millisecond",
+        });
+      }}
     />
   );
 }
