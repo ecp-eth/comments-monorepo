@@ -1,11 +1,11 @@
-const ECP_INDEXER_SCHEMA_NAME = process.env.ECP_INDEXER_SCHEMA_NAME;
+const DATABASE_SCHEMA = process.env.DATABASE_SCHEMA;
 
-if (!ECP_INDEXER_SCHEMA_NAME) {
+if (!DATABASE_SCHEMA) {
   throw new Error(
-    "ECP_INDEXER_SCHEMA_NAME is not set. Make sure it is the same schema name used in production",
+    "DATABASE_SCHEMA is not set. Make sure it is the same schema name used in production usually deployment id",
   );
 }
 
 globalThis.PONDER_NAMESPACE_BUILD = {
-  schema: ECP_INDEXER_SCHEMA_NAME,
+  schema: DATABASE_SCHEMA,
 };

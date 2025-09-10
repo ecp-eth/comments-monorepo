@@ -11,6 +11,7 @@
     "dev": "ponder dev",
     "prestart": "NODE_ENV=production pnpm db:migrate:up",
     "start": "NODE_ENV=production ponder start",
+    "start:supervisor": "node --experimental-transform-types ./bin/supervisor.ts",
     "db": "ponder db",
     "codegen": "ponder codegen",
     "serve": "ponder serve",

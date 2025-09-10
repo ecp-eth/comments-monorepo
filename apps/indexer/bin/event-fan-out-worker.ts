@@ -4,9 +4,7 @@ import * as Sentry from "@sentry/node";
 import "./init.ts";
 import { env } from "../src/env.ts";
 import { eventOutboxFanOutService } from "../src/services/index.ts";
-
-// @TODO wait for indexer to be ready and then start fanning out events.
-// @TODO perhaps add pm2 or something to package.json that will just restart workers if they die but fail if the indexer fails.
+import { waitForIndexerToBeReady } from "./utils.ts";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
@@ -25,6 +23,14 @@ const abortController = new AbortController();
     console.log(`Received ${signal}, shutting down...`);
   });
 });
+
+if (process.env.WAIT_FOR_INDEXER_TO_BE_READY === "true") {
+  console.log("Waiting for indexer to be ready...");
+
+  await waitForIndexerToBeReady({ signal: abortController.signal });
+
+  console.log("Indexer is ready");
+}
 
 await eventOutboxFanOutService
   .fanOutEvents({
