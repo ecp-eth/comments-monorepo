@@ -163,3 +163,24 @@ export const AnalyticsSlaBandsResponseSchema = z.object({
 export type AnalyticsSlaBandsResponseSchemaType = z.infer<
   typeof AnalyticsSlaBandsResponseSchema
 >;
+
+export const AnalyticsErrorsResponseSchema = z.object({
+  results: z.array(
+    z.object({
+      time: z.coerce.date(),
+      http4xx: z.coerce.number(),
+      http5xx: z.coerce.number(),
+      timeout: z.coerce.number(),
+      other: z.coerce.number(),
+    }),
+  ),
+  info: z.object({
+    bucket: z.enum(["hour", "day", "week", "month"]),
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
+});
+
+export type AnalyticsErrorsResponseSchemaType = z.infer<
+  typeof AnalyticsErrorsResponseSchema
+>;

@@ -13,6 +13,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "../ui/chart";
+import { useAnalyticsErrorsQuery } from "@/queries/analytics";
+import { Skeleton } from "../ui/skeleton";
+import { ErrorScreen } from "../error-screen";
+import { Button } from "../ui/button";
+import { RotateCwIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
   http4xx: {
@@ -33,44 +39,40 @@ const chartConfig = {
   },
 };
 
-const data = [
-  {
-    time: new Date().toISOString(),
-    http4xx: 10,
-    http5xx: 5,
-    timeout: 0,
-    other: 0,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 1,
-    ).toISOString(),
-    http4xx: 7,
-    http5xx: 3,
-    timeout: 0,
-    other: 0,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 2,
-    ).toISOString(),
-    http4xx: 6,
-    http5xx: 5,
-    timeout: 0,
-    other: 0,
-  },
-  {
-    time: new Date(
-      new Date().getTime() - 1000 * 60 * 60 * 24 * 3,
-    ).toISOString(),
-    http4xx: 4,
-    http5xx: 3,
-    timeout: 10,
-    other: 5,
-  },
-];
-
 export function ErrorBreakdownChartCard() {
+  const analyticsErrorsQuery = useAnalyticsErrorsQuery();
+
+  if (analyticsErrorsQuery.status === "pending") {
+    return <Skeleton className="w-full h-full rounded-xl" />;
+  }
+
+  if (analyticsErrorsQuery.status === "error") {
+    console.error(analyticsErrorsQuery.error);
+    return (
+      <Card className="flex">
+        <ErrorScreen
+          title="Error fetching errors breakdown"
+          description="Please try again later. If the problem persists, please contact support."
+          actions={
+            <Button
+              disabled={analyticsErrorsQuery.isRefetching}
+              onClick={() => analyticsErrorsQuery.refetch()}
+              className="gap-2"
+            >
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  analyticsErrorsQuery.isRefetching && "animate-spin",
+                )}
+              />
+              Retry
+            </Button>
+          }
+        />
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -81,7 +83,7 @@ export function ErrorBreakdownChartCard() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart data={data}>
+          <BarChart data={analyticsErrorsQuery.data.results}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="time"
@@ -89,11 +91,17 @@ export function ErrorBreakdownChartCard() {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                const date = new Date(value);
+                if (analyticsErrorsQuery.data.info.bucket === "hour") {
+                  return new Intl.DateTimeFormat(undefined, {
+                    hour: "numeric",
+                    minute: "numeric",
+                  }).format(value);
+                }
+
                 return new Intl.DateTimeFormat(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(date);
+                }).format(value);
               }}
             />
             <ChartTooltip

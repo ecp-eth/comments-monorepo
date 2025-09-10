@@ -51,6 +51,7 @@ import { setupAnalyticsTerminalGet } from "./analytics/terminal/get";
 import { setupAnalyticsSuccessRatesGet } from "./analytics/success-rates/get";
 import { setupAnalyticsE2ELatencyGet } from "./analytics/e2e-latency/get";
 import { setupAnalyticsSlaBandsGet } from "./analytics/sla-bands/get";
+import { setupAnalyticsErrorsGet } from "./analytics/errors/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -105,6 +106,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAnalyticsSuccessRatesGet(app);
   setupAnalyticsE2ELatencyGet(app);
   setupAnalyticsSlaBandsGet(app);
+  setupAnalyticsErrorsGet(app);
 
   return app;
 }

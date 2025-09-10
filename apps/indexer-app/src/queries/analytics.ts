@@ -26,6 +26,8 @@ import {
   AnalyticsE2ELatencyResponseSchema,
   type AnalyticsSlaBandsResponseSchemaType,
   AnalyticsSlaBandsResponseSchema,
+  type AnalyticsErrorsResponseSchemaType,
+  AnalyticsErrorsResponseSchema,
 } from "@/api/schemas/analytics";
 import {
   createAnalyticsKpiDeliveriesQueryKey,
@@ -39,6 +41,7 @@ import {
   createAnalyticsSuccessRatesQueryKey,
   createAnalyticsE2ELatencyQueryKey,
   createAnalyticsSlaBandsQueryKey,
+  createAnalyticsErrorsQueryKey,
 } from "./query-keys";
 
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
@@ -497,6 +500,47 @@ export function useAnalyticsSlaBandsQuery(
       }
 
       return AnalyticsSlaBandsResponseSchema.parse(await response.json());
+    },
+    ...options,
+  });
+}
+
+type UseAnalyticsErrorsQueryOptions = Omit<
+  UseQueryOptions<
+    AnalyticsErrorsResponseSchemaType,
+    Error,
+    AnalyticsErrorsResponseSchemaType,
+    ReturnType<typeof createAnalyticsErrorsQueryKey>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export function useAnalyticsErrorsQuery(
+  options?: UseAnalyticsErrorsQueryOptions,
+) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createAnalyticsErrorsQueryKey(),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        return fetch(createFetchUrl("/api/analytics/errors"), {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch analytics errors: ${response.statusText}`,
+        );
+      }
+
+      return AnalyticsErrorsResponseSchema.parse(await response.json());
     },
     ...options,
   });

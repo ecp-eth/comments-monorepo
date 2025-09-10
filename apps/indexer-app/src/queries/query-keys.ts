@@ -132,3 +132,7 @@ export function createAnalyticsE2ELatencyQueryKey() {
 export function createAnalyticsSlaBandsQueryKey() {
   return ["analytics-sla-bands"] as const;
 }
+
+export function createAnalyticsErrorsQueryKey() {
+  return ["analytics-errors"] as const;
+}
