@@ -135,20 +135,21 @@ export function AttemptsOverTimeChartCard() {
                 />
               </linearGradient>
             </defs>
-            <Area
-              dataKey="successes"
-              type="monotone"
-              fill="url(#fillSuccesses)"
-              fillOpacity={0.4}
-              stroke="var(--color-successes)"
-              stackId="a"
-            />
+
             <Area
               dataKey="failures"
               type="monotone"
               fill="url(#fillFailures)"
               fillOpacity={0.4}
               stroke="var(--color-failures)"
+              stackId="a"
+            />
+            <Area
+              dataKey="successes"
+              type="monotone"
+              fill="url(#fillSuccesses)"
+              fillOpacity={0.4}
+              stroke="var(--color-successes)"
               stackId="a"
             />
           </AreaChart>
