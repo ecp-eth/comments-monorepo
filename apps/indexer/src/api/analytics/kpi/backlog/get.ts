@@ -72,7 +72,7 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
           COUNT(*) FILTER (WHERE status NOT IN ('success','failure')) AS "inProgress",
           COUNT(*) FILTER (WHERE status = 'pending')                  AS pending,
           COUNT(*) FILTER (WHERE status = 'processing')               AS "processing",
-          MIN(next_attempt_at)                                        AS "nextDueAt",
+          MIN(next_attempt_at) FILTER (WHERE status NOT IN('success','failure')) AS "nextDueAt",
           EXTRACT(EPOCH FROM (now() - MIN(created_at)))::int          AS "oldestAgeSec"
         FROM ${schema.appWebhookDelivery} d
         WHERE d.app_webhook_id IN (
