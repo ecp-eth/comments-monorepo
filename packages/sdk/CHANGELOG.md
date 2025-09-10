@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.29
+
+### Patch Changes
+
+- 944211a: fix(sdk): temporarily added a schema fix to avoid crashing on opengraph image schema error
+
 ## 0.0.28
 
 ### Patch Changes
