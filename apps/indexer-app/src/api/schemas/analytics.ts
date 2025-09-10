@@ -107,6 +107,11 @@ export const AnalyticsSuccessRatesResponseSchema = z.object({
       firstSuccessRate: z.coerce.number(),
     }),
   ),
+  info: z.object({
+    bucket: z.enum(["hour", "day", "week", "month"]),
+    from: z.coerce.date(),
+    to: z.coerce.date(),
+  }),
 });
 
 export type AnalyticsSuccessRatesResponseSchemaType = z.infer<
