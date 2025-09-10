@@ -3,9 +3,11 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
+  type Table as TableType,
   type TableState,
   useReactTable,
+  type PaginationState,
+  type OnChangeFn,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -19,8 +21,13 @@ import {
 type DataTableProps<TData = unknown> = {
   data: TData[];
   columns: ColumnDef<TData>[];
-  state?: TableState;
+  state?: Partial<TableState>;
   tableActions?: React.ReactNode;
+  pagination?: React.ComponentType<{
+    table: TableType<TData>;
+  }>;
+  paginationRowCount?: number;
+  onPaginationChange?: OnChangeFn<PaginationState>;
 };
 
 export function DataTable<TData = unknown>({
@@ -28,14 +35,19 @@ export function DataTable<TData = unknown>({
   columns,
   state,
   tableActions,
+  pagination: Pagination,
+  paginationRowCount,
+  onPaginationChange,
 }: DataTableProps<TData>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     state,
+    manualPagination: true,
+    onPaginationChange,
+    rowCount: paginationRowCount,
   });
 
   return (
@@ -94,6 +106,7 @@ export function DataTable<TData = unknown>({
           </TableBody>
         </Table>
       </div>
+      {Pagination && <Pagination table={table} />}
     </div>
   );
 }

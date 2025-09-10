@@ -31,7 +31,12 @@ import {
   useWebhookQuery,
 } from "@/queries/webhook";
 import type { ColumnDef } from "@tanstack/react-table";
-import { RotateCwIcon, WebhookIcon } from "lucide-react";
+import {
+  RotateCwIcon,
+  WebhookIcon,
+  CheckCircle2Icon,
+  CircleAlertIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { use, useMemo } from "react";
 
@@ -47,9 +52,33 @@ export default function WebhookPage({
   useProtectRoute(appQuery);
   useProtectRoute(webhookQuery);
 
+  // @todo add some KPIs and charts from dashboard but isolate them per app and webhook
+
   if (webhookQuery.status === "pending" || appQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader
+          breadcrumbs={[
+            { label: "Apps", href: "/apps" },
+            ...(appQuery.data
+              ? [{ label: appQuery.data.name, href: `/apps/${appId}` }]
+              : []),
+          ]}
+        />
+        <AppContent className="flex-col gap-4">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
+            <Skeleton className="w-full h-full aspect-video rounded-xl" />
+            <Skeleton className="w-full h-full aspect-video rounded-xl" />
+            <Skeleton className="w-full h-full aspect-video rounded-xl" />
+            <Skeleton className="w-full h-full aspect-video rounded-xl" />
+          </div>
+          <div className="flex flex-col flex-1 gap-4">
+            <h2 className="text-lg font-medium">Deliveries</h2>
+            <Skeleton className="w-full h-full rounded-xl aspect-video" />
+          </div>
+        </AppContent>
+      </>
+    );
   }
 
   if (
@@ -66,15 +95,17 @@ export default function WebhookPage({
               : []),
           ]}
         />
-        <ErrorScreen
-          title="Webhook not found"
-          description="The webhook you are looking for does not exist."
-          actions={
-            <Button asChild>
-              <Link href={`/apps/${appId}`}>Go back</Link>
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Webhook not found"
+            description="The webhook you are looking for does not exist."
+            actions={
+              <Button asChild>
+                <Link href={`/apps/${appId}`}>Go back</Link>
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
@@ -92,20 +123,22 @@ export default function WebhookPage({
               : []),
           ]}
         />
-        <ErrorScreen
-          title="Error fetching webhook"
-          description="Please try again later. If the problem persists, please contact support."
-          actions={
-            <Button
-              disabled={webhookQuery.isRefetching}
-              onClick={() => webhookQuery.refetch()}
-              className="gap-2"
-            >
-              <RotateCwIcon className="h-4 w-4" />
-              Retry
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching webhook"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={webhookQuery.isRefetching}
+                onClick={() => webhookQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon className="h-4 w-4" />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
@@ -127,25 +160,25 @@ export default function WebhookPage({
             },
           ]}
         />
-        <ErrorScreen
-          title="Error fetching app"
-          description="Please try again later. If the problem persists, please contact support."
-          actions={
-            <Button
-              disabled={appQuery.isRefetching}
-              onClick={() => appQuery.refetch()}
-              className="gap-2"
-            >
-              <RotateCwIcon className="h-4 w-4" />
-              Retry
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching app"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={appQuery.isRefetching}
+                onClick={() => appQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon className="h-4 w-4" />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
-
-  // @todo render webhook details (deliveries + statistics)
 
   return (
     <>
@@ -327,8 +360,7 @@ function WebhookDeliveryAttemptsList({
   useProtectRoute(deliveriesQuery);
 
   if (deliveriesQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return <Skeleton className="w-full h-full rounded-xl aspect-video" />;
   }
 
   if (deliveriesQuery.status === "error") {
@@ -407,19 +439,37 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
           row.original.responseStatus >= 200 &&
           row.original.responseStatus <= 399
         ) {
-          return <Badge variant="outline">{row.original.responseStatus}</Badge>;
+          return (
+            <Badge className="gap-2" variant="outline">
+              <CheckCircle2Icon className="h-4 w-4 text-green-400" />
+              {row.original.responseStatus}
+            </Badge>
+          );
         }
 
         if (row.original.responseStatus === -1) {
-          return <Badge variant="destructive">Timeout</Badge>;
+          return (
+            <Badge className="gap-2" variant="outline">
+              <CircleAlertIcon className="h-4 w-4 text-red-400" />
+              Timeout
+            </Badge>
+          );
         }
 
         if (row.original.responseStatus === -2) {
-          return <Badge variant="destructive">Network Error</Badge>;
+          return (
+            <Badge className="gap-2" variant="outline">
+              <CircleAlertIcon className="h-4 w-4 text-red-400" />
+              Network Error
+            </Badge>
+          );
         }
 
         return (
-          <Badge variant="destructive">{row.original.responseStatus}</Badge>
+          <Badge className="gap-2" variant="outline">
+            <CircleAlertIcon className="h-4 w-4 text-red-400" />
+            {row.original.responseStatus}
+          </Badge>
         );
       },
     },
@@ -427,7 +477,10 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
       header: "Response Time",
       accessorKey: "responseMs",
       cell: ({ row }) => {
-        return `${row.original.responseMs}ms`;
+        return row.original.responseMs.toLocaleString(undefined, {
+          unit: "millisecond",
+          style: "unit",
+        });
       },
     },
   ];

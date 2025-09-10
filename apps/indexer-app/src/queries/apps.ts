@@ -17,16 +17,33 @@ type UseAppsQueryOptions = Omit<
     ReturnType<typeof createAppsQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  page?: number;
+  limit?: number;
+};
 
-export function useAppsQuery(options?: UseAppsQueryOptions) {
+export function useAppsQuery({
+  page,
+  limit,
+  ...options
+}: UseAppsQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAppsQueryKey(),
+    queryKey: createAppsQueryKey({ page, limit }),
     queryFn: async ({ signal }) => {
       const listAppsResponse = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/apps"), {
+        const url = createFetchUrl("/api/apps");
+
+        if (page) {
+          url.searchParams.set("page", page.toString());
+        }
+
+        if (limit) {
+          url.searchParams.set("limit", limit.toString());
+        }
+
+        return fetch(url, {
           signal,
           headers,
         });

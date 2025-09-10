@@ -20,7 +20,7 @@ export const ListAppsResponseSchema = z.object({
     }),
   ),
   pageInfo: z.object({
-    totalPages: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
   }),
 });
 

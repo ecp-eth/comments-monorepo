@@ -12,22 +12,41 @@ import { ErrorScreen } from "@/components/error-screen";
 import { cn } from "@/lib/utils";
 import { DataTable } from "@/components/data-table";
 import type { ListAppsResponseSchemaType } from "@/api/schemas/apps";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import Link from "next/link";
 import { CreateAppDialogButton } from "@/components/create-app-dialog-button";
+import { useState } from "react";
+import { keepPreviousData } from "@tanstack/react-query";
+import { DataTableBasicPagination } from "@/components/data-table-basic-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AppsPage() {
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const meQuery = useMeQuery();
   const appsQuery = useAppsQuery({
     refetchOnMount: true,
+    placeholderData: keepPreviousData,
+    page: paginationState.pageIndex + 1,
+    limit: paginationState.pageSize,
   });
+
+  console.log(paginationState);
 
   useProtectRoute(meQuery);
   useProtectRoute(appsQuery);
 
   if (meQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
+        <AppContent className="flex-col gap-4">
+          <Skeleton className="w-full h-full rounded-xl" />
+        </AppContent>
+      </>
+    );
   }
 
   if (meQuery.status === "error") {
@@ -36,7 +55,7 @@ export default function AppsPage() {
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <AppContent>
+        <AppContent className="flex-col gap-4">
           <ErrorScreen
             title="Error fetching your identity"
             description="Please try again later. If the problem persists, please contact support."
@@ -62,8 +81,14 @@ export default function AppsPage() {
   }
 
   if (appsQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
+        <AppContent className="flex-col gap-4">
+          <Skeleton className="w-full h-full rounded-xl" />
+        </AppContent>
+      </>
+    );
   }
 
   if (appsQuery.status === "error") {
@@ -72,7 +97,7 @@ export default function AppsPage() {
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <AppContent>
+        <AppContent className="flex-col gap-4">
           <ErrorScreen
             title="Error fetching your apps"
             description="Please try again later. If the problem persists, please contact support."
@@ -97,11 +122,10 @@ export default function AppsPage() {
     );
   }
 
-  // @todo add pagination
   return (
     <>
       <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-      <AppContent>
+      <AppContent className="flex-col gap-4">
         {appsQuery.data.results.length === 0 ? (
           <EmptyScreen
             icon={<TerminalSquareIcon />}
@@ -114,6 +138,10 @@ export default function AppsPage() {
             data={appsQuery.data.results}
             columns={columns}
             tableActions={<CreateAppDialogButton />}
+            pagination={DataTableBasicPagination}
+            state={{ pagination: paginationState }}
+            onPaginationChange={setPaginationState}
+            paginationRowCount={appsQuery.data.pageInfo.total}
           />
         )}
       </AppContent>

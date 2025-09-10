@@ -186,7 +186,7 @@ export class AppManager implements IAppManager {
     return {
       apps,
       pageInfo: {
-        totalPages: Math.ceil(totalApps / limit),
+        total: totalApps,
       },
     };
   }
@@ -262,7 +262,7 @@ type IAppManager_ListAppsParams = z.infer<typeof ListAppsParamsSchema>;
 type IAppManager_ListAppsResult = {
   apps: AppSelectType[];
   pageInfo: {
-    totalPages: number;
+    total: number;
   };
 };
 

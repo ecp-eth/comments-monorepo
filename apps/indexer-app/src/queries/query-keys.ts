@@ -1,5 +1,11 @@
-export function createAppsQueryKey() {
-  return ["apps"] as const;
+export function createAppsQueryKey({
+  page,
+  limit,
+}: {
+  page?: number;
+  limit?: number;
+} = {}) {
+  return ["apps", page, limit] as const;
 }
 
 export function createAppQueryKey(appId: string) {
