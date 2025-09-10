@@ -20,8 +20,16 @@ export function createWebhookQueryKey(appId: string, webhookId: string) {
   return ["webhook", appId, webhookId] as const;
 }
 
-export function createWebhooksQueryKey(appId: string) {
-  return ["webhooks", appId] as const;
+export function createWebhooksQueryKey({
+  appId,
+  page,
+  limit,
+}: {
+  appId: string;
+  page?: number;
+  limit?: number;
+}) {
+  return ["webhooks", appId, page, limit] as const;
 }
 
 export function createWebhookDeliveryAttemptsQueryKey(

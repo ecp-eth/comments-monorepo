@@ -41,7 +41,7 @@ export const AppWebhooksGetResponseSchema = z.object({
     }),
   ),
   pageInfo: z.object({
-    totalPages: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
   }),
 });
 

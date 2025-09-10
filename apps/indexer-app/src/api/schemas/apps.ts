@@ -174,7 +174,7 @@ export type AppWebhookDeleteResponseSchemaType = z.infer<
 export const AppWebhooksListResponseSchema = z.object({
   results: z.array(AppWebhookSchema),
   pageInfo: z.object({
-    totalPages: z.number().int().nonnegative(),
+    total: z.number().int().nonnegative(),
   }),
 });
 

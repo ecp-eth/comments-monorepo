@@ -19,19 +19,33 @@ type UseWebhooksQueryOptions = Omit<
   "queryKey" | "queryFn"
 > & {
   appId: string;
+  page?: number;
+  limit?: number;
 };
 
 export function useWebhooksQuery({
   appId,
+  page,
+  limit,
   ...options
 }: UseWebhooksQueryOptions) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createWebhooksQueryKey(appId),
+    queryKey: createWebhooksQueryKey({ appId, page, limit }),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl(`/api/apps/${appId}/webhooks`), {
+        const url = createFetchUrl(`/api/apps/${appId}/webhooks`);
+
+        if (page) {
+          url.searchParams.set("page", page.toString());
+        }
+
+        if (limit) {
+          url.searchParams.set("limit", limit.toString());
+        }
+
+        return fetch(url, {
           signal,
           headers,
         });

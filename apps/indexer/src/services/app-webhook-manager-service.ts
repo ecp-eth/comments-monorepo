@@ -100,8 +100,6 @@ export class AppWebhookManager implements IAppWebhookManager {
       eq(schema.appWebhook.appId, app.id),
     );
 
-    const totalPages = Math.ceil(appWebhooksCount / limit);
-
     const appWebhooks = await this.db.query.appWebhook.findMany({
       where(fields, operators) {
         return operators.eq(fields.appId, app.id);
@@ -116,7 +114,7 @@ export class AppWebhookManager implements IAppWebhookManager {
     return {
       appWebhooks,
       pageInfo: {
-        totalPages,
+        total: appWebhooksCount,
       },
     };
   }
@@ -202,7 +200,7 @@ type IAppWebhookManager_ListAppWebhooksParams = z.infer<
 type IAppWebhookManager_ListAppWebhooksResult = {
   appWebhooks: AppWebhookSelectType[];
   pageInfo: {
-    totalPages: number;
+    total: number;
   };
 };
 

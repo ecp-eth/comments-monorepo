@@ -5,7 +5,7 @@ import { AppContent } from "@/components/app-content";
 import { ErrorScreen } from "@/components/error-screen";
 import { AppNotFoundError } from "@/errors";
 import { useAppQuery } from "@/queries/app";
-import { use, useMemo } from "react";
+import { use, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useMeQuery } from "@/queries/me";
@@ -16,12 +16,15 @@ import { EmptyScreen } from "@/components/empty-screen";
 import { CreateWebhookDialogButton } from "@/components/create-webhook-dialog-button";
 import { DataTable } from "@/components/data-table";
 import type { AppWebhooksListResponseSchemaType } from "@/api/schemas/apps";
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type AppSchemaType } from "@/api/schemas/apps";
 import { AppDetailsSecretForm } from "@/components/app-details-secret-form";
 import { AppDetailsRenameForm } from "@/components/app-details-rename-form";
 import { AppDetailsDeleteButton } from "@/components/app-details-delete-button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DataTableBasicPagination } from "@/components/data-table-basic-pagination";
+import { cn } from "@/lib/utils";
 
 export default function AppPage({
   params,
@@ -35,9 +38,17 @@ export default function AppPage({
   useProtectRoute(meQuery);
   useProtectRoute(appQuery);
 
+  // @todo add some KPIs and charts from dashboard but isolate them per app
+
   if (meQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
+        <AppContent className="flex-col gap-4">
+          <Skeleton className="w-full h-full rounded-xl" />
+        </AppContent>
+      </>
+    );
   }
 
   if (meQuery.status === "error") {
@@ -46,27 +57,35 @@ export default function AppPage({
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <ErrorScreen
-          title="Error fetching your identity"
-          description="Please try again later. If the problem persists, please contact support."
-          actions={
-            <Button
-              disabled={meQuery.isRefetching}
-              onClick={() => meQuery.refetch()}
-              className="gap-2"
-            >
-              <RotateCwIcon className="h-4 w-4" />
-              Retry
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching your identity"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={meQuery.isRefetching}
+                onClick={() => meQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon className="h-4 w-4" />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
 
   if (appQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return (
+      <>
+        <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
+        <AppContent className="flex-col gap-4">
+          <Skeleton className="w-full h-full rounded-xl" />
+        </AppContent>
+      </>
+    );
   }
 
   if (
@@ -76,15 +95,17 @@ export default function AppPage({
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <ErrorScreen
-          title="App not found"
-          description="The app you are looking for does not exist."
-          actions={
-            <Button asChild>
-              <Link href="/apps">Go back</Link>
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="App not found"
+            description="The app you are looking for does not exist."
+            actions={
+              <Button asChild>
+                <Link href="/apps">Go back</Link>
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
@@ -95,25 +116,25 @@ export default function AppPage({
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <ErrorScreen
-          title="Error fetching app"
-          description="Please try again later. If the problem persists, please contact support."
-          actions={
-            <Button
-              disabled={appQuery.isRefetching}
-              onClick={() => appQuery.refetch()}
-              className="gap-2"
-            >
-              <RotateCwIcon className="h-4 w-4" />
-              Retry
-            </Button>
-          }
-        />
+        <AppContent className="flex-col gap-4">
+          <ErrorScreen
+            title="Error fetching app"
+            description="Please try again later. If the problem persists, please contact support."
+            actions={
+              <Button
+                disabled={appQuery.isRefetching}
+                onClick={() => appQuery.refetch()}
+                className="gap-2"
+              >
+                <RotateCwIcon className="h-4 w-4" />
+                Retry
+              </Button>
+            }
+          />
+        </AppContent>
       </>
     );
   }
-
-  // @todo render app details + statistics + webhooks
 
   return (
     <>
@@ -156,6 +177,10 @@ function AppDetailsCard({ app }: { app: AppSchemaType }) {
 }
 
 function WebhooksList({ appId }: { appId: string }) {
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const webhooksQuery = useWebhooksQuery({ appId, refetchOnMount: true });
   const columns = useMemo(
     () => createWebhooksDataTableColumns({ appId }),
@@ -165,8 +190,7 @@ function WebhooksList({ appId }: { appId: string }) {
   useProtectRoute(webhooksQuery);
 
   if (webhooksQuery.status === "pending") {
-    // @todo loading screen
-    return null;
+    return <Skeleton className="w-full border rounded-xl aspect-video" />;
   }
 
   if (webhooksQuery.status === "error") {
@@ -183,7 +207,12 @@ function WebhooksList({ appId }: { appId: string }) {
               onClick={() => webhooksQuery.refetch()}
               className="gap-2"
             >
-              <RotateCwIcon className="h-4 w-4" />
+              <RotateCwIcon
+                className={cn(
+                  "h-4 w-4",
+                  webhooksQuery.isRefetching && "animate-spin",
+                )}
+              />
               Retry
             </Button>
           }
@@ -205,12 +234,15 @@ function WebhooksList({ appId }: { appId: string }) {
     );
   }
 
-  // @todo add pagination
   return (
     <DataTable
       data={webhooksQuery.data.results}
       columns={columns}
       tableActions={<CreateWebhookDialogButton appId={appId} />}
+      pagination={DataTableBasicPagination}
+      state={{ pagination: paginationState }}
+      onPaginationChange={setPaginationState}
+      paginationRowCount={webhooksQuery.data.pageInfo.total}
     />
   );
 }
