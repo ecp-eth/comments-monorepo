@@ -83,11 +83,17 @@ export function SuccessRatesChartCard() {
               axisLine={false}
               tickMargin={8}
               tickFormatter={(value) => {
-                const date = new Date(value);
+                if (analyticsSuccessRatesQuery.data.info.bucket === "hour") {
+                  return new Intl.DateTimeFormat(undefined, {
+                    hour: "numeric",
+                    minute: "numeric",
+                  }).format(value);
+                }
+
                 return new Intl.DateTimeFormat(undefined, {
                   day: "numeric",
                   month: "short",
-                }).format(date);
+                }).format(value);
               }}
             />
             <ChartTooltip
