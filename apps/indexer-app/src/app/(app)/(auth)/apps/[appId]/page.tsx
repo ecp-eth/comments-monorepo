@@ -156,7 +156,7 @@ function AppDetailsCard({ app }: { app: AppSchemaType }) {
 }
 
 function WebhooksList({ appId }: { appId: string }) {
-  const webhooksQuery = useWebhooksQuery({ appId });
+  const webhooksQuery = useWebhooksQuery({ appId, refetchOnMount: true });
   const columns = useMemo(
     () => createWebhooksDataTableColumns({ appId }),
     [appId],
