@@ -596,8 +596,11 @@ paths:
                                     - string
                                     - 'null'
                                 image:
-                                  type: string
-                                  format: uri
+                                  anyOf:
+                                    - type: string
+                                      format: uri
+                                    - type: string
+                                      pattern: ^\/[^/\s]+$
                                 url:
                                   type: string
                                   format: uri
@@ -1025,8 +1028,11 @@ paths:
                                             - string
                                             - 'null'
                                         image:
-                                          type: string
-                                          format: uri
+                                          anyOf:
+                                            - type: string
+                                              format: uri
+                                            - type: string
+                                              pattern: ^\/[^/\s]+$
                                         url:
                                           type: string
                                           format: uri
@@ -1496,8 +1502,11 @@ paths:
                                               - string
                                               - 'null'
                                           image:
-                                            type: string
-                                            format: uri
+                                            anyOf:
+                                              - type: string
+                                                format: uri
+                                              - type: string
+                                                pattern: ^\/[^/\s]+$
                                           url:
                                             type: string
                                             format: uri
@@ -1925,8 +1934,11 @@ paths:
                                                       - string
                                                       - 'null'
                                                   image:
-                                                    type: string
-                                                    format: uri
+                                                    anyOf:
+                                                      - type: string
+                                                        format: uri
+                                                      - type: string
+                                                        pattern: ^\/[^/\s]+$
                                                   url:
                                                     type: string
                                                     format: uri
@@ -2620,8 +2632,11 @@ paths:
                                           - string
                                           - 'null'
                                       image:
-                                        type: string
-                                        format: uri
+                                        anyOf:
+                                          - type: string
+                                            format: uri
+                                          - type: string
+                                            pattern: ^\/[^/\s]+$
                                       url:
                                         type: string
                                         format: uri
@@ -3049,8 +3064,11 @@ paths:
                                                   - string
                                                   - 'null'
                                               image:
-                                                type: string
-                                                format: uri
+                                                anyOf:
+                                                  - type: string
+                                                    format: uri
+                                                  - type: string
+                                                    pattern: ^\/[^/\s]+$
                                               url:
                                                 type: string
                                                 format: uri
@@ -3520,8 +3538,11 @@ paths:
                                                     - string
                                                     - 'null'
                                                 image:
-                                                  type: string
-                                                  format: uri
+                                                  anyOf:
+                                                    - type: string
+                                                      format: uri
+                                                    - type: string
+                                                      pattern: ^\/[^/\s]+$
                                                 url:
                                                   type: string
                                                   format: uri
@@ -3949,8 +3970,11 @@ paths:
                                                             - string
                                                             - 'null'
                                                         image:
-                                                          type: string
-                                                          format: uri
+                                                          anyOf:
+                                                            - type: string
+                                                              format: uri
+                                                            - type: string
+                                                              pattern: ^\/[^/\s]+$
                                                         url:
                                                           type: string
                                                           format: uri
@@ -4659,8 +4683,11 @@ paths:
                                           - string
                                           - 'null'
                                       image:
-                                        type: string
-                                        format: uri
+                                        anyOf:
+                                          - type: string
+                                            format: uri
+                                          - type: string
+                                            pattern: ^\/[^/\s]+$
                                       url:
                                         type: string
                                         format: uri
@@ -5088,8 +5115,11 @@ paths:
                                                   - string
                                                   - 'null'
                                               image:
-                                                type: string
-                                                format: uri
+                                                anyOf:
+                                                  - type: string
+                                                    format: uri
+                                                  - type: string
+                                                    pattern: ^\/[^/\s]+$
                                               url:
                                                 type: string
                                                 format: uri
@@ -5559,8 +5589,11 @@ paths:
                                                     - string
                                                     - 'null'
                                                 image:
-                                                  type: string
-                                                  format: uri
+                                                  anyOf:
+                                                    - type: string
+                                                      format: uri
+                                                    - type: string
+                                                      pattern: ^\/[^/\s]+$
                                                 url:
                                                   type: string
                                                   format: uri
@@ -5988,8 +6021,11 @@ paths:
                                                             - string
                                                             - 'null'
                                                         image:
-                                                          type: string
-                                                          format: uri
+                                                          anyOf:
+                                                            - type: string
+                                                              format: uri
+                                                            - type: string
+                                                              pattern: ^\/[^/\s]+$
                                                         url:
                                                           type: string
                                                           format: uri
@@ -6936,8 +6972,11 @@ paths:
                                           - string
                                           - 'null'
                                       image:
-                                        type: string
-                                        format: uri
+                                        anyOf:
+                                          - type: string
+                                            format: uri
+                                          - type: string
+                                            pattern: ^\/[^/\s]+$
                                       url:
                                         type: string
                                         format: uri
@@ -7465,8 +7504,11 @@ paths:
                                     - string
                                     - 'null'
                                 image:
-                                  type: string
-                                  format: uri
+                                  anyOf:
+                                    - type: string
+                                      format: uri
+                                    - type: string
+                                      pattern: ^\/[^/\s]+$
                                 url:
                                   type: string
                                   format: uri
@@ -7968,8 +8010,11 @@ paths:
                                     - string
                                     - 'null'
                                 image:
-                                  type: string
-                                  format: uri
+                                  anyOf:
+                                    - type: string
+                                      format: uri
+                                    - type: string
+                                      pattern: ^\/[^/\s]+$
                                 url:
                                   type: string
                                   format: uri
