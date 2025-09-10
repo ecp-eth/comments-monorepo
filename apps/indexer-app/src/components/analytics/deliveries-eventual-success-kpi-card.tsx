@@ -11,10 +11,16 @@ import { Skeleton } from "../ui/skeleton";
 import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 export function DeliveriesEventualSuccessKpiCard() {
-  const analyticsKpiEventualSuccessQuery =
-    useAnalyticsKpiEventualSuccessQuery();
+  const { params } = useAnalyticsContext();
+  const analyticsKpiEventualSuccessQuery = useAnalyticsKpiEventualSuccessQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+    },
+  });
 
   if (analyticsKpiEventualSuccessQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;
@@ -72,7 +78,7 @@ export function DeliveriesEventualSuccessKpiCard() {
       </CardHeader>
       <CardFooter className="text-sm">
         <div className="text-muted-foreground">
-          Eventual delivery success rate in the last 7 days
+          Eventual delivery success rate in the {params.label}
         </div>
       </CardFooter>
     </Card>

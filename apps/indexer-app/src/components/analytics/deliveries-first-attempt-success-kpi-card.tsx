@@ -11,10 +11,17 @@ import { Skeleton } from "../ui/skeleton";
 import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 export function DeliveriesFirstAttemptSuccessKpiCard() {
+  const { params } = useAnalyticsContext();
   const analyticsKpiFirstAttemptSuccessQuery =
-    useAnalyticsKpiFirstAttemptSuccessQuery();
+    useAnalyticsKpiFirstAttemptSuccessQuery({
+      params: {
+        from: params.from,
+        to: params.to,
+      },
+    });
 
   if (analyticsKpiFirstAttemptSuccessQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;
@@ -72,7 +79,7 @@ export function DeliveriesFirstAttemptSuccessKpiCard() {
       </CardHeader>
       <CardFooter className="text-sm">
         <div className="text-muted-foreground">
-          First attempt delivery success rate in the last 7 days
+          First attempt delivery success rate in the {params.label}
         </div>
       </CardFooter>
     </Card>

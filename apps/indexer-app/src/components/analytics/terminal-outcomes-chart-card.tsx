@@ -19,6 +19,7 @@ import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 const chartConfig = {
   successes: {
@@ -32,6 +33,7 @@ const chartConfig = {
 };
 
 export function TerminalOutcomesChartCard() {
+  const { params } = useAnalyticsContext();
   const analyticsTerminalQuery = useAnalyticsTerminalQuery();
 
   if (analyticsTerminalQuery.status === "pending") {
@@ -70,7 +72,7 @@ export function TerminalOutcomesChartCard() {
       <CardHeader>
         <CardTitle>Terminal outcomes</CardTitle>
         <CardDescription>
-          Showing terminal outcomes in the last 7 days
+          Showing terminal outcomes in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

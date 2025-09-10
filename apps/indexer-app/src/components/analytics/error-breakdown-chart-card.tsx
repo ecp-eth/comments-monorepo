@@ -19,6 +19,7 @@ import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 const chartConfig = {
   http4xx: {
@@ -40,6 +41,7 @@ const chartConfig = {
 };
 
 export function ErrorBreakdownChartCard() {
+  const { params } = useAnalyticsContext();
   const analyticsErrorsQuery = useAnalyticsErrorsQuery();
 
   if (analyticsErrorsQuery.status === "pending") {
@@ -78,7 +80,7 @@ export function ErrorBreakdownChartCard() {
       <CardHeader>
         <CardTitle>Error breakdown</CardTitle>
         <CardDescription>
-          Showing error breakdown in the last 7 days
+          Showing error breakdown in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

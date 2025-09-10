@@ -10,11 +10,6 @@ export const AnalyticsKpiDeliveriesGetQueryParamsSchema = z
   .object({
     from: z.coerce.date().min(new Date("2025-01-01")).optional(),
     to: z.coerce.date().optional(),
-    bucket: z
-      .enum(["hour", "day", "week", "month"])
-      .default("hour")
-      .transform((val) => `1 ${val}`),
-    tz: z.string().default("UTC"),
   })
   .superRefine((data, ctx) => {
     if (data.from && data.to && data.from >= data.to) {
@@ -76,7 +71,7 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to, bucket, tz } = c.req.valid("query");
+      const { from, to } = c.req.valid("query");
       const toToUse = to ?? new Date();
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
@@ -86,8 +81,7 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
           attempts AS (
             SELECT
               a.*,
-              a.response_status BETWEEN 200 AND 399 AS is_success,
-              date_bin(${bucket}::interval, a.attempted_at::timestamptz, '1970-01-01'::timestamptz) AT TIME ZONE COALESCE(${tz}, 'UTC') AS bucket
+              a.response_status BETWEEN 200 AND 399 AS is_success
             FROM ${schema.appWebhookDeliveryAttempt} a
             WHERE
               a.attempted_at >= ${fromToUse} 
@@ -101,12 +95,7 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
           ),
           deliveries AS (
             SELECT
-              d.*,
-              date_bin(
-                ${bucket}::interval, 
-                d.created_at::timestamptz, 
-                '1970-01-01'::timestamptz
-              ) AT TIME ZONE COALESCE(${tz}, 'UTC') AS bucket
+              d.*
             FROM ${schema.appWebhookDelivery} d
             WHERE
               d.created_at >= ${fromToUse}
@@ -117,14 +106,6 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
                 JOIN ${schema.app} app ON (w.app_id = app.id)
                 WHERE app.owner_id = ${c.get("user").id}
               )
-          ),
-          series AS (
-            SELECT g::timestamptz AT TIME ZONE COALESCE(${tz}, 'UTC') AS bucket
-            FROM generate_series(
-              date_bin(${bucket}::interval, ${fromToUse}::timestamptz, '1970-01-01'::timestamptz), 
-              date_bin(${bucket}::interval, ${toToUse}::timestamptz, '1970-01-01'::timestamptz), 
-              ${bucket}::interval
-            ) g
           )
           
 

@@ -19,6 +19,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 const chartConfig = {
   successes: {
@@ -32,6 +33,7 @@ const chartConfig = {
 };
 
 export function AttemptsOverTimeChartCard() {
+  const { params } = useAnalyticsContext();
   const volumeQuery = useAnalyticsVolumeQuery();
 
   if (volumeQuery.status === "pending") {
@@ -70,7 +72,7 @@ export function AttemptsOverTimeChartCard() {
       <CardHeader>
         <CardTitle>Attempts over time</CardTitle>
         <CardDescription>
-          Showing attemts over time in the last 7 days
+          Showing attemts over time in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

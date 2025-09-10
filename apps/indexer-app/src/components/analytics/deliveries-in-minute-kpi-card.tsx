@@ -11,10 +11,17 @@ import { useAnalyticsKpiDeliveredUnderMinuteQuery } from "@/queries/analytics";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 export function DeliveriesInMinuteKpiCard() {
+  const { params } = useAnalyticsContext();
   const analyticsKpiDeliveredUnderMinuteQuery =
-    useAnalyticsKpiDeliveredUnderMinuteQuery();
+    useAnalyticsKpiDeliveredUnderMinuteQuery({
+      params: {
+        from: params.from,
+        to: params.to,
+      },
+    });
 
   if (analyticsKpiDeliveredUnderMinuteQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;
@@ -62,8 +69,8 @@ export function DeliveriesInMinuteKpiCard() {
       </CardHeader>
       <CardFooter className="text-sm">
         <div className="text-muted-foreground">
-          Percentage of deliveries delivered within 60 seconds in the last 7
-          days
+          Percentage of deliveries delivered within 60 seconds in the{" "}
+          {params.label}
         </div>
       </CardFooter>
     </Card>

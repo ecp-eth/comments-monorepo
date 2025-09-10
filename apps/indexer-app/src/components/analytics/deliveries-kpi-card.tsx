@@ -11,9 +11,16 @@ import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 export function DeliveriesKpiCard() {
-  const analyticsKpiDeliveriesQuery = useAnalyticsKpiDeliveriesQuery();
+  const { params } = useAnalyticsContext();
+  const analyticsKpiDeliveriesQuery = useAnalyticsKpiDeliveriesQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+    },
+  });
 
   if (analyticsKpiDeliveriesQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;
@@ -58,7 +65,7 @@ export function DeliveriesKpiCard() {
       </CardHeader>
       <CardFooter className="text-sm">
         <div className="text-muted-foreground">
-          Total webhook deliveries in the last 7 days
+          Total webhook deliveries in the {params.label}
         </div>
       </CardFooter>
     </Card>

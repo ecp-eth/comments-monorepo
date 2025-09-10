@@ -19,6 +19,7 @@ import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 const chartConfig = {
   firstSuccessRate: {
@@ -32,6 +33,7 @@ const chartConfig = {
 };
 
 export function SuccessRatesChartCard() {
+  const { params } = useAnalyticsContext();
   const analyticsSuccessRatesQuery = useAnalyticsSuccessRatesQuery();
 
   if (analyticsSuccessRatesQuery.status === "pending") {
@@ -70,7 +72,7 @@ export function SuccessRatesChartCard() {
       <CardHeader>
         <CardTitle>Success rates</CardTitle>
         <CardDescription>
-          Showing success rates in the last 7 days
+          Showing success rates in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

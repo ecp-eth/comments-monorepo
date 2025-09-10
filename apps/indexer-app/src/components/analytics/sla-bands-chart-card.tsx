@@ -19,6 +19,7 @@ import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 const chartConfig = {
   "10s": {
@@ -40,6 +41,7 @@ const chartConfig = {
 };
 
 export function SlaBandsChartCard() {
+  const { params } = useAnalyticsContext();
   const analyticsSlaBandsQuery = useAnalyticsSlaBandsQuery();
 
   if (analyticsSlaBandsQuery.status === "pending") {
@@ -81,7 +83,9 @@ export function SlaBandsChartCard() {
     <Card>
       <CardHeader>
         <CardTitle>SLA bands</CardTitle>
-        <CardDescription>Showing SLA bands in the last 7 days</CardDescription>
+        <CardDescription>
+          Showing SLA bands in the {params.label}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

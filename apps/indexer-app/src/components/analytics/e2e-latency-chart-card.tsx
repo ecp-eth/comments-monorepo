@@ -19,6 +19,7 @@ import { ErrorScreen } from "../error-screen";
 import { Button } from "../ui/button";
 import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 function CustomTooltip({
   payload,
@@ -55,6 +56,7 @@ const chartConfig = {
 };
 
 export function E2ELatencyChartCard() {
+  const { params } = useAnalyticsContext();
   const analyticsE2ELatencyQuery = useAnalyticsE2ELatencyQuery();
 
   if (analyticsE2ELatencyQuery.status === "pending") {
@@ -101,7 +103,7 @@ export function E2ELatencyChartCard() {
       <CardHeader>
         <CardTitle>End to end latency</CardTitle>
         <CardDescription>
-          Showing end to end latency in the last 7 days
+          Showing end to end latency in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

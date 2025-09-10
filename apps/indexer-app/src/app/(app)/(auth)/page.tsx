@@ -23,6 +23,17 @@ import { SuccessRatesChartCard } from "@/components/analytics/success-rates-char
 import { E2ELatencyChartCard } from "@/components/analytics/e2e-latency-chart-card";
 import { ErrorBreakdownChartCard } from "@/components/analytics/error-breakdown-chart-card";
 import { SlaBandsChartCard } from "@/components/analytics/sla-bands-chart-card";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  AnalyticsProvider,
+  useAnalyticsContext,
+} from "@/components/analytics/analytics-provider";
 
 export default function AuthDashboardPage() {
   const meQuery = useMeQuery();
@@ -130,23 +141,46 @@ export default function AuthDashboardPage() {
     <>
       <AppHeader breadcrumbs={[{ label: "Dashboard", href: "/" }]} />
       <AppContent className="flex-col gap-4">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <DeliveriesKpiCard />
-          <DeliveriesEventualSuccessKpiCard />
-          <DeliveriesFirstAttemptSuccessKpiCard />
-          <EndToEndLatencyKpiCard />
-          <BacklogSizeKpiCard />
-          <DeliveriesInMinuteKpiCard />
-        </div>
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <AttemptsOverTimeChartCard />
-          <TerminalOutcomesChartCard />
-          <SuccessRatesChartCard />
-          <E2ELatencyChartCard />
-          <ErrorBreakdownChartCard />
-          <SlaBandsChartCard />
-        </div>
+        <AnalyticsProvider>
+          <div className="flex w-full justify-end">
+            <TimePeriodSelect />
+          </div>
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <DeliveriesKpiCard />
+            <DeliveriesEventualSuccessKpiCard />
+            <DeliveriesFirstAttemptSuccessKpiCard />
+            <EndToEndLatencyKpiCard />
+            <BacklogSizeKpiCard />
+            <DeliveriesInMinuteKpiCard />
+          </div>
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <AttemptsOverTimeChartCard />
+            <TerminalOutcomesChartCard />
+            <SuccessRatesChartCard />
+            <E2ELatencyChartCard />
+            <ErrorBreakdownChartCard />
+            <SlaBandsChartCard />
+          </div>
+        </AnalyticsProvider>
       </AppContent>
     </>
+  );
+}
+
+function TimePeriodSelect() {
+  const { timePeriod, setTimePeriod } = useAnalyticsContext();
+
+  return (
+    <Select value={timePeriod} onValueChange={setTimePeriod}>
+      <SelectTrigger className="max-w-[200px]">
+        <SelectValue placeholder="Select a time period" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="1d">Last day</SelectItem>
+        <SelectItem value="7d">Last 7 days</SelectItem>
+        <SelectItem value="30d">Last 30 days</SelectItem>
+        <SelectItem value="90d">Last 90 days</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }

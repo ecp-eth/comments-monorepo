@@ -44,6 +44,31 @@ import {
   createAnalyticsErrorsQueryKey,
 } from "./query-keys";
 
+type AnalyticsParams = {
+  from?: Date;
+  to?: Date;
+  bucket?: string;
+};
+
+function analyticsParamsToSearchParams(
+  url: URL,
+  params?: AnalyticsParams,
+): URL {
+  if (params?.from) {
+    url.searchParams.set("from", params.from.toISOString());
+  }
+
+  if (params?.to) {
+    url.searchParams.set("to", params.to.toISOString());
+  }
+
+  if (params?.bucket) {
+    url.searchParams.set("bucket", params.bucket);
+  }
+
+  return url;
+}
+
 type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
   UseQueryOptions<
     AnalyticsKpiDeliveriesResponseSchemaType,
@@ -52,18 +77,23 @@ type UseAnalyticsKpiDeliveriesQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiDeliveriesQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiDeliveriesQuery(
-  options?: UseAnalyticsKpiDeliveriesQueryOptions,
-) {
+export function useAnalyticsKpiDeliveriesQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiDeliveriesQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiDeliveriesQueryKey(),
+    queryKey: createAnalyticsKpiDeliveriesQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/kpi/deliveries"), {
+        const url = createFetchUrl("/api/analytics/kpi/deliveries");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -93,18 +123,23 @@ type UseAnalyticsKpiEventualSuccessQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiEventualSuccessQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiEventualSuccessQuery(
-  options?: UseAnalyticsKpiEventualSuccessQueryOptions,
-) {
+export function useAnalyticsKpiEventualSuccessQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiEventualSuccessQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiEventualSuccessQueryKey(),
+    queryKey: createAnalyticsKpiEventualSuccessQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/kpi/eventual-success"), {
+        const url = createFetchUrl("/api/analytics/kpi/eventual-success");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -136,24 +171,26 @@ type UseAnalyticsKpiFirstAttemptSuccessQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiFirstAttemptSuccessQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiFirstAttemptSuccessQuery(
-  options?: UseAnalyticsKpiFirstAttemptSuccessQueryOptions,
-) {
+export function useAnalyticsKpiFirstAttemptSuccessQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiFirstAttemptSuccessQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiFirstAttemptSuccessQueryKey(),
+    queryKey: createAnalyticsKpiFirstAttemptSuccessQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(
-          createFetchUrl("/api/analytics/kpi/first-attempt-success"),
-          {
-            signal,
-            headers,
-          },
-        );
+        const url = createFetchUrl("/api/analytics/kpi/first-attempt-success");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
+          signal,
+          headers,
+        });
       });
 
       if (response.status === 401) {
@@ -182,18 +219,23 @@ type UseAnalyticsKpiE2ELatencyQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiE2ELatencyQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiE2ELatencyQuery(
-  options?: UseAnalyticsKpiE2ELatencyQueryOptions,
-) {
+export function useAnalyticsKpiE2ELatencyQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiE2ELatencyQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiE2ELatencyQueryKey(),
+    queryKey: createAnalyticsKpiE2ELatencyQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/kpi/e2e-latency"), {
+        const url = createFetchUrl("/api/analytics/kpi/e2e-latency");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });
@@ -262,24 +304,26 @@ type UseAnalyticsKpiDeliveredUnderMinuteQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiDeliveredUnderMinuteQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiDeliveredUnderMinuteQuery(
-  options?: UseAnalyticsKpiDeliveredUnderMinuteQueryOptions,
-) {
+export function useAnalyticsKpiDeliveredUnderMinuteQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiDeliveredUnderMinuteQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiDeliveredUnderMinuteQueryKey(),
+    queryKey: createAnalyticsKpiDeliveredUnderMinuteQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(
-          createFetchUrl("/api/analytics/kpi/delivered-under-minute"),
-          {
-            signal,
-            headers,
-          },
-        );
+        const url = createFetchUrl("/api/analytics/kpi/delivered-under-minute");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
+          signal,
+          headers,
+        });
       });
 
       if (response.status === 401) {

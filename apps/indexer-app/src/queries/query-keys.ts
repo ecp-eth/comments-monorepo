@@ -89,28 +89,83 @@ export function createWebhookAnalyticsLatencyResponseHistogramQueryKey(
   ] as const;
 }
 
-export function createAnalyticsKpiDeliveriesQueryKey() {
-  return ["analytics-kpi-deliveries"] as const;
+type AnalyticsKpiDeliveriesQueryParams = {
+  from?: Date;
+  to?: Date;
+};
+
+export function createAnalyticsKpiDeliveriesQueryKey(
+  params?: AnalyticsKpiDeliveriesQueryParams,
+) {
+  return [
+    "analytics-kpi-deliveries",
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsKpiEventualSuccessQueryKey() {
-  return ["analytics-kpi-eventual-success"] as const;
+type AnalyticsKpiEventualSuccessQueryParams = {
+  from?: Date;
+  to?: Date;
+};
+
+export function createAnalyticsKpiEventualSuccessQueryKey(
+  params?: AnalyticsKpiEventualSuccessQueryParams,
+) {
+  return [
+    "analytics-kpi-eventual-success",
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsKpiFirstAttemptSuccessQueryKey() {
-  return ["analytics-kpi-first-attempt-success"] as const;
+type AnalyticsKpiFirstAttemptSuccessQueryParams = {
+  from?: Date;
+  to?: Date;
+};
+
+export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
+  params?: AnalyticsKpiFirstAttemptSuccessQueryParams,
+) {
+  return [
+    "analytics-kpi-first-attempt-success",
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
-export function createAnalyticsKpiE2ELatencyQueryKey() {
-  return ["analytics-kpi-e2e-latency"] as const;
+type AnalyticsKpiE2ELatencyQueryParams = {
+  from?: Date;
+  to?: Date;
+};
+
+export function createAnalyticsKpiE2ELatencyQueryKey(
+  params?: AnalyticsKpiE2ELatencyQueryParams,
+) {
+  return [
+    "analytics-kpi-e2e-latency",
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
 export function createAnalyticsKpiBacklogQueryKey() {
   return ["analytics-kpi-backlog"] as const;
 }
 
-export function createAnalyticsKpiDeliveredUnderMinuteQueryKey() {
-  return ["analytics-kpi-delivered-under-minute"] as const;
+type AnalyticsKpiDeliveredUnderMinuteQueryParams = {
+  from?: Date;
+  to?: Date;
+};
+
+export function createAnalyticsKpiDeliveredUnderMinuteQueryKey(
+  params?: AnalyticsKpiDeliveredUnderMinuteQueryParams,
+) {
+  return [
+    "analytics-kpi-delivered-under-minute",
+    params?.from?.toISOString(),
+    params?.to?.toISOString(),
+  ] as const;
 }
 
 export function createAnalyticsVolumeQueryKey() {

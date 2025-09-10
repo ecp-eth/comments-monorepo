@@ -11,9 +11,16 @@ import { useAnalyticsKpiE2ELatencyQuery } from "@/queries/analytics";
 import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useAnalyticsContext } from "./analytics-provider";
 
 export function EndToEndLatencyKpiCard() {
-  const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery();
+  const { params } = useAnalyticsContext();
+  const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery({
+    params: {
+      from: params.from,
+      to: params.to,
+    },
+  });
 
   if (analyticsKpiE2ELatencyQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;
@@ -59,7 +66,7 @@ export function EndToEndLatencyKpiCard() {
       </CardHeader>
       <CardFooter className="text-sm">
         <div className="text-muted-foreground">
-          End to end latency in the last 7 days
+          End to end latency in the {params.label}
         </div>
       </CardFooter>
     </Card>
