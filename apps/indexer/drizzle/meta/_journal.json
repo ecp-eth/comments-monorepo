@@ -99,6 +99,13 @@
       "when": 1757058194179,
       "tag": "0013_statistics_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1757587116455,
+      "tag": "0014_notify_events_triggers",
+      "breakpoints": true
     }
   ]
 }
