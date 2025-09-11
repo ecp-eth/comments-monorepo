@@ -1,7 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db, siweMiddleware } from "../../../../services";
 import { OpenAPIBigintStringSchema } from "../../../../lib/schemas";
-import { SQL, sql } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
