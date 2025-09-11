@@ -49,6 +49,7 @@ type AnalyticsParams = {
   to?: Date;
   bucket?: string;
   appId?: string;
+  webhookId?: string;
 };
 
 function analyticsParamsToSearchParams(
@@ -69,6 +70,10 @@ function analyticsParamsToSearchParams(
 
   if (params?.appId) {
     url.searchParams.set("appId", params.appId);
+  }
+
+  if (params?.webhookId) {
+    url.searchParams.set("webhookId", params.webhookId);
   }
 
   return url;
@@ -270,18 +275,23 @@ type UseAnalyticsKpiBacklogQueryOptions = Omit<
     ReturnType<typeof createAnalyticsKpiBacklogQueryKey>
   >,
   "queryKey" | "queryFn"
->;
+> & {
+  params?: Omit<AnalyticsParams, "bucket">;
+};
 
-export function useAnalyticsKpiBacklogQuery(
-  options?: UseAnalyticsKpiBacklogQueryOptions,
-) {
+export function useAnalyticsKpiBacklogQuery({
+  params,
+  ...options
+}: UseAnalyticsKpiBacklogQueryOptions = {}) {
   const auth = useAuth();
 
   return useQuery({
-    queryKey: createAnalyticsKpiBacklogQueryKey(),
+    queryKey: createAnalyticsKpiBacklogQueryKey(params),
     queryFn: async ({ signal }) => {
       const response = await secureFetch(auth, async ({ headers }) => {
-        return fetch(createFetchUrl("/api/analytics/kpi/backlog"), {
+        const url = createFetchUrl("/api/analytics/kpi/backlog");
+
+        return fetch(analyticsParamsToSearchParams(url, params), {
           signal,
           headers,
         });

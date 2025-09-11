@@ -4,10 +4,15 @@ import {
   OpenAPIDateStringSchema,
   OpenAPIFloatFromDbSchema,
 } from "../../../../lib/schemas";
-import { sql } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
+
+export const AnalyticsKpiBacklogGetQueryParamsSchema = z.object({
+  appId: z.string().uuid().optional(),
+  webhookId: z.string().uuid().optional(),
+});
 
 const AnalyticsKpiBacklogGetResponseSchema = z.object({
   inProgress: OpenAPIFloatFromDbSchema,
@@ -25,6 +30,9 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
       middleware: siweMiddleware,
       tags: ["analytics", "kpi", "backlog"],
       description: "Get the backlog KPI",
+      request: {
+        query: AnalyticsKpiBacklogGetQueryParamsSchema,
+      },
       responses: {
         200: {
           description: "The backlog KPI",
@@ -61,6 +69,17 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
+      const { appId, webhookId } = c.req.valid("query");
+      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+
+      if (appId) {
+        filters.push(sql`app.id = ${appId}`);
+      }
+
+      if (webhookId) {
+        filters.push(sql`w.id = ${webhookId}`);
+      }
+
       const { rows } = await db.execute<{
         inProgress: string;
         pending: string;
@@ -77,8 +96,9 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
         FROM ${schema.appWebhookDelivery} d
         WHERE d.app_webhook_id IN (
           SELECT w.id FROM ${schema.appWebhook} w
-          JOIN ${schema.app} ap ON ap.id = w.app_id
-          WHERE ap.owner_id = ${c.get("user").id}
+          JOIN ${schema.app} app ON (app.id = w.app_id)
+          WHERE  
+            ${sql.join(filters, sql` AND `)}
         );
       `);
 

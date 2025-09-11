@@ -15,10 +15,12 @@ import { useAnalyticsContext } from "./analytics-provider";
 
 type DeliveriesFirstAttemptSuccessKpiCardProps = {
   appId?: string;
+  webhookId?: string;
 };
 
 export function DeliveriesFirstAttemptSuccessKpiCard({
   appId,
+  webhookId,
 }: DeliveriesFirstAttemptSuccessKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiFirstAttemptSuccessQuery =
@@ -27,6 +29,7 @@ export function DeliveriesFirstAttemptSuccessKpiCard({
         from: params.from,
         to: params.to,
         appId,
+        webhookId,
       },
     });
 

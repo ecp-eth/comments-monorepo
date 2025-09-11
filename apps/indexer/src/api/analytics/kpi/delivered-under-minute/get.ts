@@ -1,7 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db, siweMiddleware } from "../../../../services";
 import { OpenAPIFloatFromDbSchema } from "../../../../lib/schemas";
-import { sql } from "drizzle-orm";
+import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
@@ -10,6 +10,8 @@ export const AnalyticsKpiDeliveredUnderMinuteGetQueryParamsSchema = z
   .object({
     from: z.coerce.date().min(new Date("2025-01-01")).optional(),
     to: z.coerce.date().optional(),
+    appId: z.string().uuid().optional(),
+    webhookId: z.string().uuid().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.from && data.to && data.from >= data.to) {
@@ -71,10 +73,20 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to } = c.req.valid("query");
+      const { from, to, appId, webhookId } = c.req.valid("query");
       const toToUse = to ?? new Date();
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
+
+      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+
+      if (appId) {
+        filters.push(sql`app.id = ${appId}`);
+      }
+
+      if (webhookId) {
+        filters.push(sql`w.id = ${webhookId}`);
+      }
 
       const { rows } = await db.execute<{
         rate: string;
@@ -92,7 +104,8 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
                 SELECT w.id
                 FROM ${schema.appWebhook} w
                 JOIN ${schema.app} app ON app.id = w.app_id
-                WHERE app.owner_id = ${c.get("user").id}
+                WHERE  
+                  ${sql.join(filters, sql` AND `)}
               )
           ),
           success_time AS (

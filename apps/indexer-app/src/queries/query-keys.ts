@@ -55,6 +55,7 @@ type AnalyticsKpiDeliveriesQueryParams = {
   from?: Date;
   to?: Date;
   appId?: string;
+  webhookId?: string;
 };
 
 export function createAnalyticsKpiDeliveriesQueryKey(
@@ -65,6 +66,7 @@ export function createAnalyticsKpiDeliveriesQueryKey(
     params?.from?.toISOString(),
     params?.to?.toISOString(),
     params?.appId,
+    params?.webhookId,
   ] as const;
 }
 
@@ -72,6 +74,7 @@ type AnalyticsKpiEventualSuccessQueryParams = {
   from?: Date;
   to?: Date;
   appId?: string;
+  webhookId?: string;
 };
 
 export function createAnalyticsKpiEventualSuccessQueryKey(
@@ -82,6 +85,7 @@ export function createAnalyticsKpiEventualSuccessQueryKey(
     params?.from?.toISOString(),
     params?.to?.toISOString(),
     params?.appId,
+    params?.webhookId,
   ] as const;
 }
 
@@ -89,6 +93,7 @@ type AnalyticsKpiFirstAttemptSuccessQueryParams = {
   from?: Date;
   to?: Date;
   appId?: string;
+  webhookId?: string;
 };
 
 export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
@@ -99,6 +104,7 @@ export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
     params?.from?.toISOString(),
     params?.to?.toISOString(),
     params?.appId,
+    params?.webhookId,
   ] as const;
 }
 
@@ -106,6 +112,7 @@ type AnalyticsKpiE2ELatencyQueryParams = {
   from?: Date;
   to?: Date;
   appId?: string;
+  webhookId?: string;
 };
 
 export function createAnalyticsKpiE2ELatencyQueryKey(
@@ -116,16 +123,26 @@ export function createAnalyticsKpiE2ELatencyQueryKey(
     params?.from?.toISOString(),
     params?.to?.toISOString(),
     params?.appId,
+    params?.webhookId,
   ] as const;
 }
 
-export function createAnalyticsKpiBacklogQueryKey() {
-  return ["analytics-kpi-backlog"] as const;
+type AnalyticsKpiBacklogQueryParams = {
+  appId?: string;
+  webhookId?: string;
+};
+
+export function createAnalyticsKpiBacklogQueryKey(
+  params?: AnalyticsKpiBacklogQueryParams,
+) {
+  return ["analytics-kpi-backlog", params?.appId, params?.webhookId] as const;
 }
 
 type AnalyticsKpiDeliveredUnderMinuteQueryParams = {
   from?: Date;
   to?: Date;
+  appId?: string;
+  webhookId?: string;
 };
 
 export function createAnalyticsKpiDeliveredUnderMinuteQueryKey(
@@ -135,6 +152,8 @@ export function createAnalyticsKpiDeliveredUnderMinuteQueryKey(
     "analytics-kpi-delivered-under-minute",
     params?.from?.toISOString(),
     params?.to?.toISOString(),
+    params?.appId,
+    params?.webhookId,
   ] as const;
 }
 

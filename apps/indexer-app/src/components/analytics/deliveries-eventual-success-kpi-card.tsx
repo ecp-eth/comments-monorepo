@@ -15,10 +15,12 @@ import { useAnalyticsContext } from "./analytics-provider";
 
 type DeliveriesEventualSuccessKpiCardProps = {
   appId?: string;
+  webhookId?: string;
 };
 
 export function DeliveriesEventualSuccessKpiCard({
   appId,
+  webhookId,
 }: DeliveriesEventualSuccessKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiEventualSuccessQuery = useAnalyticsKpiEventualSuccessQuery({
@@ -26,6 +28,7 @@ export function DeliveriesEventualSuccessKpiCard({
       from: params.from,
       to: params.to,
       appId,
+      webhookId,
     },
   });
 

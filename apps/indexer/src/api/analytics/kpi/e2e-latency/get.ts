@@ -11,6 +11,7 @@ export const AnalyticsKpiE2ELatencyGetQueryParamsSchema = z
     from: z.coerce.date().min(new Date("2025-01-01")).optional(),
     to: z.coerce.date().optional(),
     appId: z.string().uuid().optional(),
+    webhookId: z.string().uuid().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.from && data.to && data.from >= data.to) {
@@ -72,7 +73,7 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to, appId } = c.req.valid("query");
+      const { from, to, appId, webhookId } = c.req.valid("query");
       const toToUse = to ?? new Date();
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
@@ -81,6 +82,10 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
 
       if (appId) {
         filters.push(sql`app.id = ${appId}`);
+      }
+
+      if (webhookId) {
+        filters.push(sql`w.id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{

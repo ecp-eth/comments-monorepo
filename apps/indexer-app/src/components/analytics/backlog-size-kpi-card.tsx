@@ -13,8 +13,21 @@ import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Fragment } from "react";
 
-export function BacklogSizeKpiCard() {
-  const analyticsKpiBacklogQuery = useAnalyticsKpiBacklogQuery();
+type BacklogSizeKpiCardProps = {
+  appId?: string;
+  webhookId?: string;
+};
+
+export function BacklogSizeKpiCard({
+  appId,
+  webhookId,
+}: BacklogSizeKpiCardProps) {
+  const analyticsKpiBacklogQuery = useAnalyticsKpiBacklogQuery({
+    params: {
+      appId,
+      webhookId,
+    },
+  });
 
   if (analyticsKpiBacklogQuery.status === "pending") {
     return <Skeleton className="w-full h-full rounded-xl" />;

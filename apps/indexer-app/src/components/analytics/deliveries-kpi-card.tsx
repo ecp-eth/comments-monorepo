@@ -15,15 +15,20 @@ import { useAnalyticsContext } from "./analytics-provider";
 
 type DeliveriesKpiCardProps = {
   appId?: string;
+  webhookId?: string;
 };
 
-export function DeliveriesKpiCard({ appId }: DeliveriesKpiCardProps) {
+export function DeliveriesKpiCard({
+  appId,
+  webhookId,
+}: DeliveriesKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiDeliveriesQuery = useAnalyticsKpiDeliveriesQuery({
     params: {
       from: params.from,
       to: params.to,
       appId,
+      webhookId,
     },
   });
 

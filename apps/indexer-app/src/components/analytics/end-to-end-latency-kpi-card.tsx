@@ -15,15 +15,20 @@ import { useAnalyticsContext } from "./analytics-provider";
 
 type EndToEndLatencyKpiCardProps = {
   appId?: string;
+  webhookId?: string;
 };
 
-export function EndToEndLatencyKpiCard({ appId }: EndToEndLatencyKpiCardProps) {
+export function EndToEndLatencyKpiCard({
+  appId,
+  webhookId,
+}: EndToEndLatencyKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery({
     params: {
       from: params.from,
       to: params.to,
       appId,
+      webhookId,
     },
   });
 

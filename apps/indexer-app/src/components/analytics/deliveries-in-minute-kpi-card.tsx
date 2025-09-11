@@ -13,13 +13,23 @@ import { RotateCwIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
 
-export function DeliveriesInMinuteKpiCard() {
+type DeliveriesInMinuteKpiCardProps = {
+  appId?: string;
+  webhookId?: string;
+};
+
+export function DeliveriesInMinuteKpiCard({
+  appId,
+  webhookId,
+}: DeliveriesInMinuteKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiDeliveredUnderMinuteQuery =
     useAnalyticsKpiDeliveredUnderMinuteQuery({
       params: {
         from: params.from,
         to: params.to,
+        appId,
+        webhookId,
       },
     });
 
