@@ -16,6 +16,8 @@ import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-te
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
 import { AppWebhookDetailsVolumeChartCard } from "@/components/app-webhook-details-volume-chart-card";
 import { DataTable } from "@/components/data-table";
+import { DataTableBasicPagination } from "@/components/data-table-basic-pagination";
+import { DataTableCursorPagination } from "@/components/data-table-cursor-pagination";
 import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +32,8 @@ import {
   useWebhookDeliveryAttemptsQuery,
   useWebhookQuery,
 } from "@/queries/webhook";
-import type { ColumnDef } from "@tanstack/react-table";
+import { keepPreviousData } from "@tanstack/react-query";
+import type { ColumnDef, PaginationState } from "@tanstack/react-table";
 import {
   RotateCwIcon,
   WebhookIcon,
@@ -38,7 +41,7 @@ import {
   CircleAlertIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { use, useMemo } from "react";
+import { use, useMemo, useState } from "react";
 
 export default function WebhookPage({
   params,
@@ -351,7 +354,21 @@ function WebhookDeliveryAttemptsList({
   appId: string;
   webhookId: string;
 }) {
-  const deliveriesQuery = useWebhookDeliveryAttemptsQuery({ appId, webhookId });
+  const [paginationParams, setPaginationParams] = useState<{
+    direction: "previous" | "next";
+    cursor: string;
+  } | null>(null);
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+  const deliveriesQuery = useWebhookDeliveryAttemptsQuery({
+    appId,
+    webhookId,
+    placeholderData: keepPreviousData,
+    limit: paginationState.pageSize,
+    ...paginationParams,
+  });
   const columns = useMemo(
     () => createWebhookDeliveryAttemptsDataTableColumns(),
     [],
@@ -398,8 +415,43 @@ function WebhookDeliveryAttemptsList({
     );
   }
 
-  // @todo add pagination
-  return <DataTable data={deliveriesQuery.data.results} columns={columns} />;
+  return (
+    <DataTable
+      data={deliveriesQuery.data.results}
+      columns={columns}
+      pagination={() => {
+        return {
+          render(props) {
+            return (
+              <DataTableCursorPagination
+                {...props}
+                hasNextPage={deliveriesQuery.data.pageInfo.hasNextPage}
+                hasPreviousPage={deliveriesQuery.data.pageInfo.hasPreviousPage}
+                onNextPage={() => {
+                  if (deliveriesQuery.data.pageInfo.endCursor) {
+                    setPaginationParams({
+                      direction: "next",
+                      cursor: deliveriesQuery.data.pageInfo.endCursor,
+                    });
+                  }
+                }}
+                onPreviousPage={() => {
+                  if (deliveriesQuery.data.pageInfo.startCursor) {
+                    setPaginationParams({
+                      direction: "previous",
+                      cursor: deliveriesQuery.data.pageInfo.startCursor,
+                    });
+                  }
+                }}
+              />
+            );
+          },
+          state: paginationState,
+          onPaginationChange: setPaginationState,
+        };
+      }}
+    />
+  );
 }
 
 function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
@@ -408,46 +460,46 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
   return [
     {
       header: "Attempted At",
-      accessorKey: "attemptedAt",
+      accessorKey: "item.attemptedAt",
       cell: ({ row }) => {
         return new Intl.DateTimeFormat(undefined, {
           dateStyle: "short",
           timeStyle: "short",
-        }).format(row.original.attemptedAt);
+        }).format(row.original.item.attemptedAt);
       },
     },
     {
       header: "Attempt Number",
-      accessorKey: "attemptNumber",
+      accessorKey: "item.attemptNumber",
     },
     {
       header: "Event Type",
-      accessorKey: "delivery.event.eventType",
+      accessorKey: "item.delivery.event.eventType",
       cell: ({ row }) => {
         return (
           <Badge variant="secondary">
-            {row.original.delivery.event.eventType}
+            {row.original.item.delivery.event.eventType}
           </Badge>
         );
       },
     },
     {
       header: "Response Status",
-      accessorKey: "responseStatus",
+      accessorKey: "item.responseStatus",
       cell: ({ row }) => {
         if (
-          row.original.responseStatus >= 200 &&
-          row.original.responseStatus <= 399
+          row.original.item.responseStatus >= 200 &&
+          row.original.item.responseStatus <= 399
         ) {
           return (
             <Badge className="gap-2" variant="outline">
               <CheckCircle2Icon className="h-4 w-4 text-green-400" />
-              {row.original.responseStatus}
+              {row.original.item.responseStatus}
             </Badge>
           );
         }
 
-        if (row.original.responseStatus === -1) {
+        if (row.original.item.responseStatus === -1) {
           return (
             <Badge className="gap-2" variant="outline">
               <CircleAlertIcon className="h-4 w-4 text-red-400" />
@@ -456,7 +508,7 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
           );
         }
 
-        if (row.original.responseStatus === -2) {
+        if (row.original.item.responseStatus === -2) {
           return (
             <Badge className="gap-2" variant="outline">
               <CircleAlertIcon className="h-4 w-4 text-red-400" />
@@ -468,16 +520,16 @@ function createWebhookDeliveryAttemptsDataTableColumns(): ColumnDef<
         return (
           <Badge className="gap-2" variant="outline">
             <CircleAlertIcon className="h-4 w-4 text-red-400" />
-            {row.original.responseStatus}
+            {row.original.item.responseStatus}
           </Badge>
         );
       },
     },
     {
       header: "Response Time",
-      accessorKey: "responseMs",
+      accessorKey: "item.responseMs",
       cell: ({ row }) => {
-        return row.original.responseMs.toLocaleString(undefined, {
+        return row.original.item.responseMs.toLocaleString(undefined, {
           unit: "millisecond",
           style: "unit",
         });

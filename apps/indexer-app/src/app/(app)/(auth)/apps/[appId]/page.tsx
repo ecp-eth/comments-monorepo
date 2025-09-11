@@ -244,10 +244,16 @@ function WebhooksList({ appId }: { appId: string }) {
       data={webhooksQuery.data.results}
       columns={columns}
       tableActions={<CreateWebhookDialogButton appId={appId} />}
-      pagination={DataTableBasicPagination}
-      state={{ pagination: paginationState }}
-      onPaginationChange={setPaginationState}
-      paginationRowCount={webhooksQuery.data.pageInfo.total}
+      pagination={() => {
+        return {
+          render(props) {
+            return <DataTableBasicPagination {...props} />;
+          },
+          paginationRowCount: webhooksQuery.data.pageInfo.total,
+          onPaginationChange: setPaginationState,
+          state: paginationState,
+        };
+      }}
     />
   );
 }

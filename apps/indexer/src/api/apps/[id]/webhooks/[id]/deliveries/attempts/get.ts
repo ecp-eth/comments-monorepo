@@ -63,7 +63,12 @@ export const AppWebhookDeliveriesCursorSchema = z
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
 export const AppWebhookDeliveriesGetResponseSchema = z.object({
-  results: z.array(AppWebhookDeliverySchema),
+  results: z.array(
+    z.object({
+      cursor: AppWebhookDeliveriesCursorSchema,
+      item: AppWebhookDeliverySchema,
+    }),
+  ),
   pageInfo: z.object({
     hasPreviousPage: z.boolean(),
     hasNextPage: z.boolean(),
@@ -206,7 +211,10 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
 
         return c.json(
           formatResponseUsingZodSchema(AppWebhookDeliveriesGetResponseSchema, {
-            results: pageResults,
+            results: pageResults.map((item) => ({
+              cursor: item,
+              item,
+            })),
             pageInfo: {
               hasNextPage,
               hasPreviousPage,

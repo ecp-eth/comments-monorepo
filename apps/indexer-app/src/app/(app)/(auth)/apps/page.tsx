@@ -136,10 +136,16 @@ export default function AppsPage() {
             data={appsQuery.data.results}
             columns={columns}
             tableActions={<CreateAppDialogButton />}
-            pagination={DataTableBasicPagination}
-            state={{ pagination: paginationState }}
-            onPaginationChange={setPaginationState}
-            paginationRowCount={appsQuery.data.pageInfo.total}
+            pagination={() => {
+              return {
+                render(props) {
+                  return <DataTableBasicPagination {...props} />;
+                },
+                paginationRowCount: appsQuery.data.pageInfo.total,
+                onPaginationChange: setPaginationState,
+                state: paginationState,
+              };
+            }}
           />
         )}
       </AppContent>

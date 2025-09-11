@@ -18,16 +18,37 @@ import {
   TableRow,
 } from "./ui/table";
 
+type PaginationRenderFunctionProps<TData> = {
+  table: TableType<TData>;
+};
+
+type PaginationRenderFunction<TData> = (
+  props: PaginationRenderFunctionProps<TData>,
+) => React.ReactNode;
+
+type BasicPaginationOptions<TData> = {
+  render: PaginationRenderFunction<TData>;
+  paginationRowCount: number;
+  onPaginationChange: OnChangeFn<PaginationState>;
+  state: PaginationState;
+};
+
+type CursorPaginationOptions<TData> = {
+  render: PaginationRenderFunction<TData>;
+  onPaginationChange: OnChangeFn<PaginationState>;
+  state: PaginationState;
+};
+
+type PaginationOptionsFunction<TData> = () =>
+  | BasicPaginationOptions<TData>
+  | CursorPaginationOptions<TData>;
+
 type DataTableProps<TData = unknown> = {
   data: TData[];
   columns: ColumnDef<TData>[];
   state?: Partial<TableState>;
   tableActions?: React.ReactNode;
-  pagination?: React.ComponentType<{
-    table: TableType<TData>;
-  }>;
-  paginationRowCount?: number;
-  onPaginationChange?: OnChangeFn<PaginationState>;
+  pagination?: PaginationOptionsFunction<TData>;
 };
 
 export function DataTable<TData = unknown>({
@@ -35,10 +56,10 @@ export function DataTable<TData = unknown>({
   columns,
   state,
   tableActions,
-  pagination: Pagination,
-  paginationRowCount,
-  onPaginationChange,
+  pagination,
 }: DataTableProps<TData>) {
+  const paginationOptions = pagination?.();
+
   const table = useReactTable({
     data,
     columns,
@@ -46,8 +67,20 @@ export function DataTable<TData = unknown>({
     getFilteredRowModel: getFilteredRowModel(),
     state,
     manualPagination: true,
-    onPaginationChange,
-    rowCount: paginationRowCount,
+    // page based pagination (basic)
+    ...(paginationOptions &&
+      "paginationRowCount" in paginationOptions && {
+        rowCount: paginationOptions.paginationRowCount,
+      }),
+    // both pagination types can change the limit (pageSize)
+    ...(paginationOptions &&
+      "state" in paginationOptions && {
+        state: {
+          ...state,
+          pagination: paginationOptions.state,
+        },
+      }),
+    onPaginationChange: paginationOptions?.onPaginationChange,
   });
 
   return (
@@ -106,7 +139,7 @@ export function DataTable<TData = unknown>({
           </TableBody>
         </Table>
       </div>
-      {Pagination && <Pagination table={table} />}
+      {paginationOptions?.render({ table })}
     </div>
   );
 }

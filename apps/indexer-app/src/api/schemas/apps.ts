@@ -185,15 +185,18 @@ export type AppWebhooksListResponseSchemaType = z.infer<
 export const AppWebhookListDeliveryAttemptsResponseSchema = z.object({
   results: z.array(
     z.object({
-      id: z.coerce.bigint(),
-      attemptedAt: z.coerce.date(),
-      attemptNumber: z.number(),
-      responseStatus: z.number(),
-      responseMs: z.number(),
-      error: z.string().nullable(),
-      delivery: z.object({
-        event: z.object({
-          eventType: z.string(),
+      cursor: z.string(),
+      item: z.object({
+        id: z.coerce.bigint(),
+        attemptedAt: z.coerce.date(),
+        attemptNumber: z.number(),
+        responseStatus: z.number(),
+        responseMs: z.number(),
+        error: z.string().nullable(),
+        delivery: z.object({
+          event: z.object({
+            eventType: z.string(),
+          }),
         }),
       }),
     }),
