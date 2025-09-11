@@ -1,21 +1,26 @@
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { schema } from "../../../schema.ts";
 import { eq, sql } from "drizzle-orm";
 import isNetworkError from "is-network-error";
 import { createHmac } from "node:crypto";
+import Deferred from "promise-deferred";
+import { schema } from "../../../schema.ts";
+import type { DB } from "../db.ts";
 
 type WebhookEventDeliveryService_DeliverEventsParams = {
   signal: AbortSignal;
 };
 
 type WebhookEventDeliveryServiceOptions = {
-  db: NodePgDatabase<typeof schema>;
+  db: DB;
   /**
-   * Interval in milliseconds between fan out attempts.
+   * Polling interval in milliseconds for checking for new deliveries.
+   * This works as fallback to LISTEN/NOTIFY if there are no new deliveries.
    *
-   * @default 500
+   * Keep the interval low enough because there is no notification triggered
+   * if the delivery should be retried.
+   *
+   * @default 1000
    */
-  interval?: number;
+  pollInterval?: number;
 
   /**
    * Number of deliveries to process in a single batch.
@@ -40,18 +45,21 @@ type WebhookEventDeliveryServiceOptions = {
 };
 
 export class WebhookEventDeliveryService {
-  private readonly db: NodePgDatabase<typeof schema>;
-  private readonly interval: number;
+  private readonly db: DB;
+  private readonly pollInterval: number;
   private readonly batchSize: number;
   private readonly requestTimeout: number;
   private readonly maxDeliveryAttempts: number;
+  private deferred: Deferred.Deferred<void> | undefined;
+  private shouldProcessBatch: boolean;
 
   constructor(options: WebhookEventDeliveryServiceOptions) {
     this.db = options.db;
-    this.interval = options.interval ?? 500;
+    this.pollInterval = options.pollInterval ?? 1000;
     this.batchSize = options.batchSize ?? 20;
     this.requestTimeout = options.requestTimeout ?? 5_000;
     this.maxDeliveryAttempts = options.maxDeliveryAttempts ?? 20;
+    this.shouldProcessBatch = false;
   }
 
   async deliverEvents(
@@ -59,65 +67,104 @@ export class WebhookEventDeliveryService {
   ): Promise<void> {
     const { signal } = params;
 
+    const notificationPgClient = await this.db.$client.connect();
+
+    if (!notificationPgClient) {
+      throw new Error("Failed to connect to notification pg client");
+    }
+
+    const processBatchListener = () => {
+      // if there is a deferred, resolve it
+      if (this.deferred) {
+        this.deferred.resolve();
+      } else {
+        // this will be picked by the waitForNewDeliveries method
+        // and immediately resolve the new promise
+        this.shouldProcessBatch = true;
+      }
+    };
+
+    // start listening for new deliveries using notifications
+    await notificationPgClient.query("LISTEN webhook_deliveries_events");
+    notificationPgClient.on("notification", processBatchListener);
+
+    // fallback to polling if there were no notifications for {this.interval} seconds
+    const intervalId = setInterval(processBatchListener, this.pollInterval);
+
+    // clean up because service is aborted
+    signal.addEventListener("abort", () => {
+      clearInterval(intervalId);
+      notificationPgClient.removeListener("notification", processBatchListener);
+      notificationPgClient.release();
+      this.deferred?.resolve();
+    });
+
     while (!signal.aborted) {
-      const { rows } = await this.db.execute<{
-        id: bigint;
-        appWebhookId: string;
-        eventId: bigint;
-      }>(sql`
-        WITH
-          -- select the head of the queue for each subscription (FIFO)
-          subscription_pending_delivery_heads AS (
-            SELECT DISTINCT ON (w.app_webhook_id) w.app_webhook_id, w.next_attempt_at, w.id, w.event_id
-            FROM ${schema.appWebhookDelivery} w
-            WHERE
-              -- include expired leases
-              w.status IN ('pending', 'processing')
-              AND 
-              w.next_attempt_at <= now()
-              AND NOT EXISTS(
-                SELECT 1
-                FROM ${schema.appWebhookDelivery} x
-                WHERE
-                  x.app_webhook_id = w.app_webhook_id
-                  AND
-                  x.status = 'processing'
-                  AND 
-                  x.lease_until > now()
-              )
-            ORDER BY w.app_webhook_id, w.next_attempt_at, w.id
-          ),
+      const { rows } = await this.db.transaction(async (tx) => {
+        return tx.execute<{
+          id: bigint;
+          appWebhookId: string;
+          eventId: bigint;
+        }>(sql`
+          WITH
+            -- select the head of the queue for each subscription (FIFO)
+            subscription_pending_delivery_heads AS (
+              SELECT DISTINCT ON (w.app_webhook_id) w.app_webhook_id, w.next_attempt_at, w.id, w.event_id
+              FROM ${schema.appWebhookDelivery} w
+              WHERE
+                -- include expired leases
+                w.status IN ('pending', 'processing')
+                AND 
+                w.next_attempt_at <= now()
+                AND NOT EXISTS(
+                  SELECT 1
+                  FROM ${schema.appWebhookDelivery} x
+                  WHERE
+                    x.app_webhook_id = w.app_webhook_id
+                    AND
+                    x.status = 'processing'
+                    AND 
+                    x.lease_until > now()
+                )
+              ORDER BY w.app_webhook_id, w.next_attempt_at, w.id
+            ),
+  
+            -- avoid lock spray
+            subscription_pending_deliveries AS (
+              SELECT *
+              FROM subscription_pending_delivery_heads
+              ORDER BY next_attempt_at, id
+              LIMIT ${this.batchSize}
+            ),
+  
+            -- lock the head of the queue for each subscription (FIFO)
+            subscription_pending_deliveries_locked AS (
+              SELECT h.*
+              FROM subscription_pending_deliveries h
+              WHERE pg_try_advisory_xact_lock(hashtextextended(h.app_webhook_id::text, 0)) -- non blocking lock
+              ORDER BY h.next_attempt_at, h.id
+            )
+  
+            -- update the deliveries to processing
+            UPDATE ${schema.appWebhookDelivery} d
+            SET 
+              status = 'processing',
+              lease_until = NOW() + interval '60 seconds'
+            FROM subscription_pending_deliveries_locked l
+            WHERE l.id = d.id
+            RETURNING d.id, d.app_webhook_id, d.event_id
+        `);
+      });
 
-          -- avoid lock spray
-          subscription_pending_deliveries AS (
-            SELECT *
-            FROM subscription_pending_delivery_heads
-            ORDER BY next_attempt_at, id
-            LIMIT ${this.batchSize}
-          ),
-
-          -- lock the head of the queue for each subscription (FIFO)
-          subscription_pending_deliveries_locked AS (
-            SELECT h.*
-            FROM subscription_pending_deliveries h
-            WHERE pg_try_advisory_xact_lock(hashtextextended(h.app_webhook_id::text, 0)) -- non blocking lock
-            ORDER BY h.next_attempt_at, h.id
-          )
-
-          -- update the deliveries to processing
-          UPDATE ${schema.appWebhookDelivery} d
-          SET 
-            status = 'processing',
-            lease_until = now() + interval '60 seconds',
-            attempts_count = CASE WHEN d.status='processing' THEN d.attempts_count ELSE d.attempts_count + 1 END
-          FROM subscription_pending_deliveries_locked l
-          WHERE l.id = d.id
-          RETURNING d.id, d.app_webhook_id, d.event_id
-      `);
-
+      // if no rows were returned we essentially processed all the deliveries
+      // otherwise we want to drain the queue completely
       if (rows.length === 0) {
         // if there are no rows, wait for the next interval
-        await new Promise((resolve) => setTimeout(resolve, this.interval));
+        await this.waitForNewDeliveries();
+        // reset the deferred so it will be again created by the waitForNewDeliveries method
+        // and resolved either by notification or interval
+        this.deferred = undefined;
+        this.shouldProcessBatch = false;
 
         continue;
       }
@@ -149,6 +196,8 @@ export class WebhookEventDeliveryService {
     if (!delivery) {
       throw new Error(`Delivery with id ${deliveryId} not found`);
     }
+
+    const attemptNumber = delivery?.attemptsCount + 1;
 
     const { appWebhook, event } = delivery;
 
@@ -225,6 +274,7 @@ export class WebhookEventDeliveryService {
             appWebhookDeliveryId: deliveryId,
             responseStatus: response.status,
             responseMs,
+            attemptNumber,
           })
           .execute();
 
@@ -233,6 +283,7 @@ export class WebhookEventDeliveryService {
           .set({
             status: "success",
             leaseUntil: null,
+            attemptsCount: attemptNumber,
           })
           .where(eq(schema.appWebhookDelivery.id, deliveryId))
           .execute();
@@ -251,10 +302,11 @@ export class WebhookEventDeliveryService {
             responseStatus: error.responseStatus,
             responseMs: error.responseMs,
             error: error.responseBodyText,
+            attemptNumber,
           })
           .execute();
 
-        if (delivery.attemptsCount < this.maxDeliveryAttempts) {
+        if (delivery.attemptsCount <= this.maxDeliveryAttempts) {
           const exponentialBackoffSeconds = 2 ** delivery.attemptsCount;
           const maxJitterInSeconds = Math.ceil(exponentialBackoffSeconds * 0.2);
           const jitterInSeconds = Math.random() * maxJitterInSeconds;
@@ -267,7 +319,8 @@ export class WebhookEventDeliveryService {
             .set({
               status: "pending",
               leaseUntil: null,
-              nextAttemptAt: sql`now() + interval '${nextAttemptAtSeconds} seconds'`,
+              nextAttemptAt: sql`NOW() + (${nextAttemptAtSeconds} || ' seconds')::interval`,
+              attemptsCount: attemptNumber,
             })
             .where(eq(schema.appWebhookDelivery.id, deliveryId))
             .execute();
@@ -278,12 +331,23 @@ export class WebhookEventDeliveryService {
               status: "failed",
               leaseUntil: null,
               lastError: error.responseBodyText,
+              attemptsCount: attemptNumber,
             })
             .where(eq(schema.appWebhookDelivery.id, deliveryId))
             .execute();
         }
       });
     }
+  }
+
+  private async waitForNewDeliveries(): Promise<void> {
+    this.deferred = new Deferred<void>();
+
+    if (this.shouldProcessBatch) {
+      this.deferred.resolve();
+    }
+
+    return this.deferred.promise;
   }
 }
 

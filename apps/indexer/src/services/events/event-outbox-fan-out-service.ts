@@ -1,28 +1,33 @@
-import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { sql } from "drizzle-orm";
+import Deferred from "promise-deferred";
 import { schema } from "../../../schema.ts";
+import type { DB } from "../db.ts";
 
 type EventOutboxFanOutService_FanOutEventsParams = {
   signal: AbortSignal;
 };
 
 type EventOutboxFanOutServiceOptions = {
-  db: NodePgDatabase<typeof schema>;
+  db: DB;
   /**
-   * Interval in milliseconds between fan out attempts.
+   * Polling interval in milliseconds for checking for new events.
+   * This works as fallback to LISTEN/NOTIFY if there are no new events.
    *
-   * @default 500
+   * @default 30_000
    */
-  interval?: number;
+  pollInterval?: number;
 };
 
 export class EventOutboxFanOutService {
-  private readonly db: NodePgDatabase<typeof schema>;
-  private readonly interval: number;
+  private readonly db: DB;
+  private readonly pollInterval: number;
+  private shouldProcessBatch: boolean;
+  private deferred: Deferred.Deferred<void> | undefined;
 
   constructor(options: EventOutboxFanOutServiceOptions) {
     this.db = options.db;
-    this.interval = options.interval ?? 500;
+    this.pollInterval = options.pollInterval ?? 30_000;
+    this.shouldProcessBatch = false;
   }
 
   async fanOutEvents(
@@ -30,60 +35,108 @@ export class EventOutboxFanOutService {
   ): Promise<void> {
     const { signal } = params;
 
+    const notificationPgClient = await this.db.$client.connect();
+
+    if (!notificationPgClient) {
+      throw new Error("Failed to connect to notification pg client");
+    }
+
+    const processBatchListener = () => {
+      // if there is a deferred, resolve it
+      if (this.deferred) {
+        this.deferred.resolve();
+      } else {
+        // this will be picked by the waitForNewDeliveries method
+        // and immediately resolve the new promise
+        this.shouldProcessBatch = true;
+      }
+    };
+
+    // start listening for new events using notifications
+    await notificationPgClient.query("LISTEN event_outbox_events");
+    notificationPgClient.on("notification", processBatchListener);
+
+    // fallback to polling if there were no notifications for {this.interval} seconds
+    const intervalId = setInterval(processBatchListener, this.pollInterval);
+
+    // clean up because service is aborted
+    signal.addEventListener("abort", () => {
+      clearInterval(intervalId);
+      notificationPgClient.removeListener("notification", processBatchListener);
+      notificationPgClient.release();
+      this.deferred?.resolve();
+    });
+
     while (!signal.aborted) {
       /**
        * Select events from event outbox and mark them as locked for update. Then fan out the events to webhooks that are subscribed to the event.
        */
-      await this.db.execute(sql`
-        BEGIN;
+      const { rows } = await this.db.transaction(async (tx) => {
+        return tx.execute(sql`
+          WITH
+            -- 1) Claim a batch of events to be fan out
+            claimed_events AS (
+              SELECT * FROM ${schema.eventOutbox}
+              WHERE ${schema.eventOutbox.processedAt} IS NULL
+              ORDER BY ${schema.eventOutbox.id} ASC
+              LIMIT 100
+              FOR UPDATE SKIP LOCKED
+            ),
 
-        WITH
-          -- 1) Claim a batch of events to be fan out
-          claimed_events AS (
-            SELECT * FROM ${schema.eventOutbox}
-            WHERE ${schema.eventOutbox.processedAt} IS NULL
-            ORDER BY ${schema.eventOutbox.id} ASC
-            LIMIT 100
-            FOR UPDATE SKIP LOCKED
-          ),
-
-          -- 2) Insert the events for subscribers which are interested in the event
-          inserted_events AS (
-            INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id)
-            SELECT ${schema.appWebhook.id}, e.id
-            FROM claimed_events e
-            JOIN ${schema.appWebhook} ON (
-              ${schema.appWebhook.paused} = FALSE 
-              AND 
-              (
-                ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
-                OR ${schema.appWebhook.eventFilter} = '{}'
-              )
-              AND
-              (
-                e.event_type != 'test'
-                OR
+            -- 2) Insert the events for subscribers which are interested in the event
+            inserted_events AS (
+              INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id)
+              SELECT ${schema.appWebhook.id}, e.id
+              FROM claimed_events e
+              JOIN ${schema.appWebhook} ON (
+                ${schema.appWebhook.paused} = FALSE 
+                AND 
                 (
-                  ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
-                  AND
-                  ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
+                  ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
+                  OR ${schema.appWebhook.eventFilter} = '{}'
+                )
+                AND
+                (
+                  e.event_type != 'test'
+                  OR
+                  (
+                    ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
+                    AND
+                    ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
+                  )
                 )
               )
+              ON CONFLICT (app_webhook_id, event_id) DO NOTHING
+              RETURNING 1
             )
-            ON CONFLICT (app_webhook_id, event_id) DO NOTHING
-            RETURNING 1
-          )
 
-        -- 3) Mark the events as processed
-        UPDATE ${schema.eventOutbox}
-        SET processed_at = NOW()
-        WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events);
+          -- 3) Mark the events as processed
+          UPDATE ${schema.eventOutbox}
+          SET processed_at = NOW()
+          WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events)
+          RETURNING *;
+        `);
+      });
 
-        COMMIT;
-      `);
-
-      // @todo use NOTIFY/LISTEN to avoid polling
-      await new Promise((resolve) => setTimeout(resolve, this.interval));
+      // if no rows were returned we essentially processed all the events
+      // otherwise we want to drain the queue completely
+      if (rows.length === 0) {
+        await this.waitForNewEvents();
+        // reset the deferred so it will be again created by the waitForNewEvents method
+        // and resolved either by notification or interval
+        this.deferred = undefined;
+        this.shouldProcessBatch = false;
+      }
     }
+  }
+
+  private async waitForNewEvents(): Promise<void> {
+    this.deferred = new Deferred<void>();
+
+    if (this.shouldProcessBatch) {
+      this.deferred.resolve();
+    }
+
+    return this.deferred.promise;
   }
 }
