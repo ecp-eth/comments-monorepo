@@ -150,6 +150,7 @@ export function createAnalyticsKpiEventualSuccessQueryKey(
 type AnalyticsKpiFirstAttemptSuccessQueryParams = {
   from?: Date;
   to?: Date;
+  appId?: string;
 };
 
 export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
@@ -159,6 +160,7 @@ export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
     "analytics-kpi-first-attempt-success",
     params?.from?.toISOString(),
     params?.to?.toISOString(),
+    params?.appId,
   ] as const;
 }
 

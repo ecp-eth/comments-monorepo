@@ -13,13 +13,20 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
 
-export function DeliveriesFirstAttemptSuccessKpiCard() {
+type DeliveriesFirstAttemptSuccessKpiCardProps = {
+  appId?: string;
+};
+
+export function DeliveriesFirstAttemptSuccessKpiCard({
+  appId,
+}: DeliveriesFirstAttemptSuccessKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiFirstAttemptSuccessQuery =
     useAnalyticsKpiFirstAttemptSuccessQuery({
       params: {
         from: params.from,
         to: params.to,
+        appId,
       },
     });
 

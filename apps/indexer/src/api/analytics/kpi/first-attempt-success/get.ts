@@ -1,7 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db, siweMiddleware } from "../../../../services";
 import { OpenAPIFloatFromDbSchema } from "../../../../lib/schemas";
-import { sql } from "drizzle-orm";
+import { SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
@@ -10,6 +10,7 @@ export const AnalyticsKpiFirstAttemptSuccessGetQueryParamsSchema = z
   .object({
     from: z.coerce.date().min(new Date("2025-01-01")).optional(),
     to: z.coerce.date().optional(),
+    appId: z.string().uuid().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.from && data.to && data.from >= data.to) {
@@ -73,10 +74,16 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to } = c.req.valid("query");
+      const { from, to, appId } = c.req.valid("query");
       const toToUse = to ?? new Date();
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
+
+      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+
+      if (appId) {
+        filters.push(sql`app.id = ${appId}`);
+      }
 
       const { rows } = await db.execute<{
         firstSuccessRate: string;
@@ -84,6 +91,14 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
         previousFirstSuccessRate: string;
       }>(sql`
         WITH 
+          filtered_webhooks AS (
+            SELECT
+              w.id
+            FROM ${schema.appWebhook} w
+            JOIN ${schema.app} app ON app.id = w.app_id
+            WHERE 
+              ${sql.join(filters, sql` AND `)}
+          ),
           previous_bounds AS (
             SELECT ${fromToUse}::timestamptz - (${toToUse}::timestamptz - ${fromToUse}::timestamptz) AS previous_from, 
             ${fromToUse}::timestamptz AS previous_to
@@ -93,13 +108,10 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
               a.*,
               (a.response_status BETWEEN 200 AND 399) AS is_success
             FROM ${schema.appWebhookDeliveryAttempt} a
-            WHERE a.attempted_at >= ${fromToUse}::timestamptz AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT w.id
-                FROM ${schema.appWebhook} w
-                JOIN ${schema.app} app ON app.id = w.app_id
-                WHERE app.owner_id = ${c.get("user").id}
-              )
+            JOIN filtered_webhooks ON (a.app_webhook_id = filtered_webhooks.id)
+            WHERE 
+              a.attempted_at >= ${fromToUse}::timestamptz 
+              AND a.attempted_at < ${toToUse}::timestamptz
           ),
           first_attempts AS (
             SELECT
@@ -113,15 +125,10 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
               a.*,
               (a.response_status BETWEEN 200 AND 399) AS is_success
             FROM ${schema.appWebhookDeliveryAttempt} a
+            JOIN filtered_webhooks ON (a.app_webhook_id = filtered_webhooks.id)
             WHERE 
               a.attempted_at >= (SELECT previous_from FROM previous_bounds) 
               AND a.attempted_at < (SELECT previous_to FROM previous_bounds)
-              AND a.app_webhook_id IN (
-                SELECT w.id
-                FROM ${schema.appWebhook} w
-                JOIN ${schema.app} app ON app.id = w.app_id
-                WHERE app.owner_id = ${c.get("user").id}
-              )
           ),
           previous_first_attempts AS (
             SELECT

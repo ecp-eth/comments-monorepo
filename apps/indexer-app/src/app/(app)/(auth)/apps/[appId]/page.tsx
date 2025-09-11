@@ -143,7 +143,7 @@ export default function AppPage({
             <EndToEndLatencyKpiCard appId={appId} />
           </div>
           <div className="flex flex-col gap-4">
-            <DeliveriesFirstAttemptSuccessKpiCard />
+            <DeliveriesFirstAttemptSuccessKpiCard appId={appId} />
             <DeliveriesEventualSuccessKpiCard />
           </div>
         </div>
