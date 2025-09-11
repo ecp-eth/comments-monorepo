@@ -142,10 +142,10 @@ main() {
     
     # Run the command
     echo "🚀 Running command: $COMMAND"
-    echo "📂 Working directory: $FOLDER_PATH"
+    echo "📂 Working directory: $CURRENT_DIR"
     
     # Change to the folder and run command
-    cd "$FOLDER_PATH"
+    cd "$CURRENT_DIR"
     
     # Run command and capture exit code
     set +e  # Don't exit on command failure
