@@ -19,6 +19,7 @@ function CodeSnippet({
   autoHeightAdjustment: boolean;
 }) {
   const iframeOrigin = new URL(iframeUrl).origin;
+  const currentPageOrigin = window.location.origin;
   return (
     <>
       <iframe
@@ -35,7 +36,10 @@ function CodeSnippet({
         title="Comments"
       ></iframe>
       <script
-        src={`/embedScript.js?iframeOrigin=${iframeOrigin}&autoHeightAdjustment=${autoHeightAdjustment}`}
+        src={`${currentPageOrigin}/embedScript.js`}
+        type="text/javascript"
+        data-iframe-origin={iframeOrigin}
+        data-auto-height-adjustment={autoHeightAdjustment}
       ></script>
     </>
   );

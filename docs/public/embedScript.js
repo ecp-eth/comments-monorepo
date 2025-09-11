@@ -4,11 +4,15 @@
       const script = document.currentScript;
       if (!script)
         throw new Error("The script must be run from a <script /> tag");
-      const url = new URL(script.src),
-        origin = url.origin,
-        autoHeightAdjustment =
-          "true" === url.searchParams.get("autoHeightAdjustment");
-      return { origin: origin, autoHeightAdjustment: autoHeightAdjustment };
+      const origin = script.dataset.iframeOrigin,
+        autoHeightAdjustment = "true" === script.dataset.autoHeightAdjustment;
+      if (!origin || !autoHeightAdjustment)
+        throw new Error("iframe embed is not configured correctly");
+      return (
+        console.log("origin", origin),
+        console.log("autoHeightAdjustment", autoHeightAdjustment),
+        { origin: origin, autoHeightAdjustment: autoHeightAdjustment }
+      );
     })();
   !(function (origin) {
     window.addEventListener("message", (event) => {

@@ -16,10 +16,8 @@
     if (!script) {
       throw new Error("The script must be run from a <script /> tag");
     }
-    const url = new URL(script.src);
-    const origin = url.searchParams.get("iframeOrigin");
-    const autoHeightAdjustment =
-      url.searchParams.get("autoHeightAdjustment") === "true";
+    const origin = script.dataset.iframeOrigin;
+    const autoHeightAdjustment = script.dataset.autoHeightAdjustment === "true";
 
     if (!origin || !autoHeightAdjustment) {
       throw new Error("iframe embed is not configured correctly");
