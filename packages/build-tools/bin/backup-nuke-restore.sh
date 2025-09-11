@@ -119,7 +119,7 @@ main() {
     FOLDER_ABSOLUTE_PATH=$(realpath "$FOLDER_PATH")
     
     # Check if the folder path is above or equal to current directory
-    if [[ "$CURRENT_DIR" == "$FOLDER_ABSOLUTE_PATH" ]] || [[ "$CURRENT_DIR" == "$FOLDER_ABSOLUTE_PATH"* ]]; then
+    if [[ ! "$FOLDER_ABSOLUTE_PATH" == "$CURRENT_DIR"/* ]]; then
         echo "❌ Error: Cannot nuke folder '$FOLDER_PATH' as it contains or is above the current working directory"
         echo "   Current directory: $CURRENT_DIR"
         echo "   Target folder: $FOLDER_ABSOLUTE_PATH"
