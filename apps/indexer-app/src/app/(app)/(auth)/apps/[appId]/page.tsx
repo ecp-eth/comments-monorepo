@@ -25,6 +25,10 @@ import { AppDetailsDeleteButton } from "@/components/app-details-delete-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTableBasicPagination } from "@/components/data-table-basic-pagination";
 import { cn } from "@/lib/utils";
+import { DeliveriesKpiCard } from "@/components/analytics/deliveries-kpi-card";
+import { EndToEndLatencyKpiCard } from "@/components/analytics/end-to-end-latency-kpi-card";
+import { DeliveriesFirstAttemptSuccessKpiCard } from "@/components/analytics/deliveries-first-attempt-success-kpi-card";
+import { DeliveriesEventualSuccessKpiCard } from "@/components/analytics/deliveries-eventual-success-kpi-card";
 
 export default function AppPage({
   params,
@@ -38,9 +42,7 @@ export default function AppPage({
   useProtectRoute(meQuery);
   useProtectRoute(appQuery);
 
-  // @todo add some KPIs and charts from dashboard but isolate them per app
-
-  if (meQuery.status === "pending") {
+  if (meQuery.status === "pending" || appQuery.status === "pending") {
     return (
       <>
         <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
@@ -72,17 +74,6 @@ export default function AppPage({
               </Button>
             }
           />
-        </AppContent>
-      </>
-    );
-  }
-
-  if (appQuery.status === "pending") {
-    return (
-      <>
-        <AppHeader breadcrumbs={[{ label: "Apps", href: "/apps" }]} />
-        <AppContent className="flex-col gap-4">
-          <Skeleton className="w-full h-full rounded-xl" />
         </AppContent>
       </>
     );
@@ -147,8 +138,14 @@ export default function AppPage({
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <AppDetailsCard app={appQuery.data} />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
-          <div className="bg-muted/50 aspect-video rounded-xl" />
+          <div className="flex flex-col gap-4">
+            <DeliveriesKpiCard appId={appId} />
+            <EndToEndLatencyKpiCard />
+          </div>
+          <div className="flex flex-col gap-4">
+            <DeliveriesFirstAttemptSuccessKpiCard />
+            <DeliveriesEventualSuccessKpiCard />
+          </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
           <h2 className="text-lg font-medium">Webhooks</h2>

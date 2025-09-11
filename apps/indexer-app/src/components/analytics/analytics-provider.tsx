@@ -17,7 +17,7 @@ const context = createContext<AnalyticsContextValue>({
   timePeriod: "7d",
   params: {
     bucket: "day",
-    from: new Date(),
+    from: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
     to: new Date(),
     label: "last day",
   },

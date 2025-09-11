@@ -48,6 +48,7 @@ type AnalyticsParams = {
   from?: Date;
   to?: Date;
   bucket?: string;
+  appId?: string;
 };
 
 function analyticsParamsToSearchParams(
@@ -64,6 +65,10 @@ function analyticsParamsToSearchParams(
 
   if (params?.bucket) {
     url.searchParams.set("bucket", params.bucket);
+  }
+
+  if (params?.appId) {
+    url.searchParams.set("appId", params.appId);
   }
 
   return url;

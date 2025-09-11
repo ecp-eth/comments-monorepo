@@ -1,7 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db, siweMiddleware } from "../../../../services";
 import { OpenAPIBigintStringSchema } from "../../../../lib/schemas";
-import { sql } from "drizzle-orm";
+import { SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
@@ -10,6 +10,7 @@ export const AnalyticsKpiDeliveriesGetQueryParamsSchema = z
   .object({
     from: z.coerce.date().min(new Date("2025-01-01")).optional(),
     to: z.coerce.date().optional(),
+    appId: z.string().uuid().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.from && data.to && data.from >= data.to) {
@@ -71,43 +72,36 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to } = c.req.valid("query");
+      const { from, to, appId } = c.req.valid("query");
       const toToUse = to ?? new Date();
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
 
+      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+
+      if (appId) {
+        filters.push(sql`app.id = ${appId}`);
+      }
+
       const { rows } = await db.execute<{ deliveries: string }>(sql`
         WITH 
-          attempts AS (
+          filtered_webhooks AS (
             SELECT
-              a.*,
-              a.response_status BETWEEN 200 AND 399 AS is_success
-            FROM ${schema.appWebhookDeliveryAttempt} a
+              w.id
+            FROM ${schema.appWebhook} w
+            JOIN ${schema.app} app ON (w.app_id = app.id)
             WHERE
-              a.attempted_at >= ${fromToUse} 
-              AND a.attempted_at < ${toToUse}
-              AND a.app_webhook_id IN (
-                SELECT w.id 
-                FROM ${schema.appWebhook} w
-                JOIN ${schema.app} app ON (w.app_id = app.id)
-                WHERE app.owner_id = ${c.get("user").id}
-              )
+              ${sql.join(filters, sql` AND `)}
           ),
           deliveries AS (
             SELECT
               d.*
             FROM ${schema.appWebhookDelivery} d
+            JOIN filtered_webhooks ON (d.app_webhook_id = filtered_webhooks.id)
             WHERE
               d.created_at >= ${fromToUse}
               AND d.created_at < ${toToUse}
-              AND d.app_webhook_id IN (
-                SELECT w.id 
-                FROM ${schema.appWebhook} w
-                JOIN ${schema.app} app ON (w.app_id = app.id)
-                WHERE app.owner_id = ${c.get("user").id}
-              )
           )
-          
 
         SELECT COUNT(*) as deliveries FROM deliveries
       `);

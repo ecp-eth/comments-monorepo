@@ -118,6 +118,7 @@ export function createWebhookAnalyticsLatencyResponseHistogramQueryKey(
 type AnalyticsKpiDeliveriesQueryParams = {
   from?: Date;
   to?: Date;
+  appId?: string;
 };
 
 export function createAnalyticsKpiDeliveriesQueryKey(
@@ -127,6 +128,7 @@ export function createAnalyticsKpiDeliveriesQueryKey(
     "analytics-kpi-deliveries",
     params?.from?.toISOString(),
     params?.to?.toISOString(),
+    params?.appId,
   ] as const;
 }
 
