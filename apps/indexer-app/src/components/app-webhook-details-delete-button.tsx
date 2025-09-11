@@ -65,7 +65,7 @@ export function AppWebhookDetailsDeleteButton({
   const form = useForm({
     resolver: zodResolver(
       z.object({
-        name: z.literal(app.name, {
+        name: z.literal(webhook.name, {
           errorMap(issue, ctx) {
             if (issue.code === "invalid_literal") {
               return {
@@ -128,7 +128,7 @@ export function AppWebhookDetailsDeleteButton({
                       <FormMessage />
                     </FormItem>
                   )}
-                ></FormField>
+                />
               </div>
               <DrawerFooter>
                 <Button
