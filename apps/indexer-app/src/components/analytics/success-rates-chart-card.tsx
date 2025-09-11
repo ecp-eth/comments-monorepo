@@ -35,6 +35,7 @@ const chartConfig = {
 export function SuccessRatesChartCard() {
   const { params } = useAnalyticsContext();
   const analyticsSuccessRatesQuery = useAnalyticsSuccessRatesQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

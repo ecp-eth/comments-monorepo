@@ -23,6 +23,7 @@ export function BacklogSizeKpiCard({
   webhookId,
 }: BacklogSizeKpiCardProps) {
   const analyticsKpiBacklogQuery = useAnalyticsKpiBacklogQuery({
+    refetchOnMount: true,
     params: {
       appId,
       webhookId,

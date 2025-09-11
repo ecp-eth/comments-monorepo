@@ -24,6 +24,7 @@ export function EndToEndLatencyKpiCard({
 }: EndToEndLatencyKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

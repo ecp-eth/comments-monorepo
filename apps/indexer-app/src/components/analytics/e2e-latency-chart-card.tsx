@@ -83,6 +83,7 @@ const chartConfig = {
 export function E2ELatencyChartCard() {
   const { params } = useAnalyticsContext();
   const analyticsE2ELatencyQuery = useAnalyticsE2ELatencyQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

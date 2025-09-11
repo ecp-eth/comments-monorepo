@@ -24,6 +24,7 @@ export function DeliveriesKpiCard({
 }: DeliveriesKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiDeliveriesQuery = useAnalyticsKpiDeliveriesQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

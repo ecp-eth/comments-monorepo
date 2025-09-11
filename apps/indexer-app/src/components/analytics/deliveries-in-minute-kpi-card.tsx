@@ -25,6 +25,7 @@ export function DeliveriesInMinuteKpiCard({
   const { params } = useAnalyticsContext();
   const analyticsKpiDeliveredUnderMinuteQuery =
     useAnalyticsKpiDeliveredUnderMinuteQuery({
+      refetchOnMount: true,
       params: {
         from: params.from,
         to: params.to,

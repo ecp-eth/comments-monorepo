@@ -24,6 +24,7 @@ export function DeliveriesEventualSuccessKpiCard({
 }: DeliveriesEventualSuccessKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiEventualSuccessQuery = useAnalyticsKpiEventualSuccessQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

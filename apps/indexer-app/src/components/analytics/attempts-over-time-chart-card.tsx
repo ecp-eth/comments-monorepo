@@ -35,6 +35,7 @@ const chartConfig = {
 export function AttemptsOverTimeChartCard() {
   const { params } = useAnalyticsContext();
   const volumeQuery = useAnalyticsVolumeQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

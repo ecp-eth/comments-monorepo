@@ -43,6 +43,7 @@ const chartConfig = {
 export function ErrorBreakdownChartCard() {
   const { params } = useAnalyticsContext();
   const analyticsErrorsQuery = useAnalyticsErrorsQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

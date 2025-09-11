@@ -43,6 +43,7 @@ const chartConfig = {
 export function SlaBandsChartCard() {
   const { params } = useAnalyticsContext();
   const analyticsSlaBandsQuery = useAnalyticsSlaBandsQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,

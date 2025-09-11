@@ -25,6 +25,7 @@ export function DeliveriesFirstAttemptSuccessKpiCard({
   const { params } = useAnalyticsContext();
   const analyticsKpiFirstAttemptSuccessQuery =
     useAnalyticsKpiFirstAttemptSuccessQuery({
+      refetchOnMount: true,
       params: {
         from: params.from,
         to: params.to,

@@ -35,6 +35,7 @@ const chartConfig = {
 export function TerminalOutcomesChartCard() {
   const { params } = useAnalyticsContext();
   const analyticsTerminalQuery = useAnalyticsTerminalQuery({
+    refetchOnMount: true,
     params: {
       from: params.from,
       to: params.to,
