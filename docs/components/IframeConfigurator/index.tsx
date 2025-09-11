@@ -17,7 +17,7 @@ import {
 import LabelWithHelp from "./LabelWithHelp";
 import { publicEnv } from "../../publicEnv";
 import CommentsEmbedPreview from "./CommentsEmbedPreview";
-import GeneratedURL from "./GeneratedURL";
+import SnippetGenerator from "./SnippetGenerator";
 import {
   Select,
   SelectContent,
@@ -702,7 +702,7 @@ export default function IframeConfigurator() {
               Copy and paste this into your website or blog, or anywhere HTML is
               supported
             </p>
-            <GeneratedURL
+            <SnippetGenerator
               config={debouncedConfig}
               embedUri={embedUri}
               source={source}
