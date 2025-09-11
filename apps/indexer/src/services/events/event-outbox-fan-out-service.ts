@@ -59,6 +59,16 @@ export class EventOutboxFanOutService {
                 ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
                 OR ${schema.appWebhook.eventFilter} = '{}'
               )
+              AND
+              (
+                e.event_type != 'test'
+                OR
+                (
+                  ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
+                  AND
+                  ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
+                )
+              )
             )
             ON CONFLICT (app_webhook_id, event_id) DO NOTHING
             RETURNING 1
@@ -72,6 +82,7 @@ export class EventOutboxFanOutService {
         COMMIT;
       `);
 
+      // @todo use NOTIFY/LISTEN to avoid polling
       await new Promise((resolve) => setTimeout(resolve, this.interval));
     }
   }
