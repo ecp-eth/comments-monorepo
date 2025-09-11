@@ -13,12 +13,17 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
 
-export function EndToEndLatencyKpiCard() {
+type EndToEndLatencyKpiCardProps = {
+  appId?: string;
+};
+
+export function EndToEndLatencyKpiCard({ appId }: EndToEndLatencyKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiE2ELatencyQuery = useAnalyticsKpiE2ELatencyQuery({
     params: {
       from: params.from,
       to: params.to,
+      appId,
     },
   });
 
@@ -53,9 +58,9 @@ export function EndToEndLatencyKpiCard() {
     );
   }
 
-  let value = "0 ms";
+  let value = "N/A";
 
-  if ("DurationFormat" in Intl) {
+  if ("DurationFormat" in Intl && analyticsKpiE2ELatencyQuery.data.p95 > 0) {
     const valueMs = analyticsKpiE2ELatencyQuery.data.p95;
     const hours = Math.floor(valueMs / 3_600_000);
     const minutes = Math.floor((valueMs % 3_600_000) / 60_000);
@@ -71,7 +76,7 @@ export function EndToEndLatencyKpiCard() {
       seconds,
       milliseconds,
     });
-  } else {
+  } else if (analyticsKpiE2ELatencyQuery.data.p95 > 0) {
     value = new Intl.NumberFormat(undefined, {
       unit: "millisecond",
       style: "unit",

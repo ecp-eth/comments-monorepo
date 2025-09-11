@@ -165,6 +165,7 @@ export function createAnalyticsKpiFirstAttemptSuccessQueryKey(
 type AnalyticsKpiE2ELatencyQueryParams = {
   from?: Date;
   to?: Date;
+  appId?: string;
 };
 
 export function createAnalyticsKpiE2ELatencyQueryKey(
@@ -174,6 +175,7 @@ export function createAnalyticsKpiE2ELatencyQueryKey(
     "analytics-kpi-e2e-latency",
     params?.from?.toISOString(),
     params?.to?.toISOString(),
+    params?.appId,
   ] as const;
 }
 
