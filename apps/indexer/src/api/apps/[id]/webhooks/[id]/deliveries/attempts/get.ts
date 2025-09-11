@@ -19,26 +19,26 @@ export const AppWebhookDeliveriesGetRequestParamsSchema = z.object({
   webhookId: z.string().uuid(),
 });
 
-export const AppWebhookDeliveriesGetRequestQuerySchema = z.object({
-  cursor: z
-    .preprocess(
-      (val) => {
-        try {
-          if (typeof val !== "string") {
-            return val;
-          }
+const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
+  (val) => {
+    try {
+      if (typeof val !== "string") {
+        return val;
+      }
 
-          return JSON.parse(Buffer.from(val, "base64url").toString("ascii"));
-        } catch {
-          return val;
-        }
-      },
-      z.object({
-        id: z.coerce.bigint(),
-      }),
-    )
-    .optional(),
-  sort: z.enum(["asc", "desc"]).default("desc"),
+      return JSON.parse(Buffer.from(val, "base64url").toString("ascii"));
+    } catch {
+      return val;
+    }
+  },
+  z.object({
+    id: z.coerce.bigint(),
+  }),
+);
+
+export const AppWebhookDeliveriesGetRequestQuerySchema = z.object({
+  before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
+  after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
   limit: z.coerce.number().int().positive().max(100).default(10),
 });
 
@@ -133,7 +133,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
     },
     async (c) => {
       const { appId, webhookId } = c.req.valid("param");
-      const { cursor, sort, limit } = c.req.valid("query");
+      const { before, after, limit } = c.req.valid("query");
 
       try {
         const { app } = await appManager.getApp({
@@ -146,48 +146,36 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
           webhookId,
         });
 
-        const previousDeliveries = cursor
-          ? await db.query.appWebhookDelivery.findFirst({
-              where(fields, operators) {
-                return operators.and(
-                  operators.eq(fields.appWebhookId, appWebhook.id),
-                  ...(sort === "asc"
-                    ? [operators.lt(fields.id, cursor.id)]
-                    : []),
-                  ...(sort === "desc"
-                    ? [operators.gt(fields.id, cursor.id)]
-                    : []),
-                );
-              },
-              orderBy(fields, operators) {
-                if (sort === "desc") {
-                  return operators.asc(fields.id);
-                }
-
-                return operators.desc(fields.id);
-              },
-            })
-          : undefined;
+        const previousDeliveries =
+          before || after
+            ? await db.query.appWebhookDelivery.findFirst({
+                where(fields, operators) {
+                  return operators.and(
+                    operators.eq(fields.appWebhookId, appWebhook.id),
+                    ...(before ? [operators.gt(fields.id, before.id)] : []),
+                    ...(after && !before
+                      ? [operators.lt(fields.id, after.id)]
+                      : []),
+                  );
+                },
+              })
+            : undefined;
 
         const results = await db.query.appWebhookDeliveryAttempt.findMany({
           where(fields, operators) {
             return operators.and(
               operators.eq(fields.appWebhookId, appWebhook.id),
-              ...(cursor && sort === "asc"
-                ? [operators.gt(fields.id, cursor.id)]
-                : []),
-              ...(cursor && sort === "desc"
-                ? [operators.lt(fields.id, cursor.id)]
-                : []),
+              ...(before ? [operators.gt(fields.id, before.id)] : []),
+              ...(after && !before ? [operators.lt(fields.id, after.id)] : []),
             );
           },
           limit: limit + 1,
           orderBy(fields, operators) {
-            if (sort === "desc") {
-              return operators.desc(fields.id);
+            if (before) {
+              return operators.asc(fields.id);
             }
 
-            return operators.asc(fields.id);
+            return operators.desc(fields.id);
           },
           with: {
             delivery: {
@@ -202,9 +190,20 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
           },
         });
 
-        const hasNextPage = results.length > limit;
-        const hasPreviousPage = !!previousDeliveries;
-        const pageResults = results.slice(0, limit);
+        const hasMoreResultsThanLimit = results.length > limit;
+
+        let hasNextPage = false;
+        let hasPreviousPage = false;
+        let pageResults = results.slice(0, limit);
+
+        if (before) {
+          pageResults = pageResults.toReversed();
+          hasPreviousPage = hasMoreResultsThanLimit;
+          hasNextPage = !!previousDeliveries;
+        } else {
+          hasNextPage = hasMoreResultsThanLimit;
+          hasPreviousPage = !!previousDeliveries;
+        }
 
         const startCursor = pageResults[0];
         const endCursor = pageResults[pageResults.length - 1];

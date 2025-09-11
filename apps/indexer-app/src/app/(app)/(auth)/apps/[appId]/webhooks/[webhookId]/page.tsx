@@ -354,20 +354,24 @@ function WebhookDeliveryAttemptsList({
   appId: string;
   webhookId: string;
 }) {
-  const [paginationParams, setPaginationParams] = useState<{
-    direction: "previous" | "next";
-    cursor: string;
-  } | null>(null);
+  const [paginationParams, setPaginationParams] = useState<
+    | {
+        direction: "previous" | "next";
+        cursor: string;
+      }
+    | undefined
+  >(undefined);
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   });
   const deliveriesQuery = useWebhookDeliveryAttemptsQuery({
+    refetchOnMount: true,
     appId,
     webhookId,
     placeholderData: keepPreviousData,
     limit: paginationState.pageSize,
-    ...paginationParams,
+    page: paginationParams,
   });
   const columns = useMemo(
     () => createWebhookDeliveryAttemptsDataTableColumns(),

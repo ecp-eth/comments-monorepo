@@ -35,16 +35,18 @@ export function createWebhooksQueryKey({
 export function createWebhookDeliveryAttemptsQueryKey(params: {
   appId: string;
   webhookId: string;
-  cursor?: string;
-  direction?: "previous" | "next";
+  page?: {
+    cursor: string;
+    direction: "previous" | "next";
+  };
   limit?: number;
 }) {
   return [
     "webhook-delivery-attempts",
     params.appId,
     params.webhookId,
-    params.cursor,
-    params.direction,
+    params.page?.cursor,
+    params.page?.direction,
     params.limit,
   ] as const;
 }

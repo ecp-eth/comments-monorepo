@@ -91,16 +91,17 @@ type UseWebhookDeliveryAttemptsQueryOptions = Omit<
 > & {
   appId: string;
   webhookId: string;
-  cursor?: string;
-  direction?: "previous" | "next";
+  page?: {
+    cursor: string;
+    direction: "previous" | "next";
+  };
   limit?: number;
 };
 
 export function useWebhookDeliveryAttemptsQuery({
   appId,
   webhookId,
-  cursor,
-  direction,
+  page,
   limit,
   ...options
 }: UseWebhookDeliveryAttemptsQueryOptions) {
@@ -110,8 +111,7 @@ export function useWebhookDeliveryAttemptsQuery({
     queryKey: createWebhookDeliveryAttemptsQueryKey({
       appId,
       webhookId,
-      cursor,
-      direction,
+      page,
       limit,
     }),
     queryFn: async ({ signal }) => {
@@ -120,15 +120,11 @@ export function useWebhookDeliveryAttemptsQuery({
           `/api/apps/${appId}/webhooks/${webhookId}/deliveries/attempts`,
         );
 
-        if (cursor) {
-          url.searchParams.set("cursor", cursor);
-        }
-
-        if (direction) {
-          if (direction === "previous") {
-            url.searchParams.set("sort", "asc");
+        if (page) {
+          if (page.direction === "next") {
+            url.searchParams.set("after", page.cursor);
           } else {
-            url.searchParams.set("sort", "desc");
+            url.searchParams.set("before", page.cursor);
           }
         }
 
@@ -156,18 +152,9 @@ export function useWebhookDeliveryAttemptsQuery({
         );
       }
 
-      const data = AppWebhookListDeliveryAttemptsResponseSchema.parse(
+      return AppWebhookListDeliveryAttemptsResponseSchema.parse(
         await response.json(),
       );
-
-      if (direction === "next") {
-        return data;
-      }
-
-      return {
-        ...data,
-        results: data.results.toReversed(),
-      };
     },
     ...options,
   });
