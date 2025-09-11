@@ -137,8 +137,8 @@ main() {
     
     # Nuke the folder (remove everything except backed up files)
     echo "💥 Nuking folder: $FOLDER_PATH"
-    rm -rf "$FOLDER_PATH"/*
-    rm -rf "$FOLDER_PATH"/.[^.]*  # Remove hidden files except . and ..
+    rm -rf "$FOLDER_PATH"
+    mkdir -p "$FOLDER_PATH"
     
     # Run the command
     echo "🚀 Running command: $COMMAND"
