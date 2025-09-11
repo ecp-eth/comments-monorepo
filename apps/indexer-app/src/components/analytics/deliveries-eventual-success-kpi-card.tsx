@@ -13,12 +13,19 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useAnalyticsContext } from "./analytics-provider";
 
-export function DeliveriesEventualSuccessKpiCard() {
+type DeliveriesEventualSuccessKpiCardProps = {
+  appId?: string;
+};
+
+export function DeliveriesEventualSuccessKpiCard({
+  appId,
+}: DeliveriesEventualSuccessKpiCardProps) {
   const { params } = useAnalyticsContext();
   const analyticsKpiEventualSuccessQuery = useAnalyticsKpiEventualSuccessQuery({
     params: {
       from: params.from,
       to: params.to,
+      appId,
     },
   });
 

@@ -135,6 +135,7 @@ export function createAnalyticsKpiDeliveriesQueryKey(
 type AnalyticsKpiEventualSuccessQueryParams = {
   from?: Date;
   to?: Date;
+  appId?: string;
 };
 
 export function createAnalyticsKpiEventualSuccessQueryKey(
@@ -144,6 +145,7 @@ export function createAnalyticsKpiEventualSuccessQueryKey(
     "analytics-kpi-eventual-success",
     params?.from?.toISOString(),
     params?.to?.toISOString(),
+    params?.appId,
   ] as const;
 }
 

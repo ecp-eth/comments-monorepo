@@ -144,7 +144,7 @@ export default function AppPage({
           </div>
           <div className="flex flex-col gap-4">
             <DeliveriesFirstAttemptSuccessKpiCard appId={appId} />
-            <DeliveriesEventualSuccessKpiCard />
+            <DeliveriesEventualSuccessKpiCard appId={appId} />
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
