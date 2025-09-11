@@ -5,18 +5,21 @@ import type {
   AppWebhookListDeliveryAttemptsResponseSchemaType,
   AppWebhookSchemaType,
 } from "@/api/schemas/apps";
+import { BacklogSizeKpiCard } from "@/components/analytics/backlog-size-kpi-card";
+import { DeliveriesEventualSuccessKpiCard } from "@/components/analytics/deliveries-eventual-success-kpi-card";
+import { DeliveriesFirstAttemptSuccessKpiCard } from "@/components/analytics/deliveries-first-attempt-success-kpi-card";
+import { DeliveriesInMinuteKpiCard } from "@/components/analytics/deliveries-in-minute-kpi-card";
+import { DeliveriesKpiCard } from "@/components/analytics/deliveries-kpi-card";
+import { EndToEndLatencyKpiCard } from "@/components/analytics/end-to-end-latency-kpi-card";
 import { AppContent } from "@/components/app-content";
 import { AppHeader } from "@/components/app-header";
 import { AppWebhookDetailsAuthForm } from "@/components/app-webhook-details-auth-form";
-import { AppWebhookDetailsChartCardBackendLatency } from "@/components/app-webhook-details-chart-card-backend-latency";
 import { AppWebhookDetailsDeleteButton } from "@/components/app-webhook-details-delete-button";
 import { AppWebhookDetailsEventsForm } from "@/components/app-webhook-details-events-form";
 import { AppWebhookDetailsRenameForm } from "@/components/app-webhook-details-rename-form";
 import { AppWebhookDetailsTestButton } from "@/components/app-webhook-details-test-button";
 import { AppWebhookDetailsUrlForm } from "@/components/app-webhook-details-url-form";
-import { AppWebhookDetailsVolumeChartCard } from "@/components/app-webhook-details-volume-chart-card";
 import { DataTable } from "@/components/data-table";
-import { DataTableBasicPagination } from "@/components/data-table-basic-pagination";
 import { DataTableCursorPagination } from "@/components/data-table-cursor-pagination";
 import { EmptyScreen } from "@/components/empty-screen";
 import { ErrorScreen } from "@/components/error-screen";
@@ -28,7 +31,6 @@ import { WebhookNotFoundError } from "@/errors";
 import { useProtectRoute } from "@/hooks/use-protect-route";
 import { useAppQuery } from "@/queries/app";
 import {
-  useWebhookAnalyticsBacklogQuery,
   useWebhookDeliveryAttemptsQuery,
   useWebhookQuery,
 } from "@/queries/webhook";
@@ -201,15 +203,22 @@ export default function WebhookPage({
       <AppContent className="flex-col gap-4">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3 w-full">
           <WebhookDetailsCard app={appQuery.data} webhook={webhookQuery.data} />
-          <WebhookAnalyticsBacklogCard appId={appId} webhookId={webhookId} />
-          <AppWebhookDetailsVolumeChartCard
-            appId={appId}
-            webhookId={webhookId}
-          />
-          <AppWebhookDetailsChartCardBackendLatency
-            appId={appId}
-            webhookId={webhookId}
-          />
+          <div className="grid auto-rows-mini gap-4">
+            <DeliveriesKpiCard appId={appId} webhookId={webhookId} />
+            <EndToEndLatencyKpiCard appId={appId} webhookId={webhookId} />
+            <BacklogSizeKpiCard appId={appId} webhookId={webhookId} />
+          </div>
+          <div className="grid auto-rows-mini gap-4">
+            <DeliveriesFirstAttemptSuccessKpiCard
+              appId={appId}
+              webhookId={webhookId}
+            />
+            <DeliveriesEventualSuccessKpiCard
+              appId={appId}
+              webhookId={webhookId}
+            />
+            <DeliveriesInMinuteKpiCard appId={appId} webhookId={webhookId} />
+          </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
           <h2 className="text-lg font-medium">Deliveries</h2>
@@ -217,107 +226,6 @@ export default function WebhookPage({
         </div>
       </AppContent>
     </>
-  );
-}
-
-function WebhookAnalyticsBacklogCard({
-  appId,
-  webhookId,
-}: {
-  appId: string;
-  webhookId: string;
-}) {
-  const analyticsBacklogQuery = useWebhookAnalyticsBacklogQuery({
-    appId,
-    webhookId,
-  });
-
-  useProtectRoute(analyticsBacklogQuery);
-
-  if (analyticsBacklogQuery.status === "error") {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Webhook Backlog</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ErrorScreen
-            title="Error fetching analytics backlog"
-            description="Please try again later. If the problem persists, please contact support."
-            actions={
-              <Button
-                disabled={analyticsBacklogQuery.isRefetching}
-                onClick={() => analyticsBacklogQuery.refetch()}
-                className="gap-2"
-                type="button"
-              >
-                <RotateCwIcon className="h-4 w-4" />
-                Retry
-              </Button>
-            }
-          />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Webhook Backlog</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-row gap-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2 items-center">
-                <span>Pending Deliveries: </span>
-                {analyticsBacklogQuery.status === "pending" ? (
-                  <Skeleton className="w-4 h-4" />
-                ) : (
-                  <span>{analyticsBacklogQuery.data.pendingDeliveries}</span>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row gap-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2 items-center">
-                <span>Next Due At: </span>
-                {analyticsBacklogQuery.status === "pending" ? (
-                  <Skeleton className="w-[10ch] h-4" />
-                ) : (
-                  <span>
-                    {analyticsBacklogQuery.data.nextDueAt
-                      ? new Intl.DateTimeFormat(undefined, {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        }).format(analyticsBacklogQuery.data.nextDueAt)
-                      : "N/A"}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row gap-2">
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row gap-2">
-                <span>Oldest Age</span>
-                {analyticsBacklogQuery.status === "pending" ? (
-                  <Skeleton className="w-[10ch] h-4" />
-                ) : (
-                  <span>
-                    {analyticsBacklogQuery.data.oldestAge
-                      ? `${analyticsBacklogQuery.data.oldestAge}s`
-                      : "N/A"}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 
