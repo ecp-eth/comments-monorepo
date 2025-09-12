@@ -87,6 +87,7 @@ export const WebhookEventNames = [
   "comment:deleted",
   "comment:edited",
   "comment:moderation:status:updated",
+  "comment:reactions:updated",
   "test",
 ] as const;
 
