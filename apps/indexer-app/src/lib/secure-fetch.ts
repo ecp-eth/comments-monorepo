@@ -3,7 +3,6 @@ import {
   RefreshAccessTokenResponseSchema,
 } from "@/api/schemas/siwe";
 import type { AuthContextValue } from "@/components/auth-provider";
-import { createFetchUrl } from "@/lib/utils";
 
 let refreshAccessTokenPromise:
   | Promise<false | RefreshAccessTokenResponse>
@@ -56,10 +55,7 @@ export async function secureFetch(
       if (newTokens) {
         headers["Authorization"] = `Bearer ${newTokens.accessToken.token}`;
 
-        authContext.updateTokens(
-          newTokens.accessToken.token,
-          newTokens.refreshToken.token,
-        );
+        authContext.updateAccessToken(newTokens.accessToken.token);
 
         continue; // retry the request with the new access token
       } else if (authContext.isLoggedIn) {
@@ -78,11 +74,8 @@ async function refreshAccessToken(
     return false;
   }
 
-  const response = await fetch(createFetchUrl("/api/auth/siwe/refresh"), {
+  const response = await fetch("/api/auth/siwe/refresh", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${authContext.refreshToken}`,
-    },
   });
 
   if (response.status === 401) {

@@ -9,7 +9,6 @@ import {
 import { SiweMessage } from "siwe";
 import { useChainId, useSignMessage } from "wagmi";
 import { Loader2Icon } from "lucide-react";
-import { useAuth } from "@/components/auth-provider";
 import {
   siweNonceResponseSchema,
   type SiweVerifyRequest,
@@ -20,13 +19,13 @@ import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
 import { cn, createFetchUrl } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
 
 export default function SignInPage() {
   const auth = useAuth();
   const chainId = useChainId();
   const connectAccountUsingRainbowKit = useConnectAccount();
   const { signMessageAsync } = useSignMessage();
-
   const signInMutation = useMutation({
     mutationFn: async () => {
       const address = await connectAccountUsingRainbowKit();
@@ -59,22 +58,19 @@ export default function SignInPage() {
         message,
       });
 
-      const verifyResponse = await fetch(
-        createFetchUrl("/api/auth/siwe/verify"),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(
-            SiweVerifyRequestSchema.parse({
-              message,
-              signature,
-              token,
-            } satisfies SiweVerifyRequest),
-          ),
+      const verifyResponse = await fetch("/api/auth/siwe/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(
+          SiweVerifyRequestSchema.parse({
+            message,
+            signature,
+            token,
+          } satisfies SiweVerifyRequest),
+        ),
+      });
 
       if (!verifyResponse.ok) {
         throw new Error("Failed to verify signature");
@@ -105,8 +101,8 @@ export default function SignInPage() {
         toast.error("An unknown error occurred. Please try again.");
       }
     },
-    onSuccess(tokens) {
-      auth.updateTokens(tokens.accessToken.token, tokens.refreshToken.token);
+    onSuccess(data) {
+      auth.updateAccessToken(data.accessToken.token);
     },
   });
 

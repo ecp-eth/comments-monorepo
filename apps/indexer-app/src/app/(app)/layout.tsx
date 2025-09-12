@@ -4,7 +4,6 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { webConfig } from "@/wagmi/client";
-import { AuthProvider } from "@/components/auth-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,12 +20,10 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={webConfig}>
-          <RainbowKitProvider>{children}</RainbowKitProvider>
-        </WagmiProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <WagmiProvider config={webConfig}>
+        <RainbowKitProvider>{children}</RainbowKitProvider>
+      </WagmiProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-const serverEnvSchema = z.object({});
+const serverEnvSchema = z.object({
+  NEXT_PUBLIC_INDEXER_URL: z
+    .string()
+    .url()
+    .default("https://api.ethcomments.xyz"),
+});
 
 const result = serverEnvSchema.safeParse(process.env);
 

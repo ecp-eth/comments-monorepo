@@ -1,32 +1,23 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { UnauthorizedError } from "@/errors";
-import { REFRESH_TOKEN_LOCAL_STORAGE_KEY } from "@/constants";
 
 export type AuthContextValue =
   | {
       isLoggedIn: false;
-      updateTokens: (accessToken: string, refreshToken: string) => void;
+      updateAccessToken: (accessToken: string) => void;
     }
   | {
       isLoggedIn: true;
       accessToken: string | null;
-      refreshToken: string;
-      updateTokens: (accessToken: string, refreshToken: string) => void;
+      updateAccessToken: (accessToken: string) => void;
       logout: () => void;
     };
 
 const authContext = createContext<AuthContextValue>({
   isLoggedIn: false,
-  updateTokens: () => {},
+  updateAccessToken: () => {},
 });
 
 export function useAuth(): AuthContextValue {
@@ -46,68 +37,35 @@ export function useAuthProtect(apiError: Error | undefined | null) {
   }
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [tokens, setTokens] = useState<null | {
-    accessToken: string | null;
-    refreshToken: string;
-  }>(() => {
-    if (typeof localStorage === "undefined") {
-      return null;
-    }
+type AuthProviderProps = {
+  accessToken: string | null | undefined;
+  children: React.ReactNode;
+};
 
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
-
-    if (!refreshToken) {
-      return null;
-    }
-
-    // on refresh the access token must be refreshed using refresh token
-    return {
-      accessToken: null,
-      refreshToken,
-    };
-  });
-
-  const logout = useCallback(() => {
-    setTokens(null);
-  }, []);
-
-  const updateTokens = useCallback(
-    (accessToken: string, refreshToken: string) => {
-      setTokens({ accessToken, refreshToken });
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (typeof localStorage !== "undefined") {
-      if (tokens) {
-        localStorage.setItem(
-          REFRESH_TOKEN_LOCAL_STORAGE_KEY,
-          tokens.refreshToken,
-        );
-      } else {
-        localStorage.removeItem(REFRESH_TOKEN_LOCAL_STORAGE_KEY);
-      }
-    }
-  }, [tokens]);
+export function AuthProvider({ accessToken, children }: AuthProviderProps) {
+  const [loadedAccessToken, setLoadedAccessToken] = useState<
+    string | null | undefined
+  >(accessToken);
 
   const value = useMemo((): AuthContextValue => {
-    if (!tokens) {
+    if (!loadedAccessToken) {
       return {
         isLoggedIn: false,
-        updateTokens,
+        updateAccessToken: (accessToken) => setLoadedAccessToken(accessToken),
       };
     }
 
     return {
       isLoggedIn: true,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      updateTokens,
-      logout,
+      accessToken: loadedAccessToken,
+      logout: () => {
+        setLoadedAccessToken(null);
+
+        fetch("/api/auth/logout");
+      },
+      updateAccessToken: (accessToken) => setLoadedAccessToken(accessToken),
     };
-  }, [tokens, updateTokens, logout]);
+  }, [loadedAccessToken]);
 
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 }

@@ -4,6 +4,8 @@ import "@rainbow-me/rainbowkit/styles.css";
 
 import { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
+import { cookies } from "next/headers";
+import { AuthProvider } from "@/components/auth-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,13 +28,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestCookies = await cookies();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <main>{children}</main>
-        <Toaster />
+        <AuthProvider accessToken={requestCookies.get("accessToken")?.value}>
+          <main>{children}</main>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
