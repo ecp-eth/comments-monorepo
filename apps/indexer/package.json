@@ -55,7 +55,7 @@
     "lru-cache": "^11.0.2",
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
-    "pg": "^8.16.3",
+    "pg": "8.16.0",
     "ponder": "0.12.21",
     "promise-deferred": "^2.0.4",
     "telegraf": "^4.16.3",
@@ -67,7 +67,7 @@
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",
     "@types/node": "^22.13.1",
-    "@types/pg": "^8.15.5",
+    "@types/pg": "8.15.4",
     "@types/promise-deferred": "^2.0.5",
     "eslint": "^9.19.0",
     "globals": "^15.14.0",

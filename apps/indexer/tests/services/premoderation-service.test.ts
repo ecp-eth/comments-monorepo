@@ -7,13 +7,17 @@ import type {
 } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { drizzle } from "drizzle-orm/node-postgres";
+import {
+  drizzle,
+  type NodePgClient,
+  type NodePgDatabase,
+} from "drizzle-orm/node-postgres";
 import { schema } from "../../schema";
 import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
 
 const db = drizzle.mock({
   schema,
-});
+}) as unknown as NodePgDatabase<typeof schema> & { $client: NodePgClient };
 
 const service = new PremoderationService({
   classificationThreshold: 50,
