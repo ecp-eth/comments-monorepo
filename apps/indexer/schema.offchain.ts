@@ -323,15 +323,15 @@ export const appWebhookDelivery = offchainSchema.table(
     nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     leaseUntil: timestamp({ withTimezone: true }),
     ownerId: uuid().references(() => user.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     appId: uuid().references(() => app.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     appWebhookId: uuid().references(() => appWebhook.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     eventId: bigint({ mode: "bigint" })
@@ -405,21 +405,21 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     attemptNumber: integer().notNull().default(1),
     ownerId: uuid().references(() => user.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     appId: uuid().references(() => app.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     appWebhookId: uuid().references(() => appWebhook.id, {
-      onDelete: "set null",
+      onDelete: "cascade",
       onUpdate: "cascade",
     }),
     appWebhookDeliveryId: bigint({ mode: "bigint" }).references(
       () => appWebhookDelivery.id,
       {
-        onDelete: "set null",
+        onDelete: "cascade",
         onUpdate: "cascade",
       },
     ),
