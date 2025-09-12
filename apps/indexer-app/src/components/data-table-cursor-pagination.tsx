@@ -1,3 +1,4 @@
+"use client";
 import { Table } from "@tanstack/react-table";
 import {
   ChevronLeft,
