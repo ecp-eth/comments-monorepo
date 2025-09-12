@@ -1,15 +1,15 @@
 import { Menu } from "@grammyjs/menu";
-import { AdminTelegramBotServiceContext, MenuId } from "../types";
+import { type AdminTelegramBotServiceContext, MenuId } from "../types.ts";
 import {
   commentModerationCommandToPayload,
   moderationCommandParser,
   moderationStatusToActionString,
   renderComment,
-} from "./moderate-helpers";
-import { CommentModerationStatus } from "../../../management/types";
+} from "./moderate-helpers.ts";
+import type { CommentModerationStatus } from "../../../management/types.ts";
 import { b, fmt } from "@grammyjs/parse-mode";
 import { renderToMarkdown } from "@ecp.eth/shared/renderer";
-import { escapeTelegramMarkdownTextElement } from "../../../utils/escapeTelegramMarkdownTextElement";
+import { escapeTelegramMarkdownTextElement } from "../../../utils/escapeTelegramMarkdownTextElement.ts";
 
 export const moderateMenu = new Menu<AdminTelegramBotServiceContext>(
   MenuId.MODERATE_MAIN_MENU,

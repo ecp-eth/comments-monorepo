@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CommentReportsService } from "../../src/services/comment-reports-service";
 import type { IReportsNotificationsService } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
-import { drizzle } from "drizzle-orm/node-postgres";
+import {
+  drizzle,
+  type NodePgDatabase,
+  type NodePgClient,
+} from "drizzle-orm/node-postgres";
 import { schema } from "../../schema";
 
 describe("CommentReportsService", () => {
@@ -45,7 +49,7 @@ describe("CommentReportsService", () => {
 
   const db = drizzle.mock({
     schema,
-  });
+  }) as unknown as NodePgDatabase<typeof schema> & { $client: NodePgClient };
 
   const commentFindFirstMock = vi.spyOn(db.query.comment, "findFirst");
   const dbExecuteMock = vi.fn();

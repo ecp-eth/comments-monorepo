@@ -1,7 +1,7 @@
 import type {
   IAdminTelegramBotServiceCommand,
   IAdminTelegramBotServiceCommand_RegisterOptions,
-} from "../types";
+} from "../types.ts";
 
 export class StartCommand implements IAdminTelegramBotServiceCommand {
   getDefinition() {
