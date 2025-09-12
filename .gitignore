@@ -37,8 +37,7 @@ yarn-error.log*
 .DS_Store
 *.pem
 .envrc
-
-.envrc
+.tmp
 
 # Proxy packages
 
