@@ -13,5 +13,5 @@ export default function AuthLayout({
     return redirect("/");
   }
 
-  return <>{children}</>;
+  return <main>{children}</main>;
 }

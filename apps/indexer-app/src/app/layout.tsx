@@ -36,7 +36,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider accessToken={requestCookies.get("accessToken")?.value}>
-          <main>{children}</main>
+          {children}
           <Toaster />
         </AuthProvider>
       </body>

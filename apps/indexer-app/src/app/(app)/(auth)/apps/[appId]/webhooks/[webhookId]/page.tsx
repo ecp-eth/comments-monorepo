@@ -57,8 +57,6 @@ export default function WebhookPage({
   useProtectRoute(appQuery);
   useProtectRoute(webhookQuery);
 
-  // @todo add some KPIs and charts from dashboard but isolate them per app and webhook
-
   if (webhookQuery.status === "pending" || appQuery.status === "pending") {
     return (
       <>
