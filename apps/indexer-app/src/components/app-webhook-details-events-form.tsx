@@ -75,7 +75,10 @@ export function AppWebhookDetailsEventsForm({
       <form
         className="flex flex-col gap-2"
         onSubmit={form.handleSubmit((values) => {
-          if (values.name === webhook.name) {
+          if (
+            JSON.stringify(values.eventFilter) ===
+            JSON.stringify(webhook.eventFilter)
+          ) {
             setIsEditing(false);
             return;
           }
