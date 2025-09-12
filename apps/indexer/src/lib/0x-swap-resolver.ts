@@ -4,7 +4,8 @@ import { env } from "../env";
 import { base } from "viem/chains";
 import { Chain, createPublicClient, http, PublicClient } from "viem";
 import { parseSwap } from "@0x/0x-parser";
-import { type Hex } from "@ecp.eth/sdk/core";
+import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
+import z from "zod";
 
 type ZeroExSwap = {
   from: {
@@ -77,14 +78,27 @@ export function createZeroExSwapResolver(
       // Try to parse swap directly from transaction hash
       // Note: metadata is not available in CommentAdded event, it comes from separate CommentMetadataSet events
       try {
-        const swap = await parseSwap({
-          publicClient,
-          transactionHash: event.transaction.hash,
-        });
+        const parsed = zeroExSwapSchema.safeParse(
+          await parseSwap({
+            publicClient,
+            transactionHash: event.transaction.hash,
+          }),
+        );
 
-        if (!swap) {
+        if (!parsed.success || !parsed.data) {
+          // that means the zero ex swap is not getting us the right stuffs even tho they
+          // typed that way
+          Sentry.captureException(parsed.error, {
+            extra: {
+              transactionHash: event.transaction.hash,
+              chainId: context.chain.id,
+            },
+          });
+
           return null;
         }
+
+        const swap = parsed.data;
 
         return {
           from: {
@@ -99,21 +113,18 @@ export function createZeroExSwapResolver(
           },
         };
       } catch (e) {
-        if (
-          e instanceof Error &&
-          e.message.includes("This is an ERC-4337 transaction.")
-        ) {
-          Sentry.captureException(e, {
-            extra: {
-              transactionHash: event.transaction.hash,
-              chainId: context.chain.id,
-            },
-          });
+        // we should never allow ex zero swap to cause the whole indexing to fail
+        Sentry.captureException(e, {
+          extra: {
+            erc4337:
+              e instanceof Error &&
+              e.message.includes("This is an ERC-4337 transaction."),
+            transactionHash: event.transaction.hash,
+            chainId: context.chain.id,
+          },
+        });
 
-          return null;
-        }
-
-        throw e;
+        return null;
       }
     },
   };
@@ -128,4 +139,17 @@ export const zeroExSwapResolver = createZeroExSwapResolver({
         },
       }
     : {},
+});
+
+const zeroExSwapSchema = z.object({
+  tokenIn: z.object({
+    symbol: z.string(),
+    address: HexSchema,
+    amount: z.string(),
+  }),
+  tokenOut: z.object({
+    symbol: z.string(),
+    address: HexSchema,
+    amount: z.string(),
+  }),
 });
