@@ -1,4 +1,0 @@
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery_attempt" ALTER COLUMN "response_status" SET NOT NULL;--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery_attempt" ALTER COLUMN "response_ms" SET NOT NULL;--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery_attempt" ADD COLUMN "app_webhook_id" uuid NOT NULL;--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery_attempt" ADD CONSTRAINT "app_webhook_delivery_attempt_app_webhook_id_app_webhook_id_fk" FOREIGN KEY ("app_webhook_id") REFERENCES "ecp_indexer_schema"."app_webhook"("id") ON DELETE cascade ON UPDATE cascade;

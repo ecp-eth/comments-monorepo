@@ -40,106 +40,15 @@
     {
       "idx": 5,
       "version": "7",
-      "when": 1755857034971,
-      "tag": "0005_user_accounts",
+      "when": 1757667282400,
+      "tag": "0005_app_infrastructure",
       "breakpoints": true
     },
     {
       "idx": 6,
       "version": "7",
-      "when": 1756106479043,
-      "tag": "0006_user_apps",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1756113902853,
-      "tag": "0007_channel_events",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1756209575687,
-      "tag": "0008_app_webhooks",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1756280834060,
-      "tag": "0009_webhook_deliveries",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1756370858466,
-      "tag": "0010_webhook_deliveries_improvements",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1756723447761,
-      "tag": "0011_missing_fields",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1756994032110,
-      "tag": "0012_easier_delivery_attempts",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1757058194179,
-      "tag": "0013_statistics_columns",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1757587116455,
-      "tag": "0014_notify_events_triggers",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "7",
-      "when": 1757599696104,
-      "tag": "0015_restructure",
-      "breakpoints": true
-    },
-    {
-      "idx": 16,
-      "version": "7",
-      "when": 1757600561039,
-      "tag": "0016_fix",
-      "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "7",
-      "when": 1757662609429,
-      "tag": "0017_fix",
-      "breakpoints": true
-    },
-    {
-      "idx": 18,
-      "version": "7",
-      "when": 1757665184255,
-      "tag": "0018_fix",
-      "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "7",
-      "when": 1757665289198,
-      "tag": "0019_fix",
+      "when": 1757667477491,
+      "tag": "0006_queue_notifications",
       "breakpoints": true
     }
   ]

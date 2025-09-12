@@ -1,6 +1,6 @@
 {
-  "id": "13cd9e8d-7ffb-4443-afe2-3a7af4f0a215",
-  "prevId": "6946996c-d3d1-4ad8-be31-f7e35446231b",
+  "id": "8b291342-6651-442f-8bdd-9be3a304d947",
+  "prevId": "cd250f03-ba0f-4b8d-b821-db69954c953f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -52,9 +52,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -62,10 +62,10 @@
       "uniqueConstraints": {
         "api_keys_name_unique": {
           "name": "api_keys_name_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "name"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -115,16 +115,16 @@
         "app_owner_id_user_id_fk": {
           "name": "app_owner_id_user_id_fk",
           "tableFrom": "app",
-          "tableTo": "user",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -175,29 +175,852 @@
         "app_signing_keys_app_id_app_id_fk": {
           "name": "app_signing_keys_app_id_app_id_fk",
           "tableFrom": "app_signing_keys",
-          "tableTo": "app",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "app_id"
           ],
+          "tableTo": "app",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "ask_one_active_secret_uq": {
           "name": "ask_one_active_secret_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "app_id",
             "revoked_at"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ecp_indexer_schema.app_webhook": {
+      "name": "app_webhook",
+      "schema": "ecp_indexer_schema",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auth": {
+          "name": "auth",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"type\":\"no-auth\"}'::jsonb"
+        },
+        "event_filter": {
+          "name": "event_filter",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "paused": {
+          "name": "paused",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "paused_at": {
+          "name": "paused_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "aw_by_event_idx": {
+          "name": "aw_by_event_idx",
+          "columns": [
+            {
+              "expression": "event_filter",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "gin",
+          "concurrently": false
+        },
+        "aw_by_paused_status_idx": {
+          "name": "aw_by_paused_status_idx",
+          "columns": [
+            {
+              "expression": "paused",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "aw_by_id_and_app_id_idx": {
+          "name": "aw_by_id_and_app_id_idx",
+          "columns": [
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "app_webhook_app_id_app_id_fk": {
+          "name": "app_webhook_app_id_app_id_fk",
+          "tableFrom": "app_webhook",
+          "columnsFrom": [
+            "app_id"
+          ],
+          "tableTo": "app",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_owner_id_user_id_fk": {
+          "name": "app_webhook_owner_id_user_id_fk",
+          "tableFrom": "app_webhook",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ecp_indexer_schema.app_webhook_delivery": {
+      "name": "app_webhook_delivery",
+      "schema": "ecp_indexer_schema",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "next_attempt_at": {
+          "name": "next_attempt_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "lease_until": {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_webhook_id": {
+          "name": "app_webhook_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "attempts_count": {
+          "name": "attempts_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "last_error": {
+          "name": "last_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "aws_by_status_and_next_attempt_at_idx": {
+          "name": "aws_by_status_and_next_attempt_at_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "next_attempt_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_webhook_idx": {
+          "name": "awd_by_webhook_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_owner_app_idx": {
+          "name": "awd_by_owner_app_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_owner_webhook_idx": {
+          "name": "awd_by_owner_webhook_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_owner_app_webhook_idx": {
+          "name": "awd_by_owner_app_webhook_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_webhook_created_at_range_idx": {
+          "name": "awd_by_webhook_created_at_range_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awd_by_webhook_status_created_at_range_idx": {
+          "name": "awd_by_webhook_status_created_at_range_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "aws_heads_per_subscription_idx": {
+          "name": "aws_heads_per_subscription_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "next_attempt_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "where": "\"ecp_indexer_schema\".\"app_webhook_delivery\".\"status\" IN ('pending', 'processing')",
+          "concurrently": false
+        },
+        "aws_inflight_idx": {
+          "name": "aws_inflight_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lease_until",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "where": "\"ecp_indexer_schema\".\"app_webhook_delivery\".\"status\" = 'processing'",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "app_webhook_delivery_owner_id_user_id_fk": {
+          "name": "app_webhook_delivery_owner_id_user_id_fk",
+          "tableFrom": "app_webhook_delivery",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_app_id_app_id_fk": {
+          "name": "app_webhook_delivery_app_id_app_id_fk",
+          "tableFrom": "app_webhook_delivery",
+          "columnsFrom": [
+            "app_id"
+          ],
+          "tableTo": "app",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_app_webhook_id_app_webhook_id_fk": {
+          "name": "app_webhook_delivery_app_webhook_id_app_webhook_id_fk",
+          "tableFrom": "app_webhook_delivery",
+          "columnsFrom": [
+            "app_webhook_id"
+          ],
+          "tableTo": "app_webhook",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_event_id_event_outbox_id_fk": {
+          "name": "app_webhook_delivery_event_id_event_outbox_id_fk",
+          "tableFrom": "app_webhook_delivery",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "tableTo": "event_outbox",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "awd_dedupe_deliveries_uq": {
+          "name": "awd_dedupe_deliveries_uq",
+          "columns": [
+            "app_webhook_id",
+            "event_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ecp_indexer_schema.app_webhook_delivery_attempt": {
+      "name": "app_webhook_delivery_attempt",
+      "schema": "ecp_indexer_schema",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "attempted_at": {
+          "name": "attempted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "attempt_number": {
+          "name": "attempt_number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_id": {
+          "name": "app_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_webhook_id": {
+          "name": "app_webhook_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_webhook_delivery_id": {
+          "name": "app_webhook_delivery_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "response_status": {
+          "name": "response_status",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "response_ms": {
+          "name": "response_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "awda_by_owner_idx": {
+          "name": "awda_by_owner_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awda_by_owner_app_idx": {
+          "name": "awda_by_owner_app_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awda_by_owner_webhook_idx": {
+          "name": "awda_by_owner_webhook_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awda_by_owner_app_webhook_idx": {
+          "name": "awda_by_owner_app_webhook_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awda_by_webhook_idx": {
+          "name": "awda_by_webhook_idx",
+          "columns": [
+            {
+              "expression": "app_webhook_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "awda_failed_partial_idx": {
+          "name": "awda_failed_partial_idx",
+          "columns": [
+            {
+              "expression": "response_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "where": "\"ecp_indexer_schema\".\"app_webhook_delivery_attempt\".\"response_status\" < 200 OR \"ecp_indexer_schema\".\"app_webhook_delivery_attempt\".\"response_status\" > 399",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "app_webhook_delivery_attempt_owner_id_user_id_fk": {
+          "name": "app_webhook_delivery_attempt_owner_id_user_id_fk",
+          "tableFrom": "app_webhook_delivery_attempt",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_attempt_app_id_app_id_fk": {
+          "name": "app_webhook_delivery_attempt_app_id_app_id_fk",
+          "tableFrom": "app_webhook_delivery_attempt",
+          "columnsFrom": [
+            "app_id"
+          ],
+          "tableTo": "app",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_attempt_app_webhook_id_app_webhook_id_fk": {
+          "name": "app_webhook_delivery_attempt_app_webhook_id_app_webhook_id_fk",
+          "tableFrom": "app_webhook_delivery_attempt",
+          "columnsFrom": [
+            "app_webhook_id"
+          ],
+          "tableTo": "app_webhook",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_attempt_app_webhook_delivery_id_app_webhook_delivery_id_fk": {
+          "name": "app_webhook_delivery_attempt_app_webhook_delivery_id_app_webhook_delivery_id_fk",
+          "tableFrom": "app_webhook_delivery_attempt",
+          "columnsFrom": [
+            "app_webhook_delivery_id"
+          ],
+          "tableTo": "app_webhook_delivery",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        },
+        "app_webhook_delivery_attempt_event_id_event_outbox_id_fk": {
+          "name": "app_webhook_delivery_attempt_event_id_event_outbox_id_fk",
+          "tableFrom": "app_webhook_delivery_attempt",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "tableTo": "event_outbox",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -319,9 +1142,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -407,9 +1230,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "comment_reports_by_created_at_idx": {
           "name": "comment_reports_by_created_at_idx",
@@ -422,9 +1245,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -437,6 +1260,99 @@
           "value": "\"ecp_indexer_schema\".\"comment_reports\".\"status\" IN ('pending', 'resolved', 'closed')"
         }
       },
+      "isRLSEnabled": false
+    },
+    "ecp_indexer_schema.event_outbox": {
+      "name": "event_outbox",
+      "schema": "ecp_indexer_schema",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "processed_at": {
+          "name": "processed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "event_uid": {
+          "name": "event_uid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "event_type": {
+          "name": "event_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aggregate_type": {
+          "name": "aggregate_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aggregate_id": {
+          "name": "aggregate_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload_size": {
+          "name": "payload_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "event_outbox_by_processed_at_idx": {
+          "name": "event_outbox_by_processed_at_idx",
+          "columns": [
+            {
+              "expression": "processed_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "event_outbox_eventUid_unique": {
+          "name": "event_outbox_eventUid_unique",
+          "columns": [
+            "event_uid"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "ecp_indexer_schema.muted_accounts": {
@@ -495,6 +1411,13 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
         }
       },
       "indexes": {},
@@ -561,27 +1484,27 @@
         "user_auth_credentials_user_id_user_id_fk": {
           "name": "user_auth_credentials_user_id_user_id_fk",
           "tableFrom": "user_auth_credentials",
-          "tableTo": "user",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "user_auth_credentials_by_method_and_identifier_uq": {
           "name": "user_auth_credentials_by_method_and_identifier_uq",
-          "nullsNotDistinct": false,
           "columns": [
             "method",
             "identifier"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -638,30 +1561,30 @@
         "user_auth_session_user_id_user_id_fk": {
           "name": "user_auth_session_user_id_user_id_fk",
           "tableFrom": "user_auth_session",
-          "tableTo": "user",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         },
         "user_auth_session_user_auth_credentials_id_user_auth_credentials_id_fk": {
           "name": "user_auth_session_user_auth_credentials_id_user_auth_credentials_id_fk",
           "tableFrom": "user_auth_session",
-          "tableTo": "user_auth_credentials",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "user_auth_credentials_id"
           ],
+          "tableTo": "user_auth_credentials",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -706,16 +1629,16 @@
         "user_auth_session_siwe_refresh_token_user_auth_session_id_user_auth_session_id_fk": {
           "name": "user_auth_session_siwe_refresh_token_user_auth_session_id_user_auth_session_id_fk",
           "tableFrom": "user_auth_session_siwe_refresh_token",
-          "tableTo": "user_auth_session",
-          "schemaTo": "ecp_indexer_schema",
           "columnsFrom": [
             "user_auth_session_id"
           ],
+          "tableTo": "user_auth_session",
+          "schemaTo": "ecp_indexer_schema",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onUpdate": "cascade",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -729,10 +1652,10 @@
   "schemas": {
     "ecp_indexer_schema": "ecp_indexer_schema"
   },
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},
