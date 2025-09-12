@@ -2,12 +2,12 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceSchemaType
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferencesSchemaInputType
 
-# Type Alias: IndexerAPICommentReferenceSchemaType
+# Type Alias: IndexerAPICommentReferencesSchemaInputType
 
 ```ts
-type IndexerAPICommentReferenceSchemaType = 
+type IndexerAPICommentReferencesSchemaInputType = (
   | {
   address: `0x${string}`;
   avatarUrl: null | string;
@@ -94,7 +94,7 @@ type IndexerAPICommentReferenceSchemaType =
   };
   type: "video";
   url: string;
-};
+})[];
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:309](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L309)
+Defined in: [packages/sdk/src/indexer/schemas.ts:342](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L342)

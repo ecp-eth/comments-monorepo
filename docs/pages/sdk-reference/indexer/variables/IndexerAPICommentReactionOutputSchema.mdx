@@ -92,23 +92,8 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
-  references: ZodArray<ZodUnion<[ZodObject<{
-     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     avatarUrl: ZodNullable<ZodString>;
-     name: ZodString;
-     position: ZodObject<{
-        end: ZodNumber;
-        start: ZodNumber;
-      }, "strip", ZodTypeAny, {
-        end: number;
-        start: number;
-      }, {
-        end: number;
-        start: number;
-     }>;
-     type: ZodLiteral<"ens">;
-     url: ZodString;
-   }, "strip", ZodTypeAny, {
+  references: ZodType<(
+     | {
      address: `0x${string}`;
      avatarUrl: null | string;
      name: string;
@@ -118,45 +103,22 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      type: "ens";
      url: string;
-   }, {
+   }
+     | {
      address: `0x${string}`;
-     avatarUrl: null | string;
-     name: string;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
      position: {
         end: number;
         start: number;
      };
-     type: "ens";
+     type: "farcaster";
      url: string;
-   }>, ZodObject<{
-     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     chainId: ZodNullable<ZodNumber>;
-     chains: ZodArray<ZodObject<{
-        caip: ...;
-        chainId: ...;
-      }, "strip", ZodTypeAny, {
-        caip: ...;
-        chainId: ...;
-      }, {
-        caip: ...;
-        chainId: ...;
-     }>, "many">;
-     decimals: ZodNumber;
-     logoURI: ZodNullable<ZodString>;
-     name: ZodString;
-     position: ZodObject<{
-        end: ZodNumber;
-        start: ZodNumber;
-      }, "strip", ZodTypeAny, {
-        end: number;
-        start: number;
-      }, {
-        end: number;
-        start: number;
-     }>;
-     symbol: ZodString;
-     type: ZodLiteral<"erc20">;
-   }, "strip", ZodTypeAny, {
+     username: string;
+   }
+     | {
      address: `0x${string}`;
      chainId: null | number;
      chains: {
@@ -172,7 +134,78 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      symbol: string;
      type: "erc20";
-   }, {
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+   })[], ZodTypeDef, (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
      address: `0x${string}`;
      chainId: null | number;
      chains: {
@@ -188,52 +221,52 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      symbol: string;
      type: "erc20";
-   }>, ZodObject<{
-     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     displayName: ZodNullable<ZodString>;
-     fid: ZodNumber;
-     fname: ZodString;
-     pfpUrl: ZodNullable<ZodString>;
-     position: ZodObject<{
-        end: ZodNumber;
-        start: ZodNumber;
-      }, "strip", ZodTypeAny, {
-        end: number;
-        start: number;
-      }, {
-        end: number;
-        start: number;
-     }>;
-     type: ZodLiteral<"farcaster">;
-     url: ZodString;
-     username: ZodString;
-   }, "strip", ZodTypeAny, {
-     address: `0x${string}`;
-     displayName: null | string;
-     fid: number;
-     fname: string;
-     pfpUrl: null | string;
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
      position: {
         end: number;
         start: number;
      };
-     type: "farcaster";
+     title: string;
+     type: "webpage";
      url: string;
-     username: string;
-   }, {
-     address: `0x${string}`;
-     displayName: null | string;
-     fid: number;
-     fname: string;
-     pfpUrl: null | string;
+   }
+     | {
+     mediaType: string;
      position: {
         end: number;
         start: number;
      };
-     type: "farcaster";
+     type: "file";
      url: string;
-     username: string;
-  }>]>, "many">;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+  })[]>;
   revision: ZodNumber;
   targetUri: ZodString;
   txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -340,7 +373,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      parentId: ZodNullable<ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>>;
-     references: ZodArray<ZodUnion<[..., ..., ...]>, "many">;
+     references: ZodType<(... | ... | ... | ... | ... | ... | ...)[], ZodTypeDef, (... | ... | ... | ... | ... | ... | ...)[]>;
      revision: ZodNumber;
      targetUri: ZodString;
      txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -1202,4 +1235,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:381](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L381)
+Defined in: [packages/sdk/src/indexer/schemas.ts:401](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L401)
