@@ -19,7 +19,7 @@
     const origin = script.dataset.iframeOrigin;
     const autoHeightAdjustment = script.dataset.autoHeightAdjustment === "true";
 
-    if (!origin || !autoHeightAdjustment) {
+    if (!origin) {
       throw new Error("iframe embed is not configured correctly");
     }
 
