@@ -38,34 +38,64 @@ export function useAuthProtect(apiError: Error | undefined | null) {
 }
 
 type AuthProviderProps = {
-  accessToken: string | null | undefined;
+  hasRefreshToken: boolean;
+  accessToken: string | null;
   children: React.ReactNode;
 };
 
-export function AuthProvider({ accessToken, children }: AuthProviderProps) {
-  const [loadedAccessToken, setLoadedAccessToken] = useState<
-    string | null | undefined
-  >(accessToken);
+export function AuthProvider({
+  accessToken,
+  hasRefreshToken,
+  children,
+}: AuthProviderProps) {
+  const [state, setState] = useState<
+    | {
+        isLoggedIn: true;
+        accessToken: string | null;
+      }
+    | {
+        isLoggedIn: false;
+      }
+  >(() => {
+    if (hasRefreshToken) {
+      return {
+        isLoggedIn: true,
+        accessToken,
+      };
+    }
+
+    return {
+      isLoggedIn: false,
+    };
+  });
 
   const value = useMemo((): AuthContextValue => {
-    if (!loadedAccessToken) {
+    if (state.isLoggedIn === false) {
       return {
         isLoggedIn: false,
-        updateAccessToken: (accessToken) => setLoadedAccessToken(accessToken),
+        updateAccessToken: (accessToken) =>
+          setState({
+            isLoggedIn: true,
+            accessToken,
+          }),
       };
     }
 
     return {
       isLoggedIn: true,
-      accessToken: loadedAccessToken,
+      accessToken: state.accessToken,
       logout: () => {
-        setLoadedAccessToken(null);
+        setState({ isLoggedIn: false });
 
         fetch("/api/auth/logout");
       },
-      updateAccessToken: (accessToken) => setLoadedAccessToken(accessToken),
+      updateAccessToken: (accessToken) =>
+        setState({
+          isLoggedIn: true,
+          accessToken,
+        }),
     };
-  }, [loadedAccessToken]);
+  }, [state]);
 
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 }
