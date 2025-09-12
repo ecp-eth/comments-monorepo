@@ -12,18 +12,18 @@ import { Button } from "../ui/button";
 import { ZodError } from "zod";
 
 function CodeSnippet({
-  url,
+  iframeUrl,
   autoHeightAdjustment,
-  scriptContent,
 }: {
-  url: string;
-  scriptContent: string;
+  iframeUrl: string;
   autoHeightAdjustment: boolean;
 }) {
+  const iframeOrigin = new URL(iframeUrl).origin;
+  const currentPageOrigin = window.location.origin;
   return (
     <>
       <iframe
-        src={url}
+        src={iframeUrl}
         style={{
           width: "100%",
           border: "none",
@@ -35,12 +35,17 @@ function CodeSnippet({
         }}
         title="Comments"
       ></iframe>
-      <script>{scriptContent}</script>
+      <script
+        src={`${currentPageOrigin}/embedScript.js`}
+        type="text/javascript"
+        data-iframe-origin={iframeOrigin}
+        data-auto-height-adjustment={autoHeightAdjustment}
+      ></script>
     </>
   );
 }
 
-export default function GeneratedURL({
+export default function SnippetGenerator({
   embedUri,
   config,
   source,
@@ -78,13 +83,11 @@ export default function GeneratedURL({
             : undefined,
       });
       const frameSrc = new URL(url).origin;
-      const scriptContent = generateScriptContent(url, autoHeightAdjustment);
 
       const snippet = renderToString(
         <CodeSnippet
-          url={url}
+          iframeUrl={url}
           autoHeightAdjustment={autoHeightAdjustment}
-          scriptContent={scriptContent ?? ""}
         />,
       );
 
@@ -186,67 +189,5 @@ export default function GeneratedURL({
         </span>
       </div>
     </div>
-  );
-}
-
-function heightAdjustmentScript(origin: string) {
-  window.addEventListener("message", (event) => {
-    if (
-      event.origin !== origin ||
-      event.data.type !== "@ecp.eth/sdk/embed/resize"
-    ) {
-      return;
-    }
-    const embedIframe = document.querySelector(
-      "iframe[title=Comments]",
-    ) as HTMLElement;
-
-    if (!embedIframe) {
-      return;
-    }
-
-    embedIframe.style.height = event.data.height + "px";
-  });
-}
-
-function mandatoryScript(origin: string) {
-  window.addEventListener("message", (event: MessageEvent) => {
-    if (
-      event.data.type !== "rainbowkit-wallet-button-mobile-clicked" ||
-      origin !== event.origin
-    ) {
-      return;
-    }
-
-    const mobileUri = event.data.uri;
-
-    if (
-      mobileUri.toLowerCase().startsWith("javascript:") ||
-      mobileUri.toLowerCase().startsWith("data:")
-    ) {
-      console.warn("Blocked potentially dangerous URI scheme:", mobileUri);
-      return;
-    }
-
-    if (mobileUri.toLowerCase().startsWith("http")) {
-      const link = document.createElement("a");
-      link.href = mobileUri;
-      link.target = "_blank";
-      link.rel = "noreferrer noopener";
-      link.click();
-    } else {
-      window.location.href = mobileUri;
-    }
-  });
-}
-
-function generateScriptContent(url: string, autoHeightAdjustment: boolean) {
-  const origin = new URL(url).origin;
-
-  return (
-    `(${mandatoryScript.toString()})(${JSON.stringify(origin)});` +
-    (autoHeightAdjustment
-      ? `(${heightAdjustmentScript.toString()})(${JSON.stringify(origin)});`
-      : "")
   );
 }
