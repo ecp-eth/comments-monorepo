@@ -102,7 +102,9 @@ export function AppWebhookDetailsDeleteButton({
             })}
           >
             <DrawerTrigger asChild>
-              <Button variant="destructive">Delete Webhook</Button>
+              <Button variant="destructive" type="button">
+                Delete Webhook
+              </Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
