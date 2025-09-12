@@ -6,6 +6,7 @@ import type {
 } from "@ecp.eth/sdk/indexer/schemas";
 import DataLoader from "dataloader";
 import { parse as parseHTML } from "node-html-parser";
+import z from "zod";
 
 export type ResolvedURL =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
@@ -109,10 +110,22 @@ async function resolveWebPage(
     | null = null;
 
   if (ogTitle && ogImage && ogUrl) {
+    // according to spec the image should be a full url, but in reality
+    // many websites cut corners and provide only a pathname,
+    // here we try to figure out the full url in case url parsing fails
+    let ogImageUrl: string | undefined = z
+      .string()
+      .url()
+      .safeParse(ogImage).data;
+
+    if (!ogImageUrl) {
+      ogImageUrl = new URL(ogImage, response.url).toString();
+    }
+
     opengraph = {
       title: ogTitle.trim(),
       description: ogDescription?.trim() ?? null,
-      image: ogImage,
+      image: ogImageUrl,
       url: ogUrl,
     };
   }
