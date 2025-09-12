@@ -15,9 +15,9 @@ export function useCopyToClipboard({
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const copyToClipboard = useCallback((text: string) => {
+  const copyToClipboard = useCallback(async (text: string) => {
     try {
-      navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(text);
       setStatus("success");
     } catch (error) {
       console.error(error);
@@ -27,6 +27,9 @@ export function useCopyToClipboard({
 
   useEffect(() => {
     if (status === "success") {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       timeoutRef.current = setTimeout(() => setStatus("idle"), delay);
     }
   }, [status, delay]);
