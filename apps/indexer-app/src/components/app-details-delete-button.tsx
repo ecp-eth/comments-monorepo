@@ -1,3 +1,4 @@
+"use client";
 import { useDeleteAppMutation } from "@/mutations/apps";
 import {
   Dialog,

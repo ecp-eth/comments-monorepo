@@ -87,7 +87,7 @@ export function AuthProvider({
       logout: () => {
         setState({ isLoggedIn: false });
 
-        fetch("/api/auth/logout");
+        fetch("/api/auth/logout", { method: "POST" });
       },
       updateAccessToken: (accessToken) =>
         setState({

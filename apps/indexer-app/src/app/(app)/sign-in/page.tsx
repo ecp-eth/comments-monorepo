@@ -133,7 +133,7 @@ export default function SignInPage() {
           <div className="space-y-2">
             <h1 className="text-3xl font-bold">ECP Indexer</h1>
             <p className="text-muted-foreground text-lg">
-              Build you apps on ECP Indexer
+              Build your apps on ECP Indexer
             </p>
           </div>
         </div>

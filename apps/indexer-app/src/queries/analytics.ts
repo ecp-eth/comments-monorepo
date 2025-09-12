@@ -368,7 +368,7 @@ type UseAnalyticsVolumeQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsVolumeQuery({
@@ -414,7 +414,7 @@ type UseAnalyticsTerminalQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsTerminalQuery({
@@ -460,7 +460,7 @@ type UseAnalyticsSuccessRatesQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsSuccessRatesQuery({
@@ -506,7 +506,7 @@ type UseAnalyticsE2ELatencyQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsE2ELatencyQuery({
@@ -552,7 +552,7 @@ type UseAnalyticsSlaBandsQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsSlaBandsQuery({
@@ -598,7 +598,7 @@ type UseAnalyticsErrorsQueryOptions = Omit<
   >,
   "queryKey" | "queryFn"
 > & {
-  params?: AnalyticsParams;
+  params?: Omit<AnalyticsParams, "appId" | "webhookId">;
 };
 
 export function useAnalyticsErrorsQuery({

@@ -1,3 +1,4 @@
+"use client";
 import type { AppSchemaType } from "@/api/schemas/apps";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useQueryClient } from "@tanstack/react-query";

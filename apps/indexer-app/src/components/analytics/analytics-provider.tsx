@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useMemo, useState } from "react";
 
 type TimePeriod = "1d" | "7d" | "30d" | "90d";

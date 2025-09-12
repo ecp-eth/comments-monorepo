@@ -1,3 +1,5 @@
+"use client";
+
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -79,7 +81,7 @@ export function AttemptsOverTimeChartCard() {
       <CardHeader>
         <CardTitle>Attempts over time</CardTitle>
         <CardDescription>
-          Showing attemts over time in the {params.label}
+          Showing attempts over time in the {params.label}
         </CardDescription>
       </CardHeader>
       <CardContent>

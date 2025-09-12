@@ -1,9 +1,9 @@
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import z from "zod";
+import { z } from "zod";
 
 export const siweNonceResponseSchema = z.object({
-  nonce: z.string(),
-  token: z.string(),
+  nonce: z.string().nonempty(),
+  token: z.string().nonempty(),
 });
 
 export type SiweNonceResponse = z.infer<typeof siweNonceResponseSchema>;

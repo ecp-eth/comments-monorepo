@@ -1,3 +1,5 @@
+"use client";
+
 import { RotateCwIcon, TrendingDownIcon, TrendingUpIcon } from "lucide-react";
 import {
   Card,

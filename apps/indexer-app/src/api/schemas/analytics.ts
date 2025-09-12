@@ -149,10 +149,12 @@ export const AnalyticsSlaBandsResponseSchema = z.object({
     z.object({
       time: z.coerce.date(),
       bands: z.object({
+        "5s": z.coerce.number(),
         "10s": z.coerce.number(),
         "30s": z.coerce.number(),
         "60s": z.coerce.number(),
         "300s": z.coerce.number(),
+        ">300s": z.coerce.number(),
       }),
     }),
   ),

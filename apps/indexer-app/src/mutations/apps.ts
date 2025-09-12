@@ -106,6 +106,12 @@ export function useRenameAppMutation({
         throw ZodError.create(data.error.issues);
       }
 
+      if (!appRenameResponse.ok) {
+        throw new Error(
+          `Failed to rename app: ${appRenameResponse.statusText}`,
+        );
+      }
+
       return AppUpdateResponseSchema.parse(await appRenameResponse.json());
     },
     ...options,

@@ -1,3 +1,4 @@
+"use client";
 import { RotateCwIcon } from "lucide-react";
 import {
   Card,

@@ -1,3 +1,4 @@
+"use client";
 import { LineChart, Line, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -42,9 +43,9 @@ const chartConfig = {
     label: "≤5min",
     color: "hsl(var(--chart-5))",
   },
-  ">300s": {
+  more_than_300s: {
     label: ">5min",
-    color: "hsl(var(--chart-6))",
+    color: "var(--chart-6)",
   },
 };
 
@@ -92,6 +93,7 @@ export function SlaBandsChartCard() {
   const data = analyticsSlaBandsQuery.data.results.map((result) => ({
     time: result.time,
     ...result.bands,
+    more_than_300s: result.bands[">300s"],
   }));
 
   return (
@@ -181,12 +183,12 @@ export function SlaBandsChartCard() {
               stroke="var(--color-300s)"
             />
             <Line
-              dataKey=">300s"
-              name=">300s"
+              dataKey="more_than_300s"
+              name="more_than_300s"
               type="monotone"
-              fill="var(--color->300s)"
+              fill="var(--color-more_than_300s)"
               fillOpacity={0.4}
-              stroke="var(--color->300s)"
+              stroke="var(--color-more_than_300s)"
             />
           </LineChart>
         </ChartContainer>

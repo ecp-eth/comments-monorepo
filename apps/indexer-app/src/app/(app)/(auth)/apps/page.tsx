@@ -188,7 +188,7 @@ const columns: ColumnDef<ListAppsResponseSchemaType["results"][number]>[] = [
           {new Intl.DateTimeFormat(undefined, {
             dateStyle: "short",
             timeStyle: "short",
-          }).format(row.original.createdAt)}
+          }).format(row.original.updatedAt)}
         </span>
       );
     },

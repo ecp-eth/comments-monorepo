@@ -30,7 +30,7 @@ type SecureFetchParams = {
 export async function secureFetch(
   authContext: AuthContextValue,
   fetchFn: (params: SecureFetchParams) => Promise<Response>,
-) {
+): Promise<Response> {
   const headers: Record<string, string> = {};
 
   if (authContext.isLoggedIn && authContext.accessToken) {

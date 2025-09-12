@@ -31,10 +31,12 @@ export const AnalyticsSlaBandsGetResponseSchema = z.object({
     z.object({
       time: OpenAPIDateStringSchema,
       bands: z.object({
+        "5s": OpenAPIFloatFromDbSchema,
         "10s": OpenAPIFloatFromDbSchema,
         "30s": OpenAPIFloatFromDbSchema,
         "60s": OpenAPIFloatFromDbSchema,
         "300s": OpenAPIFloatFromDbSchema,
+        ">300s": OpenAPIFloatFromDbSchema,
       }),
     }),
   ),
