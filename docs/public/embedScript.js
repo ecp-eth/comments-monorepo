@@ -6,13 +6,8 @@
         throw new Error("The script must be run from a <script /> tag");
       const origin = script.dataset.iframeOrigin,
         autoHeightAdjustment = "true" === script.dataset.autoHeightAdjustment;
-      if (!origin || !autoHeightAdjustment)
-        throw new Error("iframe embed is not configured correctly");
-      return (
-        console.log("origin", origin),
-        console.log("autoHeightAdjustment", autoHeightAdjustment),
-        { origin: origin, autoHeightAdjustment: autoHeightAdjustment }
-      );
+      if (!origin) throw new Error("iframe embed is not configured correctly");
+      return { origin: origin, autoHeightAdjustment: autoHeightAdjustment };
     })();
   !(function (origin) {
     window.addEventListener("message", (event) => {
