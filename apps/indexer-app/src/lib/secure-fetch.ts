@@ -31,28 +31,10 @@ export async function secureFetch(
   authContext: AuthContextValue,
   fetchFn: (params: SecureFetchParams) => Promise<Response>,
 ) {
-  let accessToken = authContext.isLoggedIn ? authContext.accessToken : null;
-
-  // refresh access token if refresh token is available in cookie
-  if (authContext.isLoggedIn && !authContext.accessToken) {
-    const newTokens = await refreshAccessToken(authContext);
-
-    console.log("newTokens", newTokens);
-
-    if (!newTokens) {
-      authContext.logout();
-      return;
-    }
-
-    authContext.updateAccessToken(newTokens.accessToken.token);
-
-    accessToken = newTokens.accessToken.token;
-  }
-
   const headers: Record<string, string> = {};
 
-  if (accessToken) {
-    headers["Authorization"] = `Bearer ${accessToken}`;
+  if (authContext.isLoggedIn && authContext.accessToken) {
+    headers["Authorization"] = `Bearer ${authContext.accessToken}`;
   }
 
   while (true) {
