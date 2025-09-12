@@ -95,14 +95,18 @@ export function setupAnalyticsTerminalGet(app: OpenAPIHono) {
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
       const bucketToUse = `1 ${bucket}`;
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`d.owner_id = ${c.get("user").id}`,
+        sql`d.created_at >= ${fromToUse}::timestamptz`,
+        sql`d.created_at < ${toToUse}::timestamptz`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`d.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`d.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -112,23 +116,13 @@ export function setupAnalyticsTerminalGet(app: OpenAPIHono) {
         failures: string;
       }>(sql`
         WITH
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON (app.id = w.app_id)
-            WHERE 
-              ${sql.join(filters, sql` AND `)}
-          ),
           deliveries AS (
             SELECT
-              d.*,
+              d.status,
               date_bin(${bucketToUse}::interval, d.created_at, '1970-01-01'::timestamptz) AS bucket
             FROM ${schema.appWebhookDelivery} d
-            WHERE d.created_at >= ${fromToUse} AND d.created_at < ${toToUse}
-              AND d.app_webhook_id IN (
-                SELECT id FROM filtered_webhooks
-              )
+            WHERE 
+              ${sql.join(filters, sql` AND `)}
           ),
           series AS (
             SELECT g::timestamptz AS bucket

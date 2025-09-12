@@ -96,14 +96,18 @@ export function setupAnalyticsErrorsGet(app: OpenAPIHono) {
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
       const bucketToUse = `1 ${bucket}`;
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`a.owner_id = ${c.get("user").id}`,
+        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
+        sql`a.attempted_at < ${toToUse}::timestamptz`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`a.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`a.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -114,26 +118,13 @@ export function setupAnalyticsErrorsGet(app: OpenAPIHono) {
         other: string;
       }>(sql`
         WITH
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON (app.id = w.app_id)
-            WHERE 
-              ${sql.join(filters, sql` AND `)}
-          ),
           attempts AS (
             SELECT
-              a.*,
-              date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket,
-              a.response_status BETWEEN 200 AND 399 AS is_success
+              a.response_status,
+              date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket
             FROM ${schema.appWebhookDeliveryAttempt} a
             WHERE
-              a.attempted_at >= ${fromToUse}::timestamptz
-              AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT id FROM filtered_webhooks
-              )
+              ${sql.join(filters, sql` AND `)}
           ),
           series AS (
             SELECT g::timestamptz AS bucket

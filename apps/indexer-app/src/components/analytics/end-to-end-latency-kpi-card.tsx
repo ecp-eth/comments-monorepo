@@ -42,7 +42,7 @@ export function EndToEndLatencyKpiCard({
     return (
       <Card>
         <ErrorScreen
-          title="Error fetching e2e latency KPI"
+          title="Error fetching end to end latency KPI"
           description="Please try again later. If the problem persists, please contact support."
           actions={
             <Button
@@ -66,8 +66,11 @@ export function EndToEndLatencyKpiCard({
 
   let value = "N/A";
 
-  if ("DurationFormat" in Intl && analyticsKpiE2ELatencyQuery.data.p95 > 0) {
-    const valueMs = analyticsKpiE2ELatencyQuery.data.p95;
+  if (
+    "DurationFormat" in Intl &&
+    analyticsKpiE2ELatencyQuery.data.p95.firstAttempt > 0
+  ) {
+    const valueMs = analyticsKpiE2ELatencyQuery.data.p95.firstAttempt;
     const hours = Math.floor(valueMs / 3_600_000);
     const minutes = Math.floor((valueMs % 3_600_000) / 60_000);
     const seconds = Math.floor((valueMs % 60_000) / 1000);
@@ -82,11 +85,11 @@ export function EndToEndLatencyKpiCard({
       seconds,
       milliseconds,
     });
-  } else if (analyticsKpiE2ELatencyQuery.data.p95 > 0) {
+  } else if (analyticsKpiE2ELatencyQuery.data.p95.firstAttempt > 0) {
     value = new Intl.NumberFormat(undefined, {
       unit: "millisecond",
       style: "unit",
-    }).format(analyticsKpiE2ELatencyQuery.data.p95);
+    }).format(analyticsKpiE2ELatencyQuery.data.p95.firstAttempt);
   }
 
   return (

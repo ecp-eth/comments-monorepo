@@ -23,7 +23,10 @@ export const AnalyticsKpiE2ELatencyGetQueryParamsSchema = z
   });
 
 const AnalyticsKpiE2ELatencyGetResponseSchema = z.object({
-  p95: OpenAPIFloatFromDbSchema,
+  p95: z.object({
+    firstAttempt: OpenAPIFloatFromDbSchema,
+    firstSuccess: OpenAPIFloatFromDbSchema,
+  }),
 });
 
 export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
@@ -78,10 +81,10 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [sql`w.owner_id = ${c.get("user").id}`];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`w.app_id = ${appId}`);
       }
 
       if (webhookId) {
@@ -90,45 +93,37 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
 
       const { rows } = await db.execute<{
         p95: string;
+        p95_success: string;
       }>(sql`
         WITH 
           webhooks AS (
             SELECT w.id
             FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON app.id = w.app_id
             WHERE 
               ${sql.join(filters, sql` AND `)}
           ),
-          attempts AS (
+          delivery_stats AS (
             SELECT
-              a.*,
-              (a.response_status BETWEEN 200 AND 399) AS is_success
+              a.app_webhook_delivery_id,
+              MIN(a.attempted_at) AS first_attempt,
+              MIN(
+                CASE WHEN (a.response_status BETWEEN 200 AND 399) THEN a.attempted_at END
+              ) as first_success
             FROM ${schema.appWebhookDeliveryAttempt} a
-            JOIN webhooks ON a.app_webhook_id = webhooks.id
-            WHERE a.attempted_at >= ${fromToUse}::timestamptz AND a.attempted_at < ${toToUse}::timestamptz
-          ),
-          first_attempts AS (
-            SELECT 
-              app_webhook_delivery_id,
-              MIN(attempted_at) AS attempted_at
-            FROM attempts
-            GROUP BY 1
-          ),
-          successful_attempts AS (
-            SELECT
-              app_webhook_delivery_id,
-              MIN(attempted_at) AS attempted_at
-            FROM attempts
-            WHERE is_success
+            JOIN webhooks ON (a.app_webhook_id = webhooks.id)
+            WHERE 
+              a.attempted_at >= ${fromToUse}::timestamptz 
+              AND 
+              a.attempted_at < ${toToUse}::timestamptz
             GROUP BY 1
           )
 
           SELECT
-            EXTRACT(EPOCH FROM PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY fa.attempted_at - e.created_at)) * 1000 AS "p95"
+            EXTRACT(EPOCH FROM PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY ds.first_attempt - e.created_at)) * 1000 AS "p95",
+            EXTRACT(EPOCH FROM PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY ds.first_success - e.created_at)) * 1000 AS "p95_success"
           FROM ${schema.appWebhookDelivery} d
           JOIN ${schema.eventOutbox} e ON e.id = d.event_id
-          JOIN first_attempts fa ON fa.app_webhook_delivery_id = d.id
-          JOIN successful_attempts sa ON sa.app_webhook_delivery_id = d.id
+          JOIN delivery_stats ds ON ds.app_webhook_delivery_id = d.id
           WHERE
             d.created_at >= ${fromToUse}::timestamptz 
             AND d.created_at < ${toToUse}::timestamptz
@@ -140,7 +135,10 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
           formatResponseUsingZodSchema(
             AnalyticsKpiE2ELatencyGetResponseSchema,
             {
-              p95: 0,
+              p95: {
+                firstAttempt: 0,
+                firstSuccess: 0,
+              },
             },
           ),
           200,
@@ -148,10 +146,12 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
       }
 
       return c.json(
-        formatResponseUsingZodSchema(
-          AnalyticsKpiE2ELatencyGetResponseSchema,
-          rows[0],
-        ),
+        formatResponseUsingZodSchema(AnalyticsKpiE2ELatencyGetResponseSchema, {
+          p95: {
+            firstAttempt: rows[0].p95,
+            firstSuccess: rows[0].p95_success,
+          },
+        }),
         200,
       );
     },

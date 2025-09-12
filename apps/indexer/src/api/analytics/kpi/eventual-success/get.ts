@@ -80,10 +80,10 @@ export function setupAnalyticsKpiEventualSuccessGet(app: OpenAPIHono) {
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [sql`w.owner_id = ${c.get("user").id}`];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`w.app_id = ${appId}`);
       }
 
       if (webhookId) {
@@ -100,7 +100,6 @@ export function setupAnalyticsKpiEventualSuccessGet(app: OpenAPIHono) {
             SELECT
               w.id
             FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON app.id = w.app_id
             WHERE 
               ${sql.join(filters, sql` AND `)}
           ),

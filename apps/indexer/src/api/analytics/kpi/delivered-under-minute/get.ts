@@ -78,14 +78,18 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
+        sql`a.attempted_at < ${toToUse}::timestamptz`,
+        sql`a.owner_id = ${c.get("user").id}`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`a.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`a.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -94,28 +98,21 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
         WITH 
           attempts AS (
             SELECT
-              a.*,
+              a.app_webhook_delivery_id,
+              a.event_id,
+              a.attempted_at,
               (a.response_status BETWEEN 200 AND 399) AS is_success
             FROM ${schema.appWebhookDeliveryAttempt} a
             WHERE 
-              a.attempted_at >= ${fromToUse}::timestamptz 
-              AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT w.id
-                FROM ${schema.appWebhook} w
-                JOIN ${schema.app} app ON app.id = w.app_id
-                WHERE  
-                  ${sql.join(filters, sql` AND `)}
-              )
+              ${sql.join(filters, sql` AND `)}
           ),
           success_time AS (
             SELECT
-              d.id,
+              a.app_webhook_delivery_id,
               e.created_at,
               MIN(a.attempted_at) FILTER (WHERE a.is_success) AS success_at
-            FROM ${schema.appWebhookDelivery} d
-            JOIN ${schema.eventOutbox} e ON e.id = d.event_id
-            JOIN attempts a ON a.app_webhook_delivery_id = d.id
+            FROM attempts a
+            JOIN ${schema.eventOutbox} e ON e.id = a.event_id
             GROUP BY 1, 2
           )
 

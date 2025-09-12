@@ -98,14 +98,18 @@ export function setupAnalyticsVolumeGet(app: OpenAPIHono) {
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
       const bucketToUse = `1 ${bucket}`;
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`a.owner_id = ${c.get("user").id}`,
+        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
+        sql`a.attempted_at < ${toToUse}::timestamptz`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`a.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`a.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -118,26 +122,14 @@ export function setupAnalyticsVolumeGet(app: OpenAPIHono) {
         http5xx: string;
       }>(sql`
         WITH
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON (app.id = w.app_id)
-            WHERE 
-              ${sql.join(filters, sql` AND `)}
-          ),
           attempts AS (
             SELECT
-              a.*,
+              a.response_status,
               date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket,
               a.response_status BETWEEN 200 AND 399 AS is_success
             FROM ${schema.appWebhookDeliveryAttempt} a
             WHERE
-              a.attempted_at >= ${fromToUse}::timestamptz
-              AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT id FROM filtered_webhooks
-              )
+              ${sql.join(filters, sql` AND `)}
           ),
           series AS (
             SELECT g::timestamptz AS bucket
@@ -153,9 +145,9 @@ export function setupAnalyticsVolumeGet(app: OpenAPIHono) {
             COALESCE(COUNT(a.*), 0) AS attempts,
             COALESCE(COUNT(a.*) FILTER (WHERE a.is_success IS TRUE), 0) AS successes,
             COALESCE(COUNT(a.*) FILTER (WHERE a.is_success IS FALSE), 0) AS failures,
-            COALESCE(COUNT(*) FILTER (WHERE (a.response_status <= 0)), 0) AS transport,
-            COALESCE(COUNT(*) FILTER (WHERE a.response_status BETWEEN 400 AND 499), 0) AS http4xx,
-            COALESCE(COUNT(*) FILTER (WHERE a.response_status BETWEEN 500 AND 599), 0) AS http5xx
+            COALESCE(COUNT(a.*) FILTER (WHERE (a.response_status <= 0)), 0) AS transport,
+            COALESCE(COUNT(a.*) FILTER (WHERE a.response_status BETWEEN 400 AND 499), 0) AS http4xx,
+            COALESCE(COUNT(a.*) FILTER (WHERE a.response_status BETWEEN 500 AND 599), 0) AS http5xx
           FROM series s
           LEFT JOIN attempts a ON (s.bucket = a.bucket)
           GROUP BY s.bucket

@@ -270,6 +270,9 @@ export class WebhookEventDeliveryService {
         await tx
           .insert(schema.appWebhookDeliveryAttempt)
           .values({
+            appId: appWebhook.appId,
+            ownerId: appWebhook.ownerId,
+            eventId: event.id,
             appWebhookId: appWebhook.id,
             appWebhookDeliveryId: deliveryId,
             responseStatus: response.status,
@@ -298,6 +301,9 @@ export class WebhookEventDeliveryService {
           .insert(schema.appWebhookDeliveryAttempt)
           .values({
             appWebhookId: appWebhook.id,
+            appId: appWebhook.appId,
+            ownerId: appWebhook.ownerId,
+            eventId: event.id,
             appWebhookDeliveryId: deliveryId,
             responseStatus: error.responseStatus,
             responseMs: error.responseMs,

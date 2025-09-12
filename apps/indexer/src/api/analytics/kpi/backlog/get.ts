@@ -70,14 +70,14 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
     },
     async (c) => {
       const { appId, webhookId } = c.req.valid("query");
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [sql`d.owner_id = ${c.get("user").id}`];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`d.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`d.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -94,12 +94,8 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
           MIN(next_attempt_at) FILTER (WHERE status NOT IN('success','failure')) AS "nextDueAt",
           EXTRACT(EPOCH FROM (now() - MIN(created_at)))::int          AS "oldestAgeSec"
         FROM ${schema.appWebhookDelivery} d
-        WHERE d.app_webhook_id IN (
-          SELECT w.id FROM ${schema.appWebhook} w
-          JOIN ${schema.app} app ON (app.id = w.app_id)
-          WHERE  
-            ${sql.join(filters, sql` AND `)}
-        );
+        WHERE
+          ${sql.join(filters, sql` AND `)}
       `);
 
       if (!rows[0]) {

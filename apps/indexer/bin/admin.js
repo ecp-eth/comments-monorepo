@@ -54,7 +54,7 @@ function urlOptionValidator(val) {
 }
 
 /**
- * Creates a Kysely instance for the given database URL.
+ * Creates a Drizzle instance for the given database URL.
  * @param {string} dbUrl - The database URL to connect to.
  *
  * @returns {import('drizzle-orm/node-postgres').NodePgDatabase<import('../schema').schema>} A Drizzle instance.

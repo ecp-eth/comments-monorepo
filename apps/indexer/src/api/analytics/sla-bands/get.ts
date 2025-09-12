@@ -98,63 +98,52 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
       const bucketToUse = `1 ${bucket}`;
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`a.owner_id = ${c.get("user").id}`,
+        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
+        sql`a.attempted_at < ${toToUse}::timestamptz`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`a.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`a.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
         time: Date;
+        "5s": number;
         "10s": number;
         "30s": number;
         "60s": number;
         "300s": number;
+        ">300s": number;
       }>(sql`
         WITH
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON app.id = w.app_id
-            WHERE 
-              ${sql.join(filters, sql` AND `)}
-          ),
-          attempts AS (
-            SELECT
-              a.*,
-              date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket,
-              a.response_status BETWEEN 200 AND 399 AS is_success
-            FROM ${schema.appWebhookDeliveryAttempt} a
-            WHERE
-              a.attempted_at >= ${fromToUse}::timestamptz
-              AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT id FROM filtered_webhooks
-              )
-          ),
           successful_attempts AS (
             SELECT
               d.id as delivery_id,
               e.created_at,
-              MIN(a.attempted_at) FILTER (WHERE a.is_success) AS success_at
-            FROM attempts a
+              MIN(a.attempted_at) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS success_at
+            FROM ${schema.appWebhookDeliveryAttempt} a
             JOIN ${schema.appWebhookDelivery} d ON (d.id = a.app_webhook_delivery_id)
             JOIN ${schema.eventOutbox} e ON (e.id = d.event_id)
+            WHERE
+              ${sql.join(filters, sql` AND `)}
             GROUP BY 1, 2
           ),
           by_bucket AS (
             SELECT
               date_bin(${bucketToUse}::interval, sa.created_at, '1970-01-01'::timestamptz) AS bucket,
               COUNT(*) as total,
+              COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '5 seconds') AS "5s",
               COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '10 seconds') AS "10s",
               COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '30 seconds') AS "30s",
               COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '60 seconds') AS "60s",
-              COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '300 seconds') AS "300s"
+              COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '300 seconds') AS "300s",
+              COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at > INTERVAL '300 seconds') AS ">300s"
             FROM successful_attempts sa
             GROUP BY 1
           ),
@@ -169,10 +158,12 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
 
           SELECT
             s.bucket::timestamptz AS time,
+            COALESCE(bb."5s"::float / NULLIF(bb.total, 0), 0)::float AS "5s",
             COALESCE(bb."10s"::float / NULLIF(bb.total, 0), 0)::float AS "10s",
             COALESCE(bb."30s"::float / NULLIF(bb.total, 0), 0)::float AS "30s",
             COALESCE(bb."60s"::float / NULLIF(bb.total, 0), 0)::float AS "60s",
-            COALESCE(bb."300s"::float / NULLIF(bb.total, 0), 0)::float AS "300s"
+            COALESCE(bb."300s"::float / NULLIF(bb.total, 0), 0)::float AS "300s",
+            COALESCE(bb.">300s"::float / NULLIF(bb.total, 0), 0)::float AS ">300s"
           FROM series s
           LEFT JOIN by_bucket bb ON (s.bucket = bb.bucket)
           ORDER BY s.bucket;

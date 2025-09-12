@@ -22,6 +22,10 @@ import { useAnalyticsContext } from "./analytics-provider";
 import { CustomChartTooltipContent } from "../ui/chart-custom";
 
 const chartConfig = {
+  "5s": {
+    label: "≤5s",
+    color: "hsl(var(--chart-1))",
+  },
   "10s": {
     label: "≤10s",
     color: "hsl(var(--chart-2))",
@@ -37,6 +41,10 @@ const chartConfig = {
   "300s": {
     label: "≤5min",
     color: "hsl(var(--chart-5))",
+  },
+  ">300s": {
+    label: ">5min",
+    color: "hsl(var(--chart-6))",
   },
 };
 
@@ -133,6 +141,14 @@ export function SlaBandsChartCard() {
             />
             <ChartLegend content={<ChartLegendContent />} />
             <Line
+              dataKey="5s"
+              name="5s"
+              type="monotone"
+              fill="var(--color-5s)"
+              fillOpacity={0.4}
+              stroke="var(--color-5s)"
+            />
+            <Line
               dataKey="10s"
               name="10s"
               type="monotone"
@@ -163,6 +179,14 @@ export function SlaBandsChartCard() {
               fill="var(--color-300s)"
               fillOpacity={0.4}
               stroke="var(--color-300s)"
+            />
+            <Line
+              dataKey=">300s"
+              name=">300s"
+              type="monotone"
+              fill="var(--color->300s)"
+              fillOpacity={0.4}
+              stroke="var(--color->300s)"
             />
           </LineChart>
         </ChartContainer>

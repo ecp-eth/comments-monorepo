@@ -13,6 +13,7 @@ import {
   unique,
   bigserial,
   boolean,
+  bigint,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
@@ -282,6 +283,10 @@ export const appWebhook = offchainSchema.table(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
+    ownerId: uuid().references(() => user.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     name: text().notNull(),
@@ -296,6 +301,7 @@ export const appWebhook = offchainSchema.table(
   (table) => [
     index("aw_by_event_idx").using("gin", table.eventFilter),
     index("aw_by_paused_status_idx").on(table.paused),
+    index("aw_by_id_and_app_id_idx").on(table.id, table.appId),
   ],
 );
 
@@ -316,13 +322,19 @@ export const appWebhookDelivery = offchainSchema.table(
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     leaseUntil: timestamp({ withTimezone: true }),
-    appWebhookId: uuid()
-      .notNull()
-      .references(() => appWebhook.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
-    eventId: bigserial({ mode: "bigint" })
+    ownerId: uuid().references(() => user.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    appId: uuid().references(() => app.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    appWebhookId: uuid().references(() => appWebhook.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    eventId: bigint({ mode: "bigint" })
       .notNull()
       .references(() => eventOutbox.id, {
         onDelete: "cascade",
@@ -337,11 +349,29 @@ export const appWebhookDelivery = offchainSchema.table(
   (table) => [
     // prevents double-enqueue and re-sends on reindexing
     unique("awd_dedupe_deliveries_uq").on(table.appWebhookId, table.eventId),
+    // used for webhook delivery service worker
     index("aws_by_status_and_next_attempt_at_idx").on(
       table.status,
       table.nextAttemptAt,
     ),
+    // used for analytics
     index("awd_by_webhook_idx").on(table.appWebhookId),
+    index("awd_by_owner_app_idx").on(table.ownerId, table.appId),
+    index("awd_by_owner_webhook_idx").on(table.ownerId, table.appWebhookId),
+    index("awd_by_owner_app_webhook_idx").on(
+      table.ownerId,
+      table.appId,
+      table.appWebhookId,
+    ),
+    index("awd_by_webhook_created_at_range_idx").on(
+      table.appWebhookId,
+      table.createdAt,
+    ),
+    index("awd_by_webhook_status_created_at_range_idx").on(
+      table.appWebhookId,
+      table.status,
+      table.createdAt,
+    ),
     // this index is used to find the head of the queue for each subscription (FIFO)
     index("aws_heads_per_subscription_idx")
       .on(table.appWebhookId, table.nextAttemptAt, table.id)
@@ -374,31 +404,53 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
     id: bigserial({ mode: "bigint" }).primaryKey(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     attemptNumber: integer().notNull().default(1),
-    appWebhookId: uuid()
-      .notNull()
-      .references(() => appWebhook.id, {
-        onDelete: "cascade",
+    ownerId: uuid().references(() => user.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    appId: uuid().references(() => app.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    appWebhookId: uuid().references(() => appWebhook.id, {
+      onDelete: "set null",
+      onUpdate: "cascade",
+    }),
+    appWebhookDeliveryId: bigint({ mode: "bigint" }).references(
+      () => appWebhookDelivery.id,
+      {
+        onDelete: "set null",
         onUpdate: "cascade",
-      }),
-    appWebhookDeliveryId: bigserial({ mode: "bigint" })
-      .notNull()
-      .references(() => appWebhookDelivery.id, {
-        onDelete: "cascade",
-        onUpdate: "cascade",
-      }),
+      },
+    ),
+    eventId: bigint({ mode: "bigint" }).references(() => eventOutbox.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
     responseStatus: integer().notNull(),
     responseMs: integer().notNull(),
     error: text(),
   },
   (table) => [
-    index("awda_by_webhook_time_idx").on(
-      table.appWebhookDeliveryId,
+    // used for analytics
+    index("awda_by_owner_idx").on(table.ownerId, table.attemptedAt),
+    index("awda_by_owner_app_idx").on(
+      table.ownerId,
+      table.appId,
       table.attemptedAt,
     ),
-    index("awda_by_delivery_idx").on(
-      table.appWebhookDeliveryId,
-      table.attemptNumber,
+    index("awda_by_owner_webhook_idx").on(
+      table.ownerId,
+      table.appWebhookId,
+      table.attemptedAt,
     ),
+    index("awda_by_owner_app_webhook_idx").on(
+      table.ownerId,
+      table.appId,
+      table.appWebhookId,
+      table.attemptedAt,
+    ),
+    index("awda_by_webhook_idx").on(table.appWebhookId, table.attemptedAt),
     index("awda_failed_partial_idx")
       .on(table.responseStatus)
       .where(

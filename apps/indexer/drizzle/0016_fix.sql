@@ -1,0 +1,1 @@
+ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery" ALTER COLUMN "app_webhook_id" DROP NOT NULL;

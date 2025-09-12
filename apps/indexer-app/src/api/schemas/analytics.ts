@@ -29,7 +29,10 @@ export type AnalyticsKpiFirstAttemptSuccessResponseSchemaType = z.infer<
 >;
 
 export const AnalyticsKpiE2ELatencyResponseSchema = z.object({
-  p95: z.coerce.number(),
+  p95: z.object({
+    firstAttempt: z.coerce.number(),
+    firstSuccess: z.coerce.number(),
+  }),
 });
 
 export type AnalyticsKpiE2ELatencyResponseSchemaType = z.infer<

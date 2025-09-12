@@ -121,11 +121,13 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
             WHERE 
               ${sql.join(filters, sql` AND `)}
           ),
-          attempts AS (
+          delivery_stats AS (
             SELECT
-              a.*,
-              date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket,
-              a.response_status BETWEEN 200 AND 399 AS is_success
+              app_webhook_delivery_id,
+              MIN(attempted_at) AS first_attempt_at,
+              MIN(
+                CASE WHEN (response_status BETWEEN 200 AND 399) THEN attempted_at END
+              ) AS success_at
             FROM ${schema.appWebhookDeliveryAttempt} a
             WHERE
               a.attempted_at >= ${fromToUse}::timestamptz
@@ -133,30 +135,15 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
               AND a.app_webhook_id IN (
                 SELECT id FROM filtered_webhooks
               )
-          ),
-          first_attempts AS (
-            SELECT
-              app_webhook_delivery_id,
-              MIN(attempted_at) AS first_attempt_at
-            FROM attempts a
-            GROUP BY 1
-          ),
-          successful_attempts AS (
-            SELECT
-              app_webhook_delivery_id,
-              MIN(attempted_at) AS success_at
-            FROM attempts a
-            WHERE a.is_success
             GROUP BY 1
           ),
           latencies AS (
             SELECT
-              date_bin(${bucketToUse}::interval, fa.first_attempt_at, '1970-01-01'::timestamptz) AS bucket,
-              EXTRACT(EPOCH FROM (sa.success_at - e.created_at)) * 1000 AS latency
+              date_bin(${bucketToUse}::interval, ds.first_attempt_at, '1970-01-01'::timestamptz) AS bucket,
+              EXTRACT(EPOCH FROM (ds.success_at - e.created_at)) * 1000 AS latency
             FROM ${schema.appWebhookDelivery} d
             JOIN ${schema.eventOutbox} e ON e.id = d.event_id
-            JOIN first_attempts fa ON fa.app_webhook_delivery_id = d.id
-            JOIN successful_attempts sa ON sa.app_webhook_delivery_id = d.id
+            JOIN delivery_stats ds ON ds.app_webhook_delivery_id = d.id
             WHERE
               d.app_webhook_id IN (
                 SELECT id FROM filtered_webhooks

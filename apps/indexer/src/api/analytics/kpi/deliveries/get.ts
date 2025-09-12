@@ -78,37 +78,26 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
       const fromToUse =
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`d.created_at >= ${fromToUse}::timestamptz`,
+        sql`d.created_at < ${toToUse}::timestamptz`,
+        sql`d.owner_id = ${c.get("user").id}`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`d.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`d.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{ deliveries: string }>(sql`
-        WITH 
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON (w.app_id = app.id)
-            WHERE
-              ${sql.join(filters, sql` AND `)}
-          ),
-          deliveries AS (
-            SELECT
-              d.*
-            FROM ${schema.appWebhookDelivery} d
-            JOIN filtered_webhooks ON (d.app_webhook_id = filtered_webhooks.id)
-            WHERE
-              d.created_at >= ${fromToUse}
-              AND d.created_at < ${toToUse}
-          )
-
-        SELECT COUNT(*) as deliveries FROM deliveries
+        SELECT
+          COUNT(*) as deliveries
+        FROM ${schema.appWebhookDelivery} d
+        WHERE
+          ${sql.join(filters, sql` AND `)}
       `);
 
       if (!rows[0]) {

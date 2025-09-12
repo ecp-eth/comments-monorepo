@@ -85,8 +85,8 @@ export class EventOutboxFanOutService {
 
             -- 2) Insert the events for subscribers which are interested in the event
             inserted_events AS (
-              INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id)
-              SELECT ${schema.appWebhook.id}, e.id
+              INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id, app_id, owner_id)
+              SELECT ${schema.appWebhook.id}, e.id, ${schema.appWebhook.appId}, ${schema.appWebhook.ownerId}
               FROM claimed_events e
               JOIN ${schema.appWebhook} ON (
                 ${schema.appWebhook.paused} = FALSE 

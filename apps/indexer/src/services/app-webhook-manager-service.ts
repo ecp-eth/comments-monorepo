@@ -25,6 +25,7 @@ export class AppWebhookManager implements IAppWebhookManager {
         .insert(schema.appWebhook)
         .values({
           appId: app.id,
+          ownerId: app.ownerId,
           name: webhook.name,
           url: webhook.url,
           auth: webhook.auth,

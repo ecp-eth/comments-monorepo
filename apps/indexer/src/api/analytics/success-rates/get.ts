@@ -94,14 +94,18 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
         from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
       const bucketToUse = `1 ${bucket}`;
 
-      const filters: SQL[] = [sql`app.owner_id = ${c.get("user").id}`];
+      const filters: SQL[] = [
+        sql`a.owner_id = ${c.get("user").id}`,
+        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
+        sql`a.attempted_at < ${toToUse}::timestamptz`,
+      ];
 
       if (appId) {
-        filters.push(sql`app.id = ${appId}`);
+        filters.push(sql`a.app_id = ${appId}`);
       }
 
       if (webhookId) {
-        filters.push(sql`w.id = ${webhookId}`);
+        filters.push(sql`a.app_webhook_id = ${webhookId}`);
       }
 
       const { rows } = await db.execute<{
@@ -110,34 +114,15 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
         firstSuccessRate: string;
       }>(sql`
         WITH
-          filtered_webhooks AS (
-            SELECT
-              w.id
-            FROM ${schema.appWebhook} w
-            JOIN ${schema.app} app ON (app.id = w.app_id)
-            WHERE 
-              ${sql.join(filters, sql` AND `)}
-          ),
-          attempts AS (
-            SELECT
-              a.*,
-              date_bin(${bucketToUse}::interval, a.attempted_at, '1970-01-01'::timestamptz) AS bucket,
-              a.response_status BETWEEN 200 AND 399 AS is_success
-            FROM ${schema.appWebhookDeliveryAttempt} a
-            WHERE
-              a.attempted_at >= ${fromToUse}::timestamptz
-              AND a.attempted_at < ${toToUse}::timestamptz
-              AND a.app_webhook_id IN (
-                SELECT id FROM filtered_webhooks
-              )
-          ),
           per_delivery AS (
             SELECT
               a.app_webhook_delivery_id,
-              MIN(a.attempt_number) FILTER (WHERE a.is_success) AS first_success_attempt,
-              BOOL_OR(a.is_success) AS eventually_delivered,
+              MIN(a.attempt_number) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS first_success_attempt,
+              BOOL_OR(a.response_status BETWEEN 200 AND 399) AS eventually_delivered,
               MIN(a.attempted_at) AS first_attempt_at
-            FROM attempts a
+            FROM ${schema.appWebhookDeliveryAttempt} a
+            WHERE
+              ${sql.join(filters, sql` AND `)}
             GROUP BY 1 
           ),
           by_bucket AS (
