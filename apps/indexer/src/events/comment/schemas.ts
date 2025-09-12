@@ -19,6 +19,7 @@ export const CommentEvents = [
   "comment:deleted",
   "comment:edited",
   "comment:moderation:status:updated",
+  "comment:reactions:updated",
 ] as const;
 
 export type CommentEvent = (typeof CommentEvents)[number];
@@ -149,4 +150,24 @@ export type CommentModerationStatusUpdatedEventInput = z.input<
 
 export type CommentModerationStatusUpdatedEvent = z.infer<
   typeof CommentModerationStatusUpdatedEventSchema
+>;
+
+export const CommentReactionsUpdatedEventSchema = z.object({
+  event: z.literal("comment:reactions:updated" satisfies CommentEvent),
+  uid: z.string(),
+  version: z.literal(1),
+  data: z.object({
+    comment: z.object({
+      id: HexSchema,
+      reactionCounts: z.record(z.number()),
+    }),
+  }),
+});
+
+export type CommentReactionsUpdatedEventInput = z.input<
+  typeof CommentReactionsUpdatedEventSchema
+>;
+
+export type CommentReactionsUpdatedEvent = z.infer<
+  typeof CommentReactionsUpdatedEventSchema
 >;

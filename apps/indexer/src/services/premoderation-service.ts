@@ -16,19 +16,23 @@ import {
   CommentNotFoundError,
 } from "./errors.ts";
 import { createCommentModerationStatusUpdatedEvent } from "../events/comment/index.ts";
+import type { EventOutboxService } from "./event-outbox-service.ts";
 
 type PremoderationServiceOptions = {
   classificationThreshold: number;
   db: DB;
+  eventOutboxService: EventOutboxService;
 };
 
 export class PremoderationService implements ICommentPremoderationService {
   private classificationThreshold: number;
   private db: DB;
+  private eventOutboxService: EventOutboxService;
 
   constructor(options: PremoderationServiceOptions) {
     this.classificationThreshold = options.classificationThreshold;
     this.db = options.db;
+    this.eventOutboxService = options.eventOutboxService;
   }
 
   async moderate(
@@ -212,16 +216,12 @@ export class PremoderationService implements ICommentPremoderationService {
             comment: updatedComment,
           });
 
-        await this.db
-          .insert(schema.eventOutbox)
-          .values({
-            aggregateType: "comment",
-            aggregateId: commentModerationStatusEvent.data.comment.id,
-            eventType: commentModerationStatusEvent.event,
-            eventUid: commentModerationStatusEvent.uid,
-            payload: commentModerationStatusEvent,
-          })
-          .execute();
+        await this.eventOutboxService.publishEvent({
+          tx,
+          aggregateId: updatedComment.id,
+          aggregateType: "comment",
+          event: commentModerationStatusEvent,
+        });
       }
 
       if (status === "pending") {

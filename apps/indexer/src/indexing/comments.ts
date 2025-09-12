@@ -34,6 +34,7 @@ import {
   ponderEventToCommentDeletedEvent,
   ponderEventToCommentHookMetadataSetEvent,
   ponderEventToCommentEditedEvent,
+  createCommentReactionsUpdatedEvent,
 } from "../events/comment/index.ts";
 import { schema } from "../../schema.ts";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
@@ -124,7 +125,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         if (event.args.commentType === COMMENT_TYPE_REACTION) {
           const reactionType = event.args.content;
 
-          await db
+          await tx
             .update(schema.comment)
             .set({
               reactionCounts: {
@@ -156,7 +157,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         referencesResolutionResult.references,
       );
 
-      const [insertedComment] = await db
+      const [insertedComment] = await tx
         .insert(schema.comment)
         .values({
           id: event.args.commentId,
@@ -343,14 +344,28 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         reactionCounts[existingComment.content] =
           (reactionCounts[existingComment.content] ?? 1) - 1;
 
-        await tx
+        const [updatedParentComment] = await tx
           .update(schema.comment)
           .set({
             reactionCounts,
             updatedAt: new Date(Number(event.block.timestamp) * 1000),
           })
           .where(eq(schema.comment.id, existingComment.parentId))
+          .returning()
           .execute();
+
+        if (!updatedParentComment) {
+          return;
+        }
+
+        await eventOutboxService.publishEvent({
+          aggregateId: updatedParentComment.id,
+          aggregateType: "comment",
+          tx,
+          event: createCommentReactionsUpdatedEvent({
+            comment: updatedParentComment,
+          }),
+        });
       }
     });
   });

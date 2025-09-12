@@ -15,6 +15,9 @@ import {
   type CommentModerationStatusUpdatedEvent,
   CommentModerationStatusUpdatedEventSchema,
   type CommentModerationStatusUpdatedEventInput,
+  CommentReactionsUpdatedEventSchema,
+  type CommentReactionsUpdatedEvent,
+  type CommentReactionsUpdatedEventInput,
 } from "./schemas.ts";
 import type {
   IndexerAPICommentReferencesSchemaType,
@@ -158,6 +161,23 @@ export function ponderEventToCommentEditedEvent({
       },
     },
   } satisfies CommentEditedEventInput);
+}
+
+export function createCommentReactionsUpdatedEvent({
+  comment,
+}: {
+  comment: CommentSelectType;
+}): CommentReactionsUpdatedEvent {
+  const uid = `comment:reactions:updated:${comment.chainId}:${comment.updatedAt.getTime()}:${comment.id}`;
+
+  return CommentReactionsUpdatedEventSchema.parse({
+    event: "comment:reactions:updated",
+    uid,
+    version: 1,
+    data: {
+      comment,
+    },
+  } satisfies CommentReactionsUpdatedEventInput);
 }
 
 export function createCommentModerationStatusUpdatedEvent({

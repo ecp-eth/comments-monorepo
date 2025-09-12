@@ -18,6 +18,7 @@ import type {
   CommentEditedEvent,
   CommentModerationStatusUpdatedEvent,
   CommentEvent,
+  CommentReactionsUpdatedEvent,
 } from "./comment/schemas.ts";
 import type { TestEvent } from "./test/schemas.ts";
 
@@ -34,6 +35,7 @@ export type Events =
   | CommentDeletedEvent
   | CommentEditedEvent
   | CommentModerationStatusUpdatedEvent
+  | CommentReactionsUpdatedEvent
   | TestEvent;
 
 export type EventTypes =
