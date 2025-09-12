@@ -283,10 +283,12 @@ export const appWebhook = offchainSchema.table(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    ownerId: uuid().references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
+    ownerId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     name: text().notNull(),
@@ -322,18 +324,24 @@ export const appWebhookDelivery = offchainSchema.table(
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     leaseUntil: timestamp({ withTimezone: true }),
-    ownerId: uuid().references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    appId: uuid().references(() => app.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    appWebhookId: uuid().references(() => appWebhook.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
+    ownerId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appWebhookId: uuid()
+      .notNull()
+      .references(() => appWebhook.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     eventId: bigint({ mode: "bigint" })
       .notNull()
       .references(() => eventOutbox.id, {
@@ -404,29 +412,36 @@ export const appWebhookDeliveryAttempt = offchainSchema.table(
     id: bigserial({ mode: "bigint" }).primaryKey(),
     attemptedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     attemptNumber: integer().notNull().default(1),
-    ownerId: uuid().references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    appId: uuid().references(() => app.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    appWebhookId: uuid().references(() => appWebhook.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-    appWebhookDeliveryId: bigint({ mode: "bigint" }).references(
-      () => appWebhookDelivery.id,
-      {
+    ownerId: uuid()
+      .notNull()
+      .references(() => user.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
-      },
-    ),
-    eventId: bigint({ mode: "bigint" }).references(() => eventOutbox.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
+      }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appWebhookId: uuid()
+      .notNull()
+      .references(() => appWebhook.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appWebhookDeliveryId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => appWebhookDelivery.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    eventId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => eventOutbox.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
     responseStatus: integer().notNull(),
     responseMs: integer().notNull(),
     error: text(),
