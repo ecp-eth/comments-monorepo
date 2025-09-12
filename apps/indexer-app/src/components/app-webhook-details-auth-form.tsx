@@ -91,7 +91,7 @@ export function AppWebhookDetailsAuthForm({
       <form
         className="flex flex-col gap-2"
         onSubmit={form.handleSubmit((values) => {
-          if (values.name === webhook.name) {
+          if (JSON.stringify(values.auth) === JSON.stringify(webhook.auth)) {
             setIsEditing(false);
             return;
           }
@@ -115,7 +115,7 @@ export function AppWebhookDetailsAuthForm({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Edit events</p>
+                  <p>Edit authentication</p>
                 </TooltipContent>
               </Tooltip>
             ) : null}
@@ -252,7 +252,7 @@ export function AppWebhookDetailsAuthForm({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Save events</p>
+                    <p>Save authentication</p>
                   </TooltipContent>
                 </Tooltip>
               </>
