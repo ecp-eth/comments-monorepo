@@ -96,7 +96,9 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
             })}
           >
             <DrawerTrigger asChild>
-              <Button variant="destructive">Delete App</Button>
+              <Button variant="destructive" type="button">
+                Delete App
+              </Button>
             </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
@@ -141,6 +143,7 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
                   disabled={deleteAppMutation.isPending}
                   variant="outline"
                   onClick={() => setIsOpen(false)}
+                  type="button"
                 >
                   Cancel
                 </Button>
@@ -171,7 +174,9 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
           })}
         >
           <DialogTrigger asChild>
-            <Button variant="destructive">Delete App</Button>
+            <Button variant="destructive" type="button">
+              Delete App
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -204,6 +209,7 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
                 disabled={deleteAppMutation.isPending}
                 variant="outline"
                 onClick={() => setIsOpen(false)}
+                type="button"
               >
                 Cancel
               </Button>
