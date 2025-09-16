@@ -21,12 +21,26 @@ const PROCESSES = [
   {
     name: "worker:fan-out",
     command: "pnpm",
-    args: ["run", "worker:fan-out"],
+    args: [
+      "run",
+      "worker:fan-out",
+      "--indexer-url",
+      process.env.NODE_ENV === "production"
+        ? "http://localhost:8080"
+        : "http://localhost:42069",
+    ],
   },
   {
     name: "worker:webhook-event-delivery",
     command: "pnpm",
-    args: ["run", "worker:webhook-event-delivery"],
+    args: [
+      "run",
+      "worker:webhook-event-delivery",
+      "--indexer-url",
+      process.env.NODE_ENV === "production"
+        ? "http://localhost:8080"
+        : "http://localhost:42069",
+    ],
   },
 ];
 
