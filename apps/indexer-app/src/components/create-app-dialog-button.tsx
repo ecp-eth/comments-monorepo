@@ -1,3 +1,4 @@
+"use client";
 import { PlusIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodError } from "zod";
