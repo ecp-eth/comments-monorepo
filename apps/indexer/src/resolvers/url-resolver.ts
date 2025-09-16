@@ -7,6 +7,7 @@ import type {
 import DataLoader from "dataloader";
 import { parse as parseHTML } from "node-html-parser";
 import z from "zod";
+import { getImageDimension } from "../utils/getImageDimension.ts";
 
 export type ResolvedURL =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
@@ -31,7 +32,8 @@ async function resolveURL(
   url: string,
   timeout: number,
 ): Promise<ResolvedURL | null> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(timeout) });
+  const abortController = createTimedAbortController(timeout);
+  const response = await fetch(url, { signal: abortController.signal });
   const contentType =
     normalizeContentType(response.headers.get("content-type")) ||
     "application/octet-stream";
@@ -54,10 +56,14 @@ async function resolveURL(
   }
 
   if (contentType.startsWith("image/")) {
+    const dimension = await getImageDimension(response, abortController).catch(
+      () => undefined,
+    );
     return {
       type: "image",
       mediaType: contentType,
       url: finalUrl,
+      dimension,
     };
   }
 
@@ -144,6 +150,7 @@ async function resolveWebPage(
     title,
     description,
     favicon: favicon ? resolveFaviconUrl(favicon, response.url) : null,
+    mediaType: "text/html",
   };
 }
 
@@ -178,4 +185,17 @@ export function createURLResolver({
       ...dataLoaderOptions,
     },
   );
+}
+
+function createTimedAbortController(timeout: number): AbortController {
+  const abortController = new AbortController();
+  setTimeout(() => {
+    abortController.abort(
+      new DOMException(
+        "The operation was aborted due to timeout",
+        "TimeoutError",
+      ),
+    );
+  }, timeout);
+  return abortController;
 }

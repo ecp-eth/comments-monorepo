@@ -257,6 +257,7 @@ export const IndexerAPICommentReferenceURLWebPageSchema = z.object({
       url: z.string().url(),
     })
     .nullable(),
+  mediaType: z.string(),
 });
 
 export type IndexerAPICommentReferenceURLWebPageSchemaType = z.infer<
@@ -274,11 +275,17 @@ export type IndexerAPICommentReferenceURLFileSchemaType = z.infer<
   typeof IndexerAPICommentReferenceURLFileSchema
 >;
 
+const IndexerAPICommentReferenceMediaDimensionSchema = z.object({
+  width: z.number().int().min(0),
+  height: z.number().int().min(0),
+});
+
 export const IndexerAPICommentReferenceURLImageSchema = z.object({
   type: z.literal("image"),
   url: z.string().url(),
   position: IndexerAPICommentReferencePositionSchema,
   mediaType: z.string(),
+  dimension: IndexerAPICommentReferenceMediaDimensionSchema.optional(),
 });
 
 export type IndexerAPICommentReferenceURLImageSchemaType = z.infer<

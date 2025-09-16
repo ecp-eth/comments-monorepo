@@ -606,6 +606,8 @@ paths:
                                 - description
                                 - image
                                 - url
+                            mediaType:
+                              type: string
                           required:
                             - type
                             - url
@@ -614,6 +616,7 @@ paths:
                             - description
                             - favicon
                             - opengraph
+                            - mediaType
                         - type: object
                           properties:
                             type:
@@ -661,6 +664,18 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            dimension:
+                              type: object
+                              properties:
+                                width:
+                                  type: integer
+                                  minimum: 0
+                                height:
+                                  type: integer
+                                  minimum: 0
+                              required:
+                                - width
+                                - height
                           required:
                             - type
                             - url
@@ -1037,6 +1052,8 @@ paths:
                                         - description
                                         - image
                                         - url
+                                    mediaType:
+                                      type: string
                                   required:
                                     - type
                                     - url
@@ -1045,6 +1062,7 @@ paths:
                                     - description
                                     - favicon
                                     - opengraph
+                                    - mediaType
                                 - type: object
                                   properties:
                                     type:
@@ -1092,6 +1110,18 @@ paths:
                                         - end
                                     mediaType:
                                       type: string
+                                    dimension:
+                                      type: object
+                                      properties:
+                                        width:
+                                          type: integer
+                                          minimum: 0
+                                        height:
+                                          type: integer
+                                          minimum: 0
+                                      required:
+                                        - width
+                                        - height
                                   required:
                                     - type
                                     - url
@@ -1510,6 +1540,8 @@ paths:
                                           - description
                                           - image
                                           - url
+                                      mediaType:
+                                        type: string
                                     required:
                                       - type
                                       - url
@@ -1518,6 +1550,7 @@ paths:
                                       - description
                                       - favicon
                                       - opengraph
+                                      - mediaType
                                   - type: object
                                     properties:
                                       type:
@@ -1565,6 +1598,18 @@ paths:
                                           - end
                                       mediaType:
                                         type: string
+                                      dimension:
+                                        type: object
+                                        properties:
+                                          width:
+                                            type: integer
+                                            minimum: 0
+                                          height:
+                                            type: integer
+                                            minimum: 0
+                                        required:
+                                          - width
+                                          - height
                                     required:
                                       - type
                                       - url
@@ -1941,6 +1986,8 @@ paths:
                                                   - description
                                                   - image
                                                   - url
+                                              mediaType:
+                                                type: string
                                             required:
                                               - type
                                               - url
@@ -1949,6 +1996,7 @@ paths:
                                               - description
                                               - favicon
                                               - opengraph
+                                              - mediaType
                                           - type: object
                                             properties:
                                               type:
@@ -1996,6 +2044,18 @@ paths:
                                                   - end
                                               mediaType:
                                                 type: string
+                                              dimension:
+                                                type: object
+                                                properties:
+                                                  width:
+                                                    type: integer
+                                                    minimum: 0
+                                                  height:
+                                                    type: integer
+                                                    minimum: 0
+                                                required:
+                                                  - width
+                                                  - height
                                             required:
                                               - type
                                               - url
@@ -2638,6 +2698,8 @@ paths:
                                       - description
                                       - image
                                       - url
+                                  mediaType:
+                                    type: string
                                 required:
                                   - type
                                   - url
@@ -2646,6 +2708,7 @@ paths:
                                   - description
                                   - favicon
                                   - opengraph
+                                  - mediaType
                               - type: object
                                 properties:
                                   type:
@@ -2693,6 +2756,18 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
                                 required:
                                   - type
                                   - url
@@ -3069,6 +3144,8 @@ paths:
                                               - description
                                               - image
                                               - url
+                                          mediaType:
+                                            type: string
                                         required:
                                           - type
                                           - url
@@ -3077,6 +3154,7 @@ paths:
                                           - description
                                           - favicon
                                           - opengraph
+                                          - mediaType
                                       - type: object
                                         properties:
                                           type:
@@ -3124,6 +3202,18 @@ paths:
                                               - end
                                           mediaType:
                                             type: string
+                                          dimension:
+                                            type: object
+                                            properties:
+                                              width:
+                                                type: integer
+                                                minimum: 0
+                                              height:
+                                                type: integer
+                                                minimum: 0
+                                            required:
+                                              - width
+                                              - height
                                         required:
                                           - type
                                           - url
@@ -3542,6 +3632,8 @@ paths:
                                                 - description
                                                 - image
                                                 - url
+                                            mediaType:
+                                              type: string
                                           required:
                                             - type
                                             - url
@@ -3550,6 +3642,7 @@ paths:
                                             - description
                                             - favicon
                                             - opengraph
+                                            - mediaType
                                         - type: object
                                           properties:
                                             type:
@@ -3597,6 +3690,18 @@ paths:
                                                 - end
                                             mediaType:
                                               type: string
+                                            dimension:
+                                              type: object
+                                              properties:
+                                                width:
+                                                  type: integer
+                                                  minimum: 0
+                                                height:
+                                                  type: integer
+                                                  minimum: 0
+                                              required:
+                                                - width
+                                                - height
                                           required:
                                             - type
                                             - url
@@ -3973,6 +4078,8 @@ paths:
                                                         - description
                                                         - image
                                                         - url
+                                                    mediaType:
+                                                      type: string
                                                   required:
                                                     - type
                                                     - url
@@ -3981,6 +4088,7 @@ paths:
                                                     - description
                                                     - favicon
                                                     - opengraph
+                                                    - mediaType
                                                 - type: object
                                                   properties:
                                                     type:
@@ -4028,6 +4136,18 @@ paths:
                                                         - end
                                                     mediaType:
                                                       type: string
+                                                    dimension:
+                                                      type: object
+                                                      properties:
+                                                        width:
+                                                          type: integer
+                                                          minimum: 0
+                                                        height:
+                                                          type: integer
+                                                          minimum: 0
+                                                      required:
+                                                        - width
+                                                        - height
                                                   required:
                                                     - type
                                                     - url
@@ -4685,6 +4805,8 @@ paths:
                                       - description
                                       - image
                                       - url
+                                  mediaType:
+                                    type: string
                                 required:
                                   - type
                                   - url
@@ -4693,6 +4815,7 @@ paths:
                                   - description
                                   - favicon
                                   - opengraph
+                                  - mediaType
                               - type: object
                                 properties:
                                   type:
@@ -4740,6 +4863,18 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
                                 required:
                                   - type
                                   - url
@@ -5116,6 +5251,8 @@ paths:
                                               - description
                                               - image
                                               - url
+                                          mediaType:
+                                            type: string
                                         required:
                                           - type
                                           - url
@@ -5124,6 +5261,7 @@ paths:
                                           - description
                                           - favicon
                                           - opengraph
+                                          - mediaType
                                       - type: object
                                         properties:
                                           type:
@@ -5171,6 +5309,18 @@ paths:
                                               - end
                                           mediaType:
                                             type: string
+                                          dimension:
+                                            type: object
+                                            properties:
+                                              width:
+                                                type: integer
+                                                minimum: 0
+                                              height:
+                                                type: integer
+                                                minimum: 0
+                                            required:
+                                              - width
+                                              - height
                                         required:
                                           - type
                                           - url
@@ -5589,6 +5739,8 @@ paths:
                                                 - description
                                                 - image
                                                 - url
+                                            mediaType:
+                                              type: string
                                           required:
                                             - type
                                             - url
@@ -5597,6 +5749,7 @@ paths:
                                             - description
                                             - favicon
                                             - opengraph
+                                            - mediaType
                                         - type: object
                                           properties:
                                             type:
@@ -5644,6 +5797,18 @@ paths:
                                                 - end
                                             mediaType:
                                               type: string
+                                            dimension:
+                                              type: object
+                                              properties:
+                                                width:
+                                                  type: integer
+                                                  minimum: 0
+                                                height:
+                                                  type: integer
+                                                  minimum: 0
+                                              required:
+                                                - width
+                                                - height
                                           required:
                                             - type
                                             - url
@@ -6020,6 +6185,8 @@ paths:
                                                         - description
                                                         - image
                                                         - url
+                                                    mediaType:
+                                                      type: string
                                                   required:
                                                     - type
                                                     - url
@@ -6028,6 +6195,7 @@ paths:
                                                     - description
                                                     - favicon
                                                     - opengraph
+                                                    - mediaType
                                                 - type: object
                                                   properties:
                                                     type:
@@ -6075,6 +6243,18 @@ paths:
                                                         - end
                                                     mediaType:
                                                       type: string
+                                                    dimension:
+                                                      type: object
+                                                      properties:
+                                                        width:
+                                                          type: integer
+                                                          minimum: 0
+                                                        height:
+                                                          type: integer
+                                                          minimum: 0
+                                                      required:
+                                                        - width
+                                                        - height
                                                   required:
                                                     - type
                                                     - url
@@ -6970,6 +7150,8 @@ paths:
                                       - description
                                       - image
                                       - url
+                                  mediaType:
+                                    type: string
                                 required:
                                   - type
                                   - url
@@ -6978,6 +7160,7 @@ paths:
                                   - description
                                   - favicon
                                   - opengraph
+                                  - mediaType
                               - type: object
                                 properties:
                                   type:
@@ -7025,6 +7208,18 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
                                 required:
                                   - type
                                   - url
@@ -7501,6 +7696,8 @@ paths:
                                 - description
                                 - image
                                 - url
+                            mediaType:
+                              type: string
                           required:
                             - type
                             - url
@@ -7509,6 +7706,7 @@ paths:
                             - description
                             - favicon
                             - opengraph
+                            - mediaType
                         - type: object
                           properties:
                             type:
@@ -7556,6 +7754,18 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            dimension:
+                              type: object
+                              properties:
+                                width:
+                                  type: integer
+                                  minimum: 0
+                                height:
+                                  type: integer
+                                  minimum: 0
+                              required:
+                                - width
+                                - height
                           required:
                             - type
                             - url
@@ -8006,6 +8216,8 @@ paths:
                                 - description
                                 - image
                                 - url
+                            mediaType:
+                              type: string
                           required:
                             - type
                             - url
@@ -8014,6 +8226,7 @@ paths:
                             - description
                             - favicon
                             - opengraph
+                            - mediaType
                         - type: object
                           properties:
                             type:
@@ -8061,6 +8274,18 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            dimension:
+                              type: object
+                              properties:
+                                width:
+                                  type: integer
+                                  minimum: 0
+                                height:
+                                  type: integer
+                                  minimum: 0
+                              required:
+                                - width
+                                - height
                           required:
                             - type
                             - url

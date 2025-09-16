@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import nock from "nock";
+import fs from "fs";
+import path from "path";
 import { createURLResolver } from "../../src/resolvers/url-resolver";
+import { Readable } from "stream";
 
 nock.disableNetConnect();
 
@@ -13,8 +16,12 @@ describe("url loader", () => {
   });
 
   it("resolves image url", async () => {
-    nock("https://example.com").get("/").reply(200, "", {
+    const image = fs.readFileSync(
+      path.join(__dirname, "fixtures", "example-image.jpg"),
+    );
+    nock("https://example.com").get("/").reply(200, image, {
       "content-type": "image/png",
+      "content-length": image.length.toString(),
     });
 
     const result = await urlResolver.load("https://example.com");
@@ -23,6 +30,94 @@ describe("url loader", () => {
       type: "image",
       url: "https://example.com/",
       mediaType: "image/png",
+      dimension: {
+        width: 5067,
+        height: 1865,
+      },
+    });
+  });
+
+  it("resolves jpg image url with slow image data", async () => {
+    // with a slow image stream, it will cause the getImageSize to abort the request to save time
+    const image = fs.readFileSync(
+      path.join(__dirname, "fixtures", "example-image.jpg"),
+    );
+
+    nock("https://example.com")
+      .get("/example-image.jpg")
+      .reply(200, createSlowStream(image), {
+        "content-type": "image/png",
+        "content-length": image.length.toString(),
+      });
+
+    const result = await urlResolver.load(
+      "https://example.com/example-image.jpg",
+    );
+
+    expect(result).toEqual({
+      type: "image",
+      url: "https://example.com/example-image.jpg",
+      mediaType: "image/png",
+      dimension: {
+        width: 5067,
+        height: 1865,
+      },
+    });
+  });
+
+  it("resolves png image url with slow image data", async () => {
+    // with a slow image stream, it will cause the getImageSize to abort the request to save time
+    const image = fs.readFileSync(
+      path.join(__dirname, "fixtures", "example-image.png"),
+    );
+
+    nock("https://example.com")
+      .get("/example-image.png")
+      .reply(200, createSlowStream(image), {
+        "content-type": "image/png",
+        "content-length": image.length.toString(),
+      });
+
+    const result = await urlResolver.load(
+      "https://example.com/example-image.png",
+    );
+
+    expect(result).toEqual({
+      type: "image",
+      url: "https://example.com/example-image.png",
+      mediaType: "image/png",
+      dimension: {
+        width: 5067,
+        height: 1865,
+      },
+    });
+  });
+
+  it("resolves svg image url with slow image data", async () => {
+    // with a slow image stream, it will cause the getImageSize to abort the request to save time
+    const image = fs.readFileSync(
+      path.join(__dirname, "fixtures", "example-image.svg"),
+    );
+
+    nock("https://example.com")
+      .get("/example-image.svg")
+      .reply(200, createSlowStream(image), {
+        "content-type": "image/png",
+        "content-length": image.length.toString(),
+      });
+
+    const result = await urlResolver.load(
+      "https://example.com/example-image.svg",
+    );
+
+    expect(result).toEqual({
+      type: "image",
+      url: "https://example.com/example-image.svg",
+      mediaType: "image/png",
+      dimension: {
+        width: 5067,
+        height: 1865,
+      },
     });
   });
 
@@ -109,6 +204,7 @@ describe("url loader", () => {
         description: null,
         favicon: null,
         opengraph: null,
+        mediaType: "text/html",
       });
     });
 
@@ -144,6 +240,7 @@ describe("url loader", () => {
         },
         description: "Description",
         favicon: null,
+        mediaType: "text/html",
       });
     });
 
@@ -180,6 +277,44 @@ describe("url loader", () => {
         },
         description: "Description",
         favicon: null,
+        mediaType: "text/html",
+      });
+    });
+
+    it("resolves webpage with relative image path in og data", async () => {
+      nock("https://example.com")
+        .get("/")
+        .reply(
+          200,
+          `<html>
+        <title>Hello</title>
+        <meta name='description' content='Description'>
+        <meta property='og:title' content='Hello'>
+        <meta property='og:description' content='Og Description'>
+        <meta property='og:image' content='/image.png'>
+        <meta property='og:url' content='https://example.com/'>
+        <body>Hello</body>
+        </html>`,
+          {
+            "content-type": "text/html",
+          },
+        );
+
+      const result = await urlResolver.load("https://example.com");
+
+      expect(result).toEqual({
+        type: "webpage",
+        url: "https://example.com/",
+        title: "Hello",
+        opengraph: {
+          title: "Hello",
+          description: "Og Description",
+          image: "https://example.com/image.png",
+          url: "https://example.com/",
+        },
+        description: "Description",
+        favicon: null,
+        mediaType: "text/html",
       });
     });
 
@@ -203,6 +338,7 @@ describe("url loader", () => {
         title: "Hello",
         description: null,
         opengraph: null,
+        mediaType: "text/html",
       });
     });
 
@@ -226,6 +362,7 @@ describe("url loader", () => {
         title: "Hello",
         description: null,
         opengraph: null,
+        mediaType: "text/html",
       });
     });
   });
@@ -240,3 +377,24 @@ describe("url loader", () => {
     );
   });
 });
+
+function createSlowStream(buffer: Buffer, chunkSize = 2048, delay = 10) {
+  let offset = 0;
+
+  return new Readable({
+    read() {
+      if (offset >= buffer.length) {
+        this.push(null); // end of stream
+        return;
+      }
+
+      const chunk = buffer.subarray(offset, offset + chunkSize);
+      offset += chunkSize;
+
+      // simulate async delay
+      setTimeout(() => {
+        this.push(chunk);
+      }, delay);
+    },
+  });
+}

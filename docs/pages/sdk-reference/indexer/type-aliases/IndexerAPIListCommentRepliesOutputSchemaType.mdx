@@ -103,6 +103,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: null | string;
@@ -128,6 +129,10 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -241,6 +246,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
               | {
               description: null | string;
               favicon: null | string;
+              mediaType: string;
               opengraph:   | null
                  | {
                  description: ...;
@@ -266,6 +272,10 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
               url: string;
             }
               | {
+              dimension?: {
+                 height: ...;
+                 width: ...;
+              };
               mediaType: string;
               position: {
                  end: number;
@@ -429,6 +439,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            | {
            description: null | string;
            favicon: null | string;
+           mediaType: string;
            opengraph:   | null
               | {
               description: ...;
@@ -454,6 +465,10 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
            url: string;
          }
            | {
+           dimension?: {
+              height: ...;
+              width: ...;
+           };
            mediaType: string;
            position: {
               end: number;
@@ -506,7 +521,7 @@ type IndexerAPIListCommentRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:488](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L488)
+Defined in: [packages/sdk/src/indexer/schemas.ts:495](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L495)
 
 ## Type declaration
 
@@ -660,6 +675,7 @@ results: {
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -685,6 +701,10 @@ results: {
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -798,6 +818,7 @@ results: {
            | {
            description: null | string;
            favicon: null | string;
+           mediaType: string;
            opengraph:   | null
               | {
               description: ...;
@@ -823,6 +844,10 @@ results: {
            url: string;
          }
            | {
+           dimension?: {
+              height: ...;
+              width: ...;
+           };
            mediaType: string;
            position: {
               end: number;
@@ -986,6 +1011,7 @@ results: {
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: ...;
@@ -1011,6 +1037,10 @@ results: {
         url: string;
       }
         | {
+        dimension?: {
+           height: ...;
+           width: ...;
+        };
         mediaType: string;
         position: {
            end: number;

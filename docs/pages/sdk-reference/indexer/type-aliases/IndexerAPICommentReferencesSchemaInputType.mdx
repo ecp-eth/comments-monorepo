@@ -53,6 +53,7 @@ type IndexerAPICommentReferencesSchemaInputType = (
   | {
   description: null | string;
   favicon: null | string;
+  mediaType: string;
   opengraph:   | null
      | {
      description: null | string;
@@ -78,6 +79,10 @@ type IndexerAPICommentReferencesSchemaInputType = (
   url: string;
 }
   | {
+  dimension?: {
+     height: number;
+     width: number;
+  };
   mediaType: string;
   position: {
      end: number;
@@ -97,4 +102,4 @@ type IndexerAPICommentReferencesSchemaInputType = (
 })[];
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:342](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L342)
+Defined in: [packages/sdk/src/indexer/schemas.ts:349](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L349)

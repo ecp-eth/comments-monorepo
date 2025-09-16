@@ -443,6 +443,7 @@ describe("renderToReact", () => {
             description: "Example description",
             favicon: null,
             opengraph: null,
+            mediaType: "text/html",
           },
           {
             type: "erc20",
@@ -700,6 +701,7 @@ describe("renderToMarkdown", () => {
           },
           description:
             "A modular protocol for onchain comments that enables apps to add social features without buying into a full-stack social network. Built on Ethereum standards, chain-agnostic, and free to use.",
+          mediaType: "text/html",
         },
         {
           url: "https://amber-electoral-takin-876.mypinata.cloud/ipfs/bafybeihnltvyg5fgrvvqdszx6skfpkmg4hjtumj4gdn7wdwjba2uxnzsgu",
@@ -972,6 +974,7 @@ describe("renderToMarkdown", () => {
             description: "Example description",
             favicon: null,
             opengraph: null,
+            mediaType: "text/html",
           },
           {
             type: "erc20",
@@ -1100,6 +1103,7 @@ describe("renderToMarkdown", () => {
             title: "",
             favicon: null,
             opengraph: null,
+            mediaType: "text/html",
           },
         ],
       });

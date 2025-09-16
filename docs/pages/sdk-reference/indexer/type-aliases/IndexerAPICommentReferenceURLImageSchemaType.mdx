@@ -8,6 +8,10 @@
 
 ```ts
 type IndexerAPICommentReferenceURLImageSchemaType = {
+  dimension?: {
+     height: number;
+     width: number;
+  };
   mediaType: string;
   position: {
      end: number;
@@ -18,9 +22,30 @@ type IndexerAPICommentReferenceURLImageSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:284](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L284)
+Defined in: [packages/sdk/src/indexer/schemas.ts:291](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L291)
 
 ## Type declaration
+
+### dimension?
+
+```ts
+optional dimension: {
+  height: number;
+  width: number;
+};
+```
+
+#### dimension.height
+
+```ts
+height: number;
+```
+
+#### dimension.width
+
+```ts
+width: number;
+```
 
 ### mediaType
 

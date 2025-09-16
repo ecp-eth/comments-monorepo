@@ -39,7 +39,7 @@ import {
 import { schema } from "../../schema.ts";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 
-const resolverCommentReferences: ResolveCommentReferencesOptions = {
+const commentResolverReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
   ensByNameResolver: ensByNameResolverService,
   erc20ByAddressResolver: erc20ByAddressResolverService,
@@ -147,7 +147,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           chainId: context.chain.id,
           content: event.args.content,
         },
-        resolverCommentReferences,
+        commentResolverReferences,
       );
 
       // We need to check if the comment already has a moderation status
@@ -408,7 +408,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           chainId: context.chain.id,
           content: event.args.content,
         },
-        resolverCommentReferences,
+        commentResolverReferences,
       );
 
       const newCommentRevision = existingComment.revision + 1;
