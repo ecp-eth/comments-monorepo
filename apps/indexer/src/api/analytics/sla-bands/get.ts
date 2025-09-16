@@ -102,8 +102,8 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
 
       const filters: SQL[] = [
         sql`a.owner_id = ${c.get("user").id}`,
-        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
-        sql`a.attempted_at < ${toToUse}::timestamptz`,
+        sql`e.created_at >= ${fromToUse}::timestamptz`,
+        sql`e.created_at < ${toToUse}::timestamptz`,
       ];
 
       if (appId) {
@@ -126,12 +126,11 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
         WITH
           successful_attempts AS (
             SELECT
-              d.id as delivery_id,
+              a.app_webhook_delivery_id as delivery_id,
               e.created_at,
               MIN(a.attempted_at) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS success_at
-            FROM ${schema.appWebhookDeliveryAttempt} a
-            JOIN ${schema.appWebhookDelivery} d ON (d.id = a.app_webhook_delivery_id)
-            JOIN ${schema.eventOutbox} e ON (e.id = d.event_id)
+            FROM ${schema.eventOutbox} e
+            LEFT JOIN ${schema.appWebhookDeliveryAttempt} a ON (a.event_id = e.id)
             WHERE
               ${sql.join(filters, sql` AND `)}
             GROUP BY 1, 2
