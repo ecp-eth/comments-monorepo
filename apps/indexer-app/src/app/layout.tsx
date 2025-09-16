@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Broadcast Channels Mini App",
+  title: "ECP Indexer App",
   description:
-    "Broadcast Channels Mini App powered by Ethereum Comments Protocol",
+    "ECP Indexer App to manage your applications and webhooks for Ethereum Comments Protocol",
 };
 
 export default async function RootLayout({
