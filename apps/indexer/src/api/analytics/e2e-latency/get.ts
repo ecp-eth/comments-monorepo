@@ -112,7 +112,7 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
 
       const { rows } = await db.execute<{
         time: Date;
-        percentiles: string | null;
+        percentiles: string[] | null;
       }>(sql`
         WITH
           filtered_webhooks AS (
