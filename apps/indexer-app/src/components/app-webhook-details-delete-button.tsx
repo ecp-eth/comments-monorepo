@@ -134,13 +134,17 @@ export function AppWebhookDetailsDeleteButton({
               </div>
               <DrawerFooter>
                 <Button
+                  className="gap-2"
                   disabled={deleteWebhookMutation.isPending}
                   variant="destructive"
                   type="submit"
                   form="delete-webhook-form"
                 >
                   {deleteWebhookMutation.isPending ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <>
+                      <Loader2Icon className="h-4 w-4 animate-spin" />
+                      <span>Deleting...</span>
+                    </>
                   ) : (
                     "Delete"
                   )}
@@ -222,9 +226,13 @@ export function AppWebhookDetailsDeleteButton({
                 variant="destructive"
                 type="submit"
                 form="delete-webhook-dialog-form"
+                className="gap-2"
               >
                 {deleteWebhookMutation.isPending ? (
-                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <>
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
                 ) : (
                   "Delete"
                 )}

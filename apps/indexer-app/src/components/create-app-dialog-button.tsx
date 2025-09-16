@@ -143,12 +143,16 @@ export function CreateAppDialogButton({
               </div>
               <DrawerFooter>
                 <Button
+                  className="gap-2"
                   type="submit"
                   form="create-app-dialog-form"
                   disabled={createAppMutation.isPending}
                 >
                   {createAppMutation.isPending ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <>
+                      <Loader2Icon className="h-4 w-4 animate-spin" />
+                      <span>Creating...</span>
+                    </>
                   ) : (
                     "Create"
                   )}
@@ -204,12 +208,16 @@ export function CreateAppDialogButton({
             </div>
             <DialogFooter>
               <Button
+                className="gap-2"
                 type="submit"
                 form="create-app-dialog-form"
                 disabled={createAppMutation.isPending}
               >
                 {createAppMutation.isPending ? (
-                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <>
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <span>Creating...</span>
+                  </>
                 ) : (
                   "Create"
                 )}

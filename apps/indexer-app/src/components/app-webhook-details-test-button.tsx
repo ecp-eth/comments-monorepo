@@ -64,12 +64,16 @@ export function AppWebhookDetailsTestButton({
           </DrawerHeader>
           <DrawerFooter>
             <Button
+              className="gap-2"
               disabled={sendTestWebhookEventMutation.isPending}
               type="button"
               onClick={() => sendTestWebhookEventMutation.mutate()}
             >
               {sendTestWebhookEventMutation.isPending ? (
-                <Loader2Icon className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <span>Sending...</span>
+                </>
               ) : (
                 "Send"
               )}
@@ -120,12 +124,16 @@ export function AppWebhookDetailsTestButton({
             Cancel
           </Button>
           <Button
+            className="gap-2"
             disabled={sendTestWebhookEventMutation.isPending}
             type="button"
             onClick={() => sendTestWebhookEventMutation.mutate()}
           >
             {sendTestWebhookEventMutation.isPending ? (
-              <Loader2Icon className="h-4 w-4 animate-spin" />
+              <>
+                <Loader2Icon className="h-4 w-4 animate-spin" />
+                <span>Sending...</span>
+              </>
             ) : (
               "Send"
             )}

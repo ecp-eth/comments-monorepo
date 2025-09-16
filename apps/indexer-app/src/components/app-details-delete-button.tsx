@@ -128,13 +128,17 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
               </div>
               <DrawerFooter>
                 <Button
+                  className="gap-2"
                   disabled={deleteAppMutation.isPending}
                   variant="destructive"
                   type="submit"
                   form="delete-app-form"
                 >
                   {deleteAppMutation.isPending ? (
-                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <>
+                      <Loader2Icon className="h-4 w-4 animate-spin" />
+                      <span>Deleting...</span>
+                    </>
                   ) : (
                     "Delete"
                   )}
@@ -214,13 +218,17 @@ export function AppDetailsDeleteButton({ app }: { app: AppSchemaType }) {
                 Cancel
               </Button>
               <Button
+                className="gap-2"
                 disabled={deleteAppMutation.isPending}
                 variant="destructive"
                 type="submit"
                 form="delete-app-dialog-form"
               >
                 {deleteAppMutation.isPending ? (
-                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <>
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
                 ) : (
                   "Delete"
                 )}
