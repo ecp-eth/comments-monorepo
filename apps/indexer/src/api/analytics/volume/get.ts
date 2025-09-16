@@ -51,14 +51,14 @@ export function setupAnalyticsVolumeGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/analytics/volume",
       tags: ["analytics", "volume"],
-      description: "Get the analytics volume",
+      description: "Get the analytics volume of delivery attempts",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsVolumeGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics volume",
+          description: "The analytics volume of delivery attempts",
           content: {
             "application/json": {
               schema: AnalyticsVolumeGetResponseSchema,

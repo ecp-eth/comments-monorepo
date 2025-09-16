@@ -30,9 +30,10 @@ export function setupUsersMe(app: OpenAPIHono) {
       middleware: siweMiddleware,
       path: "/api/users/me",
       tags: ["user"],
+      description: "Get the current user",
       responses: {
         200: {
-          description: "User",
+          description: "User details",
           content: {
             "application/json": {
               schema: UserMeResponseSchema,

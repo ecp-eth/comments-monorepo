@@ -36,10 +36,10 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
         query: AnalyticsKpiDeliveredUnderMinuteGetQueryParamsSchema,
       },
       tags: ["analytics", "kpi", "delivered-under-minute"],
-      description: "Get the delivered under minute KPI",
+      description: "Get the delivered under minute live status",
       responses: {
         200: {
-          description: "The delivered under minute KPI",
+          description: "The delivered under minute live status",
           content: {
             "application/json": {
               schema: AnalyticsKpiDeliveredUnderMinuteGetResponseSchema,

@@ -25,13 +25,14 @@ export function setupAppGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/apps/{id}",
       tags: ["apps", "webhooks"],
+      description: "Get an app",
       middleware: siweMiddleware,
       request: {
         params: AppGetRequestParamsSchema,
       },
       responses: {
         200: {
-          description: "App",
+          description: "App details",
           content: {
             "application/json": {
               schema: AppGetResponseSchema,

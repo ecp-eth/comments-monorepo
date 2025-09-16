@@ -28,6 +28,7 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
       method: "post",
       path: "/api/auth/siwe/verify",
       tags: ["auth", "siwe"],
+      description: "Verify a SIWE request and issue auth tokens",
       request: {
         body: {
           content: {
@@ -40,7 +41,7 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
       },
       responses: {
         200: {
-          description: "SIWE verification successful",
+          description: "SIWE verification successful and auth tokens issued",
           content: {
             "application/json": {
               schema: AuthSiweVerifyResponseSchema,
@@ -49,6 +50,14 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
         },
         400: {
           description: "SIWE verification failed",
+          content: {
+            "application/json": {
+              schema: APIErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,

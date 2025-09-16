@@ -32,6 +32,7 @@ export function setupAppUpdate(app: OpenAPIHono) {
       method: "patch",
       path: "/api/apps/{id}",
       tags: ["apps", "webhooks"],
+      description: "Update an app",
       middleware: siweMiddleware,
       request: {
         params: AppUpdateRequestParamsSchema,
@@ -46,7 +47,7 @@ export function setupAppUpdate(app: OpenAPIHono) {
       },
       responses: {
         200: {
-          description: "App updated",
+          description: "App updated successfully",
           content: {
             "application/json": {
               schema: AppUpdateResponseSchema,

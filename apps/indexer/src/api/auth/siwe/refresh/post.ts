@@ -31,20 +31,37 @@ export function setupAuthSiweRefresh(app: OpenAPIHono) {
       method: "post",
       path: "/api/auth/siwe/refresh",
       tags: ["auth", "siwe"],
+      description: "Refresh a SIWE access token using a refresh token",
       request: {
         headers: AuthSiweRefreshHeadersSchema,
       },
       responses: {
         200: {
-          description: "Tokens refreshed",
+          description: "Tokens refreshed successfully",
           content: {
             "application/json": {
               schema: AuthSiweRefreshResponseSchema,
             },
           },
         },
+        400: {
+          description: "Invalid request",
+          content: {
+            "application/json": {
+              schema: APIErrorResponseSchema,
+            },
+          },
+        },
         401: {
           description: "Not authenticated",
+          content: {
+            "application/json": {
+              schema: APIErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,

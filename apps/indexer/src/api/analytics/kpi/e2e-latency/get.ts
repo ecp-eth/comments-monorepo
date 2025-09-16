@@ -39,10 +39,12 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
         query: AnalyticsKpiE2ELatencyGetQueryParamsSchema,
       },
       tags: ["analytics", "kpi", "e2e-latency"],
-      description: "Get the e2e latency KPI",
+      description:
+        "Get the p95 end to end latency of first attempt and first success since event creation in ms",
       responses: {
         200: {
-          description: "The e2e latency KPI",
+          description:
+            "The p95 end to end latency of first attempt and first success since event creation in ms",
           content: {
             "application/json": {
               schema: AnalyticsKpiE2ELatencyGetResponseSchema,

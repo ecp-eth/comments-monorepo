@@ -53,14 +53,14 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/analytics/sla-bands",
       tags: ["analytics", "sla-bands"],
-      description: "Get the analytics sla bands",
+      description: "Get the analytics sla bands of delivery attempts",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsSlaBandsGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics sla bands",
+          description: "The analytics sla bands of delivery attempts",
           content: {
             "application/json": {
               schema: AnalyticsSlaBandsGetResponseSchema,

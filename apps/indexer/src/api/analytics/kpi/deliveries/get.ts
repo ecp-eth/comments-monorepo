@@ -36,10 +36,10 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
         query: AnalyticsKpiDeliveriesGetQueryParamsSchema,
       },
       tags: ["analytics", "kpi", "deliveries"],
-      description: "Get the deliveries KPI",
+      description: "Get the deliveries live status",
       responses: {
         200: {
-          description: "The deliveries KPI",
+          description: "The deliveries live status",
           content: {
             "application/json": {
               schema: AnalyticsKpiDeliveriesGetResponseSchema,

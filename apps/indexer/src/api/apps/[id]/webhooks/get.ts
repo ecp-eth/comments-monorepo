@@ -51,6 +51,7 @@ export function setupAppWebhooksGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/apps/{id}/webhooks",
       tags: ["apps", "webhooks"],
+      description: "Get a list of webhooks for an app",
       middleware: siweMiddleware,
       request: {
         params: AppWebhooksGetRequestParamsSchema,
@@ -58,7 +59,7 @@ export function setupAppWebhooksGet(app: OpenAPIHono) {
       },
       responses: {
         200: {
-          description: "Webhooks",
+          description: "Paginated list of webhooks",
           content: {
             "application/json": {
               schema: AppWebhooksGetResponseSchema,

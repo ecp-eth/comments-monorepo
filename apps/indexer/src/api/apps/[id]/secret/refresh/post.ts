@@ -21,18 +21,19 @@ export function setupAppSecretRefresh(app: OpenAPIHono) {
       method: "post",
       path: "/api/apps/{id}/secret/refresh",
       tags: ["apps", "webhooks"],
+      description: "Refresh an app secret",
       middleware: siweMiddleware,
       request: {
         params: AppSecretRefreshRequestParamsSchema,
       },
       responses: {
         200: {
+          description: "Secret refreshed successfully",
           content: {
             "application/json": {
               schema: AppSecretRefreshResponseSchema,
             },
           },
-          description: "Secret refreshed successfully",
         },
         401: {
           content: {

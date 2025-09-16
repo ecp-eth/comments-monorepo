@@ -24,18 +24,19 @@ export function setupAppDelete(app: OpenAPIHono) {
       method: "delete",
       path: "/api/apps/{id}",
       tags: ["apps", "webhooks"],
+      description: "Delete an app",
       middleware: siweMiddleware,
       request: {
         params: AppDeleteRequestParamsSchema,
       },
       responses: {
         200: {
+          description: "App deleted successfully",
           content: {
             "application/json": {
               schema: AppDeleteResponseSchema,
             },
           },
-          description: "App deleted successfully",
         },
         401: {
           content: {

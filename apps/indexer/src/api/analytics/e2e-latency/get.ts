@@ -51,14 +51,16 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/analytics/e2e-latency",
       tags: ["analytics", "e2e-latency"],
-      description: "Get the analytics end to end latency in ms",
+      description:
+        "Get the analytics end to end latency from event creation to first successful delivery attempt in ms",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsE2ELatencyGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics end to end latency in ms",
+          description:
+            "The analytics end to end latency from event creation to first successful delivery attempt in ms",
           content: {
             "application/json": {
               schema: AnalyticsE2ELatencyGetResponseSchema,

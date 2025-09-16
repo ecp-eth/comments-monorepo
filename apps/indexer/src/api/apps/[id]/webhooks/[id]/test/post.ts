@@ -22,13 +22,14 @@ export function setupAppWebhookTest(app: OpenAPIHono) {
       method: "post",
       path: "/api/apps/{appId}/webhooks/{webhookId}/test",
       tags: ["apps", "webhooks"],
+      description: "Test a webhook",
       middleware: siweMiddleware,
       request: {
         params: AppWebhookTestRequestParamsSchema,
       },
       responses: {
         204: {
-          description: "Webhook test event queued",
+          description: "Webhook test event queued successfully",
         },
         400: {
           description: "Invalid request",
@@ -47,7 +48,7 @@ export function setupAppWebhookTest(app: OpenAPIHono) {
           },
         },
         404: {
-          description: "Not found",
+          description: "Webhook or app not found",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,

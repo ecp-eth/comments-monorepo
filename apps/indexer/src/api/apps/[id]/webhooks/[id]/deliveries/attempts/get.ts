@@ -83,6 +83,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts",
       tags: ["apps", "webhooks", "deliveries"],
+      description: "Get a list of delivery attempts for a webhook",
       middleware: siweMiddleware,
       request: {
         params: AppWebhookDeliveriesGetRequestParamsSchema,
@@ -90,7 +91,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
       },
       responses: {
         200: {
-          description: "Webhook deliveries",
+          description: "Paginated list of delivery attempts",
           content: {
             "application/json": {
               schema: AppWebhookDeliveriesGetResponseSchema,
@@ -114,7 +115,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
           },
         },
         404: {
-          description: "Not found",
+          description: "Webhook or app not found",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,

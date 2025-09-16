@@ -31,13 +31,14 @@ export function setupAppsGet(app: OpenAPIHono) {
       method: "get",
       path: "/api/apps",
       tags: ["apps", "webhooks"],
+      description: "Get a list of apps",
       middleware: siweMiddleware,
       request: {
         query: AppGetRequestQuerySchema,
       },
       responses: {
         200: {
-          description: "Apps",
+          description: "Paginated list of apps",
           content: {
             "application/json": {
               schema: AppsGetResponseSchema,

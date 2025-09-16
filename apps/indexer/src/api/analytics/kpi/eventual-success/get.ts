@@ -38,10 +38,10 @@ export function setupAnalyticsKpiEventualSuccessGet(app: OpenAPIHono) {
         query: AnalyticsKpiEventualSuccessGetQueryParamsSchema,
       },
       tags: ["analytics", "kpi", "eventual-success"],
-      description: "Get the deliveries KPI",
+      description: "Get the eventual success live status",
       responses: {
         200: {
-          description: "The eventual success KPI",
+          description: "The eventual success live status",
           content: {
             "application/json": {
               schema: AnalyticsKpiEventualSuccessGetResponseSchema,

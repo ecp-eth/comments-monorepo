@@ -47,15 +47,15 @@ export function setupAnalyticsTerminalGet(app: OpenAPIHono) {
     {
       method: "get",
       path: "/api/analytics/terminal",
-      tags: ["analytics", "volume"],
-      description: "Get the analytics terminal outcomes",
+      tags: ["analytics", "terminal"],
+      description: "Get the analytics terminal outcomes of deliveries",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsTerminalGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics terminal outcomes",
+          description: "The analytics terminal outcomes of deliveries",
           content: {
             "application/json": {
               schema: AnalyticsTerminalGetResponseSchema,

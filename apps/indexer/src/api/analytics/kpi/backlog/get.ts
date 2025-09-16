@@ -29,13 +29,13 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
       path: "/api/analytics/kpi/backlog",
       middleware: siweMiddleware,
       tags: ["analytics", "kpi", "backlog"],
-      description: "Get the backlog KPI",
+      description: "Get the backlog live status",
       request: {
         query: AnalyticsKpiBacklogGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The backlog KPI",
+          description: "The backlog live status",
           content: {
             "application/json": {
               schema: AnalyticsKpiBacklogGetResponseSchema,

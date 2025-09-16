@@ -43,6 +43,7 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
       method: "post",
       path: "/api/apps/{id}/webhooks",
       tags: ["apps", "webhooks"],
+      description: "Create a new webhook for an app",
       middleware: siweMiddleware,
       request: {
         params: AppWebhookCreateRequestParamsSchema,
@@ -57,7 +58,7 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
       },
       responses: {
         200: {
-          description: "Webhook created",
+          description: "Webhook created successfully",
           content: {
             "application/json": {
               schema: AppWebhookCreateResponseSchema,

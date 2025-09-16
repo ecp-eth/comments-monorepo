@@ -38,10 +38,10 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
         query: AnalyticsKpiFirstAttemptSuccessGetQueryParamsSchema,
       },
       tags: ["analytics", "kpi", "first-attempt-success"],
-      description: "Get the deliveries KPI",
+      description: "Get the first attempt success live status",
       responses: {
         200: {
-          description: "The first attempt success KPI",
+          description: "The first attempt success live status",
           content: {
             "application/json": {
               schema: AnalyticsKpiFirstAttemptSuccessGetResponseSchema,

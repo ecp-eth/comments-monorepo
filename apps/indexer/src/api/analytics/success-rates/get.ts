@@ -46,15 +46,15 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
     {
       method: "get",
       path: "/api/analytics/success-rates",
-      tags: ["analytics", "volume"],
-      description: "Get the analytics success rates",
+      tags: ["analytics", "success-rates"],
+      description: "Get the analytics success rates of deliveries",
       middleware: siweMiddleware,
       request: {
         query: AnalyticsSuccessRatesGetQueryParamsSchema,
       },
       responses: {
         200: {
-          description: "The analytics success rates",
+          description: "The analytics success rates of deliveries",
           content: {
             "application/json": {
               schema: AnalyticsSuccessRatesGetResponseSchema,
