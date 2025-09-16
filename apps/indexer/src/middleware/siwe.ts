@@ -2,7 +2,7 @@ import type { Env, MiddlewareHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import {
-  SiweAuthServiceError,
+  SiweAuthService_Error,
   type ISiweAuthService,
 } from "../services/siwe-auth-service.ts";
 
@@ -48,7 +48,7 @@ export function createSiweMiddleware({
 
       await next();
     } catch (e) {
-      if (e instanceof z.ZodError || e instanceof SiweAuthServiceError) {
+      if (e instanceof z.ZodError || e instanceof SiweAuthService_Error) {
         throw new HTTPException(401, {
           message: "Not authenticated",
         });

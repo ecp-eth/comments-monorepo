@@ -1,5 +1,5 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import { SiweAuthServiceError } from "../../../../services/siwe-auth-service";
+import { SiweAuthService_Error } from "../../../../services/siwe-auth-service";
 import { siweAuthService } from "../../../../services";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
@@ -84,7 +84,7 @@ export function setupAuthSiweRefresh(app: OpenAPIHono) {
           200,
         );
       } catch (e) {
-        if (e instanceof SiweAuthServiceError) {
+        if (e instanceof SiweAuthService_Error) {
           return c.json(
             {
               message: "Not authenticated",

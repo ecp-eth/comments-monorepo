@@ -568,14 +568,14 @@ function throwAuthServiceError(error: unknown): never {
   throw error;
 }
 
-export class SiweAuthServiceError extends Error {
+export class SiweAuthService_Error extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "SiweAuthServiceError";
+    this.name = "SiweAuthService_Error";
   }
 }
 
-export class SiweAuthService_JwtTokenExpiredError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenExpiredError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -585,7 +585,7 @@ export class SiweAuthService_JwtTokenExpiredError extends SiweAuthServiceError {
   }
 }
 
-export class SiweAuthService_JwtTokenIssuedAtError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenIssuedAtError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -595,7 +595,7 @@ export class SiweAuthService_JwtTokenIssuedAtError extends SiweAuthServiceError 
   }
 }
 
-export class SiweAuthService_JwtTokenNotBeforeError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenNotBeforeError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -605,7 +605,7 @@ export class SiweAuthService_JwtTokenNotBeforeError extends SiweAuthServiceError
   }
 }
 
-export class SiweAuthService_JwtTokenInvalidError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenInvalidError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -615,14 +615,14 @@ export class SiweAuthService_JwtTokenInvalidError extends SiweAuthServiceError {
   }
 }
 
-export class SiweAuthService_JwtTokenInvalidAudienceError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenInvalidAudienceError extends SiweAuthService_Error {
   constructor() {
     super(`JWT token has invalid audience`);
     this.name = "SiweAuthService_JwtTokenInvalidAudienceError";
   }
 }
 
-export class SiweAuthService_JwtTokenIssuerError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenIssuerError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -632,7 +632,7 @@ export class SiweAuthService_JwtTokenIssuerError extends SiweAuthServiceError {
   }
 }
 
-export class SiweAuthService_JwtTokenSignatureMismatchedError extends SiweAuthServiceError {
+export class SiweAuthService_JwtTokenSignatureMismatchedError extends SiweAuthService_Error {
   public readonly innerError: Error;
 
   constructor(innerError: Error) {
@@ -642,70 +642,70 @@ export class SiweAuthService_JwtTokenSignatureMismatchedError extends SiweAuthSe
   }
 }
 
-export class SiweAuthService_MissingChainIdError extends SiweAuthServiceError {
+export class SiweAuthService_MissingChainIdError extends SiweAuthService_Error {
   constructor() {
     super(`Missing chain id in SIWE message`);
     this.name = "SiweAuthService_MissingChainIdError";
   }
 }
 
-export class SiweAuthService_UnsupportedChainError extends SiweAuthServiceError {
+export class SiweAuthService_UnsupportedChainError extends SiweAuthService_Error {
   constructor() {
     super(`Unsupported chain`);
     this.name = "SiweAuthService_UnsupportedChainError";
   }
 }
 
-export class SiweAuthService_SiweMessageVerificationFailedError extends SiweAuthServiceError {
+export class SiweAuthService_SiweMessageVerificationFailedError extends SiweAuthService_Error {
   constructor() {
     super(`SIWE message verification failed`);
     this.name = "SiweAuthService_SiweMessageVerificationFailedError";
   }
 }
 
-export class SiweAuthService_InvalidTokenOrMessageError extends SiweAuthServiceError {
+export class SiweAuthService_InvalidTokenOrMessageError extends SiweAuthService_Error {
   constructor() {
     super(`Invalid token or message`);
     this.name = "SiweAuthService_InvalidTokenOrMessageError";
   }
 }
 
-export class SiweAuthService_FailedToCreateUserError extends SiweAuthServiceError {
+export class SiweAuthService_FailedToCreateUserError extends SiweAuthService_Error {
   constructor() {
     super(`Failed to create user`);
     this.name = "SiweAuthService_FailedToCreateUserError";
   }
 }
 
-export class SiweAuthService_FailedToCreateAuthCredentialsError extends SiweAuthServiceError {
+export class SiweAuthService_FailedToCreateAuthCredentialsError extends SiweAuthService_Error {
   constructor() {
     super(`Failed to create auth credentials`);
     this.name = "SiweAuthService_FailedToCreateAuthCredentialsError";
   }
 }
 
-export class SiweAuthService_FailedToCreateAuthSessionError extends SiweAuthServiceError {
+export class SiweAuthService_FailedToCreateAuthSessionError extends SiweAuthService_Error {
   constructor() {
     super(`Failed to create auth session`);
     this.name = "SiweAuthService_FailedToCreateAuthSessionError";
   }
 }
 
-export class SiweAuthService_FailedToCreateRefreshTokenError extends SiweAuthServiceError {
+export class SiweAuthService_FailedToCreateRefreshTokenError extends SiweAuthService_Error {
   constructor() {
     super(`Failed to create refresh token`);
     this.name = "SiweAuthService_FailedToCreateRefreshTokenError";
   }
 }
 
-export class SiweAuthService_InvalidSessionError extends SiweAuthServiceError {
+export class SiweAuthService_InvalidSessionError extends SiweAuthService_Error {
   constructor() {
     super(`Invalid session`);
     this.name = "SiweAuthService_InvalidSessionError";
   }
 }
 
-export class SiweAuthService_InvalidRefreshTokenError extends SiweAuthServiceError {
+export class SiweAuthService_InvalidRefreshTokenError extends SiweAuthService_Error {
   constructor() {
     super(`Invalid refresh token`);
     this.name = "SiweAuthService_InvalidRefreshTokenError";

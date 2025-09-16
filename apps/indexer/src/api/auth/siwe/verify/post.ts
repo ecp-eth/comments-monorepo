@@ -1,7 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { siweAuthService } from "../../../../services";
 import { HexSchema } from "@ecp.eth/sdk/core";
-import { SiweAuthServiceError } from "../../../../services/siwe-auth-service";
+import { SiweAuthService_Error } from "../../../../services/siwe-auth-service";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 
@@ -81,7 +81,7 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
           200,
         );
       } catch (e) {
-        if (e instanceof SiweAuthServiceError) {
+        if (e instanceof SiweAuthService_Error) {
           return c.json(
             {
               message: e.message,
