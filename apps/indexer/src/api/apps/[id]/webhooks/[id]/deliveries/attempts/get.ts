@@ -36,11 +36,22 @@ const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
   }),
 );
 
-export const AppWebhookDeliveriesGetRequestQuerySchema = z.object({
-  before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
-  after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
-  limit: z.coerce.number().int().positive().max(100).default(10),
-});
+export const AppWebhookDeliveriesGetRequestQuerySchema = z
+  .object({
+    before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
+    after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
+    limit: z.coerce.number().int().positive().max(100).default(10),
+  })
+  .refine(
+    (data) => {
+      if (data.before && data.after) {
+        return false;
+      }
+
+      return true;
+    },
+    { message: "Cannot use both before and after" },
+  );
 
 export const AppWebhookDeliverySchema = z.object({
   id: OpenAPIBigintStringSchema,
