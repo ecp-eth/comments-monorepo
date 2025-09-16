@@ -144,6 +144,13 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: string;
+           dimension: {
+              height: number;
+              width: number;
+           };
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -166,7 +173,7 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:504](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L504)
+Defined in: [packages/sdk/src/indexer/schemas.ts:514](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L514)
 
 ## Type declaration
 
@@ -344,6 +351,13 @@ results: {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;

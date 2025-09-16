@@ -702,6 +702,27 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            videoTracks:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
+                                  codec:
+                                    type: string
+                                required:
+                                  - dimension
                           required:
                             - type
                             - url
@@ -1148,6 +1169,27 @@ paths:
                                         - end
                                     mediaType:
                                       type: string
+                                    videoTracks:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          dimension:
+                                            type: object
+                                            properties:
+                                              width:
+                                                type: integer
+                                                minimum: 0
+                                              height:
+                                                type: integer
+                                                minimum: 0
+                                            required:
+                                              - width
+                                              - height
+                                          codec:
+                                            type: string
+                                        required:
+                                          - dimension
                                   required:
                                     - type
                                     - url
@@ -1636,6 +1678,27 @@ paths:
                                           - end
                                       mediaType:
                                         type: string
+                                      videoTracks:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            dimension:
+                                              type: object
+                                              properties:
+                                                width:
+                                                  type: integer
+                                                  minimum: 0
+                                                height:
+                                                  type: integer
+                                                  minimum: 0
+                                              required:
+                                                - width
+                                                - height
+                                            codec:
+                                              type: string
+                                          required:
+                                            - dimension
                                     required:
                                       - type
                                       - url
@@ -2082,6 +2145,27 @@ paths:
                                                   - end
                                               mediaType:
                                                 type: string
+                                              videoTracks:
+                                                type: array
+                                                items:
+                                                  type: object
+                                                  properties:
+                                                    dimension:
+                                                      type: object
+                                                      properties:
+                                                        width:
+                                                          type: integer
+                                                          minimum: 0
+                                                        height:
+                                                          type: integer
+                                                          minimum: 0
+                                                      required:
+                                                        - width
+                                                        - height
+                                                    codec:
+                                                      type: string
+                                                  required:
+                                                    - dimension
                                             required:
                                               - type
                                               - url
@@ -2794,6 +2878,27 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  videoTracks:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        dimension:
+                                          type: object
+                                          properties:
+                                            width:
+                                              type: integer
+                                              minimum: 0
+                                            height:
+                                              type: integer
+                                              minimum: 0
+                                          required:
+                                            - width
+                                            - height
+                                        codec:
+                                          type: string
+                                      required:
+                                        - dimension
                                 required:
                                   - type
                                   - url
@@ -3240,6 +3345,27 @@ paths:
                                               - end
                                           mediaType:
                                             type: string
+                                          videoTracks:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                dimension:
+                                                  type: object
+                                                  properties:
+                                                    width:
+                                                      type: integer
+                                                      minimum: 0
+                                                    height:
+                                                      type: integer
+                                                      minimum: 0
+                                                  required:
+                                                    - width
+                                                    - height
+                                                codec:
+                                                  type: string
+                                              required:
+                                                - dimension
                                         required:
                                           - type
                                           - url
@@ -3728,6 +3854,27 @@ paths:
                                                 - end
                                             mediaType:
                                               type: string
+                                            videoTracks:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  dimension:
+                                                    type: object
+                                                    properties:
+                                                      width:
+                                                        type: integer
+                                                        minimum: 0
+                                                      height:
+                                                        type: integer
+                                                        minimum: 0
+                                                    required:
+                                                      - width
+                                                      - height
+                                                  codec:
+                                                    type: string
+                                                required:
+                                                  - dimension
                                           required:
                                             - type
                                             - url
@@ -4174,6 +4321,27 @@ paths:
                                                         - end
                                                     mediaType:
                                                       type: string
+                                                    videoTracks:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          dimension:
+                                                            type: object
+                                                            properties:
+                                                              width:
+                                                                type: integer
+                                                                minimum: 0
+                                                              height:
+                                                                type: integer
+                                                                minimum: 0
+                                                            required:
+                                                              - width
+                                                              - height
+                                                          codec:
+                                                            type: string
+                                                        required:
+                                                          - dimension
                                                   required:
                                                     - type
                                                     - url
@@ -4901,6 +5069,27 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  videoTracks:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        dimension:
+                                          type: object
+                                          properties:
+                                            width:
+                                              type: integer
+                                              minimum: 0
+                                            height:
+                                              type: integer
+                                              minimum: 0
+                                          required:
+                                            - width
+                                            - height
+                                        codec:
+                                          type: string
+                                      required:
+                                        - dimension
                                 required:
                                   - type
                                   - url
@@ -5347,6 +5536,27 @@ paths:
                                               - end
                                           mediaType:
                                             type: string
+                                          videoTracks:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                dimension:
+                                                  type: object
+                                                  properties:
+                                                    width:
+                                                      type: integer
+                                                      minimum: 0
+                                                    height:
+                                                      type: integer
+                                                      minimum: 0
+                                                  required:
+                                                    - width
+                                                    - height
+                                                codec:
+                                                  type: string
+                                              required:
+                                                - dimension
                                         required:
                                           - type
                                           - url
@@ -5835,6 +6045,27 @@ paths:
                                                 - end
                                             mediaType:
                                               type: string
+                                            videoTracks:
+                                              type: array
+                                              items:
+                                                type: object
+                                                properties:
+                                                  dimension:
+                                                    type: object
+                                                    properties:
+                                                      width:
+                                                        type: integer
+                                                        minimum: 0
+                                                      height:
+                                                        type: integer
+                                                        minimum: 0
+                                                    required:
+                                                      - width
+                                                      - height
+                                                  codec:
+                                                    type: string
+                                                required:
+                                                  - dimension
                                           required:
                                             - type
                                             - url
@@ -6281,6 +6512,27 @@ paths:
                                                         - end
                                                     mediaType:
                                                       type: string
+                                                    videoTracks:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          dimension:
+                                                            type: object
+                                                            properties:
+                                                              width:
+                                                                type: integer
+                                                                minimum: 0
+                                                              height:
+                                                                type: integer
+                                                                minimum: 0
+                                                            required:
+                                                              - width
+                                                              - height
+                                                          codec:
+                                                            type: string
+                                                        required:
+                                                          - dimension
                                                   required:
                                                     - type
                                                     - url
@@ -7246,6 +7498,27 @@ paths:
                                       - end
                                   mediaType:
                                     type: string
+                                  videoTracks:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        dimension:
+                                          type: object
+                                          properties:
+                                            width:
+                                              type: integer
+                                              minimum: 0
+                                            height:
+                                              type: integer
+                                              minimum: 0
+                                          required:
+                                            - width
+                                            - height
+                                        codec:
+                                          type: string
+                                      required:
+                                        - dimension
                                 required:
                                   - type
                                   - url
@@ -7792,6 +8065,27 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            videoTracks:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
+                                  codec:
+                                    type: string
+                                required:
+                                  - dimension
                           required:
                             - type
                             - url
@@ -8312,6 +8606,27 @@ paths:
                                 - end
                             mediaType:
                               type: string
+                            videoTracks:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  dimension:
+                                    type: object
+                                    properties:
+                                      width:
+                                        type: integer
+                                        minimum: 0
+                                      height:
+                                        type: integer
+                                        minimum: 0
+                                    required:
+                                      - width
+                                      - height
+                                  codec:
+                                    type: string
+                                required:
+                                  - dimension
                           required:
                             - type
                             - url
