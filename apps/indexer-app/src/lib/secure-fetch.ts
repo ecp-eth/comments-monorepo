@@ -32,6 +32,7 @@ export async function secureFetch(
   fetchFn: (params: SecureFetchParams) => Promise<Response>,
 ): Promise<Response> {
   const headers: Record<string, string> = {};
+  let hasRefreshed = false;
 
   if (authContext.isLoggedIn && authContext.accessToken) {
     headers["Authorization"] = `Bearer ${authContext.accessToken}`;
@@ -41,16 +42,21 @@ export async function secureFetch(
     const response = await fetchFn({ headers });
 
     if (response.status === 401) {
-      // refresh access token because it probably expired
-      if (!refreshAccessTokenPromise) {
-        refreshAccessTokenPromise = refreshAccessToken(authContext);
+      // prevent infinite cycle
+      if (hasRefreshed) {
+        return response;
       }
+
+      // refresh access token because it probably expired
+      refreshAccessTokenPromise ||= refreshAccessToken(authContext);
 
       // if there are multiple requests waiting for the access token to be refreshed,
       // we only want to refresh it once
       const newTokens = await refreshAccessTokenPromise;
 
       refreshAccessTokenPromise = undefined;
+
+      hasRefreshed = true;
 
       if (newTokens) {
         headers["Authorization"] = `Bearer ${newTokens.accessToken.token}`;
