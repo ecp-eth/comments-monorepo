@@ -160,7 +160,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
 
         const previousDeliveries =
           before || after
-            ? await db.query.appWebhookDelivery.findFirst({
+            ? await db.query.appWebhookDeliveryAttempt.findFirst({
                 where(fields, operators) {
                   return operators.and(
                     operators.eq(fields.appWebhookId, appWebhook.id),
