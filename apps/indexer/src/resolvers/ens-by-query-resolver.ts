@@ -1,10 +1,10 @@
 import * as Sentry from "@sentry/node";
 import { z } from "zod";
 import DataLoader from "dataloader";
-import DeferredCtor, { Deferred } from "promise-deferred";
+import DeferredCtor, { type Deferred } from "promise-deferred";
 import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
-import type { ResolvedENSData } from "./ens.types";
+import type { ResolvedENSData } from "./ens.types.ts";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;

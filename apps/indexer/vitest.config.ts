@@ -7,6 +7,9 @@ process.env.SKIP_DRIZZLE_SCHEMA_DETECTION ||= "1";
 process.env.NEYNAR_API_KEY ||= "test";
 process.env.ENS_RPC_URL ||= "https://ethereum-rpc.publicnode.com";
 process.env.SIM_API_KEY ||= "test";
+process.env.JWT_SIWE_NONCE_SECRET ||= "test";
+process.env.JWT_ACCESS_TOKEN_SECRET ||= "test";
+process.env.JWT_REFRESH_TOKEN_SECRET ||= "test";
 
 export default defineConfig({
   plugins: [

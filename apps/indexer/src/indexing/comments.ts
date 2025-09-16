@@ -3,29 +3,41 @@ import { ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
-} from "../lib/utils";
-import schema from "ponder:schema";
-import { getAddress } from "viem";
+} from "../lib/utils.ts";
 import {
   commentModerationService,
+  db,
+  eventOutboxService,
   mutedAccountsManagementService,
-} from "../services";
+} from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
-import { zeroExSwapResolver } from "../lib/0x-swap-resolver";
+import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
 import {
   resolveCommentReferences,
   type ResolveCommentReferencesOptions,
-} from "../lib/resolve-comment-references";
-import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
-import { ensByNameResolverService } from "../services/ens-by-name-resolver";
-import { erc20ByAddressResolverService } from "../services/erc20-by-address-resolver";
-import { erc20ByTickerResolverService } from "../services/erc20-by-ticker-resolver";
-import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
-import { farcasterByNameResolverService } from "../services/farcaster-by-name-resolver";
-import { urlResolverService } from "../services/url-resolver";
+} from "../lib/resolve-comment-references.ts";
+import {
+  ensByAddressResolverService,
+  ensByNameResolverService,
+  erc20ByAddressResolverService,
+  erc20ByTickerResolverService,
+  farcasterByAddressResolverService,
+  farcasterByNameResolverService,
+  urlResolverService,
+} from "../services/index.ts";
 
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { env } from "../env";
+import { env } from "../env.ts";
+import { eq } from "drizzle-orm";
+import {
+  ponderEventToCommentAddedEvent,
+  ponderEventToCommentDeletedEvent,
+  ponderEventToCommentHookMetadataSetEvent,
+  ponderEventToCommentEditedEvent,
+  createCommentReactionsUpdatedEvent,
+} from "../events/comment/index.ts";
+import { schema } from "../../schema.ts";
+import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 
 const resolverCommentReferences: ResolveCommentReferencesOptions = {
   ensByAddressResolver: ensByAddressResolverService,
@@ -72,198 +84,290 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       context,
     });
 
-    const createdAt = new Date(Number(event.args.createdAt) * 1000);
-    const updatedAt = new Date(Number(event.args.createdAt) * 1000);
+    await db.transaction(async (tx) => {
+      const createdAt = new Date(Number(event.args.createdAt) * 1000);
+      const updatedAt = new Date(Number(event.args.createdAt) * 1000);
 
-    const parentId = transformCommentParentId(event.args.parentId);
-    let rootCommentId: Hex | null = null;
+      const parentId = transformCommentParentId(event.args.parentId);
+      let rootCommentId: Hex | null = null;
 
-    if (parentId) {
-      const parentComment = await context.db.find(schema.comment, {
-        id: parentId,
-      });
-
-      if (!parentComment) {
-        Sentry.captureMessage(
-          `Parent comment not found for commentId: ${event.args.commentId}, parentId: ${parentId}`,
-          {
-            level: "warning",
-            extra: {
-              commentId: event.args.commentId,
-              parentId,
-              targetUri,
-              app: event.args.app,
-              chainId: context.chain.id,
-              author: event.args.author,
-              txHash: event.transaction.hash,
-              logIndex: event.log.logIndex,
-              createdAt,
-              updatedAt,
-              parentCommentId: event.args.parentId,
-            },
+      if (parentId) {
+        const parentComment = await tx.query.comment.findFirst({
+          where(fields, operators) {
+            return operators.eq(fields.id, parentId);
           },
-        );
+        });
 
-        return;
-      }
-
-      if (event.args.commentType === COMMENT_TYPE_REACTION) {
-        const reactionType = event.args.content;
-
-        await context.db
-          .update(schema.comment, {
-            id: parentId,
-          })
-          .set({
-            reactionCounts: {
-              ...parentComment.reactionCounts,
-              [reactionType]:
-                (parentComment.reactionCounts?.[reactionType] ?? 0) + 1,
+        if (!parentComment) {
+          Sentry.captureMessage(
+            `Parent comment not found for commentId: ${event.args.commentId}, parentId: ${parentId}`,
+            {
+              level: "warning",
+              extra: {
+                commentId: event.args.commentId,
+                parentId,
+                targetUri,
+                app: event.args.app,
+                chainId: context.chain.id,
+                author: event.args.author,
+                txHash: event.transaction.hash,
+                logIndex: event.log.logIndex,
+                createdAt,
+                updatedAt,
+                parentCommentId: event.args.parentId,
+              },
             },
-          });
+          );
+
+          return;
+        }
+
+        if (event.args.commentType === COMMENT_TYPE_REACTION) {
+          const reactionType = event.args.content;
+
+          await tx
+            .update(schema.comment)
+            .set({
+              reactionCounts: {
+                ...parentComment.reactionCounts,
+                [reactionType]:
+                  (parentComment.reactionCounts?.[reactionType] ?? 0) + 1,
+              },
+            })
+            .where(eq(schema.comment.id, parentId))
+            .execute();
+        }
+
+        // if parent comment doesn't have a root comment id then it is a root comment itself
+        rootCommentId = parentComment.rootCommentId ?? parentComment.id;
       }
 
-      // if parent comment doesn't have a root comment id then it is a root comment itself
-      rootCommentId = parentComment.rootCommentId ?? parentComment.id;
-    }
+      const referencesResolutionResult = await resolveCommentReferences(
+        {
+          chainId: context.chain.id,
+          content: event.args.content,
+        },
+        resolverCommentReferences,
+      );
 
-    const referencesResolutionResult = await resolveCommentReferences(
-      {
-        chainId: context.chain.id,
-        content: event.args.content,
-      },
-      resolverCommentReferences,
-    );
+      // We need to check if the comment already has a moderation status
+      // this is useful during the reindex process
+      const moderationResult = await commentModerationService.moderate(
+        event.args,
+        referencesResolutionResult.references,
+      );
 
-    // We need to check if the comment already has a moderation status
-    // this is useful during the reindex process
-    const moderationResult = await commentModerationService.moderate(
-      event.args,
-      referencesResolutionResult.references,
-    );
+      const [insertedComment] = await tx
+        .insert(schema.comment)
+        .values({
+          id: event.args.commentId,
+          content: event.args.content,
+          metadata: event.args.metadata.slice(),
+          hookMetadata: [], // Hook metadata still comes from separate events
+          targetUri,
+          parentId,
+          rootCommentId,
+          author: event.args.author,
+          txHash: event.transaction.hash,
+          createdAt,
+          updatedAt,
+          chainId: context.chain.id,
+          app: event.args.app,
+          logIndex: event.log.logIndex,
+          channelId: event.args.channelId,
+          commentType: event.args.commentType,
+          moderationStatus: moderationResult.result.status,
+          moderationStatusChangedAt: moderationResult.result.changedAt,
+          moderationClassifierResult: moderationResult.result.classifier.labels,
+          moderationClassifierScore: moderationResult.result.classifier.score,
+          zeroExSwap,
+          references: referencesResolutionResult.references,
+          referencesResolutionStatus: referencesResolutionResult.status,
+          referencesResolutionStatusChangedAt: new Date(),
+          reactionCounts: {},
+        })
+        .returning()
+        .execute();
 
-    await context.db.insert(schema.comment).values({
-      id: event.args.commentId,
-      content: event.args.content,
-      metadata: event.args.metadata.slice(),
-      hookMetadata: [], // Hook metadata still comes from separate events
-      targetUri,
-      parentId,
-      rootCommentId,
-      author: event.args.author,
-      txHash: event.transaction.hash,
-      createdAt,
-      updatedAt,
-      chainId: context.chain.id,
-      app: event.args.app,
-      logIndex: event.log.logIndex,
-      channelId: event.args.channelId,
-      commentType: event.args.commentType,
-      moderationStatus: moderationResult.result.status,
-      moderationStatusChangedAt: moderationResult.result.changedAt,
-      moderationClassifierResult: moderationResult.result.classifier.labels,
-      moderationClassifierScore: moderationResult.result.classifier.score,
-      zeroExSwap,
-      references: referencesResolutionResult.references,
-      referencesResolutionStatus: referencesResolutionResult.status,
-      referencesResolutionStatusChangedAt: new Date(),
-      reactionCounts: {},
+      if (!insertedComment) {
+        throw new Error("Failed to insert comment");
+      }
+
+      await moderationResult.saveAndNotify();
+
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentAddedEvent({
+          event,
+          context,
+          moderationStatus: moderationResult.result.status,
+          references: referencesResolutionResult.references,
+          comment: insertedComment,
+          zeroExSwap,
+        }),
+        aggregateId: insertedComment.id,
+        aggregateType: "comment",
+        tx,
+      });
     });
-
-    await moderationResult.saveAndNotify();
   });
 
   // Handle hook metadata setting separately
   ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
-    const comment = await context.db.find(schema.comment, {
-      id: event.args.commentId,
-    });
-
-    if (!comment) {
-      // Ponder should respect the event order, so this should never happen
-      Sentry.captureMessage(
-        `Comment not found while setting hook metadata for commentId: ${event.args.commentId}`,
-        {
-          level: "warning",
-        },
-      );
-      return;
-    }
-
-    // Add the hook metadata entry to the existing hookMetadata array
-    const existingHookMetadata = comment.hookMetadata ?? [];
-    const newHookMetadataEntry = {
-      key: event.args.key,
-      value: event.args.value,
-    };
-
-    // Check if this key already exists and update it, otherwise add new entry
-    const existingIndex = existingHookMetadata.findIndex(
-      (entry) => entry.key === event.args.key,
-    );
-    if (existingIndex !== -1) {
-      existingHookMetadata[existingIndex] = newHookMetadataEntry;
-    } else {
-      existingHookMetadata.push(newHookMetadataEntry);
-    }
-
-    await context.db
-      .update(schema.comment, {
-        id: event.args.commentId,
-      })
-      .set({
-        hookMetadata: existingHookMetadata,
+    await db.transaction(async (tx) => {
+      const comment = await tx.query.comment.findFirst({
+        where: eq(schema.comment.id, event.args.commentId),
       });
+
+      if (!comment) {
+        // Ponder should respect the event order, so this should never happen
+        Sentry.captureMessage(
+          `Comment not found while setting hook metadata for commentId: ${event.args.commentId}`,
+          {
+            level: "warning",
+          },
+        );
+        return;
+      }
+
+      // Add the hook metadata entry to the existing hookMetadata array
+      let hookMetadata = comment.hookMetadata || [];
+      let hookMetadataOperation: MetadataSetOperation;
+
+      if (event.args.value === "0x") {
+        // delete the key from metadata
+        hookMetadata = hookMetadata.filter(
+          (entry) => entry.key !== event.args.key,
+        );
+
+        hookMetadataOperation = {
+          type: "delete",
+          key: event.args.key,
+        };
+      } else {
+        // update / add the key to metadata
+        const metadataEntry = hookMetadata.find(
+          (entry) => entry.key === event.args.key,
+        );
+
+        if (metadataEntry) {
+          metadataEntry.value = event.args.value;
+
+          hookMetadataOperation = {
+            type: "update",
+            key: event.args.key,
+            value: event.args.value,
+          };
+        } else {
+          hookMetadata.push({
+            key: event.args.key,
+            value: event.args.value,
+          });
+
+          hookMetadataOperation = {
+            type: "create",
+            key: event.args.key,
+            value: event.args.value,
+          };
+        }
+      }
+
+      await tx
+        .update(schema.comment)
+        .set({
+          hookMetadata,
+          updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        })
+        .where(eq(schema.comment.id, event.args.commentId))
+        .execute();
+
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentHookMetadataSetEvent({
+          event,
+          context,
+          hookMetadata,
+          hookMetadataOperation,
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
+      });
+    });
   });
 
   ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
-    const existingComment = await context.db.find(schema.comment, {
-      id: event.args.commentId,
-    });
-
-    if (!existingComment) {
-      return;
-    }
-
-    if (getAddress(existingComment.author) === getAddress(event.args.author)) {
-      await context.db
-        .update(schema.comment, {
-          id: event.args.commentId,
-        })
-        .set({
-          deletedAt: new Date(Number(event.block.timestamp) * 1000),
-        });
-    }
-
-    if (
-      existingComment.commentType === COMMENT_TYPE_REACTION &&
-      existingComment.parentId
-    ) {
-      const parentComment = await context.db.find(schema.comment, {
-        id: existingComment.parentId,
+    await db.transaction(async (tx) => {
+      const existingComment = await tx.query.comment.findFirst({
+        where: eq(schema.comment.id, event.args.commentId),
       });
 
-      if (!parentComment) {
+      if (!existingComment) {
         return;
       }
 
-      const reactionCounts = parentComment.reactionCounts;
-
-      if (!reactionCounts) {
-        return;
-      }
-
-      reactionCounts[existingComment.content] =
-        (reactionCounts[existingComment.content] ?? 1) - 1;
-
-      await context.db
-        .update(schema.comment, {
-          id: existingComment.parentId,
-        })
+      await tx
+        .update(schema.comment)
         .set({
-          reactionCounts,
+          updatedAt: new Date(Number(event.block.timestamp) * 1000),
+          deletedAt: new Date(Number(event.block.timestamp) * 1000),
+        })
+        .where(eq(schema.comment.id, event.args.commentId))
+        .execute();
+
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentDeletedEvent({
+          event,
+          context,
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
+      });
+
+      if (
+        existingComment.commentType === COMMENT_TYPE_REACTION &&
+        existingComment.parentId
+      ) {
+        const parentComment = await tx.query.comment.findFirst({
+          where: eq(schema.comment.id, existingComment.parentId),
         });
-    }
+
+        if (!parentComment) {
+          return;
+        }
+
+        const reactionCounts = parentComment.reactionCounts;
+
+        if (!reactionCounts) {
+          return;
+        }
+
+        reactionCounts[existingComment.content] =
+          (reactionCounts[existingComment.content] ?? 1) - 1;
+
+        const [updatedParentComment] = await tx
+          .update(schema.comment)
+          .set({
+            reactionCounts,
+            updatedAt: new Date(Number(event.block.timestamp) * 1000),
+          })
+          .where(eq(schema.comment.id, existingComment.parentId))
+          .returning()
+          .execute();
+
+        if (!updatedParentComment) {
+          return;
+        }
+
+        await eventOutboxService.publishEvent({
+          aggregateId: updatedParentComment.id,
+          aggregateType: "comment",
+          tx,
+          event: createCommentReactionsUpdatedEvent({
+            comment: updatedParentComment,
+          }),
+        });
+      }
+    });
   });
 
   ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
@@ -274,64 +378,78 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       return;
     }
 
-    const existingComment = await context.db.find(schema.comment, {
-      id: event.args.commentId,
-    });
-
-    if (!existingComment) {
-      Sentry.captureMessage(
-        `Comment not found while editing commentId: ${event.args.commentId}`,
-        {
-          level: "warning",
-          extra: {
-            commentId: event.args.commentId,
-            author: event.args.author,
-            editedByApp: event.args.editedByApp,
-            chainId: context.chain.id,
-            txHash: event.transaction.hash,
-            logIndex: event.log.logIndex,
-          },
-        },
-      );
-      return;
-    }
-
-    const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
-
-    const referencesResolutionResult = await resolveCommentReferences(
-      {
-        chainId: context.chain.id,
-        content: event.args.content,
-      },
-      resolverCommentReferences,
-    );
-
-    const newCommentRevision = existingComment.revision + 1;
-
-    const moderationResult = await commentModerationService.moderateUpdate({
-      comment: event.args,
-      commentRevision: newCommentRevision,
-      references: referencesResolutionResult.references,
-      existingComment,
-    });
-
-    await context.db
-      .update(schema.comment, {
-        id: event.args.commentId,
-      })
-      .set({
-        content: event.args.content,
-        revision: newCommentRevision,
-        updatedAt,
-        references: referencesResolutionResult.references,
-        referencesResolutionStatus: referencesResolutionResult.status,
-        referencesResolutionStatusChangedAt: new Date(),
-        moderationStatus: moderationResult.result.status,
-        moderationStatusChangedAt: moderationResult.result.changedAt,
-        moderationClassifierResult: moderationResult.result.classifier.labels,
-        moderationClassifierScore: moderationResult.result.classifier.score,
+    await db.transaction(async (tx) => {
+      const existingComment = await tx.query.comment.findFirst({
+        where: eq(schema.comment.id, event.args.commentId),
       });
 
-    await moderationResult.saveAndNotify();
+      if (!existingComment) {
+        Sentry.captureMessage(
+          `Comment not found while editing commentId: ${event.args.commentId}`,
+          {
+            level: "warning",
+            extra: {
+              commentId: event.args.commentId,
+              author: event.args.author,
+              editedByApp: event.args.editedByApp,
+              chainId: context.chain.id,
+              txHash: event.transaction.hash,
+              logIndex: event.log.logIndex,
+            },
+          },
+        );
+        return;
+      }
+
+      const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
+
+      const referencesResolutionResult = await resolveCommentReferences(
+        {
+          chainId: context.chain.id,
+          content: event.args.content,
+        },
+        resolverCommentReferences,
+      );
+
+      const newCommentRevision = existingComment.revision + 1;
+
+      const moderationResult = await commentModerationService.moderateUpdate({
+        comment: event.args,
+        commentRevision: newCommentRevision,
+        references: referencesResolutionResult.references,
+        existingComment,
+      });
+
+      await tx
+        .update(schema.comment)
+        .set({
+          content: event.args.content,
+          revision: newCommentRevision,
+          updatedAt,
+          references: referencesResolutionResult.references,
+          referencesResolutionStatus: referencesResolutionResult.status,
+          referencesResolutionStatusChangedAt: new Date(),
+          moderationStatus: moderationResult.result.status,
+          moderationStatusChangedAt: moderationResult.result.changedAt,
+          moderationClassifierResult: moderationResult.result.classifier.labels,
+          moderationClassifierScore: moderationResult.result.classifier.score,
+        })
+        .where(eq(schema.comment.id, event.args.commentId))
+        .execute();
+
+      await eventOutboxService.publishEvent({
+        event: ponderEventToCommentEditedEvent({
+          event,
+          context,
+          references: referencesResolutionResult.references,
+          moderationStatus: moderationResult.result.status,
+        }),
+        aggregateId: event.args.commentId,
+        aggregateType: "comment",
+        tx,
+      });
+
+      await moderationResult.saveAndNotify();
+    });
   });
 }

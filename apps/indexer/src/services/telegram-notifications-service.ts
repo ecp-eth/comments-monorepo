@@ -1,10 +1,10 @@
 import { Telegraf, TelegramError } from "telegraf";
-import type { ITelegramNotificationsService } from "./types";
+import type { ITelegramNotificationsService } from "./types.ts";
 import {
   decryptWebhookCallbackData,
   encryptWebhookCallbackData,
   type WebhookCallbackData,
-} from "../utils/webhook";
+} from "../utils/webhook.ts";
 import type { Convenience } from "telegraf/types";
 
 type TelegramNotificationsServiceOptions =

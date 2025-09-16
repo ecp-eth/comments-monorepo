@@ -1,7 +1,7 @@
 import { setDatabaseSchema } from "@ponder/client";
-import * as onchainSchema from "./ponder.schema";
-import * as offchainSchema from "./schema.offchain";
-import { env } from "./src/env";
+import * as onchainSchema from "./ponder.schema.ts";
+import * as offchainSchema from "./schema.offchain.ts";
+import { env } from "./src/env.ts";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -20,9 +20,11 @@ if (globalThis.PONDER_NAMESPACE_BUILD) {
   console.warn(
     "Do not use SKIP_DRIZZLE_SCHEMA_DETECTION if you actually want to use the real database. This is useful only for docs generation.",
   );
+} else if (env.DATABASE_SCHEMA) {
+  schemaName = env.DATABASE_SCHEMA;
 } else {
   throw new Error(
-    "PONDER_NAMESPACE_BUILD is not set, are you sure you are running this script using ponder start/dev/serve?",
+    "Please set the DATABASE_SCHEMA environment variable to the name of the schema you want to use for the indexer on chain data or run this script using ponder start/dev/serve.",
   );
 }
 

@@ -36,6 +36,41 @@
       "when": 1755549060646,
       "tag": "0004_rare_blue_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1757667282400,
+      "tag": "0005_app_infrastructure",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1757667477491,
+      "tag": "0006_queue_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1758010425250,
+      "tag": "0007_event_creation_date_idx",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1758011965282,
+      "tag": "0008_make_nulls_not_distinct",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1758013113791,
+      "tag": "0009_missing_indexes",
+      "breakpoints": true
     }
   ]
 }

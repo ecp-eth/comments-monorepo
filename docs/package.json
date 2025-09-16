@@ -18,7 +18,7 @@
     "ref:gen:sdk": "rm -rf pages/sdk-reference && mkdir -p pages/sdk-reference && typedoc --publicPath /sdk-reference/ && add-mdx-autogen-warning pages/sdk-reference/index.mdx",
     "ref:gen:protocol": "backup-nuke-restore pages/protocol-reference \"solidity-docgen -s pages -o pages/protocol-reference -i ../packages/protocol/src/ --solc-module solc -t templates/solidity-codegen\" index.mdx",
     "ref:gen:indexer:index": "cp ../apps/indexer/README.md pages/indexer-reference/index.mdx && add-mdx-autogen-warning pages/indexer-reference/index.mdx",
-    "ref:gen:indexer:openapi": "NEYNAR_API_KEY=123 SIM_API_KEY=123 SKIP_DRIZZLE_SCHEMA_DETECTION=1 WEBHOOK_SECRET=secret ENS_RPC_URL=https://some.rpc.url DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres tsx --import ./scripts/ponder-module-register.mjs scripts/generate-indexer-openapi-spec.ts",
+    "ref:gen:indexer:openapi": "tsx --import ./scripts/ponder-module-register.mjs --import ./scripts/generate-env-vars.mjs scripts/generate-indexer-openapi-spec.ts",
     "ref:gen:indexer": "backup-nuke-restore pages/indexer-reference \"pnpm run ref:gen:indexer:index && pnpm run ref:gen:indexer:openapi\" custom-swagger-override.css restful.tsx",
     "ref:gen:all": "pnpm run ref:gen:protocol && pnpm run ref:gen:sdk && pnpm run ref:gen:indexer && pnpm run ref:gen:demo && pnpm run ref:gen:react-editor"
   },

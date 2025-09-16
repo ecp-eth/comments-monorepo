@@ -5,9 +5,9 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
-import { normalizeUrl } from "./utils";
-import { SUPPORTED_CHAIN_IDS } from "../env";
-import { CommentModerationLabel } from "../services/types";
+import { normalizeUrl } from "./utils.ts";
+import { SUPPORTED_CHAIN_IDS } from "../env.ts";
+import { CommentModerationLabel } from "../services/types.ts";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -510,3 +510,68 @@ export const ERC20Caip19Schema = z.custom<ERC20CAIP19>(
     message: "Invalid CAIP-19",
   },
 );
+
+export const OpenAPIDateStringSchema = z
+  .custom<string | Date>(
+    (v: unknown) => {
+      const result = z.coerce.date().safeParse(v);
+
+      if (!result.success) {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message: "Could not parse date",
+    },
+  )
+  .transform((val) => z.coerce.date().parse(val).toISOString())
+  .openapi({
+    description: "A date string in ISO 8601 format",
+    type: "string",
+  });
+
+export const OpenAPIBigintStringSchema = z
+  .custom<string | bigint>(
+    (v: unknown) => {
+      return z.coerce.bigint().safeParse(v).success;
+    },
+    {
+      message: "Could not parse bigint",
+    },
+  )
+  .transform((v) => z.coerce.bigint().parse(v).toString())
+  .openapi({
+    description: "A bigint string",
+    type: "string",
+  });
+
+export const OpenAPIFloatFromDbSchema = z
+  .preprocess((v, ctx) => {
+    const result = z.coerce.number().safeParse(v);
+
+    if (!result.success) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid float",
+      });
+
+      return z.NEVER;
+    }
+
+    return result.data;
+  }, z.number())
+  .openapi({
+    type: "number",
+  });
+
+export const OpenAPIMaskedAppSecretSchema = z
+  .string()
+  .transform((secret) => {
+    return secret.slice(0, 4) + "......." + secret.slice(-4);
+  })
+  .openapi({
+    description: "Masked app secret",
+    type: "string",
+  });

@@ -7,17 +7,26 @@ import type {
 } from "../../src/services/types";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { drizzle } from "drizzle-orm/node-postgres";
+import {
+  drizzle,
+  type NodePgClient,
+  type NodePgDatabase,
+} from "drizzle-orm/node-postgres";
 import { schema } from "../../schema";
 import type { CommentModerationStatusesSelectType } from "../../schema.offchain";
 
 const db = drizzle.mock({
   schema,
-});
+}) as unknown as NodePgDatabase<typeof schema> & { $client: NodePgClient };
+
+const { eventOutboxService } = await vi.importMock<
+  typeof import("../../src/services/index.ts")
+>("../../src/services/index.ts");
 
 const service = new PremoderationService({
   classificationThreshold: 50,
   db,
+  eventOutboxService,
 });
 
 const mockLowerRiskClassifierResult: CommentModerationClassfierResult = {
@@ -310,6 +319,7 @@ describe("PremoderationService", () => {
         save: expect.any(Function),
       });
       expect(dbExecuteInsertMock).not.toHaveBeenCalled();
+      expect(eventOutboxService.publishEvent).not.toHaveBeenCalled();
     });
 
     test("should set status to pending given the change is higher risk than the threshold", async () => {
@@ -549,6 +559,7 @@ describe("PremoderationService", () => {
         updatedBy: "premoderation",
       });
 
+      expect(eventOutboxService.publishEvent).toHaveBeenCalledOnce();
       expect(dbInsertMock).toHaveBeenCalledOnce();
       expect(dbInsertMock).toHaveBeenCalledWith(
         schema.commentModerationStatuses,
@@ -566,6 +577,7 @@ describe("PremoderationService", () => {
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         moderationStatusChangedAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       });
 
       // we changed to approved so it called update on previous moderation statuses
@@ -604,6 +616,7 @@ describe("PremoderationService", () => {
         updatedBy: "premoderation",
       });
 
+      expect(eventOutboxService.publishEvent).toHaveBeenCalledOnce();
       expect(dbInsertMock).toHaveBeenCalledOnce();
       expect(dbInsertMock).toHaveBeenCalledWith(
         schema.commentModerationStatuses,
@@ -621,6 +634,7 @@ describe("PremoderationService", () => {
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "approved" as ModerationStatus,
         moderationStatusChangedAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       });
 
       // we changed to approved so it called update on previous moderation statuses
@@ -676,9 +690,11 @@ describe("PremoderationService", () => {
       expect(dbUpdateSetMock).toHaveBeenCalledWith({
         moderationStatus: "pending" as ModerationStatus,
         moderationStatusChangedAt: expect.any(Date),
+        updatedAt: expect.any(Date),
       });
 
       expect(dbUpdateExecuteMock).toHaveBeenCalledTimes(1);
+      expect(eventOutboxService.publishEvent).toHaveBeenCalledOnce();
     });
   });
 });

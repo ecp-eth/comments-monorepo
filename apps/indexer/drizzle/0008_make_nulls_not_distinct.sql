@@ -1,0 +1,2 @@
+ALTER TABLE "ecp_indexer_schema"."app_signing_keys" DROP CONSTRAINT "ask_one_active_secret_uq";--> statement-breakpoint
+ALTER TABLE "ecp_indexer_schema"."app_signing_keys" ADD CONSTRAINT "ask_one_active_secret_uq" UNIQUE NULLS NOT DISTINCT("app_id","revoked_at");

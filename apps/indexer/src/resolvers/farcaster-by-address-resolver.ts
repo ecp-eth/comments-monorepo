@@ -11,7 +11,7 @@ import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
 } from "@ecp.eth/sdk/indexer";
-import type { ResolvedFarcasterData } from "./farcaster.types";
+import type { ResolvedFarcasterData } from "./farcaster.types.ts";
 
 export type FarcasterByAddressResolver = DataLoader<
   Hex,

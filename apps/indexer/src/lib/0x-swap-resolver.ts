@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
-import { IndexingFunctionArgs } from "ponder:registry";
-import { env } from "../env";
+import type { IndexingFunctionArgs } from "ponder:registry";
+import { env } from "../env.ts";
 import { base } from "viem/chains";
 import { Chain, createPublicClient, http, PublicClient } from "viem";
 import { parseSwap } from "@0x/0x-parser";

@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { createPublicClient, http } from "viem";
-import { getChainById } from "../utils/getChainById";
-import { type ERC20ClientConfig, type ERC20ClientRegistry } from "../resolvers";
+import { getChainById } from "../utils/getChainById.ts";
+import {
+  type ERC20ClientConfig,
+  type ERC20ClientRegistry,
+} from "../resolvers/index.ts";
 
 class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   private clientsByChainId: Record<number, ERC20ClientConfig>;

@@ -2,15 +2,19 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import type {
   CommentClassifierCacheServiceResult,
   ICommentClassifierCacheService,
-} from "./types";
-import type { DB } from "./db";
+} from "./types.ts";
+import type { DB } from "./db.ts";
 import { and, eq } from "drizzle-orm";
-import { schema } from "../../schema";
+import { schema } from "../../schema.ts";
 
 export class ClassificationCacheService
   implements ICommentClassifierCacheService
 {
-  constructor(private db: DB) {}
+  private db: DB;
+
+  constructor(db: DB) {
+    this.db = db;
+  }
 
   async getByCommentId(
     commentId: Hex,

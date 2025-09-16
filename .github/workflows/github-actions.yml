@@ -126,6 +126,10 @@ jobs:
       FARCASTER_MINI_APP_WEBHOOK_URL: "https://example.com/webhook"
       FARCASTER_MINI_APP_URL: "https://example.com"
 
+      JWT_SIWE_NONCE_SECRET: "siwe-secret"
+      JWT_ACCESS_TOKEN_SECRET: "access-token-secret"
+      JWT_REFRESH_TOKEN_SECRET: "refresh-token-secret"
+
     name: Build and Test on Node.js 22
     steps:
       - name: Check out code

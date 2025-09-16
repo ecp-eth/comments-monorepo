@@ -1,5 +1,8 @@
 import { LRUCache } from "lru-cache";
-import { createURLResolver, type ResolvedURL } from "../resolvers/url-resolver";
+import {
+  createURLResolver,
+  type ResolvedURL,
+} from "../resolvers/url-resolver.ts";
 
 const cacheMap = new LRUCache<string, Promise<ResolvedURL | null>>({
   max: 10000,

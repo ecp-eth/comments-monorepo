@@ -8726,4 +8726,3289 @@ paths:
                     description: The error message
                 required:
                   - message
+  /api/auth/siwe/nonce:
+    get:
+      tags:
+        - auth
+        - siwe
+      description: Get a nonce for a SIWE request
+      responses:
+        '200':
+          description: Nonce and token generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nonce:
+                    type: string
+                    minLength: 1
+                  token:
+                    type: string
+                    minLength: 1
+                required:
+                  - nonce
+                  - token
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/auth/siwe/verify:
+    post:
+      tags:
+        - auth
+        - siwe
+      description: Verify a SIWE request and issue auth tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                signature: {}
+                token:
+                  type: string
+                  minLength: 1
+              required:
+                - message
+                - signature
+                - token
+      responses:
+        '200':
+          description: SIWE verification successful and auth tokens issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        minLength: 1
+                      expiresAt:
+                        type: integer
+                        exclusiveMinimum: 0
+                    required:
+                      - token
+                      - expiresAt
+                  refreshToken:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        minLength: 1
+                      expiresAt:
+                        type: integer
+                        exclusiveMinimum: 0
+                    required:
+                      - token
+                      - expiresAt
+                required:
+                  - accessToken
+                  - refreshToken
+        '400':
+          description: SIWE verification failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/auth/siwe/refresh:
+    post:
+      tags:
+        - auth
+        - siwe
+      description: Refresh a SIWE access token using a refresh token
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            pattern: ^Bearer\s[^\s]+$
+          required: true
+          name: Authorization
+          in: header
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      expiresAt:
+                        type: number
+                    required:
+                      - token
+                      - expiresAt
+                  refreshToken:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                      expiresAt:
+                        type: number
+                    required:
+                      - token
+                      - expiresAt
+                required:
+                  - accessToken
+                  - refreshToken
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/users/me:
+    get:
+      tags:
+        - user
+      description: Get the current user
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  authMethods:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        updatedAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        identifier:
+                          type: string
+                        method:
+                          type: string
+                          enum:
+                            - siwe
+                      required:
+                        - id
+                        - createdAt
+                        - updatedAt
+                        - identifier
+                        - method
+                  role:
+                    type: string
+                    enum:
+                      - admin
+                      - user
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - authMethods
+                  - role
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Create a new app
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+              required:
+                - name
+      responses:
+        '200':
+          description: App created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                    minLength: 1
+                  secret:
+                    type: string
+                    description: Masked app secret
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - secret
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    get:
+      tags:
+        - apps
+        - webhooks
+      description: Get a list of apps
+      parameters:
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 10
+          required: false
+          name: limit
+          in: query
+      responses:
+        '200':
+          description: Paginated list of apps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        updatedAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        name:
+                          type: string
+                          minLength: 1
+                      required:
+                        - id
+                        - createdAt
+                        - updatedAt
+                        - name
+                  pageInfo:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        minimum: 0
+                    required:
+                      - total
+                required:
+                  - results
+                  - pageInfo
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{id}:
+    delete:
+      tags:
+        - apps
+        - webhooks
+      description: Delete an app
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      responses:
+        '200':
+          description: App deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                    minLength: 1
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    patch:
+      tags:
+        - apps
+        - webhooks
+      description: Update an app
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+              required:
+                - name
+      responses:
+        '200':
+          description: App updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                    minLength: 1
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    get:
+      tags:
+        - apps
+        - webhooks
+      description: Get an app
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      responses:
+        '200':
+          description: App details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 50
+                  secret:
+                    type: string
+                    description: Masked app secret
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - secret
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{id}/secret/refresh:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Refresh an app secret
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      responses:
+        '200':
+          description: Secret refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                    description: Masked app secret
+                required:
+                  - secret
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{id}/secret/reveal:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Reveal an app secret
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      responses:
+        '200':
+          description: Secret revealed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                    minLength: 1
+                required:
+                  - secret
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{id}/webhooks:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Create a new webhook for an app
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+                events:
+                  type: array
+                  items:
+                    type: string
+                    enum: &ref_4
+                      - approval:added
+                      - approval:removed
+                      - channel:created
+                      - channel:updated
+                      - channel:hook:status:updated
+                      - channel:metadata:set
+                      - channel:transferred
+                      - comment:added
+                      - comment:hook:metadata:set
+                      - comment:deleted
+                      - comment:edited
+                      - comment:moderation:status:updated
+                      - comment:reactions:updated
+                      - test
+                  minItems: 1
+                auth:
+                  oneOf:
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - http-basic-auth
+                        headerName:
+                          type: string
+                          default: Authorization
+                        username:
+                          type: string
+                        password:
+                          type: string
+                      required:
+                        - type
+                        - username
+                        - password
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - header
+                        headerName:
+                          type: string
+                          default: Authorization
+                        headerValue:
+                          type: string
+                      required:
+                        - type
+                        - headerValue
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - no-auth
+                      required:
+                        - type
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+              required:
+                - url
+                - events
+                - auth
+                - name
+      responses:
+        '200':
+          description: Webhook created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+                  auth:
+                    oneOf:
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - http-basic-auth
+                          headerName:
+                            type: string
+                            default: Authorization
+                          username:
+                            type: string
+                          password:
+                            type: string
+                        required:
+                          - type
+                          - username
+                          - password
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - header
+                          headerName:
+                            type: string
+                            default: Authorization
+                          headerValue:
+                            type: string
+                        required:
+                          - type
+                          - headerValue
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - no-auth
+                        required:
+                          - type
+                  eventFilter:
+                    type: array
+                    items:
+                      type: string
+                      enum: *ref_4
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - url
+                  - auth
+                  - eventFilter
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    get:
+      tags:
+        - apps
+        - webhooks
+      description: Get a list of webhooks for an app
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            default: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 10
+          required: false
+          name: limit
+          in: query
+      responses:
+        '200':
+          description: Paginated list of webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        createdAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        updatedAt:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        name:
+                          type: string
+                        url:
+                          type: string
+                          format: uri
+                        auth:
+                          oneOf:
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - http-basic-auth
+                                headerName:
+                                  type: string
+                                  default: Authorization
+                                username:
+                                  type: string
+                                password:
+                                  type: string
+                              required:
+                                - type
+                                - username
+                                - password
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - header
+                                headerName:
+                                  type: string
+                                  default: Authorization
+                                headerValue:
+                                  type: string
+                              required:
+                                - type
+                                - headerValue
+                            - type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum:
+                                    - no-auth
+                              required:
+                                - type
+                        eventFilter:
+                          type: array
+                          items:
+                            type: string
+                            enum: *ref_4
+                        adminOnly:
+                          type: object
+                          properties:
+                            paused:
+                              type: boolean
+                            pausedAt:
+                              type: string
+                              description: A date string in ISO 8601 format
+                          required:
+                            - paused
+                            - pausedAt
+                      required:
+                        - id
+                        - createdAt
+                        - updatedAt
+                        - name
+                        - url
+                        - auth
+                        - eventFilter
+                  pageInfo:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        minimum: 0
+                    required:
+                      - total
+                required:
+                  - results
+                  - pageInfo
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{appId}/webhooks/{webhookId}:
+    delete:
+      tags:
+        - apps
+        - webhooks
+      description: Delete a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+      responses:
+        '200':
+          description: Webhook deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+                  auth:
+                    oneOf:
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - http-basic-auth
+                          headerName:
+                            type: string
+                            default: Authorization
+                          username:
+                            type: string
+                          password:
+                            type: string
+                        required:
+                          - type
+                          - username
+                          - password
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - header
+                          headerName:
+                            type: string
+                            default: Authorization
+                          headerValue:
+                            type: string
+                        required:
+                          - type
+                          - headerValue
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - no-auth
+                        required:
+                          - type
+                  eventFilter:
+                    type: array
+                    items:
+                      type: string
+                      enum: *ref_4
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - url
+                  - auth
+                  - eventFilter
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Webhook not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    get:
+      tags:
+        - apps
+        - webhooks
+      description: Get a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+      responses:
+        '200':
+          description: Webhook details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+                  auth:
+                    oneOf:
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - http-basic-auth
+                          headerName:
+                            type: string
+                            default: Authorization
+                          username:
+                            type: string
+                          password:
+                            type: string
+                        required:
+                          - type
+                          - username
+                          - password
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - header
+                          headerName:
+                            type: string
+                            default: Authorization
+                          headerValue:
+                            type: string
+                        required:
+                          - type
+                          - headerValue
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - no-auth
+                        required:
+                          - type
+                  eventFilter:
+                    type: array
+                    items:
+                      type: string
+                      enum: *ref_4
+                  adminOnly:
+                    type: object
+                    properties:
+                      paused:
+                        type: boolean
+                      pausedAt:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - paused
+                      - pausedAt
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - url
+                  - auth
+                  - eventFilter
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+    patch:
+      tags:
+        - apps
+        - webhooks
+      description: Update a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auth:
+                  oneOf:
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - http-basic-auth
+                        headerName:
+                          type: string
+                          default: Authorization
+                        username:
+                          type: string
+                        password:
+                          type: string
+                      required:
+                        - type
+                        - username
+                        - password
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - header
+                        headerName:
+                          type: string
+                          default: Authorization
+                        headerValue:
+                          type: string
+                      required:
+                        - type
+                        - headerValue
+                    - type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - no-auth
+                      required:
+                        - type
+                eventFilter:
+                  type: array
+                  items:
+                    type: string
+                    enum: *ref_4
+                  minItems: 1
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                url:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Webhook updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  updatedAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  name:
+                    type: string
+                  url:
+                    type: string
+                    format: uri
+                  auth:
+                    oneOf:
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - http-basic-auth
+                          headerName:
+                            type: string
+                            default: Authorization
+                          username:
+                            type: string
+                          password:
+                            type: string
+                        required:
+                          - type
+                          - username
+                          - password
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - header
+                          headerName:
+                            type: string
+                            default: Authorization
+                          headerValue:
+                            type: string
+                        required:
+                          - type
+                          - headerValue
+                      - type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - no-auth
+                        required:
+                          - type
+                  eventFilter:
+                    type: array
+                    items:
+                      type: string
+                      enum: *ref_4
+                required:
+                  - id
+                  - createdAt
+                  - updatedAt
+                  - name
+                  - url
+                  - auth
+                  - eventFilter
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{appId}/webhooks/{webhookId}/test:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Test a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+      responses:
+        '204':
+          description: Webhook test event queued successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Webhook or app not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts:
+    get:
+      tags:
+        - apps
+        - webhooks
+        - deliveries
+      description: Get a list of delivery attempts for a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: before
+          in: query
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: after
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 10
+          required: false
+          name: limit
+          in: query
+      responses:
+        '200':
+          description: Paginated list of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cursor:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                          required:
+                            - id
+                        item:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                            attemptedAt:
+                              type: string
+                              description: A date string in ISO 8601 format
+                            attemptNumber:
+                              type: number
+                            responseStatus:
+                              type: number
+                            responseMs:
+                              type: number
+                            error:
+                              type:
+                                - string
+                                - 'null'
+                            delivery:
+                              type: object
+                              properties:
+                                event:
+                                  type: object
+                                  properties:
+                                    eventType:
+                                      type: string
+                                  required:
+                                    - eventType
+                              required:
+                                - event
+                          required:
+                            - id
+                            - attemptedAt
+                            - attemptNumber
+                            - responseStatus
+                            - responseMs
+                            - error
+                            - delivery
+                      required:
+                        - cursor
+                        - item
+                  pageInfo:
+                    type: object
+                    properties:
+                      hasPreviousPage:
+                        type: boolean
+                      hasNextPage:
+                        type: boolean
+                      startCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                      endCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                    required:
+                      - hasPreviousPage
+                      - hasNextPage
+                required:
+                  - results
+                  - pageInfo
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Webhook or app not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/deliveries:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - deliveries
+      description: Get the deliveries live status
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The deliveries live status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deliveries:
+                    type: string
+                    description: A bigint string
+                required:
+                  - deliveries
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/eventual-success:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - eventual-success
+      description: Get the eventual success live status
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The eventual success live status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  eventualSuccessRate:
+                    type: number
+                  previousEventualSuccessRate:
+                    type: number
+                  delta:
+                    type: number
+                required:
+                  - eventualSuccessRate
+                  - previousEventualSuccessRate
+                  - delta
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/first-attempt-success:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - first-attempt-success
+      description: Get the first attempt success live status
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The first attempt success live status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  firstSuccessRate:
+                    type: number
+                  previousFirstSuccessRate:
+                    type: number
+                  delta:
+                    type: number
+                required:
+                  - firstSuccessRate
+                  - previousFirstSuccessRate
+                  - delta
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/e2e-latency:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - e2e-latency
+      description: >-
+        Get the p95 end to end latency of first attempt and first success since
+        event creation in ms
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: >-
+            The p95 end to end latency of first attempt and first success since
+            event creation in ms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  p95:
+                    type: object
+                    properties:
+                      firstAttempt:
+                        type: number
+                      firstSuccess:
+                        type: number
+                    required:
+                      - firstAttempt
+                      - firstSuccess
+                required:
+                  - p95
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/backlog:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - backlog
+      description: Get the backlog live status
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The backlog live status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inProgress:
+                    type: number
+                  pending:
+                    type: number
+                  processing:
+                    type: number
+                  nextDueAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  oldestAgeSec:
+                    type:
+                      - integer
+                      - 'null'
+                    minimum: 0
+                required:
+                  - inProgress
+                  - pending
+                  - processing
+                  - nextDueAt
+                  - oldestAgeSec
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/kpi/delivered-under-minute:
+    get:
+      tags:
+        - analytics
+        - kpi
+        - delivered-under-minute
+      description: Get the delivered under minute live status
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The delivered under minute live status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rate:
+                    type: number
+                required:
+                  - rate
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/volume:
+    get:
+      tags:
+        - analytics
+        - volume
+      description: Get the analytics volume of delivery attempts
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: &ref_5
+              - hour
+              - day
+              - week
+              - month
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The analytics volume of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        attempts:
+                          type: string
+                          description: A bigint string
+                        successes:
+                          type: string
+                          description: A bigint string
+                        failures:
+                          type: string
+                          description: A bigint string
+                        http4xx:
+                          type: string
+                          description: A bigint string
+                        http5xx:
+                          type: string
+                          description: A bigint string
+                        transport:
+                          type: string
+                          description: A bigint string
+                      required:
+                        - time
+                        - attempts
+                        - successes
+                        - failures
+                        - http4xx
+                        - http5xx
+                        - transport
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/terminal:
+    get:
+      tags:
+        - analytics
+        - terminal
+      description: Get the analytics terminal outcomes of deliveries
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: *ref_5
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The analytics terminal outcomes of deliveries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        deliveries:
+                          type: string
+                          description: A bigint string
+                        successes:
+                          type: string
+                          description: A bigint string
+                        failures:
+                          type: string
+                          description: A bigint string
+                      required:
+                        - time
+                        - deliveries
+                        - successes
+                        - failures
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/success-rates:
+    get:
+      tags:
+        - analytics
+        - success-rates
+      description: Get the analytics success rates of deliveries
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: *ref_5
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The analytics success rates of deliveries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        eventualSuccessRate:
+                          type: number
+                        firstSuccessRate:
+                          type: number
+                      required:
+                        - time
+                        - eventualSuccessRate
+                        - firstSuccessRate
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/e2e-latency:
+    get:
+      tags:
+        - analytics
+        - e2e-latency
+      description: >-
+        Get the analytics end to end latency from event creation to first
+        successful delivery attempt in ms
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: *ref_5
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: >-
+            The analytics end to end latency from event creation to first
+            successful delivery attempt in ms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        latencies:
+                          type: object
+                          properties:
+                            p50:
+                              type: number
+                            p90:
+                              type: number
+                            p95:
+                              type: number
+                            p99:
+                              type: number
+                          required:
+                            - p50
+                            - p90
+                            - p95
+                            - p99
+                      required:
+                        - time
+                        - latencies
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/sla-bands:
+    get:
+      tags:
+        - analytics
+        - sla-bands
+      description: Get the analytics sla bands of delivery attempts
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: *ref_5
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The analytics sla bands of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        bands:
+                          type: object
+                          properties:
+                            5s:
+                              type: number
+                            10s:
+                              type: number
+                            30s:
+                              type: number
+                            60s:
+                              type: number
+                            300s:
+                              type: number
+                            '>300s':
+                              type: number
+                          required:
+                            - 5s
+                            - 10s
+                            - 30s
+                            - 60s
+                            - 300s
+                            - '>300s'
+                      required:
+                        - time
+                        - bands
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/analytics/errors:
+    get:
+      tags:
+        - analytics
+        - errors
+      description: Get the analytics errors breakdown
+      parameters:
+        - schema:
+            type: string
+          required: false
+          name: from
+          in: query
+        - schema:
+            type:
+              - string
+              - 'null'
+          required: false
+          name: to
+          in: query
+        - schema:
+            type: string
+            enum: *ref_5
+            default: day
+          required: false
+          name: bucket
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: appId
+          in: query
+        - schema:
+            type: string
+            format: uuid
+          required: false
+          name: webhookId
+          in: query
+      responses:
+        '200':
+          description: The analytics errors breakdown
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        time:
+                          type: string
+                          description: A date string in ISO 8601 format
+                        http4xx:
+                          type: string
+                          description: A bigint string
+                        http5xx:
+                          type: string
+                          description: A bigint string
+                        timeout:
+                          type: string
+                          description: A bigint string
+                        other:
+                          type: string
+                          description: A bigint string
+                      required:
+                        - time
+                        - http4xx
+                        - http5xx
+                        - timeout
+                        - other
+                  info:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                        enum:
+                          - hour
+                          - day
+                          - week
+                          - month
+                      from:
+                        type: string
+                        description: A date string in ISO 8601 format
+                      to:
+                        type: string
+                        description: A date string in ISO 8601 format
+                    required:
+                      - bucket
+                      - from
+                      - to
+                required:
+                  - results
+                  - info
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
 webhooks: {}

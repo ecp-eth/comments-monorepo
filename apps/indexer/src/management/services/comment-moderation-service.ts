@@ -6,13 +6,13 @@ import type {
   ICommentPremoderationService,
   IModerationNotificationsService,
   TelegramCallbackQuery,
-} from "../../services/types";
+} from "../../services/types.ts";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
-import type { CommentModerationClassfierResult } from "../../services/types";
-import { CommentNotFoundError } from "../../services/errors";
+import type { CommentModerationClassfierResult } from "../../services/types.ts";
+import { CommentNotFoundError } from "../../services/errors.ts";
 
-type ModerationStatus = "pending" | "approved" | "rejected";
+export type ModerationStatus = "pending" | "approved" | "rejected";
 
 interface CommentModerationServiceOptions {
   knownReactions: Set<string>;

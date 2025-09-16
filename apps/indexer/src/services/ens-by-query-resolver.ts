@@ -1,10 +1,10 @@
 import { LRUCache } from "lru-cache";
-import { env } from "../env";
+import { env } from "../env.ts";
 import {
   createENSByQueryResolver,
   type ENSByQueryResolverKey,
   type ResolvedENSData,
-} from "../resolvers";
+} from "../resolvers/index.ts";
 
 const cacheMap = new LRUCache<
   ENSByQueryResolverKey,

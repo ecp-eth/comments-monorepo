@@ -1,12 +1,12 @@
 import { Menu } from "@grammyjs/menu";
-import { MenuId, type AdminTelegramBotServiceContext } from "../types";
-import type { CommentReportStatus } from "../../../management/types";
+import { MenuId, type AdminTelegramBotServiceContext } from "../types.ts";
+import type { CommentReportStatus } from "../../../management/types.ts";
 import {
   renderReport,
   reportCommandParser,
   reportCommandToPayload,
   reportStatusToString,
-} from "./report-helpers";
+} from "./report-helpers.ts";
 import { b, fmt } from "@grammyjs/parse-mode";
 
 export const reportMenu = new Menu<AdminTelegramBotServiceContext>(

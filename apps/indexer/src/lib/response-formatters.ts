@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
@@ -6,11 +7,14 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import type { CommentSelectType } from "ponder:schema";
-import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
-import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
+import { ensByAddressResolverService } from "../services/ens-by-address-resolver.ts";
+import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver.ts";
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
-import { env } from "../env";
-import type { ResolvedENSData, ResolvedFarcasterData } from "../resolvers";
+import { env } from "../env.ts";
+import type {
+  ResolvedENSData,
+  ResolvedFarcasterData,
+} from "../resolvers/index.ts";
 
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];
@@ -271,4 +275,18 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
       resolvedFarcasterData,
     ),
   };
+}
+
+/**
+ * This function formats the response using a zod schema.
+ * It respects the schema's input and output shape. Can be used to transform json incompatible data to json compatible data.
+ * @param schema - The zod schema to use for formatting the response.
+ * @param responseData - The data to format.
+ * @returns The formatted response.
+ */
+export function formatResponseUsingZodSchema<T extends z.ZodType>(
+  schema: T,
+  responseData: z.input<T>,
+): z.output<T> {
+  return schema.parse(responseData);
 }
