@@ -9,6 +9,8 @@ import {
   AppSecretRefreshResponseSchema,
   AppDeleteResponseSchema,
   type AppDeleteResponseSchemaType,
+  type AppSecretRevealResponseSchemaType,
+  AppSecretRevealResponseSchema,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
 import { UnauthorizedError } from "@/errors";
@@ -113,6 +115,57 @@ export function useRenameAppMutation({
       }
 
       return AppUpdateResponseSchema.parse(await appRenameResponse.json());
+    },
+    ...options,
+  });
+}
+
+type UseRevealAppSecretMutationOptions = Omit<
+  UseMutationOptions<AppSecretRevealResponseSchemaType, Error, void>,
+  "mutationFn"
+> & {
+  appId: string;
+};
+
+export function useRevealAppSecretMutation({
+  appId,
+  ...options
+}: UseRevealAppSecretMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async () => {
+      const appSecretRevealResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(createFetchUrl(`/api/apps/${appId}/secret/reveal`), {
+            method: "POST",
+            headers: {
+              ...headers,
+            },
+          });
+        },
+      );
+
+      if (appSecretRevealResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appSecretRevealResponse.status === 400) {
+        throw new Error(
+          `Failed to reveal app secret: ${appSecretRevealResponse.statusText}`,
+        );
+      }
+
+      if (!appSecretRevealResponse.ok) {
+        throw new Error(
+          `Failed to reveal app secret: ${appSecretRevealResponse.statusText}`,
+        );
+      }
+
+      return AppSecretRevealResponseSchema.parse(
+        await appSecretRevealResponse.json(),
+      );
     },
     ...options,
   });

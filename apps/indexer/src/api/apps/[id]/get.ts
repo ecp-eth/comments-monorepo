@@ -2,6 +2,7 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
+  OpenAPIMaskedAppSecretSchema,
 } from "../../../lib/schemas.ts";
 import { appManager, siweMiddleware } from "../../../services/index.ts";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
@@ -16,7 +17,7 @@ export const AppGetResponseSchema = z.object({
   createdAt: OpenAPIDateStringSchema,
   updatedAt: OpenAPIDateStringSchema,
   name: z.string().nonempty().max(50),
-  secret: z.string().nonempty(),
+  secret: OpenAPIMaskedAppSecretSchema,
 });
 
 export function setupAppGet(app: OpenAPIHono) {

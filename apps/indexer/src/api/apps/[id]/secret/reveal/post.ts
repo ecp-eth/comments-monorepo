@@ -1,40 +1,37 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { appManager, siweMiddleware } from "../../../../../services/index.ts";
-import {
-  APIErrorResponseSchema,
-  OpenAPIMaskedAppSecretSchema,
-} from "../../../../../lib/schemas.ts";
+import { APIErrorResponseSchema } from "../../../../../lib/schemas.ts";
 import {
   AppManagerAppNotFoundError,
   AppManagerFailedToRefreshAppSecretError,
 } from "../../../../../services/app-manager-service.ts";
 import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters.ts";
 
-export const AppSecretRefreshRequestParamsSchema = z.object({
+export const AppSecretRevealRequestParamsSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const AppSecretRefreshResponseSchema = z.object({
-  secret: OpenAPIMaskedAppSecretSchema,
+export const AppSecretResponseSchema = z.object({
+  secret: z.string().nonempty(),
 });
 
-export function setupAppSecretRefresh(app: OpenAPIHono) {
+export function setupAppSecretReveal(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/api/apps/{id}/secret/refresh",
+      path: "/api/apps/{id}/secret/reveal",
       tags: ["apps", "webhooks"],
-      description: "Refresh an app secret",
+      description: "Reveal an app secret",
       middleware: siweMiddleware,
       request: {
-        params: AppSecretRefreshRequestParamsSchema,
+        params: AppSecretRevealRequestParamsSchema,
       },
       responses: {
         200: {
-          description: "Secret refreshed successfully",
+          description: "Secret revealed successfully",
           content: {
             "application/json": {
-              schema: AppSecretRefreshResponseSchema,
+              schema: AppSecretResponseSchema,
             },
           },
         },
@@ -68,14 +65,14 @@ export function setupAppSecretRefresh(app: OpenAPIHono) {
       const { id } = c.req.valid("param");
 
       try {
-        const { appSigningKey } = await appManager.refreshAppSecret({
+        const { signingKey } = await appManager.getApp({
           id,
           ownerId: c.get("user").id,
         });
 
         return c.json(
-          formatResponseUsingZodSchema(AppSecretRefreshResponseSchema, {
-            secret: appSigningKey.secret,
+          formatResponseUsingZodSchema(AppSecretResponseSchema, {
+            secret: signingKey.secret,
           }),
           200,
         );

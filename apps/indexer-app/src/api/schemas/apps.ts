@@ -55,8 +55,16 @@ export type AppUpdateResponseSchemaType = z.infer<
   typeof AppUpdateResponseSchema
 >;
 
+export const AppSecretRevealResponseSchema = z.object({
+  secret: z.string().nonempty().describe("Revealed app secret"),
+});
+
+export type AppSecretRevealResponseSchemaType = z.infer<
+  typeof AppSecretRevealResponseSchema
+>;
+
 export const AppSecretRefreshResponseSchema = z.object({
-  secret: z.string().nonempty(),
+  secret: z.string().nonempty().describe("Masked app secret"),
 });
 
 export type AppSecretRefreshResponseSchemaType = z.infer<

@@ -26,6 +26,7 @@ import { setupUsersMe } from "./users/me/get";
 import { setupAppCreate } from "./apps/post";
 import { setupAppDelete } from "./apps/[id]/delete";
 import { setupAppSecretRefresh } from "./apps/[id]/secret/refresh/post";
+import { setupAppSecretReveal } from "./apps/[id]/secret/reveal/post";
 import { setupAppsGet } from "./apps/get";
 import { setupAppGet } from "./apps/[id]/get";
 import { setupAppWebhookCreate } from "./apps/[id]/webhooks/create";
@@ -77,6 +78,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppCreate(app);
   setupAppDelete(app);
   setupAppSecretRefresh(app);
+  setupAppSecretReveal(app);
   setupAppUpdate(app);
   setupAppsGet(app);
   setupAppGet(app);

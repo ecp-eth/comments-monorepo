@@ -565,3 +565,13 @@ export const OpenAPIFloatFromDbSchema = z
   .openapi({
     type: "number",
   });
+
+export const OpenAPIMaskedAppSecretSchema = z
+  .string()
+  .transform((secret) => {
+    return secret.slice(0, 4) + "......." + secret.slice(-4);
+  })
+  .openapi({
+    description: "Masked app secret",
+    type: "string",
+  });

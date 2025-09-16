@@ -17,7 +17,10 @@ import {
   RotateCwIcon,
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useRefreshAppSecretMutation } from "@/mutations/apps";
+import {
+  useRefreshAppSecretMutation,
+  useRevealAppSecretMutation,
+} from "@/mutations/apps";
 import { toast } from "sonner";
 import { createAppQueryKey } from "@/queries/query-keys";
 import {
@@ -39,6 +42,13 @@ import {
 
 export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
   const copySecret = useCopyToClipboard();
+  const revealAppSecretMutation = useRevealAppSecretMutation({
+    appId: app.id,
+    onError(error) {
+      console.error(error);
+      toast.error("Failed to reveal app secret. Please try again.");
+    },
+  });
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSecretShown, setIsSecretShown] = useState(false);
   const form = useForm({
@@ -73,9 +83,9 @@ export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
                     {...field}
                     readOnly
                     value={
-                      isSecretShown
-                        ? field.value
-                        : `${field.value.slice(0, 6)}...${field.value.slice(-6)}`
+                      isSecretShown && revealAppSecretMutation.isSuccess
+                        ? revealAppSecretMutation.data.secret
+                        : app.secret
                     }
                   />
                 </FormControl>
@@ -83,11 +93,24 @@ export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      disabled={revealAppSecretMutation.isPending}
                       type="button"
                       variant="secondary"
-                      onClick={() => setIsSecretShown(!isSecretShown)}
+                      onClick={() => {
+                        if (!isSecretShown) {
+                          if (!revealAppSecretMutation.isSuccess) {
+                            revealAppSecretMutation.mutate();
+                          }
+
+                          setIsSecretShown(true);
+                        } else {
+                          setIsSecretShown(!isSecretShown);
+                        }
+                      }}
                     >
-                      {!isSecretShown ? (
+                      {revealAppSecretMutation.isPending ? (
+                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                      ) : !isSecretShown ? (
                         <EyeIcon className="h-4 w-4" />
                       ) : (
                         <EyeOffIcon className="h-4 w-4" />
@@ -101,11 +124,24 @@ export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
+                      disabled={revealAppSecretMutation.isPending}
                       type="button"
                       variant="secondary"
-                      onClick={() => copySecret.copyToClipboard(app.secret)}
+                      onClick={() => {
+                        if (revealAppSecretMutation.isSuccess) {
+                          copySecret.copyToClipboard(
+                            revealAppSecretMutation.data.secret,
+                          );
+                        } else {
+                          revealAppSecretMutation.mutateAsync().then((data) => {
+                            copySecret.copyToClipboard(data.secret);
+                          });
+                        }
+                      }}
                     >
-                      {copySecret.isCopied === "success" ? (
+                      {revealAppSecretMutation.isPending ? (
+                        <Loader2Icon className="h-4 w-4 animate-spin" />
+                      ) : copySecret.isCopied === "success" ? (
                         <CheckIcon className="h-4 w-4" />
                       ) : (
                         <CopyIcon className="h-4 w-4" />
@@ -135,6 +171,10 @@ export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
         <AppDetailsSecretFormConfirmDialog
           app={app}
           onClose={() => setIsConfirmDialogOpen(false)}
+          onRefresh={() => {
+            revealAppSecretMutation.reset();
+            setIsSecretShown(false);
+          }}
         />
       )}
     </Form>
@@ -144,13 +184,15 @@ export function AppDetailsSecretForm({ app }: { app: AppSchemaType }) {
 function AppDetailsSecretFormConfirmDialog({
   app,
   onClose,
+  onRefresh,
 }: {
   app: AppSchemaType;
   onClose: () => void;
+  onRefresh: () => void;
 }) {
   const isMobile = useIsMobile();
   const queryClient = useQueryClient();
-  const renameAppMutation = useRefreshAppSecretMutation({
+  const refreshAppSecretMutation = useRefreshAppSecretMutation({
     appId: app.id,
     onSuccess() {
       toast.success("App secret refreshed successfully");
@@ -161,6 +203,7 @@ function AppDetailsSecretFormConfirmDialog({
       });
 
       onClose();
+      onRefresh();
     },
     onError(error) {
       console.error(error);
@@ -173,7 +216,7 @@ function AppDetailsSecretFormConfirmDialog({
       <Drawer
         open
         onOpenChange={() => {
-          if (renameAppMutation.isPending) {
+          if (refreshAppSecretMutation.isPending) {
             return;
           }
 
@@ -190,11 +233,11 @@ function AppDetailsSecretFormConfirmDialog({
 
           <DrawerFooter>
             <Button
-              disabled={renameAppMutation.isPending}
+              disabled={refreshAppSecretMutation.isPending}
               variant="destructive"
-              onClick={() => renameAppMutation.mutate()}
+              onClick={() => refreshAppSecretMutation.mutate()}
             >
-              {renameAppMutation.isPending ? (
+              {refreshAppSecretMutation.isPending ? (
                 <Loader2Icon className="h-4 w-4 animate-spin" />
               ) : (
                 "Refresh"
@@ -202,7 +245,7 @@ function AppDetailsSecretFormConfirmDialog({
             </Button>
 
             <Button
-              disabled={renameAppMutation.isPending}
+              disabled={refreshAppSecretMutation.isPending}
               variant="outline"
               onClick={() => onClose()}
             >
@@ -218,7 +261,7 @@ function AppDetailsSecretFormConfirmDialog({
     <Dialog
       open
       onOpenChange={() => {
-        if (renameAppMutation.isPending) {
+        if (refreshAppSecretMutation.isPending) {
           return;
         }
 
@@ -234,18 +277,18 @@ function AppDetailsSecretFormConfirmDialog({
         </DialogDescription>
         <DialogFooter>
           <Button
-            disabled={renameAppMutation.isPending}
+            disabled={refreshAppSecretMutation.isPending}
             variant="outline"
             onClick={() => onClose()}
           >
             Cancel
           </Button>
           <Button
-            disabled={renameAppMutation.isPending}
+            disabled={refreshAppSecretMutation.isPending}
             variant="destructive"
-            onClick={() => renameAppMutation.mutate()}
+            onClick={() => refreshAppSecretMutation.mutate()}
           >
-            {renameAppMutation.isPending ? (
+            {refreshAppSecretMutation.isPending ? (
               <Loader2Icon className="h-4 w-4 animate-spin" />
             ) : (
               "Refresh"

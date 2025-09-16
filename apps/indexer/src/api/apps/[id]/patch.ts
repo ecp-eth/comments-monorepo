@@ -23,7 +23,7 @@ export const AppUpdateResponseSchema = z.object({
   id: z.string().uuid(),
   createdAt: OpenAPIDateStringSchema,
   updatedAt: OpenAPIDateStringSchema,
-  name: z.string().nonempty().max(50),
+  name: z.string().nonempty(),
 });
 
 export function setupAppUpdate(app: OpenAPIHono) {
