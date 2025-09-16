@@ -500,5 +500,8 @@ export const eventOutbox = offchainSchema.table(
     payload: jsonb().$type<Events>().notNull(),
     payloadSize: integer().notNull().default(0),
   },
-  (table) => [index("event_outbox_by_processed_at_idx").on(table.processedAt)],
+  (table) => [
+    index("event_outbox_by_processed_at_idx").on(table.processedAt),
+    index("event_outbox_by_created_at_idx").on(table.createdAt),
+  ],
 );

@@ -1,0 +1,1 @@
+CREATE INDEX "event_outbox_by_created_at_idx" ON "ecp_indexer_schema"."event_outbox" USING btree ("created_at");
