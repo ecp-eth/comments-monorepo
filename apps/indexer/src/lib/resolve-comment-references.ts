@@ -1,16 +1,20 @@
-import type {
-  IndexerAPICommentReferencesSchemaType,
-  IndexerAPICommentReferenceENSSchemaType,
-  IndexerAPICommentReferenceERC20SchemaType,
-  IndexerAPICommentReferenceFarcasterSchemaType,
-  IndexerAPICommentReferenceSchemaType,
-  IndexerAPICommentReferenceURLFileSchemaType,
-  IndexerAPICommentReferenceURLImageSchemaType,
-  IndexerAPICommentReferenceURLVideoSchemaType,
-  IndexerAPICommentReferenceURLWebPageSchemaType,
+import {
+  type IndexerAPICommentReferencesSchemaType,
+  type IndexerAPICommentReferenceENSSchemaType,
+  type IndexerAPICommentReferenceERC20SchemaType,
+  type IndexerAPICommentReferenceFarcasterSchemaType,
+  type IndexerAPICommentReferenceSchemaType,
+  IndexerAPICommentReferenceENSSchema,
+  IndexerAPICommentReferenceFarcasterSchema,
+  IndexerAPICommentReferenceERC20Schema,
+  IndexerAPICommentReferenceURLFileSchema,
+  IndexerAPICommentReferenceURLImageSchema,
+  IndexerAPICommentReferenceURLVideoSchema,
+  IndexerAPICommentReferenceURLWebPageSchema,
 } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
 import type { Hex } from "viem";
+import z from "zod";
 import type {
   ENSByAddressResolver,
   ENSByNameResolver,
@@ -242,30 +246,34 @@ async function resolveEthAddress(
   const ensData = await ensByAddressResolver.load(address);
 
   if (ensData) {
-    return {
-      type: "ens",
-      name: ensData.name,
-      address,
-      avatarUrl: ensData.avatarUrl,
-      position,
-      url: ensData.url,
-    };
+    return (
+      IndexerAPICommentReferenceENSSchema.safeParse({
+        type: "ens",
+        name: ensData.name,
+        address,
+        avatarUrl: ensData.avatarUrl,
+        position,
+        url: ensData.url,
+      } satisfies IndexerAPICommentReferenceENSSchemaType).data ?? null
+    );
   }
 
   const farcasterData = await farcasterByAddressResolver.load(address);
 
   if (farcasterData) {
-    return {
-      type: "farcaster",
-      address,
-      displayName: farcasterData.displayName ?? null,
-      fid: farcasterData.fid,
-      fname: farcasterData.fname,
-      pfpUrl: farcasterData.pfpUrl ?? null,
-      username: farcasterData.username,
-      url: farcasterData.url,
-      position,
-    };
+    return (
+      IndexerAPICommentReferenceFarcasterSchema.safeParse({
+        type: "farcaster",
+        address,
+        displayName: farcasterData.displayName ?? null,
+        fid: farcasterData.fid,
+        fname: farcasterData.fname,
+        pfpUrl: farcasterData.pfpUrl ?? null,
+        username: farcasterData.username,
+        url: farcasterData.url,
+        position,
+      } satisfies IndexerAPICommentReferenceFarcasterSchemaType).data ?? null
+    );
   }
 
   return resolveERC20TokenEthAddress(address, undefined, position, options);
@@ -284,12 +292,14 @@ async function resolveERC20TokenEthAddress(
   const result = await erc20ByAddressResolver.load(address);
 
   if (result) {
-    return {
-      type: "erc20",
-      ...result,
-      chainId: chainId ?? null,
-      position,
-    };
+    return (
+      IndexerAPICommentReferenceERC20Schema.safeParse({
+        type: "erc20",
+        ...result,
+        chainId: chainId ?? null,
+        position,
+      } satisfies IndexerAPICommentReferenceERC20SchemaType).data ?? null
+    );
   }
 
   return null;
@@ -303,14 +313,16 @@ async function resolveEnsName(
   const result = await ensByNameResolver.load(name);
 
   if (result) {
-    return {
-      type: "ens",
-      address: result.address,
-      avatarUrl: result.avatarUrl,
-      name: result.name,
-      position,
-      url: result.url,
-    };
+    return (
+      IndexerAPICommentReferenceENSSchema.safeParse({
+        type: "ens",
+        address: result.address,
+        avatarUrl: result.avatarUrl,
+        name: result.name,
+        position,
+        url: result.url,
+      } satisfies IndexerAPICommentReferenceENSSchemaType).data ?? null
+    );
   }
 
   return null;
@@ -324,17 +336,19 @@ async function resolveFarcasterFname(
   const result = await farcasterByNameResolver.load(fname);
 
   if (result) {
-    return {
-      type: "farcaster",
-      address: result.address,
-      displayName: result.displayName ?? null,
-      fid: result.fid,
-      fname: result.fname,
-      pfpUrl: result.pfpUrl ?? null,
-      username: result.username,
-      url: result.url,
-      position,
-    };
+    return (
+      IndexerAPICommentReferenceFarcasterSchema.safeParse({
+        type: "farcaster",
+        address: result.address,
+        displayName: result.displayName ?? null,
+        fid: result.fid,
+        fname: result.fname,
+        pfpUrl: result.pfpUrl ?? null,
+        username: result.username,
+        url: result.url,
+        position,
+      } as IndexerAPICommentReferenceFarcasterSchemaType).data ?? null
+    );
   }
 
   return null;
@@ -349,40 +363,48 @@ async function resolveERC20TokenTicker(
   const result = await erc20ByTickerResolver.load([ticker, chainId]);
 
   if (result) {
-    return {
-      type: "erc20",
-      chainId,
-      symbol: result.symbol,
-      address: result.address,
-      name: result.name,
-      position,
-      logoURI: result.logoURI,
-      decimals: result.decimals,
-      chains: result.chains,
-    };
+    return (
+      IndexerAPICommentReferenceERC20Schema.safeParse({
+        type: "erc20",
+        chainId,
+        symbol: result.symbol,
+        address: result.address,
+        name: result.name,
+        position,
+        logoURI: result.logoURI,
+        decimals: result.decimals,
+        chains: result.chains,
+      } satisfies IndexerAPICommentReferenceERC20SchemaType).data ?? null
+    );
   }
 
   return null;
 }
 
+const ResolveURLResult = z.union([
+  IndexerAPICommentReferenceURLFileSchema,
+  IndexerAPICommentReferenceURLImageSchema,
+  IndexerAPICommentReferenceURLVideoSchema,
+  IndexerAPICommentReferenceURLWebPageSchema,
+  z.null(),
+]);
+
+type ResolveURLResultType = z.output<typeof ResolveURLResult>;
+
 async function resolveURL(
   url: string,
   position: ResolverPosition,
   { urlResolver }: ResolveCommentReferencesOptions,
-): Promise<
-  | IndexerAPICommentReferenceURLFileSchemaType
-  | IndexerAPICommentReferenceURLImageSchemaType
-  | IndexerAPICommentReferenceURLVideoSchemaType
-  | IndexerAPICommentReferenceURLWebPageSchemaType
-  | null
-> {
+): Promise<ResolveURLResultType> {
   const result = await urlResolver.load(url);
 
   if (result) {
-    return {
-      ...result,
-      position,
-    };
+    return (
+      ResolveURLResult.safeParse({
+        ...result,
+        position,
+      } satisfies ResolveURLResultType).data ?? null
+    );
   }
 
   return null;

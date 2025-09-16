@@ -253,12 +253,7 @@ export const IndexerAPICommentReferenceURLWebPageSchema = z.object({
     .object({
       title: z.string(),
       description: z.string().nullable(),
-      image: z.union([
-        z.string().url(),
-        z
-          .string()
-          .regex(/^\/[^\s]+$/, "Must be a valid file path starting with /"),
-      ]),
+      image: z.string().url(),
       url: z.string().url(),
     })
     .nullable(),
@@ -315,11 +310,36 @@ export type IndexerAPICommentReferenceSchemaType = z.infer<
   typeof IndexerAPICommentReferenceSchema
 >;
 
-export const IndexerAPICommentReferencesSchema = z.array(
-  IndexerAPICommentReferenceSchema,
-);
+export const IndexerAPICommentReferencesSchema = z
+  .array(
+    IndexerAPICommentReferenceSchema.or(
+      z.unknown().transform(() => {
+        return null;
+      }),
+    ),
+  )
+  .transform<IndexerAPICommentReferenceSchemaType[]>((arr) => {
+    return arr
+      .map((item) => {
+        // should just ignore any invalid reference to avoid breaking the whole comment
+        const parsed = IndexerAPICommentReferenceSchema.safeParse(item);
+        return parsed.success ? parsed.data : null;
+      })
+      .filter((x): x is IndexerAPICommentReferenceSchemaType => x !== null);
+  }) as z.ZodType<
+  z.output<typeof IndexerAPICommentReferenceSchema>[],
+  z.ZodTypeDef,
+  // overwrite the input type as zod .catch() causes input type to became `unknown`
+  // stricten the input type here will help us to catch invalid input earlier in this case and avoid
+  // unnecessary input type inferring in various places.
+  z.input<typeof IndexerAPICommentReferenceSchema>[]
+>;
 
 export type IndexerAPICommentReferencesSchemaType = z.infer<
+  typeof IndexerAPICommentReferencesSchema
+>;
+
+export type IndexerAPICommentReferencesSchemaInputType = z.input<
   typeof IndexerAPICommentReferencesSchema
 >;
 
