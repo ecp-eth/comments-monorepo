@@ -11,7 +11,7 @@ const workerCommand = new Command()
   );
 
 type WorkerCommandOptions = {
-  "wait-for-indexer": boolean;
+  waitForIndexer: boolean;
   indexerUrl: string;
 };
 

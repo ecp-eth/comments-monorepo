@@ -34,7 +34,7 @@ const eventOutboxFanOutService = new EventOutboxFanOutService({
   });
 });
 
-if (options["wait-for-indexer"]) {
+if (options.waitForIndexer) {
   console.log("Waiting for indexer to be ready...");
 
   await waitForIndexerToBeReady({

@@ -26,7 +26,7 @@ export const webhookEventDeliveryService = new WebhookEventDeliveryService({
   db,
 });
 
-if (options["wait-for-indexer"]) {
+if (options.waitForIndexer) {
   console.log("Waiting for indexer to be ready...");
 
   await waitForIndexerToBeReady({
