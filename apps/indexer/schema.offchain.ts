@@ -260,7 +260,9 @@ export const appSigningKeys = offchainSchema.table(
     secret: text().notNull(),
   },
   (table) => [
-    unique("ask_one_active_secret_uq").on(table.appId, table.revokedAt),
+    unique("ask_one_active_secret_uq")
+      .on(table.appId, table.revokedAt)
+      .nullsNotDistinct(),
   ],
 );
 

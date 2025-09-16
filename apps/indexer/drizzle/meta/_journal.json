@@ -57,6 +57,13 @@
       "when": 1758010425250,
       "tag": "0007_event_creation_date_idx",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1758011965282,
+      "tag": "0008_make_nulls_not_distinct",
+      "breakpoints": true
     }
   ]
 }
