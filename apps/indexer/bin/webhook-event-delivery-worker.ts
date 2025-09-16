@@ -1,7 +1,6 @@
 #!/usr/bin/env node --experimental-transform-types
 
 import * as Sentry from "@sentry/node";
-import "./init.ts";
 import { env } from "../src/env.ts";
 import { webhookEventDeliveryService } from "../src/services/index.ts";
 import { waitForIndexerToBeReady } from "./utils.ts";
