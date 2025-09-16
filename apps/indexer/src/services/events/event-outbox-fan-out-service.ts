@@ -42,12 +42,12 @@ export class EventOutboxFanOutService {
     }
 
     const processBatchListener = () => {
-      // if there is a deferred, resolve it
+      // if there is a deferred, resolve it (we are already waiting for new events)
       if (this.deferred) {
         this.deferred.resolve();
       } else {
-        // this will be picked by the waitForNewDeliveries method
-        // and immediately resolve the new promise
+        // this will be picked by the `waitForNewEvents()` method
+        // and immediately resolve the new promise (this happens when during the procesing we got new events)
         this.shouldProcessBatch = true;
       }
     };
@@ -59,11 +59,18 @@ export class EventOutboxFanOutService {
     // fallback to polling if there were no notifications for {this.interval} seconds
     const intervalId = setInterval(processBatchListener, this.pollInterval);
 
-    // clean up because service is aborted
-    signal.addEventListener("abort", () => {
+    /**
+     * Cleanup function to be called when the service is aborted (loop is broken on condition)
+     */
+    const cleanup = () => {
       clearInterval(intervalId);
       notificationPgClient.removeListener("notification", processBatchListener);
       notificationPgClient.release();
+      this.deferred?.resolve();
+    };
+
+    signal.addEventListener("abort", () => {
+      // if the loop is waiting for new events, resolve the deferred so the abort signal is picked up
       this.deferred?.resolve();
     });
 
@@ -74,7 +81,7 @@ export class EventOutboxFanOutService {
       const { rows } = await this.db.transaction(async (tx) => {
         return tx.execute(sql`
           WITH
-            -- 1) Claim a batch of events to be fan out
+            -- 1) Claim a batch of events to be fanned out
             claimed_events AS (
               SELECT * FROM ${schema.eventOutbox}
               WHERE ${schema.eventOutbox.processedAt} IS NULL
@@ -128,6 +135,8 @@ export class EventOutboxFanOutService {
         this.shouldProcessBatch = false;
       }
     }
+
+    cleanup();
   }
 
   private async waitForNewEvents(): Promise<void> {
