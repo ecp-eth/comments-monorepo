@@ -8,23 +8,7 @@ import { db, siweMiddleware } from "../../../services";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../schema";
-
-export const AnalyticsSuccessRatesGetQueryParamsSchema = z
-  .object({
-    from: z.coerce.date().min(new Date("2025-01-01")).optional(),
-    to: z.coerce.date().optional(),
-    bucket: z.enum(["hour", "day", "week", "month"]).default("day"),
-    appId: z.string().uuid().optional(),
-    webhookId: z.string().uuid().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.from && data.to && data.from >= data.to) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "From date must be before to date",
-      });
-    }
-  });
+import { AnalyticsQueryParamsSchema } from "../schemas";
 
 export const AnalyticsSuccessRatesGetResponseSchema = z.object({
   results: z.array(
@@ -50,7 +34,7 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
       description: "Get the analytics success rates of deliveries",
       middleware: siweMiddleware,
       request: {
-        query: AnalyticsSuccessRatesGetQueryParamsSchema,
+        query: AnalyticsQueryParamsSchema,
       },
       responses: {
         200: {
@@ -88,16 +72,14 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to, bucket, appId, webhookId } = c.req.valid("query");
-      const toToUse = to ?? new Date();
-      const fromToUse =
-        from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
+      const { from, to, bucket, appId, webhookId, originForBucket } =
+        c.req.valid("query");
       const bucketToUse = `1 ${bucket}`;
 
       const filters: SQL[] = [
         sql`a.owner_id = ${c.get("user").id}`,
-        sql`a.attempted_at >= ${fromToUse}::timestamptz`,
-        sql`a.attempted_at < ${toToUse}::timestamptz`,
+        sql`a.attempted_at >= ${from}::timestamptz`,
+        sql`a.attempted_at < ${to}::timestamptz`,
       ];
 
       if (appId) {
@@ -127,7 +109,7 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
           ),
           by_bucket AS (
             SELECT 
-              date_bin(${bucketToUse}::interval, pd.first_attempt_at, '1970-01-01'::timestamptz) AS bucket,
+              date_bin(${bucketToUse}::interval, pd.first_attempt_at, ${originForBucket}::timestamptz) AS bucket,
               AVG(pd.eventually_delivered::int) AS event_success_rate,
               AVG(CASE WHEN pd.first_success_attempt = 1 THEN 1 ELSE 0 END) AS first_success_rate
             FROM per_delivery pd
@@ -136,8 +118,8 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
           series AS (
             SELECT g::timestamptz AS bucket
             FROM generate_series(
-              date_bin(${bucketToUse}::interval, ${fromToUse}::timestamptz, '1970-01-01'::timestamptz),
-              date_bin(${bucketToUse}::interval, ${toToUse}::timestamptz,   '1970-01-01'::timestamptz),
+              date_bin(${bucketToUse}::interval, ${from}::timestamptz, ${originForBucket}::timestamptz),
+              date_bin(${bucketToUse}::interval, ${to}::timestamptz,   ${originForBucket}::timestamptz),
               ${bucketToUse}::interval
             ) g
           )
@@ -156,8 +138,8 @@ export function setupAnalyticsSuccessRatesGet(app: OpenAPIHono) {
           results: rows,
           info: {
             bucket,
-            from: fromToUse,
-            to: toToUse,
+            from,
+            to,
           },
         }),
         200,

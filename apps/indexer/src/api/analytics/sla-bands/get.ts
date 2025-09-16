@@ -8,23 +8,7 @@ import { db, siweMiddleware } from "../../../services";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../schema";
-
-export const AnalyticsSlaBandsGetQueryParamsSchema = z
-  .object({
-    from: z.coerce.date().min(new Date("2025-01-01")).optional(),
-    to: z.coerce.date().optional(),
-    bucket: z.enum(["hour", "day", "week", "month"]).default("day"),
-    appId: z.string().uuid().optional(),
-    webhookId: z.string().uuid().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (data.from && data.to && data.from >= data.to) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "From date must be before to date",
-      });
-    }
-  });
+import { AnalyticsQueryParamsSchema } from "../schemas";
 
 export const AnalyticsSlaBandsGetResponseSchema = z.object({
   results: z.array(
@@ -56,7 +40,7 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
       description: "Get the analytics sla bands of delivery attempts",
       middleware: siweMiddleware,
       request: {
-        query: AnalyticsSlaBandsGetQueryParamsSchema,
+        query: AnalyticsQueryParamsSchema,
       },
       responses: {
         200: {
@@ -94,16 +78,14 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { from, to, bucket, appId, webhookId } = c.req.valid("query");
-      const toToUse = to ?? new Date();
-      const fromToUse =
-        from ?? new Date(toToUse.getTime() - 1000 * 60 * 60 * 24 * 7);
+      const { from, to, bucket, appId, webhookId, originForBucket } =
+        c.req.valid("query");
       const bucketToUse = `1 ${bucket}`;
 
       const filters: SQL[] = [
         sql`a.owner_id = ${c.get("user").id}`,
-        sql`e.created_at >= ${fromToUse}::timestamptz`,
-        sql`e.created_at < ${toToUse}::timestamptz`,
+        sql`e.created_at >= ${from}::timestamptz`,
+        sql`e.created_at < ${to}::timestamptz`,
       ];
 
       if (appId) {
@@ -137,7 +119,7 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
           ),
           by_bucket AS (
             SELECT
-              date_bin(${bucketToUse}::interval, sa.created_at, '1970-01-01'::timestamptz) AS bucket,
+              date_bin(${bucketToUse}::interval, sa.created_at, ${originForBucket}::timestamptz) AS bucket,
               COUNT(*) as total,
               COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '5 seconds') AS "5s",
               COUNT(*) FILTER (WHERE sa.success_at IS NOT NULL AND sa.success_at - sa.created_at <= INTERVAL '10 seconds') AS "10s",
@@ -151,8 +133,8 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
           series AS (
             SELECT g::timestamptz AS bucket
             FROM generate_series(
-              date_bin(${bucketToUse}::interval, ${fromToUse}::timestamptz, '1970-01-01'::timestamptz),
-              date_bin(${bucketToUse}::interval, ${toToUse}::timestamptz,   '1970-01-01'::timestamptz),
+              date_bin(${bucketToUse}::interval, ${from}::timestamptz, ${originForBucket}::timestamptz),
+              date_bin(${bucketToUse}::interval, ${to}::timestamptz,   ${originForBucket}::timestamptz),
               ${bucketToUse}::interval
             ) g
           )
@@ -178,8 +160,8 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
           })),
           info: {
             bucket,
-            from: fromToUse,
-            to: toToUse,
+            from,
+            to,
           },
         }),
         200,
