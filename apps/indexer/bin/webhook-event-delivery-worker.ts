@@ -2,8 +2,9 @@
 
 import * as Sentry from "@sentry/node";
 import { env } from "../src/env.ts";
-import { webhookEventDeliveryService } from "../src/services/index.ts";
+import { db } from "../src/services/db.ts";
 import { waitForIndexerToBeReady } from "./utils.ts";
+import { WebhookEventDeliveryService } from "../src/services/events/webhook-event-delivery-service.ts";
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
@@ -14,6 +15,10 @@ Sentry.init({
 
 console.log("Starting webhook event delivery worker");
 const abortController = new AbortController();
+
+export const webhookEventDeliveryService = new WebhookEventDeliveryService({
+  db,
+});
 
 if (process.env.WAIT_FOR_INDEXER_TO_BE_READY === "true") {
   console.log("Waiting for indexer to be ready...");

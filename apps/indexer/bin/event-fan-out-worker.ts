@@ -2,7 +2,8 @@
 
 import * as Sentry from "@sentry/node";
 import { env } from "../src/env.ts";
-import { eventOutboxFanOutService } from "../src/services/index.ts";
+import { db } from "../src/services/db.ts";
+import { EventOutboxFanOutService } from "../src/services/events/event-outbox-fan-out-service.ts";
 import { waitForIndexerToBeReady } from "./utils.ts";
 
 Sentry.init({
@@ -14,6 +15,10 @@ Sentry.init({
 
 console.log("Starting fan out worker");
 const abortController = new AbortController();
+
+const eventOutboxFanOutService = new EventOutboxFanOutService({
+  db,
+});
 
 // graceful shutdown
 (["SIGINT", "SIGTERM", "SIGHUP"] as NodeJS.Signals[]).forEach((signal) => {
