@@ -10,7 +10,9 @@ export async function waitForIndexerToBeReady(params: {
     }
 
     try {
-      const response = await fetch(new URL("/ready", indexerUrl));
+      const response = await fetch(new URL("/ready", indexerUrl), {
+        signal,
+      });
 
       if (response.status === 200) {
         return;
