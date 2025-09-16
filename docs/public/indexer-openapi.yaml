@@ -9047,10 +9047,9 @@ paths:
                   name:
                     type: string
                     minLength: 1
-                    maxLength: 50
                   secret:
                     type: string
-                    minLength: 1
+                    description: Masked app secret
                 required:
                   - id
                   - createdAt
@@ -9139,7 +9138,6 @@ paths:
                         name:
                           type: string
                           minLength: 1
-                          maxLength: 50
                       required:
                         - id
                         - createdAt
@@ -9225,7 +9223,6 @@ paths:
                   name:
                     type: string
                     minLength: 1
-                    maxLength: 50
                 required:
                   - id
                   - createdAt
@@ -9312,7 +9309,6 @@ paths:
                   name:
                     type: string
                     minLength: 1
-                    maxLength: 50
                 required:
                   - id
                   - createdAt
@@ -9389,7 +9385,7 @@ paths:
                     maxLength: 50
                   secret:
                     type: string
-                    minLength: 1
+                    description: Masked app secret
                 required:
                   - id
                   - createdAt
@@ -9448,6 +9444,68 @@ paths:
       responses:
         '200':
           description: Secret refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+                    description: Masked app secret
+                required:
+                  - secret
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: App not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{id}/secret/reveal:
+    post:
+      tags:
+        - apps
+        - webhooks
+      description: Reveal an app secret
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: id
+          in: path
+      responses:
+        '200':
+          description: Secret revealed successfully
           content:
             application/json:
               schema:
@@ -11178,7 +11236,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
+            enum: &ref_5
               - hour
               - day
               - week
@@ -11321,11 +11379,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
-              - hour
-              - day
-              - week
-              - month
+            enum: *ref_5
             default: day
           required: false
           name: bucket
@@ -11452,11 +11506,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
-              - hour
-              - day
-              - week
-              - month
+            enum: *ref_5
             default: day
           required: false
           name: bucket
@@ -11579,11 +11629,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
-              - hour
-              - day
-              - week
-              - month
+            enum: *ref_5
             default: day
           required: false
           name: bucket
@@ -11717,11 +11763,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
-              - hour
-              - day
-              - week
-              - month
+            enum: *ref_5
             default: day
           required: false
           name: bucket
@@ -11859,11 +11901,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum:
-              - hour
-              - day
-              - week
-              - month
+            enum: *ref_5
             default: day
           required: false
           name: bucket
