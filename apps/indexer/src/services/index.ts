@@ -27,7 +27,7 @@ import config from "../../ponder.config.ts";
 import { createSiweMiddleware } from "../middleware/siwe.ts";
 import { AppManager } from "./app-manager-service.ts";
 import { AppWebhookManager } from "./app-webhook-manager-service.ts";
-import { EventOutboxService } from "./event-outbox-service.ts";
+import { EventOutboxService } from "./events/event-outbox-service.ts";
 
 export { db };
 

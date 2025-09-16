@@ -16,7 +16,7 @@ import {
   CommentNotFoundError,
 } from "./errors.ts";
 import { createCommentModerationStatusUpdatedEvent } from "../events/comment/index.ts";
-import type { EventOutboxService } from "./event-outbox-service.ts";
+import type { EventOutboxService } from "./events/event-outbox-service.ts";
 
 type PremoderationServiceOptions = {
   classificationThreshold: number;

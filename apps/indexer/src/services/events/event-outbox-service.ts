@@ -1,8 +1,8 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { PgQueryResultHKT, PgTransaction } from "drizzle-orm/pg-core";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { schema } from "../../schema.ts";
-import type { EventOutboxAggregateType, Events } from "../events/types.ts";
+import { schema } from "../../../schema.ts";
+import type { EventOutboxAggregateType, Events } from "../../events/types.ts";
 
 type EventOutboxServiceOptions = {
   db: NodePgDatabase<typeof schema>;
