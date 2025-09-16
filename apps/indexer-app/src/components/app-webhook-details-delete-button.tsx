@@ -179,7 +179,9 @@ export function AppWebhookDetailsDeleteButton({
           })}
         >
           <DialogTrigger asChild>
-            <Button variant="destructive">Delete Webhook</Button>
+            <Button variant="destructive" type="button">
+              Delete Webhook
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
