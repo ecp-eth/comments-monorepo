@@ -53,6 +53,10 @@ function resolveAuthor(author: Hex): Promise<string | Hex> {
   });
 }
 
+export const eventOutboxService = new EventOutboxService({
+  db,
+});
+
 export const telegramNotificationsService = new TelegramNotificationsService(
   env.MODERATION_TELEGRAM_BOT_TOKEN &&
   env.MODERATION_TELEGRAM_CHANNEL_ID &&
@@ -107,6 +111,7 @@ export const premoderationService = env.MODERATION_ENABLED
       classificationThreshold:
         env.MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD,
       db,
+      eventOutboxService,
     })
   : new NoopPremoderationService();
 
@@ -175,10 +180,6 @@ export const appManager = new AppManager({
 });
 
 export const appWebhookManager = new AppWebhookManager({
-  db,
-});
-
-export const eventOutboxService = new EventOutboxService({
   db,
 });
 
