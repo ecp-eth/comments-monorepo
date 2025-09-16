@@ -399,7 +399,7 @@ export function CreateWebhookDialogButton({
         <Form {...form}>
           <form id={formID} onSubmit={handleSubmit} className={formClassName}>
             <DrawerTrigger asChild>
-              <Button className={className}>
+              <Button className={className} type="button">
                 <PlusIcon /> Create webhook
               </Button>
             </DrawerTrigger>
