@@ -74,11 +74,11 @@ export class WebhookEventDeliveryService {
     }
 
     const processBatchListener = () => {
-      // if there is a deferred, resolve it
+      // if there is a deferred, resolve it (we are already waiting for new deliveries)
       if (this.deferred) {
         this.deferred.resolve();
       } else {
-        // this will be picked by the waitForNewDeliveries method
+        // this will be picked by the `waitForNewDeliveries()` method
         // and immediately resolve the new promise
         this.shouldProcessBatch = true;
       }
@@ -91,11 +91,18 @@ export class WebhookEventDeliveryService {
     // fallback to polling if there were no notifications for {this.interval} seconds
     const intervalId = setInterval(processBatchListener, this.pollInterval);
 
-    // clean up because service is aborted
-    signal.addEventListener("abort", () => {
+    /**
+     * Cleanup function to be called when the service is aborted (loop is broken on condition)
+     */
+    const cleanup = () => {
       clearInterval(intervalId);
       notificationPgClient.removeListener("notification", processBatchListener);
       notificationPgClient.release();
+      this.deferred?.resolve();
+    };
+
+    // if the loop is waiting for new deliveries, resolve the deferred so the abort signal is picked up
+    signal.addEventListener("abort", () => {
       this.deferred?.resolve();
     });
 
@@ -172,6 +179,8 @@ export class WebhookEventDeliveryService {
       // we could use all settled here but we prefer to fail if there is some unhandled error
       await Promise.all(rows.map((row) => this.deliver(row.id)));
     }
+
+    cleanup();
   }
 
   private async deliver(deliveryId: bigint): Promise<void> {
