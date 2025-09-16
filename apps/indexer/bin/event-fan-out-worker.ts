@@ -1,5 +1,8 @@
 #!/usr/bin/env node --experimental-transform-types
 
+/**
+ * This script is used to fan out events from the event outbox to all webhooks that are subscribed to the event.
+ */
 import * as Sentry from "@sentry/node";
 import { env } from "../src/env.ts";
 import { db } from "../src/services/db.ts";

@@ -1,5 +1,8 @@
 #!/usr/bin/env node --experimental-transform-types
 
+/**
+ * This script is used to deliver events to webhooks that are subscribed to the event.
+ */
 import * as Sentry from "@sentry/node";
 import { env } from "../src/env.ts";
 import { db } from "../src/services/db.ts";

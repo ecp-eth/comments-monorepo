@@ -1,5 +1,12 @@
 #!/usr/bin/env node --experimental-transform-types
 
+/**
+ * This supervisor script is used to start the indexer and its workers.
+ *
+ * It runs the indexer and its workers and if any of them crash it will kill all of them so railway can restart the whole service.
+ *
+ * It is just simple replacement for pm2 which is an overkill for this scenario.
+ */
 import { type ChildProcess, spawn } from "node:child_process";
 import { type Readable } from "node:stream";
 import readline from "node:readline";
