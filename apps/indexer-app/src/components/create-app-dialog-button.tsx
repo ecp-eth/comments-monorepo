@@ -1,5 +1,5 @@
 "use client";
-import { PlusIcon } from "lucide-react";
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodError } from "zod";
 import { useForm } from "react-hook-form";
@@ -114,7 +114,7 @@ export function CreateAppDialogButton({
             className={formClassName}
           >
             <DrawerTrigger asChild>
-              <Button className={className}>
+              <Button className={className} type="button">
                 <PlusIcon /> Create app
               </Button>
             </DrawerTrigger>
@@ -142,8 +142,16 @@ export function CreateAppDialogButton({
                 />
               </div>
               <DrawerFooter>
-                <Button type="submit" form="create-app-dialog-form">
-                  Create
+                <Button
+                  type="submit"
+                  form="create-app-dialog-form"
+                  disabled={createAppMutation.isPending}
+                >
+                  {createAppMutation.isPending ? (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
                 </Button>
               </DrawerFooter>
             </DrawerContent>
@@ -167,7 +175,7 @@ export function CreateAppDialogButton({
           className={formClassName}
         >
           <DialogTrigger asChild>
-            <Button className={className}>
+            <Button className={className} type="button">
               <PlusIcon /> Create app
             </Button>
           </DialogTrigger>
@@ -195,8 +203,16 @@ export function CreateAppDialogButton({
               />
             </div>
             <DialogFooter>
-              <Button type="submit" form="create-app-dialog-form">
-                Create
+              <Button
+                type="submit"
+                form="create-app-dialog-form"
+                disabled={createAppMutation.isPending}
+              >
+                {createAppMutation.isPending ? (
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Create"
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
