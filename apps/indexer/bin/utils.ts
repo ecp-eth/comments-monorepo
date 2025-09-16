@@ -1,5 +1,8 @@
-export async function waitForIndexerToBeReady(params: { signal: AbortSignal }) {
-  const { signal } = params;
+export async function waitForIndexerToBeReady(params: {
+  signal: AbortSignal;
+  indexerUrl: string;
+}) {
+  const { signal, indexerUrl } = params;
 
   while (true) {
     if (signal.aborted) {
@@ -7,7 +10,7 @@ export async function waitForIndexerToBeReady(params: { signal: AbortSignal }) {
     }
 
     try {
-      const response = await fetch("http://localhost:42069/ready");
+      const response = await fetch(new URL("/ready", indexerUrl));
 
       if (response.status === 200) {
         return;

@@ -1,4 +1,4 @@
-#!/usr/bin/env node --experimental-transform-types
+#!/usr/bin/env -S node --experimental-transform-types
 
 /**
  * This script is used to deliver events to webhooks that are subscribed to the event.
@@ -8,6 +8,9 @@ import { env } from "../src/env.ts";
 import { db } from "../src/services/db.ts";
 import { waitForIndexerToBeReady } from "./utils.ts";
 import { WebhookEventDeliveryService } from "../src/services/events/webhook-event-delivery-service.ts";
+import { parseWorkerCommandOptions } from "./shared.ts";
+
+const options = parseWorkerCommandOptions();
 
 Sentry.init({
   enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
@@ -23,10 +26,13 @@ export const webhookEventDeliveryService = new WebhookEventDeliveryService({
   db,
 });
 
-if (process.env.WAIT_FOR_INDEXER_TO_BE_READY === "true") {
+if (options["wait-for-indexer"]) {
   console.log("Waiting for indexer to be ready...");
 
-  await waitForIndexerToBeReady({ signal: abortController.signal });
+  await waitForIndexerToBeReady({
+    signal: abortController.signal,
+    indexerUrl: options.indexerUrl,
+  });
 
   console.log("Indexer is ready");
 }
