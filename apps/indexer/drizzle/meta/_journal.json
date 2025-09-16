@@ -64,6 +64,13 @@
       "when": 1758011965282,
       "tag": "0008_make_nulls_not_distinct",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1758013113791,
+      "tag": "0009_missing_indexes",
+      "breakpoints": true
     }
   ]
 }

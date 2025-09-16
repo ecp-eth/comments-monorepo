@@ -163,24 +163,31 @@ export const userAuthCredentialsRelations = relations(
   }),
 );
 
-export const userAuthSession = offchainSchema.table("user_auth_session", {
-  id: uuid().primaryKey().defaultRandom(),
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  userId: uuid()
-    .notNull()
-    .references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  userAuthCredentialsId: uuid()
-    .notNull()
-    .references(() => userAuthCredentials.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-});
+export const userAuthSession = offchainSchema.table(
+  "user_auth_session",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    userAuthCredentialsId: uuid()
+      .notNull()
+      .references(() => userAuthCredentials.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => [
+    index("uass_by_user_id_idx").on(table.userId),
+    index("uass_by_last_used_idx").on(table.lastUsedAt),
+  ],
+);
 
 export const userAuthSessionRelations = relations(
   userAuthSession,
@@ -209,6 +216,7 @@ export const userAuthSessionSiweRefreshToken = offchainSchema.table(
         onUpdate: "cascade",
       }),
   },
+  (table) => [index("uassrt_by_expires_at_idx").on(table.expiresAt)],
 );
 
 export const userAuthSessionSiweRefreshTokenRelations = relations(
@@ -221,18 +229,22 @@ export const userAuthSessionSiweRefreshTokenRelations = relations(
   }),
 );
 
-export const app = offchainSchema.table("app", {
-  id: uuid().primaryKey().defaultRandom(),
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  ownerId: uuid()
-    .notNull()
-    .references(() => user.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  name: text().notNull(),
-});
+export const app = offchainSchema.table(
+  "app",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    ownerId: uuid()
+      .notNull()
+      .references(() => user.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    name: text().notNull(),
+  },
+  (table) => [index("app_by_owner_id_idx").on(table.ownerId)],
+);
 
 export type AppSelectType = typeof app.$inferSelect;
 
