@@ -99,20 +99,12 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
           attempts AS (
             SELECT
               a.app_webhook_delivery_id,
-              a.event_id,
-              a.attempted_at,
-              (a.response_status BETWEEN 200 AND 399) AS is_success
+              e.created_at,
+              MIN(a.attempted_at) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS success_at
             FROM ${schema.appWebhookDeliveryAttempt} a
+            JOIN ${schema.eventOutbox} e ON e.id = a.event_id
             WHERE 
               ${sql.join(filters, sql` AND `)}
-          ),
-          success_time AS (
-            SELECT
-              a.app_webhook_delivery_id,
-              e.created_at,
-              MIN(a.attempted_at) FILTER (WHERE a.is_success) AS success_at
-            FROM attempts a
-            JOIN ${schema.eventOutbox} e ON e.id = a.event_id
             GROUP BY 1, 2
           )
 
@@ -124,7 +116,7 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
                 NULLIF(COUNT(*), 0)
               ), 0
             ) as "rate"
-          FROM success_time
+          FROM attempts
       `);
 
       if (!rows[0]) {
