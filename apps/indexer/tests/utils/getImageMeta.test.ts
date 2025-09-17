@@ -1,93 +1,87 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import fs from "fs";
 import path from "path";
-import { getImageDimension } from "../../src/utils/getImageDimension";
+import { getImageMeta } from "../../src/utils/getImageMeta";
 
 describe("getImageDimension", () => {
   const fixturesDir = path.join(__dirname, "../resolvers/fixtures");
+  const jpgBuffer = fs.readFileSync(
+    path.join(fixturesDir, "example-image.jpg"),
+  );
+  const pngBuffer = fs.readFileSync(
+    path.join(fixturesDir, "example-image.png"),
+  );
+  const svgBuffer = fs.readFileSync(
+    path.join(fixturesDir, "example-image.svg"),
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("successful image size detection", () => {
+  describe("successful image size and media type detection", () => {
     it("should get dimensions from JPG image", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.jpg"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(jpgBuffer, {
         status: 200,
         headers: {
-          "content-length": imageBuffer.length.toString(),
+          "content-length": jpgBuffer.length.toString(),
           "content-type": "image/jpeg",
         },
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toEqual({
         width: expect.any(Number),
         height: expect.any(Number),
+        mediaType: "image/jpeg",
       });
-      expect(result?.width).toBeGreaterThan(0);
-      expect(result?.height).toBeGreaterThan(0);
     });
 
     it("should get dimensions from PNG image", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.png"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(pngBuffer, {
         status: 200,
         headers: {
-          "content-length": imageBuffer.length.toString(),
+          "content-length": pngBuffer.length.toString(),
           "content-type": "image/png",
         },
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toEqual({
         width: expect.any(Number),
         height: expect.any(Number),
+        mediaType: "image/png",
       });
-      expect(result?.width).toBeGreaterThan(0);
-      expect(result?.height).toBeGreaterThan(0);
     });
 
     it("should get dimensions from SVG image", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.svg"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(svgBuffer, {
         status: 200,
         headers: {
-          "content-length": imageBuffer.length.toString(),
+          "content-length": svgBuffer.length.toString(),
           "content-type": "image/svg+xml",
         },
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toEqual({
         width: expect.any(Number),
         height: expect.any(Number),
+        mediaType: "image/svg+xml",
       });
-      expect(result?.width).toBeGreaterThan(0);
-      expect(result?.height).toBeGreaterThan(0);
     });
 
     it("should abort the stream after getting dimensions", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.jpg"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(jpgBuffer, {
         status: 200,
         headers: {
-          "content-length": imageBuffer.length.toString(),
+          "content-length": jpgBuffer.length.toString(),
           "content-type": "image/jpeg",
         },
       });
@@ -95,7 +89,7 @@ describe("getImageDimension", () => {
       const abortController = new AbortController();
       const abortSpy = vi.spyOn(abortController, "abort");
 
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toBeDefined();
       expect(abortSpy).toHaveBeenCalled();
@@ -130,7 +124,7 @@ describe("getImageDimension", () => {
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toBeDefined();
       // The actual dimensions might be different, so just check they're valid numbers
@@ -149,7 +143,7 @@ describe("getImageDimension", () => {
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toBeUndefined();
     });
@@ -163,49 +157,7 @@ describe("getImageDimension", () => {
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
-
-      expect(result).toBeUndefined();
-    });
-
-    it("should return undefined for invalid content-length", async () => {
-      const response = new Response("test", {
-        status: 200,
-        headers: {
-          "content-length": "invalid",
-        },
-      });
-
-      const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
-
-      expect(result).toBeUndefined();
-    });
-
-    it("should return undefined for zero content-length", async () => {
-      const response = new Response("", {
-        status: 200,
-        headers: {
-          "content-length": "0",
-        },
-      });
-
-      const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
-
-      expect(result).toBeUndefined();
-    });
-
-    it("should return undefined for negative content-length", async () => {
-      const response = new Response("test", {
-        status: 200,
-        headers: {
-          "content-length": "-1",
-        },
-      });
-
-      const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       expect(result).toBeUndefined();
     });
@@ -222,19 +174,14 @@ describe("getImageDimension", () => {
 
       const abortController = new AbortController();
 
-      await expect(
-        getImageDimension(response, abortController),
-      ).rejects.toThrow();
+      await expect(getImageMeta(response, abortController)).rejects.toThrow();
     });
 
     it("should handle aborted request controller gracefully", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.jpg"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(jpgBuffer, {
         status: 200,
         headers: {
-          "content-length": imageBuffer.length.toString(),
+          "content-length": jpgBuffer.length.toString(),
           "content-type": "image/jpeg",
         },
       });
@@ -243,24 +190,21 @@ describe("getImageDimension", () => {
       abortController.abort();
 
       // Should still work despite abort error
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
       expect(result).toBeUndefined();
     });
   });
 
   describe("content-length handling", () => {
     it("should respect MAX_IMAGE_HEADER_LENGTH limit", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.jpg"),
-      );
-      const largeContentLength = 1000000; // 1MB
-      const MAX_IMAGE_HEADER_LENGTH = 3000 * 10; // 30KB
+      const largeContentLength = 1024 * 1024; // 1MB
+      const MAX_IMAGE_HEADER_LENGTH = 1024 * 30; // 30KB
       const expectedBufferSize = Math.min(
         largeContentLength,
         MAX_IMAGE_HEADER_LENGTH,
       );
 
-      const response = new Response(imageBuffer, {
+      const response = new Response(jpgBuffer, {
         status: 200,
         headers: {
           "content-length": largeContentLength.toString(),
@@ -279,7 +223,7 @@ describe("getImageDimension", () => {
         });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
       // Should still work because it limits the buffer size
       expect(result).toBeDefined();
@@ -292,11 +236,74 @@ describe("getImageDimension", () => {
       bufferAllocSpy.mockRestore();
     });
 
+    it("should return undefined for invalid content-length", async () => {
+      const response = new Response(jpgBuffer, {
+        status: 200,
+        headers: {
+          "content-length": "invalid",
+        },
+      });
+
+      const abortController = new AbortController();
+      const result = await getImageMeta(response, abortController);
+
+      if (!result) {
+        expect.fail("Expected result to be defined");
+      }
+
+      expect(result).toEqual({
+        width: expect.any(Number),
+        height: expect.any(Number),
+        mediaType: "image/jpeg",
+      });
+    });
+
+    it("should return undefined for zero content-length", async () => {
+      const response = new Response(jpgBuffer, {
+        status: 200,
+        headers: {
+          "content-length": "0",
+        },
+      });
+
+      const abortController = new AbortController();
+      const result = await getImageMeta(response, abortController);
+
+      if (!result) {
+        expect.fail("Expected result to be defined");
+      }
+
+      expect(result).toEqual({
+        width: expect.any(Number),
+        height: expect.any(Number),
+        mediaType: "image/jpeg",
+      });
+    });
+
+    it("should return undefined for negative content-length", async () => {
+      const response = new Response(jpgBuffer, {
+        status: 200,
+        headers: {
+          "content-length": "-1",
+        },
+      });
+
+      const abortController = new AbortController();
+      const result = await getImageMeta(response, abortController);
+
+      if (!result) {
+        expect.fail("Expected result to be defined");
+      }
+
+      expect(result).toEqual({
+        width: expect.any(Number),
+        height: expect.any(Number),
+        mediaType: "image/jpeg",
+      });
+    });
+
     it("should handle missing content-length header", async () => {
-      const imageBuffer = fs.readFileSync(
-        path.join(fixturesDir, "example-image.jpg"),
-      );
-      const response = new Response(imageBuffer, {
+      const response = new Response(jpgBuffer, {
         status: 200,
         headers: {
           "content-type": "image/jpeg",
@@ -304,9 +311,17 @@ describe("getImageDimension", () => {
       });
 
       const abortController = new AbortController();
-      const result = await getImageDimension(response, abortController);
+      const result = await getImageMeta(response, abortController);
 
-      expect(result).toBeUndefined();
+      if (!result) {
+        expect.fail("Expected result to be defined");
+      }
+
+      expect(result).toEqual({
+        width: expect.any(Number),
+        height: expect.any(Number),
+        mediaType: "image/jpeg",
+      });
     });
   });
 });

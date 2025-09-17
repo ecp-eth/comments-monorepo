@@ -7,7 +7,7 @@ import type {
 import DataLoader from "dataloader";
 import { parse as parseHTML } from "node-html-parser";
 import z from "zod";
-import { getImageDimension } from "../utils/getImageDimension.ts";
+import { getImageMeta } from "../utils/getImageMeta.ts";
 
 export type ResolvedURL =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
@@ -56,14 +56,21 @@ async function resolveURL(
   }
 
   if (contentType.startsWith("image/")) {
-    const dimension = await getImageDimension(response, abortController).catch(
+    const meta = await getImageMeta(response, abortController).catch(
       () => undefined,
     );
     return {
       type: "image",
-      mediaType: contentType,
+      mediaType: meta?.mediaType ?? contentType,
       url: finalUrl,
-      dimension,
+      ...(meta
+        ? {
+            dimension: {
+              width: meta.width,
+              height: meta.height,
+            },
+          }
+        : undefined),
     };
   }
 
