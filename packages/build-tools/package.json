@@ -10,7 +10,8 @@
     "generate-readme-as-index-mdx": "./bin/generate-readme-as-index-mdx.sh",
     "replace-workspace-version": "./bin/replace-workspace-version.js",
     "merge-json": "./bin/merge-json.js",
-    "backup-nuke-restore": "./bin/backup-nuke-restore.sh"
+    "backup-nuke-restore": "./bin/backup-nuke-restore.sh",
+    "foundry": "./bin/foundry.sh"
   },
   "scripts": {
     "proxy-package": "tsx ./src/proxy-package.ts"
