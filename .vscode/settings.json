@@ -38,6 +38,8 @@
     "packages/react-editor/hooks": true,
     "packages/react-editor/parser": true,
     "packages/react-editor/types": true,
-    "packages/shared/ethereum-follow-protocol": true
+    "packages/shared/ethereum-follow-protocol": true,
+    "packages/sdk/indexer/webhooks": true,
+    "packages/sdk/indexer/webhooks/schemas": true
   }
 }

@@ -1,0 +1,30 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / EventFromChainSchema
+
+# Variable: EventFromChainSchema
+
+```ts
+const EventFromChainSchema: ZodObject<{
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  logIndex: number;
+  txHash: `0x${string}`;
+}, {
+  blockNumber: string;
+  chainId: number;
+  logIndex: number;
+  txHash: `0x${string}`;
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:58](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L58)
+
+Common schema for all events coming from a chain.

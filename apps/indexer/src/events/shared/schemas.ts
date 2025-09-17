@@ -8,9 +8,15 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 export type MetadataArray = z.infer<typeof MetadataArraySchema>;
 export type MetadataArrayOp = z.infer<typeof MetadataArrayOpSchema>;
 
+/**
+ * Used as output formatter for JSON
+ */
 export const bigintToStringSchema = z
   .bigint()
   .transform((val) => val.toString());
+/**
+ * Used as output formatter for JSON
+ */
 export const dateToIsoStringSchema = z
   .date()
   .transform((val) => val.toISOString());

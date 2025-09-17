@@ -1,0 +1,48 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / MetadataSetOperationSchema
+
+# Variable: MetadataSetOperationSchema
+
+```ts
+const MetadataSetOperationSchema: ZodDiscriminatedUnion<"type", [ZodObject<{
+  key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  type: ZodLiteral<"delete">;
+}, "strip", ZodTypeAny, {
+  key: `0x${string}`;
+  type: "delete";
+}, {
+  key: `0x${string}`;
+  type: "delete";
+}>, ZodObject<{
+  key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  type: ZodLiteral<"create">;
+  value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+}, "strip", ZodTypeAny, {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}, {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}>, ZodObject<{
+  key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  type: ZodLiteral<"update">;
+  value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+}, "strip", ZodTypeAny, {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+}, {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+}>]>;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:80](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L80)
+
+Common schema for all metadata set operations.

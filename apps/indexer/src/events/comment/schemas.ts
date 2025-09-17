@@ -12,14 +12,29 @@ import {
   IndexerAPICommentReferencesSchema,
   IndexerAPICommentZeroExSwapSchema,
 } from "@ecp.eth/sdk/indexer";
+import {
+  EVENT_COMMENT_ADDED,
+  EVENT_COMMENT_HOOK_METADATA_SET,
+  EVENT_COMMENT_DELETED,
+  EVENT_COMMENT_EDITED,
+  EVENT_COMMENT_MODERATION_STATUS_UPDATED,
+  EVENT_COMMENT_REACTIONS_UPDATED,
+  type CommentAddedEventSchema as OutputCommentAddedEventSchema,
+  type CommentHookMetadataSetEventSchema as OutputCommentHookMetadataSetEventSchema,
+  type CommentDeletedEventSchema as OutputCommentDeletedEventSchema,
+  type CommentEditedEventSchema as OutputCommentEditedEventSchema,
+  type CommentModerationStatusUpdatedEventSchema as OutputCommentModerationStatusUpdatedEventSchema,
+  type CommentReactionsUpdatedEventSchema as OutputCommentReactionsUpdatedEventSchema,
+  type CommentEvents as SDKCommentEvents,
+} from "@ecp.eth/sdk/indexer/webhooks/schemas";
 
 export const CommentEvents = [
-  "comment:added",
-  "comment:hook:metadata:set",
-  "comment:deleted",
-  "comment:edited",
-  "comment:moderation:status:updated",
-  "comment:reactions:updated",
+  EVENT_COMMENT_ADDED,
+  EVENT_COMMENT_HOOK_METADATA_SET,
+  EVENT_COMMENT_DELETED,
+  EVENT_COMMENT_EDITED,
+  EVENT_COMMENT_MODERATION_STATUS_UPDATED,
+  EVENT_COMMENT_REACTIONS_UPDATED,
 ] as const;
 
 export type CommentEvent = (typeof CommentEvents)[number];
@@ -48,7 +63,7 @@ const ReplyCommentEventDataSchema = CommentEventDataSchema.extend({
 
 export const CommentAddedEventSchema = z
   .object({
-    event: z.literal("comment:added" satisfies CommentEvent),
+    event: z.literal(EVENT_COMMENT_ADDED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -67,7 +82,7 @@ export type CommentAddedEvent = z.infer<typeof CommentAddedEventSchema>;
 
 export const CommentHookMetadataSetEventSchema = z
   .object({
-    event: z.literal("comment:hook:metadata:set" satisfies CommentEvent),
+    event: z.literal(EVENT_COMMENT_HOOK_METADATA_SET),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -91,7 +106,7 @@ export type CommentHookMetadataSetEvent = z.infer<
 
 export const CommentDeletedEventSchema = z
   .object({
-    event: z.literal("comment:deleted" satisfies CommentEvent),
+    event: z.literal(EVENT_COMMENT_DELETED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -112,7 +127,7 @@ export type CommentDeletedEvent = z.infer<typeof CommentDeletedEventSchema>;
 
 export const CommentEditedEventSchema = z
   .object({
-    event: z.literal("comment:edited" satisfies CommentEvent),
+    event: z.literal(EVENT_COMMENT_EDITED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -132,7 +147,7 @@ export type CommentEditedEventInput = z.input<typeof CommentEditedEventSchema>;
 export type CommentEditedEvent = z.infer<typeof CommentEditedEventSchema>;
 
 export const CommentModerationStatusUpdatedEventSchema = z.object({
-  event: z.literal("comment:moderation:status:updated" satisfies CommentEvent),
+  event: z.literal(EVENT_COMMENT_MODERATION_STATUS_UPDATED),
   uid: z.string(),
   version: z.literal(1),
   data: z.object({
@@ -153,7 +168,7 @@ export type CommentModerationStatusUpdatedEvent = z.infer<
 >;
 
 export const CommentReactionsUpdatedEventSchema = z.object({
-  event: z.literal("comment:reactions:updated" satisfies CommentEvent),
+  event: z.literal(EVENT_COMMENT_REACTIONS_UPDATED),
   uid: z.string(),
   version: z.literal(1),
   data: z.object({
@@ -171,3 +186,24 @@ export type CommentReactionsUpdatedEventInput = z.input<
 export type CommentReactionsUpdatedEvent = z.infer<
   typeof CommentReactionsUpdatedEventSchema
 >;
+
+// assert that the schema output is the same as input to sdk
+({}) as unknown as CommentAddedEvent satisfies z.input<
+  typeof OutputCommentAddedEventSchema
+>;
+({}) as unknown as CommentHookMetadataSetEvent satisfies z.input<
+  typeof OutputCommentHookMetadataSetEventSchema
+>;
+({}) as unknown as CommentDeletedEvent satisfies z.input<
+  typeof OutputCommentDeletedEventSchema
+>;
+({}) as unknown as CommentEditedEvent satisfies z.input<
+  typeof OutputCommentEditedEventSchema
+>;
+({}) as unknown as CommentModerationStatusUpdatedEvent satisfies z.input<
+  typeof OutputCommentModerationStatusUpdatedEventSchema
+>;
+({}) as unknown as CommentReactionsUpdatedEvent satisfies z.input<
+  typeof OutputCommentReactionsUpdatedEventSchema
+>;
+({}) as unknown as typeof SDKCommentEvents satisfies typeof CommentEvents;

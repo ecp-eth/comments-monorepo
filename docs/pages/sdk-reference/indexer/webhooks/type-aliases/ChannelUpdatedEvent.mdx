@@ -1,0 +1,173 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelUpdatedEvent
+
+# Type Alias: ChannelUpdatedEvent
+
+```ts
+type ChannelUpdatedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:131](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L131)
+
+An event sent to webhook when a channel is updated.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     description: string;
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  description: string;
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.description
+
+```ts
+description: string;
+```
+
+Description of the channel
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.name
+
+```ts
+name: string;
+```
+
+Name of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+### event
+
+```ts
+event: "channel:updated";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

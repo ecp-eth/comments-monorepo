@@ -1,0 +1,201 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentHookMetadataSetEvent
+
+# Type Alias: CommentHookMetadataSetEvent
+
+```ts
+type CommentHookMetadataSetEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+     hookMetadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "comment:hook:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L143)
+
+An event sent to webhook when a comment hook metadata is set.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     id: `0x${string}`;
+     updatedAt: Date;
+  };
+  hookMetadataOperation:   | {
+     key: `0x${string}`;
+     type: "delete";
+   }
+     | {
+     key: `0x${string}`;
+     type: "create";
+     value: `0x${string}`;
+   }
+     | {
+     key: `0x${string}`;
+     type: "update";
+     value: `0x${string}`;
+   };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.hookMetadata
+
+```ts
+hookMetadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Hook metadata
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.hookMetadataOperation
+
+```ts
+hookMetadataOperation: 
+  | {
+  key: `0x${string}`;
+  type: "delete";
+}
+  | {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}
+  | {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+} = MetadataSetOperationSchema;
+```
+
+Hook metadata operation
+
+### event
+
+```ts
+event: "comment:hook:metadata:set";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

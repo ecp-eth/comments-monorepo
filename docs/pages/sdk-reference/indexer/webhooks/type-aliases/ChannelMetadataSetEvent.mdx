@@ -1,0 +1,201 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelMetadataSetEvent
+
+# Type Alias: ChannelMetadataSetEvent
+
+```ts
+type ChannelMetadataSetEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        updatedAt: Date;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "channel:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L224)
+
+An event sent to webhook when a channel metadata is set.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     updatedAt: Date;
+  };
+  metadataOperation:   | {
+     key: `0x${string}`;
+     type: "delete";
+   }
+     | {
+     key: `0x${string}`;
+     type: "create";
+     value: `0x${string}`;
+   }
+     | {
+     key: `0x${string}`;
+     type: "update";
+     value: `0x${string}`;
+   };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.metadataOperation
+
+```ts
+metadataOperation: 
+  | {
+  key: `0x${string}`;
+  type: "delete";
+}
+  | {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}
+  | {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+} = MetadataSetOperationSchema;
+```
+
+Metadata operation
+
+### event
+
+```ts
+event: "channel:metadata:set";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

@@ -76,3 +76,5 @@ packages/react-editor/parser
 packages/react-editor/types
 
 packages/shared/ethereum-follow-protocol
+packages/sdk/indexer/webhooks
+packages/sdk/indexer/webhooks/schemas
