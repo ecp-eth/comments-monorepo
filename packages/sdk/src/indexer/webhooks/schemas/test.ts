@@ -4,6 +4,11 @@ import { EventV1Schema } from "./shared.js";
 export const EVENT_TEST = "test" as const;
 
 /**
+ * Test events.
+ */
+export const TestEvents = [EVENT_TEST] as const;
+
+/**
  * An event sent to webhook when a test event is triggered.
  */
 export const TestEventSchema = z

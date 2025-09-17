@@ -27,7 +27,7 @@ type ChannelTransferredEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:258](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L258)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:271](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L271)
 
 An event sent to webhook when a channel is transferred.
 
@@ -36,7 +36,7 @@ An event sent to webhook when a channel is transferred.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -80,7 +80,7 @@ Updated channel data
 #### data.channel.id
 
 ```ts
-id: bigint;
+id: bigint = StringBigintSchema;
 ```
 
 ID of the channel
@@ -96,7 +96,7 @@ Owner address
 #### data.channel.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

@@ -241,7 +241,7 @@ type CommentAddedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L85)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L102)
 
 An event sent to webhook when a comment is added.
 
@@ -250,7 +250,7 @@ An event sent to webhook when a comment is added.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number

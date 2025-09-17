@@ -42,7 +42,7 @@ type CommentHookMetadataSetEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:126](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L126)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L143)
 
 An event sent to webhook when a comment hook metadata is set.
 
@@ -51,7 +51,7 @@ An event sent to webhook when a comment hook metadata is set.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -132,7 +132,7 @@ ID of the comment
 #### data.comment.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

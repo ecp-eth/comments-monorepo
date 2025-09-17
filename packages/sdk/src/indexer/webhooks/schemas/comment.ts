@@ -3,6 +3,8 @@ import {
   EventV1Schema,
   EventFromChainSchema,
   MetadataSetOperationSchema,
+  ISO8601DateSchema,
+  StringBigintSchema,
 } from "./shared.js";
 import { HexSchema } from "../../../core/schemas.js";
 import {
@@ -21,6 +23,21 @@ export const EVENT_COMMENT_MODERATION_STATUS_UPDATED =
 export const EVENT_COMMENT_REACTIONS_UPDATED =
   "comment:reactions:updated" as const;
 
+/**
+ * Comment events.
+ */
+export const CommentEvents = [
+  EVENT_COMMENT_ADDED,
+  EVENT_COMMENT_HOOK_METADATA_SET,
+  EVENT_COMMENT_DELETED,
+  EVENT_COMMENT_EDITED,
+  EVENT_COMMENT_MODERATION_STATUS_UPDATED,
+  EVENT_COMMENT_REACTIONS_UPDATED,
+] as const;
+
+/**
+ * Comment moderation status schema.
+ */
 export const CommentModerationStatusSchema = z.enum([
   "pending",
   "approved",
@@ -33,9 +50,9 @@ export type CommentModerationStatus = z.infer<
 
 const CommentEventDataSchema = z.object({
   id: HexSchema,
-  createdAt: z.coerce.date(),
-  updatedAt: z.coerce.date(),
-  channelId: z.coerce.bigint(),
+  createdAt: ISO8601DateSchema,
+  updatedAt: ISO8601DateSchema,
+  channelId: StringBigintSchema,
   author: HexSchema,
   app: HexSchema,
   content: z.string(),
@@ -108,7 +125,7 @@ export const CommentHookMetadataSetEventSchema = z
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
         /**
          * Hook metadata
          */
@@ -151,11 +168,11 @@ export const CommentDeletedEventSchema = z
         /**
          * Deleted at date
          */
-        deletedAt: z.coerce.date(),
+        deletedAt: ISO8601DateSchema,
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
       }),
     }),
   })
@@ -188,7 +205,7 @@ export const CommentEditedEventSchema = z
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
         /**
          * Content of the comment
          */
@@ -237,12 +254,11 @@ export const CommentModerationStatusUpdatedEventSchema = z
         /**
          * Moderation status changed at date
          */
-        moderationStatusChangedAt: z.coerce.date(),
+        moderationStatusChangedAt: ISO8601DateSchema,
       }),
     }),
   })
-  .merge(EventV1Schema)
-  .merge(EventFromChainSchema);
+  .merge(EventV1Schema);
 
 export type CommentModerationStatusUpdatedEvent = z.infer<
   typeof CommentModerationStatusUpdatedEventSchema
@@ -276,8 +292,7 @@ export const CommentReactionsUpdatedEventSchema = z
       }),
     }),
   })
-  .merge(EventV1Schema)
-  .merge(EventFromChainSchema);
+  .merge(EventV1Schema);
 
 export type CommentReactionsUpdatedEvent = z.infer<
   typeof CommentReactionsUpdatedEventSchema

@@ -8,7 +8,7 @@
 
 ```ts
 const EventFromChainSchema: ZodObject<{
-  blockNumber: ZodBigInt;
+  blockNumber: ZodEffects<ZodString, bigint, string>;
   chainId: ZodNumber;
   logIndex: ZodNumber;
   txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -18,13 +18,13 @@ const EventFromChainSchema: ZodObject<{
   logIndex: number;
   txHash: `0x${string}`;
 }, {
-  blockNumber: bigint;
+  blockNumber: string;
   chainId: number;
   logIndex: number;
   txHash: `0x${string}`;
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:22](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L22)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:58](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L58)
 
 Common schema for all events coming from a chain.

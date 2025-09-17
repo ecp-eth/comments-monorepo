@@ -2,6 +2,42 @@ import { z } from "zod";
 import { HexSchema } from "../../../core/schemas.js";
 
 /**
+ * Stringified bigint schema. Used to convert the stringified bigint from JSON to bigint.
+ */
+export const StringBigintSchema = z.string().transform((val, ctx) => {
+  const result = z.coerce.bigint().safeParse(val);
+
+  if (!result.success) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid block number, could not coerce to bigint",
+    });
+
+    return z.NEVER;
+  }
+
+  return result.data;
+});
+
+/**
+ * ISO 8601 date schema. Used to convert the ISO 8601 date from JSON to date.
+ */
+export const ISO8601DateSchema = z.string().transform((val, ctx) => {
+  const result = z.coerce.date().safeParse(val);
+
+  if (!result.success) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Invalid date, could not coerce to date",
+    });
+
+    return z.NEVER;
+  }
+
+  return result.data;
+});
+
+/**
  * Common schema for all v1 events.
  */
 export const EventV1Schema = z.object({
@@ -27,7 +63,7 @@ export const EventFromChainSchema = z.object({
   /**
    * Block number
    */
-  blockNumber: z.coerce.bigint(),
+  blockNumber: StringBigintSchema,
   /**
    * Log index
    */

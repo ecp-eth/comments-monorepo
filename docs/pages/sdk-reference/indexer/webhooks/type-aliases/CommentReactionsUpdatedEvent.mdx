@@ -8,8 +8,6 @@
 
 ```ts
 type CommentReactionsUpdatedEvent = {
-  blockNumber: bigint;
-  chainId: number;
   data: {
      comment: {
         id: `0x${string}`;
@@ -17,34 +15,16 @@ type CommentReactionsUpdatedEvent = {
      };
   };
   event: "comment:reactions:updated";
-  logIndex: number;
-  txHash: `0x${string}`;
   uid: string;
   version: 1;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:282](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L282)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:297](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L297)
 
 An event sent to webhook when a comment reactions are updated.
 
 ## Type declaration
-
-### blockNumber
-
-```ts
-blockNumber: bigint;
-```
-
-Block number
-
-### chainId
-
-```ts
-chainId: number;
-```
-
-Chain ID
 
 ### data
 
@@ -93,22 +73,6 @@ event: "comment:reactions:updated";
 ```
 
 Event type
-
-### logIndex
-
-```ts
-logIndex: number;
-```
-
-Log index
-
-### txHash
-
-```ts
-txHash: `0x${string}` = HexSchema;
-```
-
-Transaction hash
 
 ### uid
 

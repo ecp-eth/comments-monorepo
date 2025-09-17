@@ -27,7 +27,7 @@ type ApprovalAddedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:51](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L51)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L63)
 
 An event sent to webhook when an approval is added
 
@@ -36,7 +36,7 @@ An event sent to webhook when an approval is added
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -98,7 +98,7 @@ Author address
 #### data.approval.createdAt
 
 ```ts
-createdAt: Date;
+createdAt: Date = ISO8601DateSchema;
 ```
 
 Created at date
@@ -114,7 +114,7 @@ ID of the approval
 #### data.approval.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

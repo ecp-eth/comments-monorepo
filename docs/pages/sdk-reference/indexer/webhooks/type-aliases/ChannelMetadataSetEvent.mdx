@@ -42,7 +42,7 @@ type ChannelMetadataSetEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:211](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L211)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L224)
 
 An event sent to webhook when a channel metadata is set.
 
@@ -51,7 +51,7 @@ An event sent to webhook when a channel metadata is set.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -113,7 +113,7 @@ Updated channel data
 #### data.channel.id
 
 ```ts
-id: bigint;
+id: bigint = StringBigintSchema;
 ```
 
 ID of the channel
@@ -132,7 +132,7 @@ Metadata of the channel
 #### data.channel.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

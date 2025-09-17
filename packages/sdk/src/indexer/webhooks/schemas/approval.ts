@@ -1,9 +1,21 @@
 import { z } from "zod";
-import { EventFromChainSchema, EventV1Schema } from "./shared.js";
+import {
+  EventFromChainSchema,
+  EventV1Schema,
+  ISO8601DateSchema,
+} from "./shared.js";
 import { HexSchema } from "../../../core/schemas.js";
 
 export const EVENT_APPROVAL_ADDED = "approval:added" as const;
 export const EVENT_APPROVAL_REMOVED = "approval:removed" as const;
+
+/**
+ * Approval events.
+ */
+export const ApprovalEvents = [
+  EVENT_APPROVAL_ADDED,
+  EVENT_APPROVAL_REMOVED,
+] as const;
 
 /**
  * An event sent to webhook when an approval is added
@@ -29,11 +41,11 @@ export const ApprovalAddedEventSchema = z
         /**
          * Created at date
          */
-        createdAt: z.coerce.date(),
+        createdAt: ISO8601DateSchema,
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
         /**
          * Author address
          */

@@ -4,7 +4,9 @@ import { MetadataArraySchema } from "../../../comments/schemas.js";
 import {
   EventFromChainSchema,
   EventV1Schema,
+  ISO8601DateSchema,
   MetadataSetOperationSchema,
+  StringBigintSchema,
 } from "./shared.js";
 
 export const EVENT_CHANNEL_CREATED = "channel:created" as const;
@@ -13,6 +15,17 @@ export const EVENT_CHANNEL_HOOK_STATUS_UPDATED =
   "channel:hook:status:updated" as const;
 export const EVENT_CHANNEL_METADATA_SET = "channel:metadata:set" as const;
 export const EVENT_CHANNEL_TRANSFERRED = "channel:transferred" as const;
+
+/**
+ * Channel events.
+ */
+export const ChannelEvents = [
+  EVENT_CHANNEL_CREATED,
+  EVENT_CHANNEL_UPDATED,
+  EVENT_CHANNEL_HOOK_STATUS_UPDATED,
+  EVENT_CHANNEL_METADATA_SET,
+  EVENT_CHANNEL_TRANSFERRED,
+] as const;
 
 /**
  * An event sent to webhook when a channel is created.
@@ -31,15 +44,15 @@ export const ChannelCreatedEventSchema = z
         /**
          * ID of the channel
          */
-        id: z.coerce.bigint(),
+        id: StringBigintSchema,
         /**
          * Created at date
          */
-        createdAt: z.coerce.date(),
+        createdAt: ISO8601DateSchema,
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
         /**
          * Owner address
          */
@@ -92,11 +105,11 @@ export const ChannelUpdatedEventSchema = z
         /**
          * ID of the channel
          */
-        id: z.coerce.bigint(),
+        id: StringBigintSchema,
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
         /**
          * Name of the channel
          */
@@ -137,7 +150,7 @@ export const ChannelHookStatusUpdatedEventSchema = z
         /**
          * ID of the channel
          */
-        id: z.coerce.bigint(),
+        id: StringBigintSchema,
         /**
          * Hook address
          */
@@ -145,7 +158,7 @@ export const ChannelHookStatusUpdatedEventSchema = z
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
       }),
       /**
        * Updated hook data
@@ -189,7 +202,7 @@ export const ChannelMetadataSetEventSchema = z
         /**
          * ID of the channel
          */
-        id: z.coerce.bigint(),
+        id: StringBigintSchema,
         /**
          * Metadata of the channel
          */
@@ -197,7 +210,7 @@ export const ChannelMetadataSetEventSchema = z
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
       }),
       /**
        * Metadata operation
@@ -232,7 +245,7 @@ export const ChannelTransferredEventSchema = z
         /**
          * ID of the channel
          */
-        id: z.coerce.bigint(),
+        id: StringBigintSchema,
         /**
          * Owner address
          */
@@ -240,7 +253,7 @@ export const ChannelTransferredEventSchema = z
         /**
          * Updated at date
          */
-        updatedAt: z.coerce.date(),
+        updatedAt: ISO8601DateSchema,
       }),
       /**
        * From address

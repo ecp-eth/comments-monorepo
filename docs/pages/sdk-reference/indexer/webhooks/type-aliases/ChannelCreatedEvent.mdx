@@ -34,7 +34,7 @@ type ChannelCreatedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:73](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L73)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L86)
 
 An event sent to webhook when a channel is created.
 
@@ -43,7 +43,7 @@ An event sent to webhook when a channel is created.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -109,7 +109,7 @@ Chain ID where the channel was created
 #### data.channel.createdAt
 
 ```ts
-createdAt: Date;
+createdAt: Date = ISO8601DateSchema;
 ```
 
 Created at date
@@ -133,7 +133,7 @@ Hook address
 #### data.channel.id
 
 ```ts
-id: bigint;
+id: bigint = StringBigintSchema;
 ```
 
 ID of the channel
@@ -168,7 +168,7 @@ Owner address
 #### data.channel.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

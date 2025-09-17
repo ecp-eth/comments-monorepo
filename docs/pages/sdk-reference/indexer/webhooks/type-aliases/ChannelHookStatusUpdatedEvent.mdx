@@ -29,7 +29,7 @@ type ChannelHookStatusUpdatedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L168)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:181](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L181)
 
 An event sent to webhook when a channel hook status is updated.
 
@@ -38,7 +38,7 @@ An event sent to webhook when a channel hook status is updated.
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number
@@ -92,7 +92,7 @@ Hook address
 #### data.channel.id
 
 ```ts
-id: bigint;
+id: bigint = StringBigintSchema;
 ```
 
 ID of the channel
@@ -100,7 +100,7 @@ ID of the channel
 #### data.channel.updatedAt
 
 ```ts
-updatedAt: Date;
+updatedAt: Date = ISO8601DateSchema;
 ```
 
 Updated at date

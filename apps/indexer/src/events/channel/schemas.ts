@@ -1,5 +1,18 @@
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments/schemas";
+import {
+  EVENT_CHANNEL_CREATED,
+  EVENT_CHANNEL_UPDATED,
+  EVENT_CHANNEL_HOOK_STATUS_UPDATED,
+  EVENT_CHANNEL_METADATA_SET,
+  EVENT_CHANNEL_TRANSFERRED,
+  type ChannelCreatedEventSchema as OutputChannelCreatedEventSchema,
+  type ChannelUpdatedEventSchema as OutputChannelUpdatedEventSchema,
+  type ChannelHookStatusUpdatedEventSchema as OutputChannelHookStatusUpdatedEventSchema,
+  type ChannelMetadataSetEventSchema as OutputChannelMetadataSetEventSchema,
+  type ChannelTransferredEventSchema as OutputChannelTransferredEventSchema,
+  type ChannelEvents as SDKChannelEvents,
+} from "@ecp.eth/sdk/indexer/webhooks/schemas";
 import z from "zod";
 import {
   bigintToStringSchema,
@@ -9,18 +22,18 @@ import {
 } from "../shared/schemas.ts";
 
 export const ChannelEvents = [
-  "channel:created",
-  "channel:updated",
-  "channel:hook:status:updated",
-  "channel:metadata:set",
-  "channel:transferred",
+  EVENT_CHANNEL_CREATED,
+  EVENT_CHANNEL_UPDATED,
+  EVENT_CHANNEL_HOOK_STATUS_UPDATED,
+  EVENT_CHANNEL_METADATA_SET,
+  EVENT_CHANNEL_TRANSFERRED,
 ] as const;
 
 export type ChannelEvent = (typeof ChannelEvents)[number];
 
 export const ChannelCreatedEventSchema = z
   .object({
-    event: z.literal("channel:created" satisfies ChannelEvent),
+    event: z.literal(EVENT_CHANNEL_CREATED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -47,7 +60,7 @@ export type ChannelCreatedEvent = z.infer<typeof ChannelCreatedEventSchema>;
 
 export const ChannelUpdatedEventSchema = z
   .object({
-    event: z.literal("channel:updated" satisfies ChannelEvent),
+    event: z.literal(EVENT_CHANNEL_UPDATED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -70,7 +83,7 @@ export type ChannelUpdatedEvent = z.infer<typeof ChannelUpdatedEventSchema>;
 
 export const ChannelHookStatusUpdatedEventSchema = z
   .object({
-    event: z.literal("channel:hook:status:updated" satisfies ChannelEvent),
+    event: z.literal(EVENT_CHANNEL_HOOK_STATUS_UPDATED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -97,7 +110,7 @@ export type ChannelHookStatusUpdatedEvent = z.infer<
 
 export const ChannelMetadataSetEventSchema = z
   .object({
-    event: z.literal("channel:metadata:set" satisfies ChannelEvent),
+    event: z.literal(EVENT_CHANNEL_METADATA_SET),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -121,7 +134,7 @@ export type ChannelMetadataSetEvent = z.infer<
 
 export const ChannelTransferEventSchema = z
   .object({
-    event: z.literal("channel:transferred" satisfies ChannelEvent),
+    event: z.literal(EVENT_CHANNEL_TRANSFERRED),
     uid: z.string(),
     version: z.literal(1),
     data: z.object({
@@ -141,3 +154,21 @@ export type ChannelTransferEventInput = z.input<
 >;
 
 export type ChannelTransferEvent = z.infer<typeof ChannelTransferEventSchema>;
+
+// assert that the schema output is the same as input to sdk
+({}) as unknown as ChannelCreatedEvent satisfies z.input<
+  typeof OutputChannelCreatedEventSchema
+>;
+({}) as unknown as ChannelUpdatedEvent satisfies z.input<
+  typeof OutputChannelUpdatedEventSchema
+>;
+({}) as unknown as ChannelHookStatusUpdatedEvent satisfies z.input<
+  typeof OutputChannelHookStatusUpdatedEventSchema
+>;
+({}) as unknown as ChannelMetadataSetEvent satisfies z.input<
+  typeof OutputChannelMetadataSetEventSchema
+>;
+({}) as unknown as ChannelTransferEvent satisfies z.input<
+  typeof OutputChannelTransferredEventSchema
+>;
+({}) as unknown as typeof SDKChannelEvents satisfies typeof ChannelEvents;

@@ -23,7 +23,7 @@ type ApprovalRemovedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:80](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L80)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:92](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L92)
 
 An event sent to webhook when an approval is removed
 
@@ -32,7 +32,7 @@ An event sent to webhook when an approval is removed
 ### blockNumber
 
 ```ts
-blockNumber: bigint;
+blockNumber: bigint = StringBigintSchema;
 ```
 
 Block number

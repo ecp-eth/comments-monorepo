@@ -8,8 +8,6 @@
 
 ```ts
 type CommentModerationStatusUpdatedEvent = {
-  blockNumber: bigint;
-  chainId: number;
   data: {
      comment: {
         id: `0x${string}`;
@@ -18,34 +16,16 @@ type CommentModerationStatusUpdatedEvent = {
      };
   };
   event: "comment:moderation:status:updated";
-  logIndex: number;
-  txHash: `0x${string}`;
   uid: string;
   version: 1;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:247](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L247)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:263](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L263)
 
 An event sent to webhook when a comment moderation status is updated.
 
 ## Type declaration
-
-### blockNumber
-
-```ts
-blockNumber: bigint;
-```
-
-Block number
-
-### chainId
-
-```ts
-chainId: number;
-```
-
-Chain ID
 
 ### data
 
@@ -92,7 +72,7 @@ Moderation status of the comment
 #### data.comment.moderationStatusChangedAt
 
 ```ts
-moderationStatusChangedAt: Date;
+moderationStatusChangedAt: Date = ISO8601DateSchema;
 ```
 
 Moderation status changed at date
@@ -104,22 +84,6 @@ event: "comment:moderation:status:updated";
 ```
 
 Event type
-
-### logIndex
-
-```ts
-logIndex: number;
-```
-
-Log index
-
-### txHash
-
-```ts
-txHash: `0x${string}` = HexSchema;
-```
-
-Transaction hash
 
 ### uid
 
