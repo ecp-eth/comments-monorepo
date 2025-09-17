@@ -9,6 +9,15 @@ nock.disableNetConnect();
 
 describe("url loader", () => {
   const urlResolver = createURLResolver();
+  const jpgBuffer = fs.readFileSync(
+    path.join(__dirname, "fixtures", "example-image.jpg"),
+  );
+  const pngBuffer = fs.readFileSync(
+    path.join(__dirname, "fixtures", "example-image.png"),
+  );
+  const svgBuffer = fs.readFileSync(
+    path.join(__dirname, "fixtures", "example-image.svg"),
+  );
 
   beforeEach(() => {
     nock.cleanAll();
@@ -16,12 +25,9 @@ describe("url loader", () => {
   });
 
   it("resolves image url", async () => {
-    const image = fs.readFileSync(
-      path.join(__dirname, "fixtures", "example-image.jpg"),
-    );
-    nock("https://example.com").get("/").reply(200, image, {
-      "content-type": "image/png",
-      "content-length": image.length.toString(),
+    nock("https://example.com").get("/").reply(200, jpgBuffer, {
+      "content-type": "image/jpeg",
+      "content-length": jpgBuffer.length.toString(),
     });
 
     const result = await urlResolver.load("https://example.com");
@@ -29,7 +35,7 @@ describe("url loader", () => {
     expect(result).toEqual({
       type: "image",
       url: "https://example.com/",
-      mediaType: "image/png",
+      mediaType: "image/jpeg",
       dimension: {
         width: 5067,
         height: 1865,
@@ -39,15 +45,11 @@ describe("url loader", () => {
 
   it("resolves jpg image url with slow image data", async () => {
     // with a slow image stream, it will cause the getImageSize to abort the request to save time
-    const image = fs.readFileSync(
-      path.join(__dirname, "fixtures", "example-image.jpg"),
-    );
-
     nock("https://example.com")
       .get("/example-image.jpg")
-      .reply(200, createSlowStream(image), {
-        "content-type": "image/png",
-        "content-length": image.length.toString(),
+      .reply(200, createSlowStream(jpgBuffer), {
+        "content-type": "image/jpeg",
+        "content-length": jpgBuffer.length.toString(),
       });
 
     const result = await urlResolver.load(
@@ -57,7 +59,7 @@ describe("url loader", () => {
     expect(result).toEqual({
       type: "image",
       url: "https://example.com/example-image.jpg",
-      mediaType: "image/png",
+      mediaType: "image/jpeg",
       dimension: {
         width: 5067,
         height: 1865,
@@ -67,15 +69,11 @@ describe("url loader", () => {
 
   it("resolves png image url with slow image data", async () => {
     // with a slow image stream, it will cause the getImageSize to abort the request to save time
-    const image = fs.readFileSync(
-      path.join(__dirname, "fixtures", "example-image.png"),
-    );
-
     nock("https://example.com")
       .get("/example-image.png")
-      .reply(200, createSlowStream(image), {
+      .reply(200, createSlowStream(pngBuffer), {
         "content-type": "image/png",
-        "content-length": image.length.toString(),
+        "content-length": pngBuffer.length.toString(),
       });
 
     const result = await urlResolver.load(
@@ -95,15 +93,11 @@ describe("url loader", () => {
 
   it("resolves svg image url with slow image data", async () => {
     // with a slow image stream, it will cause the getImageSize to abort the request to save time
-    const image = fs.readFileSync(
-      path.join(__dirname, "fixtures", "example-image.svg"),
-    );
-
     nock("https://example.com")
       .get("/example-image.svg")
-      .reply(200, createSlowStream(image), {
-        "content-type": "image/png",
-        "content-length": image.length.toString(),
+      .reply(200, createSlowStream(svgBuffer), {
+        "content-type": "image/svg+xml",
+        "content-length": svgBuffer.length.toString(),
       });
 
     const result = await urlResolver.load(
@@ -113,7 +107,7 @@ describe("url loader", () => {
     expect(result).toEqual({
       type: "image",
       url: "https://example.com/example-image.svg",
-      mediaType: "image/png",
+      mediaType: "image/svg+xml",
       dimension: {
         width: 5067,
         height: 1865,
