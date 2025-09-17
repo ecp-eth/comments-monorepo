@@ -1,11 +1,9 @@
-import { describe, it, beforeEach, before } from "node:test";
-import assert from "node:assert";
+import { describe, it, beforeEach, beforeAll, expect } from "vitest";
 import {
   createWalletClient,
   http,
   publicActions,
   parseEther,
-  ContractFunctionExecutionError,
   parseEventLogs,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -38,7 +36,7 @@ describe("channel", () => {
   let flatFeeHookAddress: Hex;
   let legacyTakeChannelFeeHookAddress: Hex;
 
-  before(async () => {
+  beforeAll(async () => {
     ({
       channelManagerAddress,
       flatFeeHookAddress,
@@ -79,7 +77,7 @@ describe("channel", () => {
       hash: channelCreationFee.txHash,
     });
 
-    assert.equal(channelCreationFeeReceipt.status, "success");
+    expect(channelCreationFeeReceipt.status).toBe("success");
 
     const commentCreationFee = await setCommentCreationFee({
       fee: parseEther("0.00"),
@@ -91,7 +89,7 @@ describe("channel", () => {
       hash: commentCreationFee.txHash,
     });
 
-    assert.equal(commentCreationFeeReceipt.status, "success");
+    expect(commentCreationFeeReceipt.status).toBe("success");
   }
 
   beforeEach(async () => {
@@ -100,26 +98,13 @@ describe("channel", () => {
 
   describe("createChannel()", () => {
     it("fails on insufficient fee", async () => {
-      await assert.rejects(
-        () =>
-          createChannel({
-            name: "Test channel",
-            writeContract: client.writeContract,
-            channelManagerAddress,
-          }),
-        (err) => {
-          assert.ok(
-            err instanceof ContractFunctionExecutionError,
-            "should be a ContractFunctionExecutionError",
-          );
-          assert.ok(
-            err.message.includes("Error: InsufficientFee()"),
-            "should include InsufficientFee",
-          );
-
-          return true;
-        },
-      );
+      await expect(
+        createChannel({
+          name: "Test channel",
+          writeContract: client.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrow(/Error: InsufficientFee\(\)/);
     });
 
     it("creates channel", async () => {
@@ -134,7 +119,7 @@ describe("channel", () => {
         hash: channel.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
   });
 
@@ -153,7 +138,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: ChannelManagerABI,
@@ -161,7 +146,7 @@ describe("channel", () => {
         eventName: "ChannelCreated",
       });
 
-      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+      expect(logs.length > 0).toBe(true);
 
       channelId = logs[0]!.args.channelId;
     });
@@ -173,7 +158,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(channel, {
+      expect(channel).toStrictEqual({
         name: "Test channel getChannel",
         description: undefined,
         hook: undefined,
@@ -191,25 +176,21 @@ describe("channel", () => {
 
   describe("channelExists()", () => {
     it("default channel", async () => {
-      assert.equal(
-        await channelExists({
+      await expect(
+        channelExists({
           channelId: 0n, // default channel id
           readContract: client.readContract,
           channelManagerAddress,
         }),
-        true,
-        "should return true for default channel id",
-      );
+      ).resolves.toBe(true);
 
-      assert.equal(
-        await channelExists({
+      await expect(
+        channelExists({
           channelId: 10n,
           readContract: client.readContract,
           channelManagerAddress,
         }),
-        false,
-        "should return false for non-existent channel id",
-      );
+      ).resolves.toBe(false);
     });
   });
 
@@ -220,11 +201,9 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(
-        fee,
-        { fee: parseEther("0.02") },
-        "should return default channel creation fee",
-      );
+      expect(fee).toStrictEqual({
+        fee: parseEther("0.02"),
+      });
     });
   });
 
@@ -243,7 +222,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: ChannelManagerABI,
@@ -251,7 +230,7 @@ describe("channel", () => {
         eventName: "ChannelCreated",
       });
 
-      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+      expect(logs.length > 0).toBe(true);
 
       channelId = logs[0]!.args.channelId;
     });
@@ -263,7 +242,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(owner, { owner: account.address });
+      expect(owner).toStrictEqual({ owner: account.address });
     });
   });
 
@@ -282,7 +261,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: ChannelManagerABI,
@@ -290,7 +269,7 @@ describe("channel", () => {
         eventName: "ChannelCreated",
       });
 
-      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+      expect(logs.length > 0).toBe(true);
 
       channelId = logs[0]!.args.channelId;
     });
@@ -309,7 +288,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the update
       const channel = await getChannel({
@@ -318,7 +297,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(channel, {
+      expect(channel).toStrictEqual({
         name: "Updated channel",
         description: "New description",
         hook: undefined,
@@ -336,20 +315,13 @@ describe("channel", () => {
 
   describe("setChannelCreationFee()", () => {
     it("fails if the account is not an owner", async () => {
-      await assert.rejects(
-        () =>
-          setChannelCreationFee({
-            fee: parseEther("0.05"),
-            writeContract: client2.writeContract,
-            channelManagerAddress,
-          }),
-        (err: unknown) => {
-          const error = err as ContractFunctionExecutionError;
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          assert.ok(error.message.includes("Error: Unauthorized()"));
-          return true;
-        },
-      );
+      await expect(
+        setChannelCreationFee({
+          fee: parseEther("0.05"),
+          writeContract: client2.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrow(/Error: Unauthorized\(\)/);
     });
 
     it("sets new fee", async () => {
@@ -364,7 +336,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the new fee
       const fee = await getChannelCreationFee({
@@ -372,7 +344,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(fee, { fee: newFee });
+      expect(fee).toStrictEqual({ fee: newFee });
     });
   });
 
@@ -383,11 +355,9 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(
-        fee,
-        { fee: parseEther("0.00") },
-        "should return default comment creation fee",
-      );
+      expect(fee).toStrictEqual({
+        fee: parseEther("0.00"),
+      });
     });
 
     it("returns updated fee", async () => {
@@ -401,42 +371,28 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const fee = await getCommentCreationFee({
         readContract: client.readContract,
         channelManagerAddress,
       });
 
-      assert.deepEqual(
-        fee,
-        { fee: parseEther("0.05") },
-        "should return updated comment creation fee",
-      );
+      expect(fee).toStrictEqual({
+        fee: parseEther("0.05"),
+      });
     });
   });
 
   describe("setCommentCreationFee()", () => {
     it("fails if the account is not an owner", async () => {
-      await assert.rejects(
-        async () => {
-          const result = await setCommentCreationFee({
-            fee: parseEther("0.03"),
-            writeContract: client2.writeContract,
-            channelManagerAddress,
-          });
-
-          await client.waitForTransactionReceipt({
-            hash: result.txHash,
-          });
-        },
-        (err: unknown) => {
-          const error = err as ContractFunctionExecutionError;
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          assert.ok(error.message.includes("Error: Unauthorized()"));
-          return true;
-        },
-      );
+      await expect(
+        setCommentCreationFee({
+          fee: parseEther("0.03"),
+          writeContract: client2.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrow(/Error: Unauthorized\(\)/);
     });
 
     it("sets new fee", async () => {
@@ -451,7 +407,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the new fee
       const fee = await getCommentCreationFee({
@@ -459,7 +415,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.deepEqual(fee, { fee: newFee });
+      expect(fee).toStrictEqual({ fee: newFee });
     });
   });
 
@@ -485,7 +441,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: ChannelManagerABI,
@@ -493,7 +449,7 @@ describe("channel", () => {
         eventName: "FeesWithdrawn",
       });
 
-      assert.ok(logs.length > 0, "FeesWithdrawn event should be found");
+      expect(logs.length > 0).toBe(true);
     });
   });
 
@@ -510,7 +466,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
   });
 
@@ -532,7 +488,7 @@ describe("channel", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: ChannelManagerABI,
@@ -540,7 +496,7 @@ describe("channel", () => {
         eventName: "ChannelCreated",
       });
 
-      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+      expect(logs.length > 0).toBe(true);
 
       return logs[0]!.args.channelId;
     }
@@ -580,8 +536,8 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(fee.amount, 900000000000000n);
-      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+      expect(fee.amount).toBe(900000000000000n);
+      expect(fee.asset).toBe(NATIVE_ASSET_ADDRESS);
     });
 
     it("estimates the fee for editing a comment from hooks impelement IFeeEstimatable", async () => {
@@ -612,8 +568,8 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(fee.amount, 900000000000000n);
-      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+      expect(fee.amount).toBe(900000000000000n);
+      expect(fee.asset).toBe(NATIVE_ASSET_ADDRESS);
     });
 
     it("estimates the fee for posting a comment from legacy take channel fee hooks", async () => {
@@ -644,8 +600,8 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(fee.amount, 100n);
-      assert.equal(fee.asset, NATIVE_ASSET_ADDRESS);
+      expect(fee.amount).toBe(100n);
+      expect(fee.asset).toBe(NATIVE_ASSET_ADDRESS);
 
       const editFee = await getEstimatedChannelEditCommentHookFee({
         readContract: client.readContract,
@@ -656,8 +612,8 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(editFee.amount, 0n);
-      assert.equal(editFee.asset, NATIVE_ASSET_ADDRESS);
+      expect(editFee.amount).toBe(0n);
+      expect(editFee.asset).toBe(NATIVE_ASSET_ADDRESS);
 
       const reactionData: CommentData = {
         content: "like",
@@ -682,8 +638,8 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(reactionFee.amount, 0n);
-      assert.equal(reactionFee.asset, NATIVE_ASSET_ADDRESS);
+      expect(reactionFee.amount).toBe(0n);
+      expect(reactionFee.asset).toBe(NATIVE_ASSET_ADDRESS);
 
       const estimatedTotalFee = await estimateChannelPostCommentFee({
         readContract: client.readContract,
@@ -694,7 +650,7 @@ describe("channel", () => {
         channelManagerAddress,
       });
 
-      assert.equal(estimatedTotalFee.baseToken.amount, 102n);
+      expect(estimatedTotalFee.baseToken.amount).toBe(102n);
     });
   });
 });

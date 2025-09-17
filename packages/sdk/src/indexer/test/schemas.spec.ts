@@ -1,5 +1,4 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 import { IndexerAPICommentReferencesSchema } from "../schemas.js";
 
 const position = {
@@ -53,8 +52,8 @@ describe("IndexerAPICommentReferencesSchema", () => {
       console.error(JSON.stringify(parsed.error, null, 2));
     }
 
-    assert.ok(parsed.success);
-    assert.deepStrictEqual(parsed.data, commentReferences);
+    expect(parsed.success).toBe(true);
+    expect(parsed.data).toStrictEqual(commentReferences);
   });
 
   it("should avoid any invalid reference", () => {
@@ -101,8 +100,8 @@ describe("IndexerAPICommentReferencesSchema", () => {
       console.error(JSON.stringify(parsed.error, null, 2));
     }
 
-    assert.ok(parsed.success);
-    assert.deepStrictEqual(parsed.data, [
+    expect(parsed.success).toBe(true);
+    expect(parsed.data).toStrictEqual([
       {
         position,
         type: "video",
