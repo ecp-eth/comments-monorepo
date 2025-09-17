@@ -79,7 +79,7 @@ install_foundry() {
 update_foundry() {
     echo "🔄 Foundry version mismatch. Updating to $TARGET_VERSION..."
     if command -v foundryup >/dev/null 2>&1; then
-        foundryup --version "$TARGET_VERSION"
+        foundryup --install "$TARGET_VERSION"
     else
         echo "❌ foundryup not found. Please run: foundryup --version $TARGET_VERSION"
         exit 1
