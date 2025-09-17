@@ -21,7 +21,8 @@
     "../packages/sdk/src/channel-manager/react/index.ts",
     "../packages/sdk/src/channel-manager/types.ts",
     "../packages/sdk/src/embed/index.ts",
-    "../packages/sdk/src/indexer/index.ts"
+    "../packages/sdk/src/indexer/index.ts",
+    "../packages/sdk/src/indexer/webhooks/index.ts"
   ],
   "out": "pages/sdk-reference",
   "tsconfig": "../packages/sdk/tsconfig.json"

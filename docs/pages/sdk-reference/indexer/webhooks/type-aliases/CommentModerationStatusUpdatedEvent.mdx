@@ -1,0 +1,139 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentModerationStatusUpdatedEvent
+
+# Type Alias: CommentModerationStatusUpdatedEvent
+
+```ts
+type CommentModerationStatusUpdatedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+     };
+  };
+  event: "comment:moderation:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:247](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L247)
+
+An event sent to webhook when a comment moderation status is updated.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint;
+```
+
+Block number
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     id: `0x${string}`;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  id: `0x${string}`;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.moderationStatus
+
+```ts
+moderationStatus: "approved" | "pending" | "rejected" = CommentModerationStatusSchema;
+```
+
+Moderation status of the comment
+
+#### data.comment.moderationStatusChangedAt
+
+```ts
+moderationStatusChangedAt: Date;
+```
+
+Moderation status changed at date
+
+### event
+
+```ts
+event: "comment:moderation:status:updated";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

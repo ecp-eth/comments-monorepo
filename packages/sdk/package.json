@@ -78,6 +78,16 @@
       "import": "./dist/esm/indexer/index.js",
       "default": "./dist/cjs/indexer/index.cjs"
     },
+    "./indexer/webhooks": {
+      "types": "./dist/esm/indexer/webhooks/index.d.ts",
+      "import": "./dist/esm/indexer/webhooks/index.js",
+      "default": "./dist/cjs/indexer/webhooks/index.cjs"
+    },
+    "./indexer/webhooks/schemas": {
+      "types": "./dist/esm/indexer/webhooks/schemas/index.d.ts",
+      "import": "./dist/esm/indexer/webhooks/schemas/index.js",
+      "default": "./dist/cjs/indexer/webhooks/schemas/index.cjs"
+    },
     "./indexer/*": {
       "types": "./dist/esm/indexer/*.d.ts",
       "import": "./dist/esm/indexer/*.js",

@@ -1,0 +1,83 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ConstructEventOptions
+
+# Type Alias: ConstructEventOptions
+
+```ts
+type ConstructEventOptions = {
+  appSecret: string;
+  requestBody: string | Buffer;
+  requestSignature: string;
+  requestTimestamp: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/index.ts:9](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/index.ts#L9)
+
+## Properties
+
+### appSecret
+
+```ts
+appSecret: string;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/index.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/index.ts#L13)
+
+App secret key.
+
+***
+
+### requestBody
+
+```ts
+requestBody: string | Buffer;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/index.ts:33](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/index.ts#L33)
+
+The raw request body.
+
+#### Example
+
+```json
+import { constructEvent } from "@ecp.eth/sdk/indexer/webhooks";
+
+export function POST(request: Request) {
+  const event = constructEvent({
+    appSecret: process.env.APP_SECRET,
+    requestBody: request.body,
+    requestSignature: request.headers.get("x-ecp-webhook-signature"),
+    requestTimestamp: request.headers.get("x-ecp-webhook-timestamp"),
+  });
+
+  // ...
+}
+```
+
+***
+
+### requestSignature
+
+```ts
+requestSignature: string;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/index.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/index.ts#L37)
+
+The signature from X-ECP-Webhook-Signature header.
+
+***
+
+### requestTimestamp
+
+```ts
+requestTimestamp: string;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/index.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/index.ts#L41)
+
+The timestamp from X-ECP-Webhook-Timestamp header.

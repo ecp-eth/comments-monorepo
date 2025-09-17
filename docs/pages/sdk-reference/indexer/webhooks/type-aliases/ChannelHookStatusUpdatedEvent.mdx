@@ -1,0 +1,174 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelHookStatusUpdatedEvent
+
+# Type Alias: ChannelHookStatusUpdatedEvent
+
+```ts
+type ChannelHookStatusUpdatedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        hook: null | `0x${string}`;
+        id: bigint;
+        updatedAt: Date;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  };
+  event: "channel:hook:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:168](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L168)
+
+An event sent to webhook when a channel hook status is updated.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint;
+```
+
+Block number
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     hook: null | `0x${string}`;
+     id: bigint;
+     updatedAt: Date;
+  };
+  hook: {
+     address: `0x${string}`;
+     enabled: boolean;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  hook: null | `0x${string}`;
+  id: bigint;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.hook
+
+```ts
+hook: null | `0x${string}`;
+```
+
+Hook address
+
+#### data.channel.id
+
+```ts
+id: bigint;
+```
+
+ID of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date;
+```
+
+Updated at date
+
+#### data.hook
+
+```ts
+hook: {
+  address: `0x${string}`;
+  enabled: boolean;
+};
+```
+
+Updated hook data
+
+#### data.hook.address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+Address of the hook
+
+#### data.hook.enabled
+
+```ts
+enabled: boolean;
+```
+
+Enabled status
+
+### event
+
+```ts
+event: "channel:hook:status:updated";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
