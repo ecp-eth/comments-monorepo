@@ -852,17 +852,11 @@ describe("comment", () => {
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "title") {
-              expect(decodedValue, originalValues.title).toBe(
-                originalValues.title,
-              );
+              expect(decodedValue).toBe(originalValues.title);
             } else if (originalKey === "description") {
-              expect(decodedValue, originalValues.description).toBe(
-                originalValues.description,
-              );
+              expect(decodedValue).toBe(originalValues.description);
             } else if (originalKey === "category") {
-              expect(decodedValue, originalValues.category).toBe(
-                originalValues.category,
-              );
+              expect(decodedValue).toBe(originalValues.category);
             }
           }
         }
@@ -1406,10 +1400,7 @@ describe("comment", () => {
             const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
             const originalKey = decodedInfo.key;
 
-            expect(
-              typeof decodedValue === "string",
-              "decodedValue is a string",
-            );
+            expect(decodedValue).toBeTypeOf("string");
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "hash") {
@@ -1581,7 +1572,9 @@ describe("comment", () => {
         expect(Object.keys(fallbackParsed).length).toBe(14);
         for (const entry of retrievedComment.metadata) {
           expect(fallbackParsed[entry.key]).toBeDefined();
-          expect(fallbackParsed[entry.key]?.type, MetadataTypeValues.BYTES);
+          expect(fallbackParsed[entry.key]?.type).toBe(
+            MetadataTypeValues.BYTES,
+          );
           expect(fallbackParsed[entry.key]?.key).toBe(entry.key); // Uses hash as key
         }
 
