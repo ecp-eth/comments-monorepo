@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import type {
   IndexerAPICommentReferenceURLFileSchemaType,
   IndexerAPICommentReferenceURLImageSchemaType,
@@ -8,6 +9,7 @@ import DataLoader from "dataloader";
 import { parse as parseHTML } from "node-html-parser";
 import z from "zod";
 import { getImageMeta } from "../utils/getImageMeta.ts";
+import { getVideoMeta } from "../utils/getVideoMeta.ts";
 
 export type ResolvedURL =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
@@ -48,16 +50,38 @@ async function resolveURL(
 
   // we don't do any sophisticated check of actual content type
   if (contentType.startsWith("video/")) {
+    const videoMeta = await getVideoMeta(response, abortController).catch(
+      (rejectReason) => {
+        Sentry.captureException("Failed to get video tracks for URL", {
+          extra: {
+            url,
+            rejectReason,
+          },
+        });
+
+        return undefined;
+      },
+    );
     return {
       type: "video",
       mediaType: contentType,
       url: finalUrl,
+      videoTracks: videoMeta?.videoTracks,
     };
   }
 
   if (contentType.startsWith("image/")) {
     const meta = await getImageMeta(response, abortController).catch(
-      () => undefined,
+      (rejectReason) => {
+        Sentry.captureException("Failed to get image dimension for URL", {
+          extra: {
+            url,
+            rejectReason,
+          },
+        });
+
+        return undefined;
+      },
     );
     return {
       type: "image",

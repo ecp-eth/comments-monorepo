@@ -137,6 +137,13 @@ type IndexerAPICommentWithRepliesSchemaType = {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   replies: {
      extra: {
@@ -280,6 +287,13 @@ type IndexerAPICommentWithRepliesSchemaType = {
            };
            type: "video";
            url: string;
+           videoTracks?: {
+              codec?: ... | ...;
+              dimension: {
+                 height: ...;
+                 width: ...;
+              };
+           }[];
         })[];
         revision: number;
         targetUri: string;
@@ -402,6 +416,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
               };
               type: "video";
               url: string;
+              videoTracks?: ... | ...;
            })[];
            revision: number;
            targetUri: string;
@@ -569,6 +584,13 @@ type IndexerAPICommentWithRepliesSchemaType = {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -604,7 +626,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:440](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L440)
+Defined in: [packages/sdk/src/indexer/schemas.ts:450](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L450)
 
 ## Type declaration
 
@@ -897,6 +919,13 @@ references: (
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
@@ -1045,6 +1074,13 @@ replies: {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -1167,6 +1203,7 @@ replies: {
            };
            type: "video";
            url: string;
+           videoTracks?: ... | ...;
         })[];
         revision: number;
         targetUri: string;
@@ -1399,6 +1436,13 @@ results: {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;
@@ -1521,6 +1565,7 @@ results: {
         };
         type: "video";
         url: string;
+        videoTracks?: ... | ...;
      })[];
      revision: number;
      targetUri: string;
@@ -1712,6 +1757,13 @@ viewerReactions: Record<string, {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;

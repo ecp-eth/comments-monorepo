@@ -136,6 +136,13 @@ type IndexerAPICommentSchemaType = {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;
@@ -157,7 +164,7 @@ type IndexerAPICommentSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:383](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L383)
+Defined in: [packages/sdk/src/indexer/schemas.ts:393](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L393)
 
 ## Type declaration
 
@@ -444,6 +451,13 @@ references: (
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

@@ -15,10 +15,17 @@ type IndexerAPICommentReferenceURLVideoSchemaType = {
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:302](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L302)
+Defined in: [packages/sdk/src/indexer/schemas.ts:312](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L312)
 
 ## Type declaration
 
@@ -59,4 +66,16 @@ type: "video";
 
 ```ts
 url: string;
+```
+
+### videoTracks?
+
+```ts
+optional videoTracks: {
+  codec?: string;
+  dimension: {
+     height: number;
+     width: number;
+  };
+}[];
 ```

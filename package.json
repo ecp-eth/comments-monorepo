@@ -48,7 +48,8 @@
       "@walletconnect/universal-provider": "~2.21.1",
       "zod": "^3.25.76",
       "viem": "~2.29.2",
-      "use-sync-external-store": "^1.5.0"
+      "use-sync-external-store": "^1.5.0",
+      "vite": "6.3.5"
     },
     "patchedDependencies": {
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",

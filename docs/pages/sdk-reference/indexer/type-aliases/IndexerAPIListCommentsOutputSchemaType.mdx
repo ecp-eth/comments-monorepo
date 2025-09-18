@@ -149,6 +149,13 @@ type IndexerAPIListCommentsOutputSchemaType = {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: string;
+           dimension: {
+              height: number;
+              width: number;
+           };
+        }[];
      })[];
      replies: {
         extra: {
@@ -292,6 +299,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
               };
               type: "video";
               url: string;
+              videoTracks?: ...[];
            })[];
            revision: number;
            targetUri: string;
@@ -485,6 +493,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
            };
            type: "video";
            url: string;
+           videoTracks?: ...[];
         })[];
         revision: number;
         targetUri: string;
@@ -521,7 +530,7 @@ type IndexerAPIListCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:474](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L474)
+Defined in: [packages/sdk/src/indexer/schemas.ts:484](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L484)
 
 ## Type declaration
 
@@ -721,6 +730,13 @@ results: {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   replies: {
      extra: {
@@ -864,6 +880,7 @@ results: {
            };
            type: "video";
            url: string;
+           videoTracks?: ...[];
         })[];
         revision: number;
         targetUri: string;
@@ -1057,6 +1074,7 @@ results: {
         };
         type: "video";
         url: string;
+        videoTracks?: ...[];
      })[];
      revision: number;
      targetUri: string;

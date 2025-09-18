@@ -99,7 +99,14 @@ type IndexerAPICommentReferencesSchemaType = (
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 })[];
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:345](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L345)
+Defined in: [packages/sdk/src/indexer/schemas.ts:355](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L355)

@@ -149,6 +149,13 @@ function fetchCommentReplies(options): Promise<{
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
      })[];
      replies: {
         extra: {
@@ -280,6 +287,7 @@ function fetchCommentReplies(options): Promise<{
               };
               type: "video";
               url: string;
+              videoTracks?: ... | ...;
            })[];
            revision: number;
            targetUri: string;
@@ -451,6 +459,7 @@ function fetchCommentReplies(options): Promise<{
            };
            type: "video";
            url: string;
+           videoTracks?: ... | ...;
         })[];
         revision: number;
         targetUri: string;
@@ -641,6 +650,13 @@ Fetch replies for a comment from the Indexer API
         \};
         `type`: `"video"`;
         `url`: `string`;
+        `videoTracks?`: \{
+           `codec?`: ... \| ...;
+           `dimension`: \{
+              `height`: ...;
+              `width`: ...;
+           \};
+        \}[];
      \})[];
      `replies`: \{
         `extra`: \{
@@ -772,6 +788,7 @@ Fetch replies for a comment from the Indexer API
               \};
               `type`: `"video"`;
               `url`: `string`;
+              `videoTracks?`: ... \| ...;
            \})[];
            `revision`: `number`;
            `targetUri`: `string`;
@@ -943,6 +960,7 @@ Fetch replies for a comment from the Indexer API
            \};
            `type`: `"video"`;
            `url`: `string`;
+           `videoTracks?`: ... \| ...;
         \})[];
         `revision`: `number`;
         `targetUri`: `string`;

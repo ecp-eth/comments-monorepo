@@ -184,6 +184,13 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
    })[], ZodTypeDef, (
      | {
      address: `0x${string}`;
@@ -276,6 +283,13 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
   })[]>;
   revision: ZodNumber;
   targetUri: ZodString;
@@ -520,6 +534,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         };
         type: "video";
         url: string;
+        videoTracks?: ... | ...;
      })[];
      revision: number;
      targetUri: string;
@@ -655,6 +670,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         };
         type: "video";
         url: string;
+        videoTracks?: ... | ...;
      })[];
      revision: number;
      targetUri: string;
@@ -804,6 +820,13 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;
@@ -938,6 +961,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ...;
+           dimension: ...;
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -1100,6 +1127,13 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;
@@ -1234,6 +1268,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ...;
+           dimension: ...;
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -1269,4 +1307,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:408](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L408)
+Defined in: [packages/sdk/src/indexer/schemas.ts:418](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L418)

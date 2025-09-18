@@ -137,6 +137,13 @@ function fetchComment(options): Promise<{
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   replies: {
      extra: {
@@ -280,6 +287,10 @@ function fetchComment(options): Promise<{
            };
            type: "video";
            url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
         })[];
         revision: number;
         targetUri: string;
@@ -381,6 +392,7 @@ function fetchComment(options): Promise<{
               position: ...;
               type: ...;
               url: ...;
+              videoTracks?: ...;
            })[];
            revision: number;
            targetUri: string;
@@ -548,6 +560,10 @@ function fetchComment(options): Promise<{
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ...;
+           dimension: ...;
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -725,6 +741,13 @@ Fetch one single comment from the Indexer API
      \};
      `type`: `"video"`;
      `url`: `string`;
+     `videoTracks?`: \{
+        `codec?`: `string`;
+        `dimension`: \{
+           `height`: `number`;
+           `width`: `number`;
+        \};
+     \}[];
   \})[];
   `replies`: \{
      `extra`: \{
@@ -868,6 +891,10 @@ Fetch one single comment from the Indexer API
            \};
            `type`: `"video"`;
            `url`: `string`;
+           `videoTracks?`: \{
+              `codec?`: ...;
+              `dimension`: ...;
+           \}[];
         \})[];
         `revision`: `number`;
         `targetUri`: `string`;
@@ -969,6 +996,7 @@ Fetch one single comment from the Indexer API
               `position`: ...;
               `type`: ...;
               `url`: ...;
+              `videoTracks?`: ...;
            \})[];
            `revision`: `number`;
            `targetUri`: `string`;
@@ -1136,6 +1164,10 @@ Fetch one single comment from the Indexer API
         \};
         `type`: `"video"`;
         `url`: `string`;
+        `videoTracks?`: \{
+           `codec?`: ...;
+           `dimension`: ...;
+        \}[];
      \})[];
      `revision`: `number`;
      `targetUri`: `string`;

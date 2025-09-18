@@ -137,6 +137,13 @@ type IndexerAPICommentReactionSchemaType = {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;
@@ -271,6 +278,13 @@ type IndexerAPICommentReactionSchemaType = {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
      })[];
      revision: number;
      targetUri: string;
@@ -306,7 +320,7 @@ type IndexerAPICommentReactionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:404](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L404)
+Defined in: [packages/sdk/src/indexer/schemas.ts:414](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L414)
 
 ## Type declaration
 
@@ -599,6 +613,13 @@ references: (
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
@@ -758,6 +779,13 @@ viewerReactions: Record<string, {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
   })[];
   revision: number;
   targetUri: string;

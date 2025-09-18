@@ -297,6 +297,16 @@ export const IndexerAPICommentReferenceURLVideoSchema = z.object({
   url: z.string().url(),
   position: IndexerAPICommentReferencePositionSchema,
   mediaType: z.string(),
+  // theoratically we could also support audio tracks in a video in the future
+  // so for naming consistency we use `videoTracks` instead of `tracks`
+  videoTracks: z
+    .array(
+      z.object({
+        dimension: IndexerAPICommentReferenceMediaDimensionSchema,
+        codec: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 export type IndexerAPICommentReferenceURLVideoSchemaType = z.infer<
