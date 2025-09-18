@@ -34,8 +34,13 @@ async function resolveURL(
   url: string,
   timeout: number,
 ): Promise<ResolvedURL | null> {
-  const abortController = createTimedAbortController(timeout);
-  const response = await fetch(url, { signal: abortController.signal });
+  const abortController = new AbortController();
+  const response = await fetch(url, {
+    signal: AbortSignal.any([
+      abortController.signal,
+      AbortSignal.timeout(timeout),
+    ]),
+  });
   const contentType =
     normalizeContentType(response.headers.get("content-type")) ||
     "application/octet-stream";
@@ -216,17 +221,4 @@ export function createURLResolver({
       ...dataLoaderOptions,
     },
   );
-}
-
-function createTimedAbortController(timeout: number): AbortController {
-  const abortController = new AbortController();
-  setTimeout(() => {
-    abortController.abort(
-      new DOMException(
-        "The operation was aborted due to timeout",
-        "TimeoutError",
-      ),
-    );
-  }, timeout);
-  return abortController;
 }
