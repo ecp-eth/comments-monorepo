@@ -91,6 +91,7 @@ type IndexerAPICommentReactionSchemaType = {
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -116,6 +117,10 @@ type IndexerAPICommentReactionSchemaType = {
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -220,6 +225,7 @@ type IndexerAPICommentReactionSchemaType = {
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: null | string;
@@ -245,6 +251,10 @@ type IndexerAPICommentReactionSchemaType = {
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -296,7 +306,7 @@ type IndexerAPICommentReactionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:397](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L397)
+Defined in: [packages/sdk/src/indexer/schemas.ts:404](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L404)
 
 ## Type declaration
 
@@ -543,6 +553,7 @@ references: (
   | {
   description: null | string;
   favicon: null | string;
+  mediaType: string;
   opengraph:   | null
      | {
      description: null | string;
@@ -568,6 +579,10 @@ references: (
   url: string;
 }
   | {
+  dimension?: {
+     height: number;
+     width: number;
+  };
   mediaType: string;
   position: {
      end: number;
@@ -697,6 +712,7 @@ viewerReactions: Record<string, {
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -722,6 +738,10 @@ viewerReactions: Record<string, {
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;

@@ -98,6 +98,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: null | string;
@@ -123,6 +124,10 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -161,7 +166,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:507](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L507)
+Defined in: [packages/sdk/src/indexer/schemas.ts:514](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L514)
 
 ## Type declaration
 
@@ -293,6 +298,7 @@ results: {
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -318,6 +324,10 @@ results: {
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;

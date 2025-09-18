@@ -446,6 +446,7 @@ describe("resolveCommentReferences", () => {
         description: null,
         opengraph: null,
         favicon: null,
+        mediaType: "text/html",
       };
 
       resolveUrl.mockResolvedValue(resolvedValue);
@@ -459,7 +460,6 @@ describe("resolveCommentReferences", () => {
       );
 
       expect(resolveUrl).toHaveBeenCalledTimes(1);
-
       expect(result.status).toBe("success");
       expect(result.references).toEqual([
         {
@@ -480,6 +480,7 @@ describe("resolveCommentReferences", () => {
         description: null,
         opengraph: null,
         favicon: null,
+        mediaType: "text/html",
       };
 
       resolveUrl.mockResolvedValue(resolvedValue);
@@ -615,6 +616,7 @@ describe("resolveCommentReferences", () => {
         description: null,
         opengraph: null,
         favicon: null,
+        mediaType: "text/html",
       });
       resolveEnsByName.mockResolvedValueOnce({
         address: "0x225f137127d9067788314bc7fcc1f36746a3c3B5",
@@ -658,6 +660,7 @@ describe("resolveCommentReferences", () => {
         description: null,
         opengraph: null,
         favicon: null,
+        mediaType: "text/html",
       });
       resolveEnsByName.mockRejectedValueOnce(new Error("Failed to resolve"));
       resolveERC20ByTicker.mockResolvedValueOnce({

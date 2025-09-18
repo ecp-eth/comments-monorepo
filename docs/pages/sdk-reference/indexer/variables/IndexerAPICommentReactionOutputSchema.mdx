@@ -138,6 +138,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -163,6 +164,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -225,6 +230,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -250,6 +256,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -473,6 +483,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         | {
         description: ... | ...;
         favicon: ... | ...;
+        mediaType: string;
         opengraph: ... | ...;
         position: {
            end: ...;
@@ -492,6 +503,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         url: string;
       }
         | {
+        dimension?: ... | ...;
         mediaType: string;
         position: {
            end: ...;
@@ -606,6 +618,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         | {
         description: ... | ...;
         favicon: ... | ...;
+        mediaType: string;
         opengraph: ... | ...;
         position: {
            end: ...;
@@ -625,6 +638,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         url: string;
       }
         | {
+        dimension?: ... | ...;
         mediaType: string;
         position: {
            end: ...;
@@ -744,6 +758,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -769,6 +784,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -873,6 +892,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: ... | ...;
@@ -898,6 +918,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -1030,6 +1054,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -1055,6 +1080,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -1159,6 +1188,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: ... | ...;
@@ -1184,6 +1214,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -1235,4 +1269,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:401](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L401)
+Defined in: [packages/sdk/src/indexer/schemas.ts:408](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L408)

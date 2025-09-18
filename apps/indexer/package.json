@@ -53,6 +53,7 @@
     "hono": "^4.9.1",
     "hono-rate-limiter": "^0.4.2",
     "is-network-error": "^1.1.0",
+    "image-size": "^2.0.2",
     "lru-cache": "^11.0.2",
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",

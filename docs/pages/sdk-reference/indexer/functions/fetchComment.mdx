@@ -91,6 +91,7 @@ function fetchComment(options): Promise<{
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -116,6 +117,10 @@ function fetchComment(options): Promise<{
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -229,6 +234,7 @@ function fetchComment(options): Promise<{
            | {
            description: null | string;
            favicon: null | string;
+           mediaType: string;
            opengraph:   | null
               | {
               description: ... | ...;
@@ -254,6 +260,10 @@ function fetchComment(options): Promise<{
            url: string;
          }
            | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
            mediaType: string;
            position: {
               end: number;
@@ -346,6 +356,7 @@ function fetchComment(options): Promise<{
               | {
               description: ...;
               favicon: ...;
+              mediaType: ...;
               opengraph: ...;
               position: ...;
               title: ...;
@@ -359,6 +370,7 @@ function fetchComment(options): Promise<{
               url: ...;
             }
               | {
+              dimension?: ...;
               mediaType: ...;
               position: ...;
               type: ...;
@@ -490,6 +502,7 @@ function fetchComment(options): Promise<{
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: ... | ...;
@@ -515,6 +528,10 @@ function fetchComment(options): Promise<{
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -662,6 +679,7 @@ Fetch one single comment from the Indexer API
      \| \{
      `description`: `null` \| `string`;
      `favicon`: `null` \| `string`;
+     `mediaType`: `string`;
      `opengraph`:   \| `null`
         \| \{
         `description`: `null` \| `string`;
@@ -687,6 +705,10 @@ Fetch one single comment from the Indexer API
      `url`: `string`;
    \}
      \| \{
+     `dimension?`: \{
+        `height`: `number`;
+        `width`: `number`;
+     \};
      `mediaType`: `string`;
      `position`: \{
         `end`: `number`;
@@ -800,6 +822,7 @@ Fetch one single comment from the Indexer API
            \| \{
            `description`: `null` \| `string`;
            `favicon`: `null` \| `string`;
+           `mediaType`: `string`;
            `opengraph`:   \| `null`
               \| \{
               `description`: ... \| ...;
@@ -825,6 +848,10 @@ Fetch one single comment from the Indexer API
            `url`: `string`;
          \}
            \| \{
+           `dimension?`: \{
+              `height`: `number`;
+              `width`: `number`;
+           \};
            `mediaType`: `string`;
            `position`: \{
               `end`: `number`;
@@ -917,6 +944,7 @@ Fetch one single comment from the Indexer API
               \| \{
               `description`: ...;
               `favicon`: ...;
+              `mediaType`: ...;
               `opengraph`: ...;
               `position`: ...;
               `title`: ...;
@@ -930,6 +958,7 @@ Fetch one single comment from the Indexer API
               `url`: ...;
             \}
               \| \{
+              `dimension?`: ...;
               `mediaType`: ...;
               `position`: ...;
               `type`: ...;
@@ -1061,6 +1090,7 @@ Fetch one single comment from the Indexer API
         \| \{
         `description`: `null` \| `string`;
         `favicon`: `null` \| `string`;
+        `mediaType`: `string`;
         `opengraph`:   \| `null`
            \| \{
            `description`: ... \| ...;
@@ -1086,6 +1116,10 @@ Fetch one single comment from the Indexer API
         `url`: `string`;
       \}
         \| \{
+        `dimension?`: \{
+           `height`: `number`;
+           `width`: `number`;
+        \};
         `mediaType`: `string`;
         `position`: \{
            `end`: `number`;

@@ -36,6 +36,7 @@ describe("IndexerAPICommentReferencesSchema", () => {
             "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
           url: "https://www.google.com",
         },
+        mediaType: "text/html",
       },
       {
         position,
@@ -83,6 +84,7 @@ describe("IndexerAPICommentReferencesSchema", () => {
           image: "/not-a-url",
           url: "https://www.google.com",
         },
+        mediaType: "text/html",
       },
       {
         position,
