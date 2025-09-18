@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect, beforeAll } from "vitest";
 import {
   createWalletClient,
   http,
@@ -27,7 +27,11 @@ import type {
 import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("approval", () => {
-  const { commentsAddress } = deployContracts();
+  let commentsAddress: Hex;
+
+  beforeAll(() => {
+    ({ commentsAddress } = deployContracts());
+  });
 
   // Test account setup
   const testPrivateKey =

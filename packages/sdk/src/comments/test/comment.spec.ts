@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect, beforeAll } from "vitest";
 import {
   ContractFunctionExecutionError,
   createWalletClient,
@@ -44,7 +44,11 @@ import type { MetadataEntry } from "../types.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("comment", () => {
-  const { commentsAddress } = deployContracts();
+  let commentsAddress: Hex;
+
+  beforeAll(() => {
+    ({ commentsAddress } = deployContracts());
+  });
 
   // Test account setup
   const testPrivateKey =

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect, beforeAll } from "vitest";
 import {
   createWalletClient,
   http,
@@ -32,11 +32,17 @@ import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("channel", () => {
-  const {
-    channelManagerAddress,
-    flatFeeHookAddress,
-    legacyTakeChannelFeeHookAddress,
-  } = deployContracts();
+  let channelManagerAddress: Hex;
+  let flatFeeHookAddress: Hex;
+  let legacyTakeChannelFeeHookAddress: Hex;
+
+  beforeAll(() => {
+    ({
+      channelManagerAddress,
+      flatFeeHookAddress,
+      legacyTakeChannelFeeHookAddress,
+    } = deployContracts());
+  });
 
   // Test account setup
   const testPrivateKey =

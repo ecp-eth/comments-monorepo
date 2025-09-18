@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, beforeAll, expect } from "vitest";
 import {
   createWalletClient,
   http,
@@ -17,9 +17,15 @@ import {
 import { createChannel } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
+import type { Hex } from "../../core/schemas.js";
 
 describe("hook", () => {
-  const { channelManagerAddress, noopHookAddress } = deployContracts();
+  let channelManagerAddress: Hex;
+  let noopHookAddress: Hex;
+
+  beforeAll(() => {
+    ({ channelManagerAddress, noopHookAddress } = deployContracts());
+  });
 
   // Test account setup
   const testPrivateKey =
