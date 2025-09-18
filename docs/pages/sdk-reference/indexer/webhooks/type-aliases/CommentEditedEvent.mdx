@@ -61,6 +61,7 @@ type CommentEditedEvent = {
            | {
            description: null | string;
            favicon: null | string;
+           mediaType: string;
            opengraph:   | null
               | {
               description: null | string;
@@ -86,6 +87,10 @@ type CommentEditedEvent = {
            url: string;
          }
            | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
            mediaType: string;
            position: {
               end: number;
@@ -102,6 +107,13 @@ type CommentEditedEvent = {
            };
            type: "video";
            url: string;
+           videoTracks?: {
+              codec?: string;
+              dimension: {
+                 height: number;
+                 width: number;
+              };
+           }[];
         })[];
         updatedAt: Date;
      };
@@ -190,6 +202,7 @@ data: {
         | {
         description: null | string;
         favicon: null | string;
+        mediaType: string;
         opengraph:   | null
            | {
            description: null | string;
@@ -215,6 +228,10 @@ data: {
         url: string;
       }
         | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
         mediaType: string;
         position: {
            end: number;
@@ -231,6 +248,13 @@ data: {
         };
         type: "video";
         url: string;
+        videoTracks?: {
+           codec?: string;
+           dimension: {
+              height: number;
+              width: number;
+           };
+        }[];
      })[];
      updatedAt: Date;
   };
@@ -292,6 +316,7 @@ comment: {
      | {
      description: null | string;
      favicon: null | string;
+     mediaType: string;
      opengraph:   | null
         | {
         description: null | string;
@@ -317,6 +342,10 @@ comment: {
      url: string;
    }
      | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
      mediaType: string;
      position: {
         end: number;
@@ -333,6 +362,13 @@ comment: {
      };
      type: "video";
      url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
   })[];
   updatedAt: Date;
 };
@@ -413,6 +449,7 @@ references: (
   | {
   description: null | string;
   favicon: null | string;
+  mediaType: string;
   opengraph:   | null
      | {
      description: null | string;
@@ -438,6 +475,10 @@ references: (
   url: string;
 }
   | {
+  dimension?: {
+     height: number;
+     width: number;
+  };
   mediaType: string;
   position: {
      end: number;
@@ -454,6 +495,13 @@ references: (
   };
   type: "video";
   url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

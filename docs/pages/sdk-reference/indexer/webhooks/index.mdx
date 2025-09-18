@@ -9,6 +9,14 @@
 Ethereum Comments Protocol SDK Indexer
 Functionality for constructing events from webhook requests.
 
+## Classes
+
+| Class | Description |
+| ------ | ------ |
+| [InvalidEventError](/sdk-reference/indexer/webhooks/classes/InvalidEventError.mdx) | Thrown when the event is invalid. |
+| [InvalidEventSignatureError](/sdk-reference/indexer/webhooks/classes/InvalidEventSignatureError.mdx) | Thrown when the event signature is invalid. |
+| [InvalidRequestBodyError](/sdk-reference/indexer/webhooks/classes/InvalidRequestBodyError.mdx) | Thrown when the request body is not valid JSON object. |
+
 ## Type Aliases
 
 | Type Alias | Description |
@@ -27,7 +35,7 @@ Functionality for constructing events from webhook requests.
 | [CommentModerationStatus](/sdk-reference/indexer/webhooks/type-aliases/CommentModerationStatus.mdx) | Comment moderation status schema. |
 | [CommentModerationStatusUpdatedEvent](/sdk-reference/indexer/webhooks/type-aliases/CommentModerationStatusUpdatedEvent.mdx) | An event sent to webhook when a comment moderation status is updated. |
 | [CommentReactionsUpdatedEvent](/sdk-reference/indexer/webhooks/type-aliases/CommentReactionsUpdatedEvent.mdx) | An event sent to webhook when a comment reactions are updated. |
-| [ConstructEventOptions](/sdk-reference/indexer/webhooks/type-aliases/ConstructEventOptions.mdx) | - |
+| [ConstructEventResult](/sdk-reference/indexer/webhooks/type-aliases/ConstructEventResult.mdx) | - |
 | [TestEvent](/sdk-reference/indexer/webhooks/type-aliases/TestEvent.mdx) | An event sent to webhook when a test event is triggered. |
 
 ## Variables
@@ -77,4 +85,5 @@ Functionality for constructing events from webhook requests.
 
 | Function | Description |
 | ------ | ------ |
-| [constructEvent](/sdk-reference/indexer/webhooks/functions/constructEvent.mdx) | - |
+| [constructEvent](/sdk-reference/indexer/webhooks/functions/constructEvent.mdx) | Constructs an event from the request body, signature, and timestamp. |
+| [constructEventFromRequest](/sdk-reference/indexer/webhooks/functions/constructEventFromRequest.mdx) | Constructs an event from a request. |

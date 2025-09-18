@@ -2,12 +2,12 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / constructEvent
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ConstructEventResult
 
-# Function: constructEvent()
+# Type Alias: ConstructEventResult
 
 ```ts
-function constructEvent(options): 
+type ConstructEventResult = 
   | {
   blockNumber: bigint;
   chainId: number;
@@ -608,41 +608,9 @@ function constructEvent(options):
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/utils.ts#L102)
+Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/utils.ts#L37)
 
-Constructs an event from the request body, signature, and timestamp.
-
-## Parameters
-
-### options
-
-The options for constructing the event.
-
-#### appSecret
-
-`string` = `...`
-
-The app secret key.
-
-#### requestBody
-
-`string` = `...`
-
-The request body.
-
-#### requestSignature
-
-`string` = `...`
-
-The signature from X-ECP-Webhook-Signature header.
-
-#### requestTimestamp
-
-`string` \| `number` = `...`
-
-The timestamp from X-ECP-Webhook-Timestamp header.
-
-## Returns
+## Type declaration
 
 ```ts
 {
@@ -3664,34 +3632,3 @@ webhookId: string;
 ```
 
 Webhook ID
-
-The event.
-
-## Example
-
-```json
-import { constructEvent } from "@ecp.eth/sdk/indexer/webhooks";
-
-export async function POST(request: Request) {
-  const event = constructEvent({
-    appSecret: process.env.APP_SECRET,
-    requestBody: await request.text(),
-    requestSignature: request.headers.get("x-ecp-webhook-signature"),
-    requestTimestamp: request.headers.get("x-ecp-webhook-timestamp"),
-  });
-
-  // ...
-}
-```
-
-## Throws
-
-If the event signature is invalid.
-
-## Throws
-
-If the request body is not valid JSON object.
-
-## Throws
-
-If the event is invalid.
