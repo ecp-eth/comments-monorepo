@@ -47,6 +47,15 @@ is_foundry_installed() {
     command -v forge >/dev/null 2>&1
 }
 
+# Function to check if foundry is installed via homebrew
+is_foundry_homebrew() {
+    if is_foundry_installed; then
+        forge --version 2>/dev/null | head -n1 | grep -q "\-Homebrew"
+    else
+        return 1
+    fi
+}
+
 # Function to get current foundry version
 get_foundry_version() {
     if is_foundry_installed; then
@@ -91,6 +100,15 @@ main() {
     # Check if foundry is installed
     if ! is_foundry_installed; then
         install_foundry
+    fi
+
+    # Check if foundry is installed via homebrew
+    if is_foundry_homebrew; then
+        echo "❌ Error: Foundry is installed via Homebrew" >&2
+        echo "   Homebrew does not support rolling back to specific versions" >&2
+        echo "   Please uninstall foundry via Homebrew (this script will help with installing the correct version):" >&2
+        echo "   brew uninstall foundry" >&2
+        exit 1
     fi
     
     # Check version
