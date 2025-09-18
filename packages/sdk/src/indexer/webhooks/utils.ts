@@ -50,7 +50,7 @@ const ConstructEventOptionsSchema = z.object({
    */
   requestSignature: z
     .string()
-    .regex(/^v1=[a-f0-9]+$/, "Invalid signature format")
+    .regex(/^v1=[a-f0-9]{64}$/, "Invalid signature format")
     .transform((value) => value.slice(3)),
   /**
    * The timestamp from X-ECP-Webhook-Timestamp header.
@@ -111,8 +111,11 @@ export function constructEvent(
     requestTimestamp,
   );
 
+  const requestSignatureBuffer = Buffer.from(requestSignature, "hex");
+
   if (
-    !timingSafeEqual(computedSignature, Buffer.from(requestSignature, "hex"))
+    requestSignatureBuffer.length !== computedSignature.length ||
+    !timingSafeEqual(computedSignature, requestSignatureBuffer)
   ) {
     throw new InvalidEventSignatureError();
   }
