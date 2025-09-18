@@ -45,7 +45,7 @@ export function CommentMediaVideo({
       ref={videoRef}
       src={url}
       controls
-      className="max-w-full max-h-full rounded-md"
+      className="w-full h-full rounded-md"
       style={{ objectFit }}
     />
   );
@@ -53,7 +53,12 @@ export function CommentMediaVideo({
   return (
     <div className="w-full h-full flex items-center justify-center">
       {typeof file === "string" ? (
-        <a href={file} target="_blank" rel="noopener noreferrer">
+        <a
+          href={file}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full h-full"
+        >
           {video}
         </a>
       ) : (

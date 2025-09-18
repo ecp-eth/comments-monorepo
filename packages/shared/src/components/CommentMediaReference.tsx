@@ -38,7 +38,7 @@ function CommentMediaReferenceWrapper({
   children: React.ReactNode;
 }) {
   return (
-    <div className="w-[100px] h-[100px] flex flex-col items-center justify-center gap-2 p-2 border rounded-md bg-muted/30 overflow-hidden">
+    <div className="w-[200px] h-[200px] flex flex-col items-center justify-center gap-2 p-2 border rounded-md bg-muted/30 overflow-hidden">
       {children}
     </div>
   );
