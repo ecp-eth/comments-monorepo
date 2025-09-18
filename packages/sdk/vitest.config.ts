@@ -5,9 +5,6 @@ export default defineConfig({
     // Global setup file - runs once before all tests
     globalSetup: "./scripts/vitest-global-setup.ts",
 
-    // Setup files - run before each test file
-    setupFiles: ["./scripts/vitest-setup.ts"],
-
     // Environment configuration
     environment: "node",
 
@@ -24,5 +21,8 @@ export default defineConfig({
         singleThread: true,
       },
     },
+  },
+  define: {
+    __DEV__: JSON.stringify(true), // Set to true for tests
   },
 });

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, beforeAll, expect } from "vitest";
+import { describe, it, beforeEach, expect } from "vitest";
 import {
   ContractFunctionExecutionError,
   createWalletClient,
@@ -27,7 +27,6 @@ import {
 } from "../comment.js";
 import { addApproval, revokeApproval } from "../approval.js";
 import { CommentManagerABI } from "../../abis.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CreateCommentData } from "../schemas.js";
 import { privateKeyToAccount } from "viem/accounts";
@@ -42,13 +41,10 @@ import {
   MetadataTypeValues,
 } from "../metadata.js";
 import type { MetadataEntry } from "../types.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("comment", () => {
-  let commentsAddress: Hex;
-
-  beforeAll(async () => {
-    commentsAddress = deployContracts().commentsAddress;
-  });
+  const { commentsAddress } = deployContracts();
 
   // Test account setup
   const testPrivateKey =
@@ -68,18 +64,21 @@ describe("comment", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: appAccount,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: thirdPartyAccount,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   describe("postComment()", () => {

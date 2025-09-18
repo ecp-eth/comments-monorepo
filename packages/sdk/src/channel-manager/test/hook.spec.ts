@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, beforeAll, expect } from "vitest";
+import { describe, it, beforeEach, expect } from "vitest";
 import {
   createWalletClient,
   http,
@@ -17,17 +17,9 @@ import {
 import { createChannel } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
 import { deployContracts } from "../../../scripts/test-helpers.js";
-import type { Hex } from "../../core/schemas.js";
 
 describe("hook", () => {
-  let channelManagerAddress: Hex;
-  let noopHookAddress: Hex;
-
-  beforeAll(async () => {
-    const reuslt = deployContracts();
-    channelManagerAddress = reuslt.channelManagerAddress;
-    noopHookAddress = reuslt.noopHookAddress;
-  });
+  const { channelManagerAddress, noopHookAddress } = deployContracts();
 
   // Test account setup
   const testPrivateKey =
@@ -43,12 +35,14 @@ describe("hook", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: account2,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   describe("setHook()", () => {

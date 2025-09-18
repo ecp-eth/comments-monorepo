@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, beforeAll, expect } from "vitest";
+import { describe, it, beforeEach, expect } from "vitest";
 import {
   createWalletClient,
   http,
@@ -25,24 +25,18 @@ import {
   estimateChannelPostCommentFee,
 } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CommentData, MetadataEntry } from "../../comments/types.js";
 import { AuthorAuthMethod } from "../../comments/types.js";
 import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("channel", () => {
-  let channelManagerAddress: Hex;
-  let flatFeeHookAddress: Hex;
-  let legacyTakeChannelFeeHookAddress: Hex;
-
-  beforeAll(async () => {
-    ({
-      channelManagerAddress,
-      flatFeeHookAddress,
-      legacyTakeChannelFeeHookAddress,
-    } = deployContracts());
-  });
+  const {
+    channelManagerAddress,
+    flatFeeHookAddress,
+    legacyTakeChannelFeeHookAddress,
+  } = deployContracts();
 
   // Test account setup
   const testPrivateKey =
@@ -58,12 +52,14 @@ describe("channel", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: account2,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   async function resetFees() {
@@ -476,7 +472,7 @@ describe("channel", () => {
 
     async function createChannelWithHook(hookAddress: Hex) {
       const result = await createChannel({
-        name: "Test channel for fee estimation",
+        name: "Test channel for fee estimation" + Date.now(),
         fee: parseEther("0.02"),
         // flat fee hook address
         hook: hookAddress,

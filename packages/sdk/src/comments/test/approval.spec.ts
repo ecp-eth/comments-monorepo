@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, beforeAll, expect } from "vitest";
+import { describe, it, beforeEach, expect } from "vitest";
 import {
   createWalletClient,
   http,
@@ -18,20 +18,16 @@ import {
   createApprovalTypedData,
   createRemoveApprovalTypedData,
 } from "../approval.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import { getNonce } from "../comment.js";
 import type {
   AddApprovalTypedDataSchemaType,
   RemoveApprovalTypedDataSchemaType,
 } from "../schemas.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("approval", () => {
-  let commentsAddress: Hex;
-
-  beforeAll(async () => {
-    commentsAddress = deployContracts().commentsAddress;
-  });
+  const { commentsAddress } = deployContracts();
 
   // Test account setup
   const testPrivateKey =
@@ -47,12 +43,14 @@ describe("approval", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: app,
+    pollingInterval: 100,
   }).extend(publicActions);
 
   describe("isApproved()", () => {

@@ -1,6 +1,5 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
-import { deployContracts } from "./test-helpers.js";
 
 let nodeProcess: ChildProcess;
 
@@ -11,14 +10,10 @@ export async function setup() {
 
   // Start Anvil node
   console.log("📡 Starting Anvil node...");
-  nodeProcess = spawn(
-    "anvil",
-    ["--host", "0.0.0.0", "--block-time", "1", "--slots-in-an-epoch", "1"],
-    {
-      cwd,
-      env: process.env,
-    },
-  );
+  nodeProcess = spawn("anvil", ["--host", "0.0.0.0", "--block-time", "1"], {
+    cwd,
+    env: process.env,
+  });
 
   const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
@@ -55,19 +50,9 @@ export async function setup() {
   nodeProcess.stdout?.removeAllListeners();
   nodeProcess.stderr?.removeAllListeners();
 
-  // Deploy contracts
-  console.log("📄 Deploying test contracts...");
-  try {
-    const contractAddresses = deployContracts();
-    console.log("✅ Contracts deployed:", contractAddresses);
-
-    // Make contract addresses available globally
-    globalThis.__TEST_CONTRACTS__ = contractAddresses;
-  } catch (error) {
-    console.error("❌ Contract deployment failed:", error);
-    throw error;
-  }
-
+  console.log("🔄 Verifying Anvil connection...");
+  await verifyAnvilConnection();
+  console.log("✅ Anvil connection verified");
   console.log("🎉 Global test setup complete!");
 }
 
@@ -89,4 +74,40 @@ export async function teardown() {
   }
 
   console.log("🏁 Global test teardown complete!");
+}
+
+async function verifyAnvilConnection() {
+  const maxRetries = 5;
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      const response = await fetch("http://localhost:8545", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_blockNumber",
+          params: [],
+          id: 1,
+        }),
+        signal: AbortSignal.timeout(1000),
+      });
+
+      if (response.ok) {
+        console.log("✅ Anvil connection verified");
+        return;
+      }
+    } catch (error) {
+      console.log(`🔄 Connection attempt ${retries + 1} failed, retrying...`);
+      console.error(error);
+    }
+
+    retries++;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  throw new Error("Failed to connect to Anvil after multiple attempts");
 }

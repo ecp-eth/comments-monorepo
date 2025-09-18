@@ -8,6 +8,6 @@
     "allowImportingTsExtensions": true,
     "rootDir": "."
   },
-  "include": ["./"],
+  "include": ["./", "../types"],
   "exclude": []
 }
