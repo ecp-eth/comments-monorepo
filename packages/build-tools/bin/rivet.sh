@@ -70,7 +70,7 @@ install_foundry() {
     echo "🔧 Foundry not found. Installing foundry..."
     curl -L https://foundry.paradigm.xyz | bash
     source ~/.bashrc 2>/dev/null || true
-    source ~/.zshrc 2>/dev/null || true
+    source ~/.zshenv 2>/dev/null || true
     
     # Try to run foundryup
     if command -v foundryup >/dev/null 2>&1; then

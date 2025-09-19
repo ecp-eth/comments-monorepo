@@ -11,8 +11,9 @@ export default defineConfig({
     // Globals configuration
     globals: true,
 
-    // Test timeout
+    // Test timeouts
     testTimeout: 30000,
+    hookTimeout: 30000,
 
     // Pool configuration for test execution
     pool: "threads",
