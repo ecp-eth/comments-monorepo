@@ -65,20 +65,50 @@ get_foundry_version() {
     fi
 }
 
+# Function to detect user's shell
+is_user_shell_zsh() {
+    USER_SHELL=$(basename "${SHELL:-/bin/bash}")
+    [ "$USER_SHELL" = "zsh" ] || echo "$SHELL" | grep -q "zsh"
+}
+
 # Function to install foundry
 install_foundry() {
     echo "🔧 Foundry not found. Installing foundry..."
     curl -L https://foundry.paradigm.xyz | bash
-    source ~/.bashrc 2>/dev/null || true
-    source ~/.zshrc 2>/dev/null || true
-    
-    # Try to run foundryup
-    if command -v foundryup >/dev/null 2>&1; then
-        foundryup
+
+    # Detect shell and source appropriate rc file
+    # Since this script runs under sh, we need to detect the user's actual shell
+    if is_user_shell_zsh; then
+        echo "🔧 ZSH detected. Sourcing ~/.zshenv..."
+        source ~/.zshenv 2>/dev/null || true
     else
-        echo "❌ Failed to install foundry. Please install manually:"
-        echo "   curl -L https://foundry.paradigm.xyz | bash"
-        echo "   source ~/.bashrc"
+        echo "🔧 BASH detected. Sourcing ~/.bashrc..."
+        source ~/.bashrc 2>/dev/null || true
+    fi
+
+    # Check if foundryup is available
+    if ! command -v foundryup >/dev/null 2>&1; then
+        echo "❌ Failed to install foundry. Please run these commands manually:"
+        if is_user_shell_zsh; then
+            echo "   source ~/.zshenv # or start a new terminal"
+        else
+            echo "   source ~/.bashrc # or start a new terminal"
+        fi
+        echo "   foundryup"
+        exit 1
+    fi
+
+    # Run foundryup to complete installation
+    foundryup
+    
+    # Verify foundryup worked
+    if ! command -v forge >/dev/null 2>&1; then
+        echo "❌ Foundry installation failed. Please run these commands manually:"
+        if is_user_shell_zsh; then
+            echo "   source ~/.zshenv # or start a new terminal"
+        else
+            echo "   source ~/.bashrc # or start a new terminal"
+        fi
         echo "   foundryup"
         exit 1
     fi
