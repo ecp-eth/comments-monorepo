@@ -230,6 +230,14 @@ export default defineConfig({
               link: "/sdk-reference/embed/",
             },
             {
+              text: "Indexer Module",
+              link: "/sdk-reference/indexer/",
+            },
+            {
+              text: "Indexer Webhooks Module",
+              link: "/sdk-reference/indexer/webhooks/",
+            },
+            {
               text: "All modules...",
               link: "/sdk-reference/",
             },
