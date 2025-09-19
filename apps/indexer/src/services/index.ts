@@ -179,4 +179,5 @@ export const appManager = new AppManager({
 
 export const appWebhookManager = new AppWebhookManager({
   db,
+  eventOutboxService,
 });

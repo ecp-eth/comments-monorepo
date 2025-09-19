@@ -71,6 +71,13 @@
       "when": 1758013113791,
       "tag": "0009_missing_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1758286752225,
+      "tag": "0010_event_outbox_prevent_replay",
+      "breakpoints": true
     }
   ]
 }

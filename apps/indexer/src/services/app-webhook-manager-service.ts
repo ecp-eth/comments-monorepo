@@ -4,23 +4,31 @@ import type { AppWebhookSelectType } from "../../schema.offchain.ts";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { schema } from "../../schema.ts";
 import { EventNamesSchema } from "../events/schemas.ts";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import type { EventOutboxService } from "./events/event-outbox-service.ts";
+import type { EventTypes } from "../events/types.ts";
 
 type AppWebhookManagerOptions = {
   db: NodePgDatabase<typeof schema>;
+  eventOutboxService: EventOutboxService;
 };
 
 export class AppWebhookManager implements IAppWebhookManager {
   private readonly db: NodePgDatabase<typeof schema>;
+  private readonly eventOutboxService: EventOutboxService;
 
   constructor(options: AppWebhookManagerOptions) {
     this.db = options.db;
+    this.eventOutboxService = options.eventOutboxService;
   }
 
   async createAppWebhook(params: IAppWebhookManager_CreateAppWebhookParams) {
     const { app, webhook } = CreateAppWebhookParamsSchema.parse(params);
 
     return await this.db.transaction(async (tx) => {
+      const outboxHeadPosition =
+        await this.eventOutboxService.getOutboxHeadPosition(tx);
+
       const [appWebhook] = await tx
         .insert(schema.appWebhook)
         .values({
@@ -30,6 +38,15 @@ export class AppWebhookManager implements IAppWebhookManager {
           url: webhook.url,
           auth: webhook.auth,
           eventFilter: webhook.events,
+          eventOutboxPosition: outboxHeadPosition,
+          eventActivations: webhook.events.reduce(
+            (acc, event) => {
+              acc[event] = outboxHeadPosition.toString();
+
+              return acc;
+            },
+            {} as Record<EventTypes, string>,
+          ),
         })
         .returning()
         .execute();
@@ -124,43 +141,63 @@ export class AppWebhookManager implements IAppWebhookManager {
     const { appId, webhookId, patches } =
       UpdateAppWebhookParamsSchema.parse(params);
 
-    const appWebhook = await this.db.query.appWebhook.findFirst({
-      where(fields, operators) {
-        return operators.and(
-          operators.eq(fields.id, webhookId),
-          operators.eq(fields.appId, appId),
-        );
-      },
-    });
+    return await this.db.transaction(async (tx) => {
+      const [appWebhook] = await tx
+        .select()
+        .from(schema.appWebhook)
+        .where(
+          and(
+            eq(schema.appWebhook.id, webhookId),
+            eq(schema.appWebhook.appId, appId),
+          ),
+        )
+        .for("update")
+        .execute();
 
-    if (!appWebhook) {
-      throw new AppWebhookManagerAppWebhookNotFoundError();
-    }
+      if (!appWebhook) {
+        throw new AppWebhookManagerAppWebhookNotFoundError();
+      }
 
-    if (Object.keys(patches).length === 0) {
-      return {
-        appWebhook,
+      if (Object.keys(patches).length === 0) {
+        return {
+          appWebhook,
+        };
+      }
+
+      const eventOutboxHead =
+        await this.eventOutboxService.getOutboxHeadPosition(tx);
+
+      const eventActivations: Record<EventTypes, string> = {
+        ...appWebhook.eventActivations,
+        ...patches.eventFilter?.reduce(
+          (acc, event) => {
+            acc[event] = eventOutboxHead.toString();
+
+            return acc;
+          },
+          {} as Record<EventTypes, string>,
+        ),
       };
-    }
 
-    const [updatedAppWebhook] = await this.db
-      .update(schema.appWebhook)
-      .set({
-        ...appWebhook,
-        ...patches,
-        updatedAt: new Date(),
-      })
-      .where(eq(schema.appWebhook.id, webhookId))
-      .returning()
-      .execute();
+      const [updatedAppWebhook] = await tx
+        .update(schema.appWebhook)
+        .set({
+          ...patches,
+          updatedAt: new Date(),
+          eventActivations,
+        })
+        .where(eq(schema.appWebhook.id, webhookId))
+        .returning()
+        .execute();
 
-    if (!updatedAppWebhook) {
-      throw new AppWebhookManagerFailedToUpdateAppWebhookError();
-    }
+      if (!updatedAppWebhook) {
+        throw new AppWebhookManagerFailedToUpdateAppWebhookError();
+      }
 
-    return {
-      appWebhook: updatedAppWebhook,
-    };
+      return {
+        appWebhook: updatedAppWebhook,
+      };
+    });
   }
 }
 
