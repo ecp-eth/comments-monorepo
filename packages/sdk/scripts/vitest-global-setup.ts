@@ -10,10 +10,14 @@ export async function setup() {
 
   // Start Anvil node
   console.log("📡 Starting Anvil node...");
-  nodeProcess = spawn("anvil", ["--host", "0.0.0.0", "--block-time", "1"], {
-    cwd,
-    env: process.env,
-  });
+  nodeProcess = spawn(
+    "pnpm",
+    ["rivet", "anvil", "--host", "0.0.0.0", "--block-time", "1"],
+    {
+      cwd,
+      env: process.env,
+    },
+  );
 
   const nodeProcessTimeout = AbortSignal.timeout(20_000);
 
