@@ -47,14 +47,14 @@ describe("approval", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: app,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("isApproved()", () => {

@@ -41,14 +41,14 @@ describe("hook", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: account2,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("setHook()", () => {

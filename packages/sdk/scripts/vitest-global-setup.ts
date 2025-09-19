@@ -12,7 +12,7 @@ export async function setup() {
   console.log("📡 Starting Anvil node...");
   nodeProcess = spawn(
     "pnpm",
-    ["rivet", "anvil", "--host", "0.0.0.0", "--block-time", "1"],
+    ["rivet", "anvil", "--host", "0.0.0.0", "--block-time", "0.5"],
     {
       cwd,
       env: process.env,

@@ -68,21 +68,21 @@ describe("comment", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: appAccount,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: thirdPartyAccount,
-    pollingInterval: 100,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("postComment()", () => {
@@ -98,7 +98,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -107,7 +107,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -126,7 +126,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -144,7 +144,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       appSignature = await appClient.signTypedData(typedData);
@@ -155,7 +155,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
@@ -169,7 +169,7 @@ describe("comment", () => {
       const revokeApprovalResult = await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -179,7 +179,7 @@ describe("comment", () => {
       await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const commentData = createCommentData({
@@ -193,7 +193,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -204,7 +204,7 @@ describe("comment", () => {
         appSignature,
         authorSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
@@ -226,7 +226,7 @@ describe("comment", () => {
           }),
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       ).rejects.toThrow(ContractFunctionExecutionError);
     });
@@ -247,7 +247,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -256,7 +256,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -277,7 +277,7 @@ describe("comment", () => {
       const result = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(result.comment.author).toBe(account.address);
@@ -296,7 +296,7 @@ describe("comment", () => {
           targetUri: "https://example.com",
         },
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(commentId.startsWith("0x")).toBe(true);
@@ -319,7 +319,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -328,7 +328,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -349,7 +349,7 @@ describe("comment", () => {
       const result = await deleteComment({
         commentId,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -367,7 +367,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -386,7 +386,7 @@ describe("comment", () => {
         createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       );
 
@@ -394,7 +394,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -417,7 +417,7 @@ describe("comment", () => {
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -428,7 +428,7 @@ describe("comment", () => {
         deadline: typedData.message.deadline,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
@@ -444,7 +444,7 @@ describe("comment", () => {
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await expect(
@@ -454,7 +454,7 @@ describe("comment", () => {
           deadline: typedData.message.deadline,
           appSignature: "0x1234", // Invalid signature
           writeContract: thirdPartyClient.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       ).rejects.toThrow(ContractFunctionExecutionError);
     });
@@ -469,7 +469,7 @@ describe("comment", () => {
         app: appAccount.address,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(result.startsWith("0x")).toBe(true);
@@ -483,7 +483,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(typeof nonce).toBe("bigint");
@@ -505,7 +505,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -514,12 +514,15 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
+        confirmations: 2,
       });
+
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: CommentManagerABI,
@@ -529,6 +532,8 @@ describe("comment", () => {
 
       expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
+
+      expect(commentId).toBeDefined();
     });
 
     it("edits a comment as author", async () => {
@@ -536,7 +541,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
       const edit = createEditCommentData({
         app: appAccount.address,
@@ -553,7 +558,7 @@ describe("comment", () => {
         author: account.address,
         edit,
         chainId: anvil.id,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -561,12 +566,13 @@ describe("comment", () => {
       const result = await editComment({
         edit,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
         appSignature,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
+        confirmations: 2,
       });
 
       expect(receipt.status).toBe("success");
@@ -575,7 +581,7 @@ describe("comment", () => {
       const updatedComment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(updatedComment.comment.content).toBe("Updated comment content");
@@ -589,7 +595,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -608,7 +614,7 @@ describe("comment", () => {
         createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       );
 
@@ -616,12 +622,14 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: postResult.txHash,
       });
+
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: CommentManagerABI,
@@ -631,6 +639,8 @@ describe("comment", () => {
 
       expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
+
+      expect(commentId).toBeDefined();
     });
 
     it("edits a comment with signatures", async () => {
@@ -638,7 +648,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const edit = createEditCommentData({
@@ -656,7 +666,7 @@ describe("comment", () => {
         author: account.address,
         chainId: anvil.id,
         edit,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -665,7 +675,7 @@ describe("comment", () => {
         edit,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
@@ -678,7 +688,7 @@ describe("comment", () => {
       const updatedComment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(updatedComment.comment.content).toBe("Updated comment content");
@@ -689,7 +699,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const edit = createEditCommentData({
@@ -708,7 +718,7 @@ describe("comment", () => {
           edit,
           appSignature: "0x1234", // Invalid signature
           writeContract: thirdPartyClient.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       ).rejects.toThrow(ContractFunctionExecutionError);
     });
@@ -732,7 +742,7 @@ describe("comment", () => {
         author: account.address,
         edit,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       expect(result.startsWith("0x")).toBe(true);
@@ -746,7 +756,7 @@ describe("comment", () => {
       const comment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const metadata = await client.readContract({
@@ -798,7 +808,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -807,7 +817,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -904,7 +914,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1112,7 +1122,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1121,7 +1131,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1182,7 +1192,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1191,7 +1201,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1256,7 +1266,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1265,7 +1275,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1353,7 +1363,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1362,7 +1372,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1506,7 +1516,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1515,7 +1525,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
