@@ -1,5 +1,4 @@
-import { describe, it } from "node:test";
-import assert from "node:assert";
+import { describe, it, expect } from "vitest";
 import nock from "nock";
 import { fetchComment, fetchCommentReplies } from "../api.js";
 import type { Hex } from "../../core/schemas.js";
@@ -21,7 +20,7 @@ describe("fetchComment", () => {
       chainId,
     });
 
-    assert.deepStrictEqual(expectedFetchResult, fetchResult);
+    expect(fetchResult).toStrictEqual(expectedFetchResult);
   });
 });
 
@@ -44,7 +43,7 @@ describe("fetchCommentReplies", () => {
       chainId,
     });
 
-    assert.deepStrictEqual(expectedFetchResult, fetchResult);
+    expect(fetchResult).toStrictEqual(expectedFetchResult);
   });
 });
 

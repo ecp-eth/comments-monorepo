@@ -1,0 +1,1084 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentAddedEvent
+
+# Type Alias: CommentAddedEvent
+
+```ts
+type CommentAddedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment:   | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: null | string;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ... | ...;
+              dimension: {
+                 height: ...;
+                 width: ...;
+              };
+           }[];
+        })[];
+        type: "root";
+        updatedAt: Date;
+      }
+        | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: null | string;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ... | ...;
+              dimension: {
+                 height: ...;
+                 width: ...;
+              };
+           }[];
+        })[];
+        type: "reply";
+        updatedAt: Date;
+      };
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: "" | `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  };
+  event: "comment:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L117)
+
+An event sent to webhook when a comment is added.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment:   | {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     id: `0x${string}`;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: null | string;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
+     })[];
+     type: "root";
+     updatedAt: Date;
+   }
+     | {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     id: `0x${string}`;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: null | string;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
+     })[];
+     type: "reply";
+     updatedAt: Date;
+   };
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: 
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+};
+```
+
+Comment data
+
+##### Type declaration
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+```
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+}
+```
+
+#### data.zeroExSwap
+
+```ts
+zeroExSwap: 
+  | null
+  | {
+  from: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+  to: {
+     address: "" | `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+};
+```
+
+ZeroEx swap data
+
+### event
+
+```ts
+event: "comment:added";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

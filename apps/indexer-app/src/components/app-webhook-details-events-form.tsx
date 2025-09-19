@@ -14,9 +14,10 @@ import { createWebhookQueryKey } from "@/queries/query-keys";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { Button } from "./ui/button";
-import { CheckIcon, Loader2Icon, PencilIcon } from "lucide-react";
+import { CheckIcon, Loader2Icon, PencilIcon, InfoIcon } from "lucide-react";
 import { useUpdateWebhookMutation } from "@/mutations/webhooks";
 import { Checkbox } from "./ui/checkbox";
+import Link from "next/link";
 
 export function AppWebhookDetailsEventsForm({
   app,
@@ -109,7 +110,27 @@ export function AppWebhookDetailsEventsForm({
                       <p>Edit events</p>
                     </TooltipContent>
                   </Tooltip>
-                ) : null}
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <InfoIcon className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        For more information about events, see the{" "}
+                        <Link
+                          className="underline"
+                          href="https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          documentation
+                        </Link>
+                        .
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
               </div>
               <div className="flex flex-row flex-wrap gap-2">
                 {WebhookEventNames.filter((event) =>

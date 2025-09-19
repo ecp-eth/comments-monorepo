@@ -1,5 +1,4 @@
-import { describe, it, beforeEach, before } from "node:test";
-import assert from "node:assert";
+import { describe, it, beforeEach, expect, beforeAll } from "vitest";
 import {
   createWalletClient,
   http,
@@ -19,19 +18,19 @@ import {
   createApprovalTypedData,
   createRemoveApprovalTypedData,
 } from "../approval.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import { getNonce } from "../comment.js";
 import type {
   AddApprovalTypedDataSchemaType,
   RemoveApprovalTypedDataSchemaType,
 } from "../schemas.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("approval", () => {
   let commentsAddress: Hex;
 
-  before(async () => {
-    commentsAddress = deployContracts().commentsAddress;
+  beforeAll(() => {
+    ({ commentsAddress } = deployContracts());
   });
 
   // Test account setup
@@ -48,12 +47,14 @@ describe("approval", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: app,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("isApproved()", () => {
@@ -65,11 +66,7 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.equal(
-        approved,
-        false,
-        "app signer should not be approved initially",
-      );
+      expect(approved).toBe(false);
     });
   });
 
@@ -85,7 +82,7 @@ describe("approval", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify approval
       const approved = await isApproved({
@@ -95,7 +92,7 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.equal(approved, true, "app signer should be approved");
+      expect(approved).toBe(true);
     });
   });
 
@@ -134,7 +131,7 @@ describe("approval", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       const approved = await isApproved({
         author: account.address,
@@ -143,23 +140,18 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.equal(approved, true, "app signer should be approved");
+      expect(approved).toBe(true);
     });
 
     it("fails with invalid signature", async () => {
-      await assert.rejects(
-        () =>
-          addApprovalWithSig({
-            typedData,
-            signature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
-            commentsAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          return true;
-        },
-      );
+      await expect(
+        addApprovalWithSig({
+          typedData,
+          signature: "0x1234", // Invalid signature
+          writeContract: appClient.writeContract,
+          commentsAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -188,7 +180,7 @@ describe("approval", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify approval is revoked
       const approved = await isApproved({
@@ -198,7 +190,7 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.equal(approved, false, "app signer should not be approved");
+      expect(approved).toBe(false);
     });
   });
 
@@ -247,7 +239,7 @@ describe("approval", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify approval is revoked
       const approved = await isApproved({
@@ -257,23 +249,18 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.equal(approved, false, "app signer should not be approved");
+      expect(approved).toBe(false);
     });
 
     it("fails with invalid signature", async () => {
-      await assert.rejects(
-        () =>
-          revokeApprovalWithSig({
-            typedData,
-            signature: "0x1234", // Invalid signature
-            writeContract: appClient.writeContract,
-            commentsAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          return true;
-        },
-      );
+      await expect(
+        revokeApprovalWithSig({
+          typedData,
+          signature: "0x1234", // Invalid signature
+          writeContract: appClient.writeContract,
+          commentsAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -288,8 +275,8 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.ok(result.hash.startsWith("0x"), "should return a hex string");
-      assert.equal(result.hash.length, 66, "should be 32 bytes + 0x prefix");
+      expect(result.hash.startsWith("0x")).toBe(true);
+      expect(result.hash.length).toBe(66);
     });
   });
 
@@ -304,8 +291,8 @@ describe("approval", () => {
         commentsAddress,
       });
 
-      assert.ok(result.hash.startsWith("0x"), "should return a hex string");
-      assert.equal(result.hash.length, 66, "should be 32 bytes + 0x prefix");
+      expect(result.hash.startsWith("0x")).toBe(true);
+      expect(result.hash.length).toBe(66);
     });
   });
 });

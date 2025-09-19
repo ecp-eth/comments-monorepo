@@ -78,6 +78,16 @@
       "import": "./dist/esm/indexer/index.js",
       "default": "./dist/cjs/indexer/index.cjs"
     },
+    "./indexer/webhooks": {
+      "types": "./dist/esm/indexer/webhooks/index.d.ts",
+      "import": "./dist/esm/indexer/webhooks/index.js",
+      "default": "./dist/cjs/indexer/webhooks/index.cjs"
+    },
+    "./indexer/webhooks/schemas": {
+      "types": "./dist/esm/indexer/webhooks/schemas/index.d.ts",
+      "import": "./dist/esm/indexer/webhooks/schemas/index.js",
+      "default": "./dist/cjs/indexer/webhooks/schemas/index.cjs"
+    },
     "./indexer/*": {
       "types": "./dist/esm/indexer/*.d.ts",
       "import": "./dist/esm/indexer/*.js",
@@ -94,8 +104,8 @@
     "build:all": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "build:dev": "export NODE_ENV=development && pnpm run build:all",
     "build": "export NODE_ENV=production && pnpm run build:all",
-    "test": "node --experimental-transform-types --no-warnings ./scripts/run-tests.ts",
-    "test:watch": "pnpm run test --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint \"./src/**/*.ts\""
   },
   "devDependencies": {
@@ -110,6 +120,7 @@
     "node-resolve-ts": "^1.0.2",
     "react": "~19.1.0",
     "viem": "^2.29.2",
+    "vitest": "^3.1.4",
     "wagmi": "^2.15.2",
     "zod": "^3.25.76"
   },

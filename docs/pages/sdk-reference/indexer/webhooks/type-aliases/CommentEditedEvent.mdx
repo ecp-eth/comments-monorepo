@@ -1,0 +1,557 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentEditedEvent
+
+# Type Alias: CommentEditedEvent
+
+```ts
+type CommentEditedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        content: string;
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: null | string;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: string;
+              dimension: {
+                 height: number;
+                 width: number;
+              };
+           }[];
+        })[];
+        updatedAt: Date;
+     };
+  };
+  event: "comment:edited";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L242)
+
+An event sent to webhook when a comment is edited.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     content: string;
+     id: `0x${string}`;
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: null | string;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: string;
+           dimension: {
+              height: number;
+              width: number;
+           };
+        }[];
+     })[];
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  content: string;
+  id: `0x${string}`;
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
+  })[];
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.content
+
+```ts
+content: string;
+```
+
+Content of the comment
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.moderationStatus
+
+```ts
+moderationStatus: "approved" | "pending" | "rejected" = CommentModerationStatusSchema;
+```
+
+Moderation status of the comment
+
+#### data.comment.references
+
+```ts
+references: (
+  | {
+  address: `0x${string}`;
+  avatarUrl: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "ens";
+  url: string;
+}
+  | {
+  address: `0x${string}`;
+  displayName: null | string;
+  fid: number;
+  fname: string;
+  pfpUrl: null | string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "farcaster";
+  url: string;
+  username: string;
+}
+  | {
+  address: `0x${string}`;
+  chainId: null | number;
+  chains: {
+     caip: string;
+     chainId: number;
+  }[];
+  decimals: number;
+  logoURI: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  symbol: string;
+  type: "erc20";
+}
+  | {
+  description: null | string;
+  favicon: null | string;
+  mediaType: string;
+  opengraph:   | null
+     | {
+     description: null | string;
+     image: string;
+     title: string;
+     url: string;
+   };
+  position: {
+     end: number;
+     start: number;
+  };
+  title: string;
+  type: "webpage";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "file";
+  url: string;
+}
+  | {
+  dimension?: {
+     height: number;
+     width: number;
+  };
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "image";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "video";
+  url: string;
+  videoTracks?: {
+     codec?: string;
+     dimension: {
+        height: number;
+        width: number;
+     };
+  }[];
+})[] = IndexerAPICommentReferencesSchema;
+```
+
+References of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string
+
+### event
+
+```ts
+event: "comment:edited";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

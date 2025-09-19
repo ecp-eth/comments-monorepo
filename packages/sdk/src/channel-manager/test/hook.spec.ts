@@ -1,5 +1,4 @@
-import { describe, it, beforeEach, before } from "node:test";
-import assert from "node:assert";
+import { describe, it, beforeEach, beforeAll, expect } from "vitest";
 import {
   createWalletClient,
   http,
@@ -24,10 +23,8 @@ describe("hook", () => {
   let channelManagerAddress: Hex;
   let noopHookAddress: Hex;
 
-  before(async () => {
-    const reuslt = deployContracts();
-    channelManagerAddress = reuslt.channelManagerAddress;
-    noopHookAddress = reuslt.noopHookAddress;
+  beforeAll(() => {
+    ({ channelManagerAddress, noopHookAddress } = deployContracts());
   });
 
   // Test account setup
@@ -44,12 +41,14 @@ describe("hook", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: account2,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("setHook()", () => {
@@ -73,7 +72,7 @@ describe("hook", () => {
         eventName: "ChannelCreated",
       });
 
-      assert.ok(logs.length > 0, "ChannelCreated event should be found");
+      expect(logs.length > 0).toBe(true);
       channelId = logs[0]!.args.channelId;
     });
 
@@ -89,27 +88,20 @@ describe("hook", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
 
     it("fails if hook is not registered", async () => {
       const unregisteredHook = "0x9876543210987654321098765432109876543210";
 
-      await assert.rejects(
-        () =>
-          setHook({
-            channelId,
-            hook: unregisteredHook,
-            writeContract: client.writeContract,
-            channelManagerAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          // somehow it is not possible to get error message here since it is swallowed
-          // assert.ok(err.toString().includes("Error: InvalidHookInterface()"));
-          return true;
-        },
-      );
+      await expect(
+        setHook({
+          channelId,
+          hook: unregisteredHook,
+          writeContract: client.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -120,10 +112,7 @@ describe("hook", () => {
         channelManagerAddress,
       });
 
-      assert.ok(
-        typeof result.fee === "number",
-        "fee should be a number (basis points)",
-      );
+      expect(result.fee).toBeTypeOf("number");
     });
   });
 
@@ -140,7 +129,7 @@ describe("hook", () => {
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the new fee
       const fee = await getHookTransactionFee({
@@ -148,42 +137,27 @@ describe("hook", () => {
         channelManagerAddress,
       });
 
-      assert.equal(fee.fee, newFeeBasisPoints);
+      expect(fee.fee).toBe(newFeeBasisPoints);
     });
 
     it("fails if fee percentage is too high", async () => {
-      await assert.rejects(
-        () =>
-          setHookTransactionFee({
-            feeBasisPoints: 10001, // More than 100%
-            writeContract: client.writeContract,
-            channelManagerAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof Error);
-          return true;
-        },
-      );
+      await expect(
+        setHookTransactionFee({
+          feeBasisPoints: 10001, // More than 100%
+          writeContract: client.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrow();
     });
 
     it("fails if caller is not owner", async () => {
-      await assert.rejects(
-        () =>
-          setHookTransactionFee({
-            feeBasisPoints: 500,
-            writeContract: client2.writeContract,
-            channelManagerAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          assert.ok(
-            (err as ContractFunctionExecutionError).message.includes(
-              "Error: Unauthorized()",
-            ),
-          );
-          return true;
-        },
-      );
+      await expect(
+        setHookTransactionFee({
+          feeBasisPoints: 500,
+          writeContract: client2.writeContract,
+          channelManagerAddress,
+        }),
+      ).rejects.toThrowError(/Error: Unauthorized/);
     });
   });
 });

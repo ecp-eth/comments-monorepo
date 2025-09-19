@@ -1,0 +1,215 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelCreatedEvent
+
+# Type Alias: ChannelCreatedEvent
+
+```ts
+type ChannelCreatedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${string}`;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:created";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:86](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L86)
+
+An event sent to webhook when a channel is created.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     chainId: number;
+     createdAt: Date;
+     description: string;
+     hook: null | `0x${string}`;
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     owner: `0x${string}`;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  chainId: number;
+  createdAt: Date;
+  description: string;
+  hook: null | `0x${string}`;
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  owner: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+#### data.channel.chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID where the channel was created
+
+#### data.channel.createdAt
+
+```ts
+createdAt: Date = ISO8601DateSchema;
+```
+
+Created at date. On wire it is a ISO 8601 date and time string.
+
+#### data.channel.description
+
+```ts
+description: string;
+```
+
+Description of the channel
+
+#### data.channel.hook
+
+```ts
+hook: null | `0x${string}`;
+```
+
+Hook address
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel. On wire it is a stringified bigint.
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.name
+
+```ts
+name: string;
+```
+
+Name of the channel
+
+#### data.channel.owner
+
+```ts
+owner: `0x${string}` = HexSchema;
+```
+
+Owner address
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+### event
+
+```ts
+event: "channel:created";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

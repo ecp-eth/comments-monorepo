@@ -1,0 +1,159 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelTransferredEvent
+
+# Type Alias: ChannelTransferredEvent
+
+```ts
+type ChannelTransferredEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  };
+  event: "channel:transferred";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:271](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L271)
+
+An event sent to webhook when a channel is transferred.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     id: bigint;
+     owner: `0x${string}`;
+     updatedAt: Date;
+  };
+  from: `0x${string}`;
+  to: `0x${string}`;
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  id: bigint;
+  owner: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.owner
+
+```ts
+owner: `0x${string}` = HexSchema;
+```
+
+Owner address
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.from
+
+```ts
+from: `0x${string}` = HexSchema;
+```
+
+From address
+
+#### data.to
+
+```ts
+to: `0x${string}` = HexSchema;
+```
+
+To address
+
+### event
+
+```ts
+event: "channel:transferred";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

@@ -1,0 +1,92 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentReactionsUpdatedEvent
+
+# Type Alias: CommentReactionsUpdatedEvent
+
+```ts
+type CommentReactionsUpdatedEvent = {
+  data: {
+     comment: {
+        id: `0x${string}`;
+        reactionCounts: Record<string, number>;
+     };
+  };
+  event: "comment:reactions:updated";
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:312](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L312)
+
+An event sent to webhook when a comment reactions are updated.
+
+## Type declaration
+
+### data
+
+```ts
+data: {
+  comment: {
+     id: `0x${string}`;
+     reactionCounts: Record<string, number>;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  id: `0x${string}`;
+  reactionCounts: Record<string, number>;
+};
+```
+
+Updated comment data
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.reactionCounts
+
+```ts
+reactionCounts: Record<string, number>;
+```
+
+Reaction counts
+
+### event
+
+```ts
+event: "comment:reactions:updated";
+```
+
+Event type
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

@@ -1,0 +1,117 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ApprovalRemovedEvent
+
+# Type Alias: ApprovalRemovedEvent
+
+```ts
+type ApprovalRemovedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        id: string;
+     };
+  };
+  event: "approval:removed";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:92](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L92)
+
+An event sent to webhook when an approval is removed
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  approval: {
+     id: string;
+  };
+};
+```
+
+Data of the event
+
+#### data.approval
+
+```ts
+approval: {
+  id: string;
+};
+```
+
+Approval data
+
+#### data.approval.id
+
+```ts
+id: string;
+```
+
+ID of the approval that was removed
+
+### event
+
+```ts
+event: "approval:removed";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

@@ -1,0 +1,3868 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ConstructEventResult
+
+# Type Alias: ConstructEventResult
+
+```ts
+type ConstructEventResult = 
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment:   | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
+        })[];
+        type: "root";
+        updatedAt: Date;
+      }
+        | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
+        })[];
+        type: "reply";
+        updatedAt: Date;
+      };
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: "" | `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  };
+  event: "comment:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+     hookMetadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "comment:hook:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        deletedAt: Date;
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "comment:deleted";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        content: string;
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: null | string;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ... | ...;
+              dimension: {
+                 height: ...;
+                 width: ...;
+              };
+           }[];
+        })[];
+        updatedAt: Date;
+     };
+  };
+  event: "comment:edited";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  data: {
+     comment: {
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+     };
+  };
+  event: "comment:moderation:status:updated";
+  uid: string;
+  version: 1;
+}
+  | {
+  data: {
+     comment: {
+        id: `0x${string}`;
+        reactionCounts: Record<string, number>;
+     };
+  };
+  event: "comment:reactions:updated";
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${string}`;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:created";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        hook: null | `0x${string}`;
+        id: bigint;
+        updatedAt: Date;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  };
+  event: "channel:hook:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        updatedAt: Date;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "channel:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  };
+  event: "channel:transferred";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        id: string;
+     };
+  };
+  event: "approval:removed";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+  | {
+  appId: string;
+  data: {
+     message: string;
+  };
+  event: "test";
+  uid: string;
+  version: 1;
+  webhookId: string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/utils.ts#L37)
+
+## Type declaration
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment:   | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
+        })[];
+        type: "root";
+        updatedAt: Date;
+      }
+        | {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        channelId: bigint;
+        commentType: number;
+        content: string;
+        createdAt: Date;
+        id: `0x${string}`;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
+        })[];
+        type: "reply";
+        updatedAt: Date;
+      };
+     zeroExSwap:   | null
+        | {
+        from: {
+           address: `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+        to: {
+           address: "" | `0x${string}`;
+           amount: string;
+           symbol: string;
+        };
+      };
+  };
+  event: "comment:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment:   | {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     id: `0x${string}`;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: ... | ...;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: ...;
+           dimension: ...;
+        }[];
+     })[];
+     type: "root";
+     updatedAt: Date;
+   }
+     | {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     channelId: bigint;
+     commentType: number;
+     content: string;
+     createdAt: Date;
+     id: `0x${string}`;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: ... | ...;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: ...;
+           dimension: ...;
+        }[];
+     })[];
+     type: "reply";
+     updatedAt: Date;
+   };
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: 
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+  | {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+};
+```
+
+Comment data
+
+##### Type declaration
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+```
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+}
+```
+
+#### data.zeroExSwap
+
+```ts
+zeroExSwap: 
+  | null
+  | {
+  from: {
+     address: `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+  to: {
+     address: "" | `0x${string}`;
+     amount: string;
+     symbol: string;
+  };
+};
+```
+
+ZeroEx swap data
+
+### event
+
+```ts
+event: "comment:added";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        hookMetadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+     hookMetadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "comment:hook:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     hookMetadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     id: `0x${string}`;
+     updatedAt: Date;
+  };
+  hookMetadataOperation:   | {
+     key: `0x${string}`;
+     type: "delete";
+   }
+     | {
+     key: `0x${string}`;
+     type: "create";
+     value: `0x${string}`;
+   }
+     | {
+     key: `0x${string}`;
+     type: "update";
+     value: `0x${string}`;
+   };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.hookMetadata
+
+```ts
+hookMetadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Hook metadata. On wire it is a ISO 8601 date and time string.
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+#### data.hookMetadataOperation
+
+```ts
+hookMetadataOperation: 
+  | {
+  key: `0x${string}`;
+  type: "delete";
+}
+  | {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}
+  | {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+} = MetadataSetOperationSchema;
+```
+
+Hook metadata operation
+
+### event
+
+```ts
+event: "comment:hook:metadata:set";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        deletedAt: Date;
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "comment:deleted";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     deletedAt: Date;
+     id: `0x${string}`;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  deletedAt: Date;
+  id: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.deletedAt
+
+```ts
+deletedAt: Date = ISO8601DateSchema;
+```
+
+Deleted at date. On wire it is a ISO 8601 date and time string
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string
+
+### event
+
+```ts
+event: "comment:deleted";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        content: string;
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: null | string;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ... | ...;
+              dimension: {
+                 height: ...;
+                 width: ...;
+              };
+           }[];
+        })[];
+        updatedAt: Date;
+     };
+  };
+  event: "comment:edited";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     content: string;
+     id: `0x${string}`;
+     moderationStatus: "approved" | "pending" | "rejected";
+     references: (
+        | {
+        address: `0x${string}`;
+        avatarUrl: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "ens";
+        url: string;
+      }
+        | {
+        address: `0x${string}`;
+        displayName: null | string;
+        fid: number;
+        fname: string;
+        pfpUrl: null | string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "farcaster";
+        url: string;
+        username: string;
+      }
+        | {
+        address: `0x${string}`;
+        chainId: null | number;
+        chains: {
+           caip: string;
+           chainId: number;
+        }[];
+        decimals: number;
+        logoURI: null | string;
+        name: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        symbol: string;
+        type: "erc20";
+      }
+        | {
+        description: null | string;
+        favicon: null | string;
+        mediaType: string;
+        opengraph:   | null
+           | {
+           description: null | string;
+           image: string;
+           title: string;
+           url: string;
+         };
+        position: {
+           end: number;
+           start: number;
+        };
+        title: string;
+        type: "webpage";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "file";
+        url: string;
+      }
+        | {
+        dimension?: {
+           height: number;
+           width: number;
+        };
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "image";
+        url: string;
+      }
+        | {
+        mediaType: string;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "video";
+        url: string;
+        videoTracks?: {
+           codec?: ... | ...;
+           dimension: {
+              height: ...;
+              width: ...;
+           };
+        }[];
+     })[];
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  content: string;
+  id: `0x${string}`;
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.content
+
+```ts
+content: string;
+```
+
+Content of the comment
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.moderationStatus
+
+```ts
+moderationStatus: "approved" | "pending" | "rejected" = CommentModerationStatusSchema;
+```
+
+Moderation status of the comment
+
+#### data.comment.references
+
+```ts
+references: (
+  | {
+  address: `0x${string}`;
+  avatarUrl: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "ens";
+  url: string;
+}
+  | {
+  address: `0x${string}`;
+  displayName: null | string;
+  fid: number;
+  fname: string;
+  pfpUrl: null | string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "farcaster";
+  url: string;
+  username: string;
+}
+  | {
+  address: `0x${string}`;
+  chainId: null | number;
+  chains: {
+     caip: string;
+     chainId: number;
+  }[];
+  decimals: number;
+  logoURI: null | string;
+  name: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  symbol: string;
+  type: "erc20";
+}
+  | {
+  description: null | string;
+  favicon: null | string;
+  mediaType: string;
+  opengraph:   | null
+     | {
+     description: null | string;
+     image: string;
+     title: string;
+     url: string;
+   };
+  position: {
+     end: number;
+     start: number;
+  };
+  title: string;
+  type: "webpage";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "file";
+  url: string;
+}
+  | {
+  dimension?: {
+     height: number;
+     width: number;
+  };
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "image";
+  url: string;
+}
+  | {
+  mediaType: string;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "video";
+  url: string;
+  videoTracks?: {
+     codec?: ... | ...;
+     dimension: {
+        height: ...;
+        width: ...;
+     };
+  }[];
+})[] = IndexerAPICommentReferencesSchema;
+```
+
+References of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string
+
+### event
+
+```ts
+event: "comment:edited";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  data: {
+     comment: {
+        id: `0x${string}`;
+        moderationStatus: "approved" | "pending" | "rejected";
+        moderationStatusChangedAt: Date;
+     };
+  };
+  event: "comment:moderation:status:updated";
+  uid: string;
+  version: 1;
+}
+```
+
+### data
+
+```ts
+data: {
+  comment: {
+     id: `0x${string}`;
+     moderationStatus: "approved" | "pending" | "rejected";
+     moderationStatusChangedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  id: `0x${string}`;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.moderationStatus
+
+```ts
+moderationStatus: "approved" | "pending" | "rejected" = CommentModerationStatusSchema;
+```
+
+Moderation status of the comment
+
+#### data.comment.moderationStatusChangedAt
+
+```ts
+moderationStatusChangedAt: Date = ISO8601DateSchema;
+```
+
+Moderation status changed at date. On wire it is a ISO 8601 date and time string
+
+### event
+
+```ts
+event: "comment:moderation:status:updated";
+```
+
+Event type
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  data: {
+     comment: {
+        id: `0x${string}`;
+        reactionCounts: Record<string, number>;
+     };
+  };
+  event: "comment:reactions:updated";
+  uid: string;
+  version: 1;
+}
+```
+
+### data
+
+```ts
+data: {
+  comment: {
+     id: `0x${string}`;
+     reactionCounts: Record<string, number>;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  id: `0x${string}`;
+  reactionCounts: Record<string, number>;
+};
+```
+
+Updated comment data
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.reactionCounts
+
+```ts
+reactionCounts: Record<string, number>;
+```
+
+Reaction counts
+
+### event
+
+```ts
+event: "comment:reactions:updated";
+```
+
+Event type
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${string}`;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:created";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     chainId: number;
+     createdAt: Date;
+     description: string;
+     hook: null | `0x${string}`;
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     owner: `0x${string}`;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  chainId: number;
+  createdAt: Date;
+  description: string;
+  hook: null | `0x${string}`;
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  owner: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+#### data.channel.chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID where the channel was created
+
+#### data.channel.createdAt
+
+```ts
+createdAt: Date = ISO8601DateSchema;
+```
+
+Created at date. On wire it is a ISO 8601 date and time string.
+
+#### data.channel.description
+
+```ts
+description: string;
+```
+
+Description of the channel
+
+#### data.channel.hook
+
+```ts
+hook: null | `0x${string}`;
+```
+
+Hook address
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel. On wire it is a stringified bigint.
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.name
+
+```ts
+name: string;
+```
+
+Name of the channel
+
+#### data.channel.owner
+
+```ts
+owner: `0x${string}` = HexSchema;
+```
+
+Owner address
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+### event
+
+```ts
+event: "channel:created";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     description: string;
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     name: string;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  description: string;
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  name: string;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.description
+
+```ts
+description: string;
+```
+
+Description of the channel
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.name
+
+```ts
+name: string;
+```
+
+Name of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+### event
+
+```ts
+event: "channel:updated";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        hook: null | `0x${string}`;
+        id: bigint;
+        updatedAt: Date;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  };
+  event: "channel:hook:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     hook: null | `0x${string}`;
+     id: bigint;
+     updatedAt: Date;
+  };
+  hook: {
+     address: `0x${string}`;
+     enabled: boolean;
+  };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  hook: null | `0x${string}`;
+  id: bigint;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.hook
+
+```ts
+hook: null | `0x${string}`;
+```
+
+Hook address
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.hook
+
+```ts
+hook: {
+  address: `0x${string}`;
+  enabled: boolean;
+};
+```
+
+Updated hook data
+
+#### data.hook.address
+
+```ts
+address: `0x${string}` = HexSchema;
+```
+
+Address of the hook
+
+#### data.hook.enabled
+
+```ts
+enabled: boolean;
+```
+
+Enabled status
+
+### event
+
+```ts
+event: "channel:hook:status:updated";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        updatedAt: Date;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "channel:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     id: bigint;
+     metadata: {
+        key: `0x${string}`;
+        value: `0x${string}`;
+     }[];
+     updatedAt: Date;
+  };
+  metadataOperation:   | {
+     key: `0x${string}`;
+     type: "delete";
+   }
+     | {
+     key: `0x${string}`;
+     type: "create";
+     value: `0x${string}`;
+   }
+     | {
+     key: `0x${string}`;
+     type: "update";
+     value: `0x${string}`;
+   };
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  id: bigint;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.metadata
+
+```ts
+metadata: {
+  key: `0x${string}`;
+  value: `0x${string}`;
+}[] = MetadataArraySchema;
+```
+
+Metadata of the channel
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.metadataOperation
+
+```ts
+metadataOperation: 
+  | {
+  key: `0x${string}`;
+  type: "delete";
+}
+  | {
+  key: `0x${string}`;
+  type: "create";
+  value: `0x${string}`;
+}
+  | {
+  key: `0x${string}`;
+  type: "update";
+  value: `0x${string}`;
+} = MetadataSetOperationSchema;
+```
+
+Metadata operation
+
+### event
+
+```ts
+event: "channel:metadata:set";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  };
+  event: "channel:transferred";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  channel: {
+     id: bigint;
+     owner: `0x${string}`;
+     updatedAt: Date;
+  };
+  from: `0x${string}`;
+  to: `0x${string}`;
+};
+```
+
+Data of the event
+
+#### data.channel
+
+```ts
+channel: {
+  id: bigint;
+  owner: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated channel data
+
+#### data.channel.id
+
+```ts
+id: bigint = StringBigintSchema;
+```
+
+ID of the channel
+
+#### data.channel.owner
+
+```ts
+owner: `0x${string}` = HexSchema;
+```
+
+Owner address
+
+#### data.channel.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date
+
+#### data.from
+
+```ts
+from: `0x${string}` = HexSchema;
+```
+
+From address
+
+#### data.to
+
+```ts
+to: `0x${string}` = HexSchema;
+```
+
+To address
+
+### event
+
+```ts
+event: "channel:transferred";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  approval: {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     createdAt: Date;
+     id: string;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.approval
+
+```ts
+approval: {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  createdAt: Date;
+  id: string;
+  updatedAt: Date;
+};
+```
+
+Approval data
+
+#### data.approval.app
+
+```ts
+app: `0x${string}` = HexSchema;
+```
+
+App address
+
+#### data.approval.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+Author address
+
+#### data.approval.createdAt
+
+```ts
+createdAt: Date = ISO8601DateSchema;
+```
+
+Created at date. On wire it is a ISO 8601 date and time string.
+
+#### data.approval.id
+
+```ts
+id: string;
+```
+
+ID of the approval
+
+#### data.approval.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+### event
+
+```ts
+event: "approval:added";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        id: string;
+     };
+  };
+  event: "approval:removed";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  approval: {
+     id: string;
+  };
+};
+```
+
+Data of the event
+
+#### data.approval
+
+```ts
+approval: {
+  id: string;
+};
+```
+
+Approval data
+
+#### data.approval.id
+
+```ts
+id: string;
+```
+
+ID of the approval that was removed
+
+### event
+
+```ts
+event: "approval:removed";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  appId: string;
+  data: {
+     message: string;
+  };
+  event: "test";
+  uid: string;
+  version: 1;
+  webhookId: string;
+}
+```
+
+### appId
+
+```ts
+appId: string;
+```
+
+App ID
+
+### data
+
+```ts
+data: {
+  message: string;
+};
+```
+
+Data of the event
+
+#### data.message
+
+```ts
+message: string;
+```
+
+Message
+
+### event
+
+```ts
+event: "test";
+```
+
+Event type
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+### webhookId
+
+```ts
+webhookId: string;
+```
+
+Webhook ID

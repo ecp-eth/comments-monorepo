@@ -1,0 +1,24 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / EventV1Schema
+
+# Variable: EventV1Schema
+
+```ts
+const EventV1Schema: ZodObject<{
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  uid: string;
+  version: 1;
+}, {
+  uid: string;
+  version: 1;
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:43](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L43)
+
+Common schema for all v1 events.

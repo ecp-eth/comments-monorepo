@@ -1,0 +1,139 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentDeletedEvent
+
+# Type Alias: CommentDeletedEvent
+
+```ts
+type CommentDeletedEvent = {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     comment: {
+        deletedAt: Date;
+        id: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "comment:deleted";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:197](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L197)
+
+An event sent to webhook when a comment is deleted.
+
+## Type declaration
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  comment: {
+     deletedAt: Date;
+     id: `0x${string}`;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.comment
+
+```ts
+comment: {
+  deletedAt: Date;
+  id: `0x${string}`;
+  updatedAt: Date;
+};
+```
+
+Updated comment data
+
+#### data.comment.deletedAt
+
+```ts
+deletedAt: Date = ISO8601DateSchema;
+```
+
+Deleted at date. On wire it is a ISO 8601 date and time string
+
+#### data.comment.id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+ID of the comment
+
+#### data.comment.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string
+
+### event
+
+```ts
+event: "comment:deleted";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event

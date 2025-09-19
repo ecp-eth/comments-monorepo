@@ -65,23 +65,41 @@ get_foundry_version() {
     fi
 }
 
+# Function to detect user's shell
+is_user_shell_zsh() {
+    USER_SHELL=$(basename "${SHELL:-/bin/bash}")
+    [ "$USER_SHELL" = "zsh" ] || echo "$SHELL" | grep -q "zsh"
+}
+
 # Function to install foundry
 install_foundry() {
     echo "🔧 Foundry not found. Installing foundry..."
     curl -L https://foundry.paradigm.xyz | bash
-    source ~/.bashrc 2>/dev/null || true
-    source ~/.zshrc 2>/dev/null || true
-    
-    # Try to run foundryup
-    if command -v foundryup >/dev/null 2>&1; then
-        foundryup
+
+    # Detect shell and source appropriate rc file
+    # Since this script runs under sh, we need to detect the user's actual shell
+    if is_user_shell_zsh; then
+        echo "🔧 ZSH detected. Sourcing ~/.zshenv..."
+        source ~/.zshenv 2>/dev/null || true
     else
-        echo "❌ Failed to install foundry. Please install manually:"
-        echo "   curl -L https://foundry.paradigm.xyz | bash"
-        echo "   source ~/.bashrc"
+        echo "🔧 BASH detected. Sourcing ~/.bashrc..."
+        source ~/.bashrc 2>/dev/null || true
+    fi
+
+    # Check if foundryup is available
+    if ! command -v foundryup >/dev/null 2>&1; then
+        echo "❌ Failed to install foundry. Please run these commands manually:"
+        if is_user_shell_zsh; then
+            echo "   source ~/.zshenv # or start a new terminal"
+        else
+            echo "   source ~/.bashrc # or start a new terminal"
+        fi
         echo "   foundryup"
         exit 1
     fi
+
+    # Run foundryup to complete installation
+    foundryup
 }
 
 # Function to update foundry to target version
@@ -130,21 +148,44 @@ main() {
     fi
     
     echo "✅ Foundry $TARGET_VERSION is ready"
+
+    cleanup() {
+        # Kill child process if it exists
+        if [ -n "$PID" ]; then
+            kill -TERM "$PID" 2>/dev/null
+        fi
+        exit 1
+    }
+
+    # Set up traps for common signals
+    # Note: SIGKILL (9) cannot be trapped
+    trap 'cleanup' HUP INT QUIT TERM PIPE
     
     # Pass all arguments to the global foundry command
     # Determine which foundry command to use based on the script name or first argument
     if [ "$(basename "$0")" = "forge" ] || [ "$1" = "forge" ]; then
-        forge "${@:2}"
+        forge "${@:2}" &
     elif [ "$(basename "$0")" = "cast" ] || [ "$1" = "cast" ]; then
-        cast "${@:2}"
+        cast "${@:2}" &
     elif [ "$(basename "$0")" = "anvil" ] || [ "$1" = "anvil" ]; then
-        anvil "${@:2}"
+        anvil "${@:2}" &
     elif [ "$(basename "$0")" = "chisel" ] || [ "$1" = "chisel" ]; then
-        chisel "${@:2}"
+        chisel "${@:2}" &
     else
         # Default to forge if no specific command is detected
-        forge "$@"
+        forge "$@" &
     fi
+    
+    PID=$!
+
+    # Wait for the process and capture its exit code
+    wait $PID
+    EXIT_CODE=$?
+    
+    # Remove traps before exiting
+    trap - HUP INT QUIT TERM PIPE
+    
+    exit $EXIT_CODE
 }
 
 # Run main function

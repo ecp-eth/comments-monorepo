@@ -1,5 +1,4 @@
-import { describe, it, beforeEach, before } from "node:test";
-import assert from "node:assert";
+import { describe, it, beforeEach, expect, beforeAll } from "vitest";
 import {
   ContractFunctionExecutionError,
   createWalletClient,
@@ -28,7 +27,6 @@ import {
 } from "../comment.js";
 import { addApproval, revokeApproval } from "../approval.js";
 import { CommentManagerABI } from "../../abis.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
 import type { CreateCommentData } from "../schemas.js";
 import { privateKeyToAccount } from "viem/accounts";
@@ -43,12 +41,13 @@ import {
   MetadataTypeValues,
 } from "../metadata.js";
 import type { MetadataEntry } from "../types.js";
+import { deployContracts } from "../../../scripts/test-helpers.js";
 
 describe("comment", () => {
   let commentsAddress: Hex;
 
-  before(async () => {
-    commentsAddress = deployContracts().commentsAddress;
+  beforeAll(() => {
+    ({ commentsAddress } = deployContracts());
   });
 
   // Test account setup
@@ -69,18 +68,21 @@ describe("comment", () => {
     chain: anvil,
     transport: http("http://localhost:8545"),
     account,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: appAccount,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
     transport: http("http://localhost:8545"),
     account: thirdPartyAccount,
+    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("postComment()", () => {
@@ -96,7 +98,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -105,14 +107,14 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
   });
 
@@ -124,7 +126,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -142,7 +144,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       appSignature = await appClient.signTypedData(typedData);
@@ -153,21 +155,21 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
 
     it("posts a comment with author signature when no approval exists", async () => {
       const revokeApprovalResult = await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -177,7 +179,7 @@ describe("comment", () => {
       await revokeApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const commentData = createCommentData({
@@ -191,7 +193,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -202,36 +204,31 @@ describe("comment", () => {
         appSignature,
         authorSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
 
     it("fails with invalid app signature", async () => {
-      await assert.rejects(
-        () =>
-          postCommentWithSig({
-            comment: createCommentData({
-              app: appAccount.address,
-              author: account.address,
-              content: "Test comment content",
-              metadata: [],
-              targetUri: "https://example.com",
-            }),
-            appSignature,
-            writeContract: client.writeContract,
-            commentsAddress: commentsAddress,
+      await expect(
+        postCommentWithSig({
+          comment: createCommentData({
+            app: appAccount.address,
+            author: account.address,
+            content: "Test comment content",
+            metadata: [],
+            targetUri: "https://example.com",
           }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          return true;
-        },
-      );
+          appSignature,
+          writeContract: client.writeContract,
+          commentsAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -250,7 +247,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -259,7 +256,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -272,7 +269,7 @@ describe("comment", () => {
         eventName: "CommentAdded",
       });
 
-      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
     });
 
@@ -280,11 +277,11 @@ describe("comment", () => {
       const result = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.equal(result.comment.author, account.address);
-      assert.equal(result.comment.content, "Test comment content");
+      expect(result.comment.author).toBe(account.address);
+      expect(result.comment.content).toBe("Test comment content");
     });
   });
 
@@ -299,11 +296,11 @@ describe("comment", () => {
           targetUri: "https://example.com",
         },
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.ok(commentId.startsWith("0x"), "should return a hex string");
-      assert.equal(commentId.length, 66, "should be 32 bytes + 0x prefix");
+      expect(commentId.startsWith("0x")).toBe(true);
+      expect(commentId.length).toBe(66);
     });
   });
 
@@ -322,7 +319,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -331,7 +328,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -344,7 +341,7 @@ describe("comment", () => {
         eventName: "CommentAdded",
       });
 
-      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
     });
 
@@ -352,14 +349,14 @@ describe("comment", () => {
       const result = await deleteComment({
         commentId,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
   });
 
@@ -370,7 +367,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -389,7 +386,7 @@ describe("comment", () => {
         createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       );
 
@@ -397,7 +394,7 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
@@ -410,7 +407,7 @@ describe("comment", () => {
         eventName: "CommentAdded",
       });
 
-      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
     });
 
@@ -420,7 +417,7 @@ describe("comment", () => {
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -431,14 +428,14 @@ describe("comment", () => {
         deadline: typedData.message.deadline,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
     });
 
     it("fails with invalid signatures", async () => {
@@ -447,24 +444,19 @@ describe("comment", () => {
         chainId: anvil.id,
         author: account.address,
         app: appAccount.address,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      await assert.rejects(
-        () =>
-          deleteCommentWithSig({
-            commentId,
-            app: appAccount.address,
-            deadline: typedData.message.deadline,
-            appSignature: "0x1234", // Invalid signature
-            writeContract: thirdPartyClient.writeContract,
-            commentsAddress: commentsAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          return true;
-        },
-      );
+      await expect(
+        deleteCommentWithSig({
+          commentId,
+          app: appAccount.address,
+          deadline: typedData.message.deadline,
+          appSignature: "0x1234", // Invalid signature
+          writeContract: thirdPartyClient.writeContract,
+          commentsAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -477,11 +469,11 @@ describe("comment", () => {
         app: appAccount.address,
         deadline: BigInt(Math.floor(Date.now() / 1000) + 3600),
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.ok(result.startsWith("0x"), "should return a hex string");
-      assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
+      expect(result.startsWith("0x")).toBe(true);
+      expect(result.length).toBe(66);
     });
   });
 
@@ -491,10 +483,10 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.ok(typeof nonce === "bigint", "should return a bigint");
+      expect(typeof nonce).toBe("bigint");
     });
   });
 
@@ -513,7 +505,7 @@ describe("comment", () => {
       const typedData = createCommentTypedData({
         chainId: anvil.id,
         commentData,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -522,12 +514,15 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
+        confirmations: 2,
       });
+
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: CommentManagerABI,
@@ -535,8 +530,10 @@ describe("comment", () => {
         eventName: "CommentAdded",
       });
 
-      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
+
+      expect(commentId).toBeDefined();
     });
 
     it("edits a comment as author", async () => {
@@ -544,7 +541,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
       const edit = createEditCommentData({
         app: appAccount.address,
@@ -561,7 +558,7 @@ describe("comment", () => {
         author: account.address,
         edit,
         chainId: anvil.id,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -569,24 +566,25 @@ describe("comment", () => {
       const result = await editComment({
         edit,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
         appSignature,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
+        confirmations: 2,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the comment was updated
       const updatedComment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.equal(updatedComment.comment.content, "Updated comment content");
+      expect(updatedComment.comment.content).toBe("Updated comment content");
     });
   });
 
@@ -597,7 +595,7 @@ describe("comment", () => {
       const approvalResult = await addApproval({
         app: appAccount.address,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       await client.waitForTransactionReceipt({
@@ -616,7 +614,7 @@ describe("comment", () => {
         createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         }),
       );
 
@@ -624,12 +622,14 @@ describe("comment", () => {
         comment: commentData,
         appSignature,
         writeContract: client.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await client.waitForTransactionReceipt({
         hash: postResult.txHash,
       });
+
+      expect(receipt.status).toBe("success");
 
       const logs = parseEventLogs({
         abi: CommentManagerABI,
@@ -637,8 +637,10 @@ describe("comment", () => {
         eventName: "CommentAdded",
       });
 
-      assert.ok(logs.length > 0, "CommentAdded event should be found");
+      expect(logs.length).toBeGreaterThan(0);
       commentId = logs[0]!.args.commentId;
+
+      expect(commentId).toBeDefined();
     });
 
     it("edits a comment with signatures", async () => {
@@ -646,7 +648,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const edit = createEditCommentData({
@@ -664,7 +666,7 @@ describe("comment", () => {
         author: account.address,
         chainId: anvil.id,
         edit,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const appSignature = await appClient.signTypedData(typedData);
@@ -673,23 +675,23 @@ describe("comment", () => {
         edit,
         appSignature,
         writeContract: appClient.writeContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
       });
 
-      assert.equal(receipt.status, "success");
+      expect(receipt.status).toBe("success");
 
       // Verify the comment was updated
       const updatedComment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.equal(updatedComment.comment.content, "Updated comment content");
+      expect(updatedComment.comment.content).toBe("Updated comment content");
     });
 
     it("fails with invalid signatures", async () => {
@@ -697,7 +699,7 @@ describe("comment", () => {
         author: account.address,
         app: appAccount.address,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const edit = createEditCommentData({
@@ -711,19 +713,14 @@ describe("comment", () => {
         ],
       });
 
-      await assert.rejects(
-        () =>
-          editCommentWithSig({
-            edit,
-            appSignature: "0x1234", // Invalid signature
-            writeContract: thirdPartyClient.writeContract,
-            commentsAddress: commentsAddress,
-          }),
-        (err) => {
-          assert.ok(err instanceof ContractFunctionExecutionError);
-          return true;
-        },
-      );
+      await expect(
+        editCommentWithSig({
+          edit,
+          appSignature: "0x1234", // Invalid signature
+          writeContract: thirdPartyClient.writeContract,
+          commentsAddress,
+        }),
+      ).rejects.toThrow(ContractFunctionExecutionError);
     });
   });
 
@@ -745,11 +742,11 @@ describe("comment", () => {
         author: account.address,
         edit,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
-      assert.ok(result.startsWith("0x"), "should return a hex string");
-      assert.equal(result.length, 66, "should be 32 bytes + 0x prefix");
+      expect(result.startsWith("0x")).toBe(true);
+      expect(result.length).toBe(66);
     });
   });
 
@@ -759,7 +756,7 @@ describe("comment", () => {
       const comment = await getComment({
         commentId,
         readContract: client.readContract,
-        commentsAddress: commentsAddress,
+        commentsAddress,
       });
 
       const metadata = await client.readContract({
@@ -811,7 +808,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -820,7 +817,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -833,12 +830,12 @@ describe("comment", () => {
           eventName: "CommentAdded",
         });
 
-        assert.ok(logs.length > 0, "CommentAdded event should be found");
+        expect(logs.length).toBeGreaterThan(0);
         const commentId = logs[0]!.args.commentId;
 
         // Retrieve the comment and verify metadata
         const retrievedComment = await getCommentWithMetadata(commentId);
-        assert.equal(retrievedComment.metadata.length, 3);
+        expect(retrievedComment.metadata.length).toBe(3);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -850,13 +847,13 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 3);
-        assert.equal(parsedMetadata["string title"]?.key, "title");
-        assert.equal(parsedMetadata["string title"]?.type, "string");
-        assert.equal(parsedMetadata["string description"]?.key, "description");
-        assert.equal(parsedMetadata["string description"]?.type, "string");
-        assert.equal(parsedMetadata["string category"]?.key, "category");
-        assert.equal(parsedMetadata["string category"]?.type, "string");
+        expect(Object.keys(parsedMetadata).length).toBe(3);
+        expect(parsedMetadata["string title"]?.key).toBe("title");
+        expect(parsedMetadata["string title"]?.type).toBe("string");
+        expect(parsedMetadata["string description"]?.key).toBe("description");
+        expect(parsedMetadata["string description"]?.type).toBe("string");
+        expect(parsedMetadata["string category"]?.key).toBe("category");
+        expect(parsedMetadata["string category"]?.type).toBe("string");
 
         // **NEW: Validate that encoded values decode back to original values using ONLY derived on-chain data**
         for (const entry of retrievedComment.metadata) {
@@ -869,23 +866,11 @@ describe("comment", () => {
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "title") {
-              assert.equal(
-                decodedValue,
-                originalValues.title,
-                "Decoded title should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.title);
             } else if (originalKey === "description") {
-              assert.equal(
-                decodedValue,
-                originalValues.description,
-                "Decoded description should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.description);
             } else if (originalKey === "category") {
-              assert.equal(
-                decodedValue,
-                originalValues.category,
-                "Decoded category should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.category);
             }
           }
         }
@@ -929,7 +914,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -964,13 +949,13 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 3);
-        assert.equal(parsedMetadata["bool isPublic"]?.key, "isPublic");
-        assert.equal(parsedMetadata["bool isPublic"]?.type, "bool");
-        assert.equal(parsedMetadata["bool isModerated"]?.key, "isModerated");
-        assert.equal(parsedMetadata["bool isModerated"]?.type, "bool");
-        assert.equal(parsedMetadata["bool isPinned"]?.key, "isPinned");
-        assert.equal(parsedMetadata["bool isPinned"]?.type, "bool");
+        expect(Object.keys(parsedMetadata).length).toBe(3);
+        expect(parsedMetadata["bool isPublic"]?.key).toBe("isPublic");
+        expect(parsedMetadata["bool isPublic"]?.type).toBe("bool");
+        expect(parsedMetadata["bool isModerated"]?.key).toBe("isModerated");
+        expect(parsedMetadata["bool isModerated"]?.type).toBe("bool");
+        expect(parsedMetadata["bool isPinned"]?.key).toBe("isPinned");
+        expect(parsedMetadata["bool isPinned"]?.type).toBe("bool");
 
         // **NEW: Validate that encoded boolean values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
@@ -984,23 +969,11 @@ describe("comment", () => {
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "isPublic") {
-              assert.equal(
-                decodedValue,
-                originalValues.isPublic,
-                "Decoded isPublic should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.isPublic);
             } else if (originalKey === "isModerated") {
-              assert.equal(
-                decodedValue,
-                originalValues.isModerated,
-                "Decoded isModerated should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.isModerated);
             } else if (originalKey === "isPinned") {
-              assert.equal(
-                decodedValue,
-                originalValues.isPinned,
-                "Decoded isPinned should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.isPinned);
             }
           }
         }
@@ -1069,7 +1042,7 @@ describe("comment", () => {
         const commentId = logs[0]!.args.commentId;
         const retrievedComment = await getCommentWithMetadata(commentId);
 
-        assert.equal(retrievedComment.metadata.length, 3);
+        expect(retrievedComment.metadata.length).toBe(3);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1081,11 +1054,11 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 3);
-        assert.equal(parsedMetadata["uint256 score"]?.type, "uint256");
-        assert.equal(parsedMetadata["uint256 score"]?.key, "score");
-        assert.equal(parsedMetadata["uint256 timestamp"]?.type, "uint256");
-        assert.equal(parsedMetadata["uint256 largeNumber"]?.type, "uint256");
+        expect(Object.keys(parsedMetadata).length).toBe(3);
+        expect(parsedMetadata["uint256 score"]?.type).toBe("uint256");
+        expect(parsedMetadata["uint256 score"]?.key).toBe("score");
+        expect(parsedMetadata["uint256 timestamp"]?.type).toBe("uint256");
+        expect(parsedMetadata["uint256 largeNumber"]?.type).toBe("uint256");
 
         // **NEW: Validate that encoded numeric values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
@@ -1099,23 +1072,11 @@ describe("comment", () => {
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "score") {
-              assert.equal(
-                decodedValue,
-                BigInt(originalValues.score),
-                "Decoded score should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(BigInt(originalValues.score));
             } else if (originalKey === "timestamp") {
-              assert.equal(
-                decodedValue,
-                originalValues.timestamp,
-                "Decoded timestamp should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.timestamp);
             } else if (originalKey === "largeNumber") {
-              assert.equal(
-                decodedValue,
-                originalValues.largeNumber,
-                "Decoded largeNumber should match original (using only on-chain derived type)",
-              );
+              expect(decodedValue).toBe(originalValues.largeNumber);
             }
           }
         }
@@ -1161,7 +1122,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1170,7 +1131,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1186,7 +1147,7 @@ describe("comment", () => {
         const commentId = logs[0]!.args.commentId;
         const retrievedComment = await getCommentWithMetadata(commentId);
 
-        assert.equal(retrievedComment.metadata.length, 5);
+        expect(retrievedComment.metadata.length).toBe(5);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1198,12 +1159,12 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 5);
-        assert.equal(parsedMetadata["uint8 smallInt"]?.type, "uint8");
-        assert.equal(parsedMetadata["uint16 mediumInt"]?.type, "uint16");
-        assert.equal(parsedMetadata["uint32 regularInt"]?.type, "uint32");
-        assert.equal(parsedMetadata["uint64 biggerInt"]?.type, "uint64");
-        assert.equal(parsedMetadata["uint128 hugeInt"]?.type, "uint128");
+        expect(Object.keys(parsedMetadata).length).toBe(5);
+        expect(parsedMetadata["uint8 smallInt"]?.type).toBe("uint8");
+        expect(parsedMetadata["uint16 mediumInt"]?.type).toBe("uint16");
+        expect(parsedMetadata["uint32 regularInt"]?.type).toBe("uint32");
+        expect(parsedMetadata["uint64 biggerInt"]?.type).toBe("uint64");
+        expect(parsedMetadata["uint128 hugeInt"]?.type).toBe("uint128");
       });
 
       it("creates and parses signed int types correctly", async () => {
@@ -1231,7 +1192,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1240,7 +1201,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1256,7 +1217,7 @@ describe("comment", () => {
         const commentId = logs[0]!.args.commentId;
         const retrievedComment = await getCommentWithMetadata(commentId);
 
-        assert.equal(retrievedComment.metadata.length, 2);
+        expect(retrievedComment.metadata.length).toBe(2);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1268,9 +1229,9 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 2);
-        assert.equal(parsedMetadata["int256 signedInt"]?.type, "int256");
-        assert.equal(parsedMetadata["int128 signedBig"]?.type, "int128");
+        expect(Object.keys(parsedMetadata).length).toBe(2);
+        expect(parsedMetadata["int256 signedInt"]?.type).toBe("int256");
+        expect(parsedMetadata["int128 signedBig"]?.type).toBe("int128");
       });
     });
 
@@ -1305,7 +1266,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1314,7 +1275,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1330,7 +1291,7 @@ describe("comment", () => {
         const commentId = logs[0]!.args.commentId;
         const retrievedComment = await getCommentWithMetadata(commentId);
 
-        assert.equal(retrievedComment.metadata.length, 2);
+        expect(retrievedComment.metadata.length).toBe(2);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1342,12 +1303,9 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 2);
-        assert.equal(
-          parsedMetadata["address contractAddress"]?.type,
-          "address",
-        );
-        assert.equal(parsedMetadata["address appAddress"]?.type, "address");
+        expect(Object.keys(parsedMetadata).length).toBe(2);
+        expect(parsedMetadata["address contractAddress"]?.type).toBe("address");
+        expect(parsedMetadata["address appAddress"]?.type).toBe("address");
 
         // **NEW: Validate that encoded address values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
@@ -1359,23 +1317,16 @@ describe("comment", () => {
             const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
             const originalKey = decodedInfo.key;
 
-            assert.ok(
-              typeof decodedValue === "string",
-              "decodedValue is a string",
-            );
+            expect(decodedValue).toBeTypeOf("string");
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "contractAddress") {
-              assert.equal(
-                decodedValue.toLowerCase(),
+              expect((decodedValue as string).toLowerCase()).toBe(
                 originalValues.contractAddress.toLowerCase(),
-                "Decoded contractAddress should match original (using only on-chain derived type)",
               );
             } else if (originalKey === "appAddress") {
-              assert.equal(
-                decodedValue.toLowerCase(),
+              expect((decodedValue as string).toLowerCase()).toBe(
                 originalValues.appAddress.toLowerCase(),
-                "Decoded appAddress should match original (using only on-chain derived type)",
               );
             }
           }
@@ -1412,7 +1363,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1421,7 +1372,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1437,7 +1388,7 @@ describe("comment", () => {
         const commentId = logs[0]!.args.commentId;
         const retrievedComment = await getCommentWithMetadata(commentId);
 
-        assert.equal(retrievedComment.metadata.length, 2);
+        expect(retrievedComment.metadata.length).toBe(2);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1449,9 +1400,9 @@ describe("comment", () => {
           decodedEngineeredMap,
         );
 
-        assert.equal(Object.keys(parsedMetadata).length, 2);
-        assert.equal(parsedMetadata["bytes32 hash"]?.type, "bytes32");
-        assert.equal(parsedMetadata["bytes data"]?.type, "bytes");
+        expect(Object.keys(parsedMetadata).length).toBe(2);
+        expect(parsedMetadata["bytes32 hash"]?.type).toBe("bytes32");
+        expect(parsedMetadata["bytes data"]?.type).toBe("bytes");
 
         // **NEW: Validate that encoded bytes values decode back to original values using ONLY derived on-chain data**
         // This simulates the real-world scenario where we don't have prior knowledge of the types
@@ -1463,23 +1414,16 @@ describe("comment", () => {
             const decodedValue = decodeMetadataValue(entry, decodedInfo.type);
             const originalKey = decodedInfo.key;
 
-            assert.ok(
-              typeof decodedValue === "string",
-              "decodedValue is a string",
-            );
+            expect(decodedValue).toBeTypeOf("string");
 
             // Match the decoded value to the original using the decoded key
             if (originalKey === "hash") {
-              assert.equal(
-                decodedValue.toLowerCase(),
+              expect((decodedValue as string).toLowerCase()).toBe(
                 originalValues.hash.toLowerCase(),
-                "Decoded hash should match original (using only on-chain derived type)",
               );
             } else if (originalKey === "data") {
-              assert.equal(
-                decodedValue.toLowerCase(),
+              expect((decodedValue as string).toLowerCase()).toBe(
                 originalValues.data.toLowerCase(),
-                "Decoded data should match original (using only on-chain derived type)",
               );
             }
           }
@@ -1572,7 +1516,7 @@ describe("comment", () => {
         const typedData = createCommentTypedData({
           chainId: anvil.id,
           commentData,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const appSignature = await appClient.signTypedData(typedData);
@@ -1581,7 +1525,7 @@ describe("comment", () => {
           comment: commentData,
           appSignature,
           writeContract: client.writeContract,
-          commentsAddress: commentsAddress,
+          commentsAddress,
         });
 
         const receipt = await client.waitForTransactionReceipt({
@@ -1598,7 +1542,7 @@ describe("comment", () => {
         const retrievedComment = await getCommentWithMetadata(commentId);
 
         // Should have all 14 metadata entries
-        assert.equal(retrievedComment.metadata.length, 14);
+        expect(retrievedComment.metadata.length).toBe(14);
 
         // Test decoding
         const decodedEngineeredMap = decodeMetadataTypes(
@@ -1611,27 +1555,27 @@ describe("comment", () => {
         );
 
         // Verify all types are correctly parsed from the key field
-        assert.equal(Object.keys(parsedMetadata).length, 14);
+        expect(Object.keys(parsedMetadata).length).toBe(14);
 
         // Test each type was correctly reverse-engineered
-        assert.equal(parsedMetadata["string title"]?.type, "string");
-        assert.equal(parsedMetadata["string title"]?.key, "title");
-        assert.equal(parsedMetadata["bool isActive"]?.type, "bool");
-        assert.equal(parsedMetadata["bool isActive"]?.key, "isActive");
-        assert.equal(parsedMetadata["uint256 score"]?.type, "uint256");
-        assert.equal(parsedMetadata["uint256 score"]?.key, "score");
-        assert.equal(parsedMetadata["uint8 level"]?.type, "uint8");
-        assert.equal(parsedMetadata["uint8 level"]?.key, "level");
-        assert.equal(parsedMetadata["uint16 points"]?.type, "uint16");
-        assert.equal(parsedMetadata["uint32 experience"]?.type, "uint32");
-        assert.equal(parsedMetadata["uint64 timestamp"]?.type, "uint64");
-        assert.equal(parsedMetadata["uint128 balance"]?.type, "uint128");
-        assert.equal(parsedMetadata["int256 delta"]?.type, "int256");
-        assert.equal(parsedMetadata["int128 offset"]?.type, "int128");
-        assert.equal(parsedMetadata["address owner"]?.type, "address");
-        assert.equal(parsedMetadata["bytes32 hash"]?.type, "bytes32");
-        assert.equal(parsedMetadata["bytes data"]?.type, "bytes");
-        assert.equal(parsedMetadata["string config"]?.type, "string");
+        expect(parsedMetadata["string title"]?.type).toBe("string");
+        expect(parsedMetadata["string title"]?.key).toBe("title");
+        expect(parsedMetadata["bool isActive"]?.type).toBe("bool");
+        expect(parsedMetadata["bool isActive"]?.key).toBe("isActive");
+        expect(parsedMetadata["uint256 score"]?.type).toBe("uint256");
+        expect(parsedMetadata["uint256 score"]?.key).toBe("score");
+        expect(parsedMetadata["uint8 level"]?.type).toBe("uint8");
+        expect(parsedMetadata["uint8 level"]?.key).toBe("level");
+        expect(parsedMetadata["uint16 points"]?.type).toBe("uint16");
+        expect(parsedMetadata["uint32 experience"]?.type).toBe("uint32");
+        expect(parsedMetadata["uint64 timestamp"]?.type).toBe("uint64");
+        expect(parsedMetadata["uint128 balance"]?.type).toBe("uint128");
+        expect(parsedMetadata["int256 delta"]?.type).toBe("int256");
+        expect(parsedMetadata["int128 offset"]?.type).toBe("int128");
+        expect(parsedMetadata["address owner"]?.type).toBe("address");
+        expect(parsedMetadata["bytes32 hash"]?.type).toBe("bytes32");
+        expect(parsedMetadata["bytes data"]?.type).toBe("bytes");
+        expect(parsedMetadata["string config"]?.type).toBe("string");
 
         // Test parsing WITHOUT keyTypeMap to demonstrate the limitations
         const fallbackParsed = convertContractToRecordFormat(
@@ -1639,14 +1583,13 @@ describe("comment", () => {
         );
 
         // Should still create entries but with generic keys and bytes type
-        assert.equal(Object.keys(fallbackParsed).length, 14);
+        expect(Object.keys(fallbackParsed).length).toBe(14);
         for (const entry of retrievedComment.metadata) {
-          assert.ok(fallbackParsed[entry.key]);
-          assert.equal(
-            fallbackParsed[entry.key]?.type,
+          expect(fallbackParsed[entry.key]).toBeDefined();
+          expect(fallbackParsed[entry.key]?.type).toBe(
             MetadataTypeValues.BYTES,
           );
-          assert.equal(fallbackParsed[entry.key]?.key, entry.key); // Uses hash as key
+          expect(fallbackParsed[entry.key]?.key).toBe(entry.key); // Uses hash as key
         }
 
         // **NEW: Demonstrate TRUE zero-knowledge decoding - decode ALL values using ONLY on-chain derived information**
@@ -1686,44 +1629,27 @@ describe("comment", () => {
                 typeof expectedValue === "string" &&
                 originalKey === "owner"
               ) {
-                assert.ok(
-                  typeof decodedValue === "string",
-                  "decodedValue is a string",
-                );
+                expect(decodedValue).toBeTypeOf("string");
                 // Address comparison (normalize case)
-                assert.equal(
-                  decodedValue.toLowerCase(),
+                expect((decodedValue as string).toLowerCase()).toBe(
                   expectedValue,
-                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
                 );
               } else if (
                 typeof expectedValue === "string" &&
                 (originalKey === "hash" || originalKey === "data")
               ) {
-                assert.ok(
-                  typeof decodedValue === "string",
-                  "decodedValue is a string",
-                );
+                expect(decodedValue).toBeTypeOf("string");
+
                 // Hex string comparison (normalize case)
-                assert.equal(
-                  decodedValue.toLowerCase(),
+                expect((decodedValue as string).toLowerCase()).toBe(
                   expectedValue.toLowerCase(),
-                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
                 );
               } else if (typeof expectedValue === "object") {
                 // JSON object comparison
-                assert.deepEqual(
-                  decodedValue,
-                  expectedValue,
-                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
-                );
+                expect(decodedValue).toStrictEqual(expectedValue);
               } else {
                 // Direct comparison for primitives and bigints
-                assert.equal(
-                  decodedValue,
-                  expectedValue,
-                  `Decoded ${originalKey} should match original (zero-knowledge decoding)`,
-                );
+                expect(decodedValue).toBe(expectedValue);
               }
               decodedCount++;
             }
@@ -1731,11 +1657,7 @@ describe("comment", () => {
         }
 
         // Ensure we successfully decoded all 14 metadata entries
-        assert.equal(
-          decodedCount,
-          14,
-          "Should have successfully decoded all metadata entries using only on-chain derived information",
-        );
+        expect(decodedCount).toBe(14);
       });
     });
   });

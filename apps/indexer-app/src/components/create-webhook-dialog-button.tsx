@@ -52,6 +52,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import Link from "next/link";
 
 type CreateWebhookDialogButtonProps = {
   appId: string;
@@ -205,7 +206,18 @@ export function CreateWebhookDialogButton({
                   </CollapsibleTrigger>
                 </div>
                 <FormDescription>
-                  Select the events you want to send to the webhook.
+                  <p>Select the events you want to send to the webhook.</p>
+                  <p>
+                    <Link
+                      className="underline"
+                      href="https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Learn more
+                    </Link>{" "}
+                    about the events in our documentation.
+                  </p>
                 </FormDescription>
               </div>
               <CollapsibleContent>
