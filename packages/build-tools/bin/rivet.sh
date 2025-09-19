@@ -148,10 +148,6 @@ main() {
     fi
     
     echo "✅ Foundry $TARGET_VERSION is ready"
-    
-    # Set up traps for common signals
-    # Note: SIGKILL (9) cannot be trapped
-    trap 'cleanup' HUP INT QUIT TERM PIPE
 
     cleanup() {
         # Kill child process if it exists
@@ -160,6 +156,10 @@ main() {
         fi
         exit 1
     }
+
+    # Set up traps for common signals
+    # Note: SIGKILL (9) cannot be trapped
+    trap 'cleanup' HUP INT QUIT TERM PIPE
     
     # Pass all arguments to the global foundry command
     # Determine which foundry command to use based on the script name or first argument
@@ -177,10 +177,15 @@ main() {
     fi
     
     PID=$!
+
+    # Wait for the process and capture its exit code
     wait $PID
+    EXIT_CODE=$?
+    
+    # Remove traps before exiting
     trap - HUP INT QUIT TERM PIPE
-    wait $PID
-    exit $?
+    
+    exit $EXIT_CODE
 }
 
 # Run main function
