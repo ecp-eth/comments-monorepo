@@ -1,4 +1,4 @@
-import { and, eq, lt, sql, isNull, or } from "drizzle-orm";
+import { and, eq, lt, sql } from "drizzle-orm";
 import isNetworkError from "is-network-error";
 import { createHmac } from "node:crypto";
 import Deferred from "promise-deferred";
@@ -279,15 +279,12 @@ export class WebhookEventDeliveryService {
         await tx
           .update(schema.appWebhook)
           .set({
-            lastProcessedEventId: event.id,
+            eventOutboxPosition: event.id,
           })
           .where(
             and(
               eq(schema.appWebhook.id, appWebhook.id),
-              or(
-                lt(schema.appWebhook.lastProcessedEventId, event.id),
-                isNull(schema.appWebhook.lastProcessedEventId),
-              ),
+              lt(schema.appWebhook.eventOutboxPosition, event.id),
             ),
           )
           .execute();
@@ -325,15 +322,12 @@ export class WebhookEventDeliveryService {
         await tx
           .update(schema.appWebhook)
           .set({
-            lastProcessedEventId: event.id,
+            eventOutboxPosition: event.id,
           })
           .where(
             and(
               eq(schema.appWebhook.id, appWebhook.id),
-              or(
-                lt(schema.appWebhook.lastProcessedEventId, event.id),
-                isNull(schema.appWebhook.lastProcessedEventId),
-              ),
+              lt(schema.appWebhook.eventOutboxPosition, event.id),
             ),
           )
           .execute();

@@ -1,4 +1,0 @@
-ALTER TABLE "ecp_indexer_schema"."app_webhook" ADD COLUMN "last_processed_event_id" bigint;--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook" ADD CONSTRAINT "app_webhook_last_processed_event_id_event_outbox_id_fk" FOREIGN KEY ("last_processed_event_id") REFERENCES "ecp_indexer_schema"."event_outbox"("id") ON DELETE set null ON UPDATE set null;--> statement-breakpoint
-CREATE INDEX "aw_by_created_at_idx" ON "ecp_indexer_schema"."app_webhook" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "aw_subscription_lookup_idx" ON "ecp_indexer_schema"."app_webhook" USING btree ("paused","created_at","last_processed_event_id") WHERE "ecp_indexer_schema"."app_webhook"."paused" = FALSE;

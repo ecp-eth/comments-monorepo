@@ -1,5 +1,5 @@
 {
-  "id": "270817fa-3dad-4d22-b4ca-b4486e84f283",
+  "id": "f0209d51-ee32-4c2b-9de6-f1e098a77db4",
   "prevId": "a2ab9bbf-1c48-4b51-a19d-c96bf79e273a",
   "version": "7",
   "dialect": "postgresql",
@@ -294,16 +294,24 @@
           "primaryKey": false,
           "notNull": false
         },
-        "last_processed_event_id": {
-          "name": "last_processed_event_id",
+        "event_activations": {
+          "name": "event_activations",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "event_outbox_position": {
+          "name": "event_outbox_position",
           "type": "bigint",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": 0
         }
       },
       "indexes": {
-        "aw_by_event_idx": {
-          "name": "aw_by_event_idx",
+        "aw_subscriptions_by_event_idx": {
+          "name": "aw_subscriptions_by_event_idx",
           "columns": [
             {
               "expression": "event_filter",
@@ -313,6 +321,7 @@
             }
           ],
           "isUnique": false,
+          "where": "\"ecp_indexer_schema\".\"app_webhook\".\"paused\" = FALSE",
           "concurrently": false,
           "method": "gin",
           "with": {}
@@ -368,30 +377,17 @@
           "method": "btree",
           "with": {}
         },
-        "aw_subscription_lookup_idx": {
-          "name": "aw_subscription_lookup_idx",
+        "aw_by_outbox_position_idx": {
+          "name": "aw_by_outbox_position_idx",
           "columns": [
             {
-              "expression": "paused",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "last_processed_event_id",
+              "expression": "event_outbox_position",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": false,
-          "where": "\"ecp_indexer_schema\".\"app_webhook\".\"paused\" = FALSE",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -425,20 +421,6 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
-        },
-        "app_webhook_last_processed_event_id_event_outbox_id_fk": {
-          "name": "app_webhook_last_processed_event_id_event_outbox_id_fk",
-          "tableFrom": "app_webhook",
-          "tableTo": "event_outbox",
-          "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "last_processed_event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "set null"
         }
       },
       "compositePrimaryKeys": {},
