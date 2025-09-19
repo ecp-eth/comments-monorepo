@@ -83,6 +83,24 @@ describe("runAsync", () => {
       ).rejects.toThrow("Failure");
     });
 
+    it("should not retry if retryCondition returns false", async () => {
+      try {
+        await runAsync(
+          async () => {
+            attemptCount++;
+            throw new Error("Failure");
+          },
+          { retries: 3, retryCondition: () => false },
+        );
+
+        assert.fail("Should have thrown an error");
+      } catch (error) {
+        assert.equal(attemptCount, 1);
+        assert(error instanceof Error);
+        assert.equal(error.message, "Failure");
+      }
+    });
+
     it("should throw the last error after all retries are exhausted", async () => {
       await expect(
         runAsync(
