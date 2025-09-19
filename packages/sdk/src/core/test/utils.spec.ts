@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from "vitest";
+import { describe, it, beforeEach, expect, assert } from "vitest";
 import { runAsync } from "../utils.js";
 
 describe("runAsync", () => {
@@ -105,7 +105,7 @@ describe("runAsync", () => {
       await expect(
         runAsync(
           async () => {
-            expect.fail("Function should not be called");
+            assert.fail("Function should not be called");
           },
           { signal: abortController.signal },
         ),
@@ -126,7 +126,7 @@ describe("runAsync", () => {
             throw signal.reason;
           }
 
-          expect.fail("Should not reach here");
+          assert.fail("Should not reach here");
         },
         { signal: abortController.signal },
       );
