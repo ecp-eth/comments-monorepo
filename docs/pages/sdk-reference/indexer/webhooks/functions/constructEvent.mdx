@@ -903,7 +903,7 @@ The timestamp from X-ECP-Webhook-Timestamp header.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -1395,6 +1395,240 @@ comment:
 
 Comment data
 
+##### Type declaration
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+```
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: ... | ...;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ...;
+        dimension: ...;
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+}
+```
+
 #### data.zeroExSwap
 
 ```ts
@@ -1499,7 +1733,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -1564,7 +1798,7 @@ hookMetadata: {
 }[] = MetadataArraySchema;
 ```
 
-Hook metadata
+Hook metadata. On wire it is a ISO 8601 date and time string.
 
 #### data.comment.id
 
@@ -1580,7 +1814,7 @@ ID of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 #### data.hookMetadataOperation
 
@@ -1670,7 +1904,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -1712,7 +1946,7 @@ Updated comment data
 deletedAt: Date = ISO8601DateSchema;
 ```
 
-Deleted at date
+Deleted at date. On wire it is a ISO 8601 date and time string
 
 #### data.comment.id
 
@@ -1728,7 +1962,7 @@ ID of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string
 
 ### event
 
@@ -1897,7 +2131,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -2272,7 +2506,7 @@ References of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string
 
 ### event
 
@@ -2378,7 +2612,7 @@ Moderation status of the comment
 moderationStatusChangedAt: Date = ISO8601DateSchema;
 ```
 
-Moderation status changed at date
+Moderation status changed at date. On wire it is a ISO 8601 date and time string
 
 ### event
 
@@ -2518,7 +2752,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -2584,7 +2818,7 @@ Chain ID where the channel was created
 createdAt: Date = ISO8601DateSchema;
 ```
 
-Created at date
+Created at date. On wire it is a ISO 8601 date and time string.
 
 #### data.channel.description
 
@@ -2608,7 +2842,7 @@ Hook address
 id: bigint = StringBigintSchema;
 ```
 
-ID of the channel
+ID of the channel. On wire it is a stringified bigint.
 
 #### data.channel.metadata
 
@@ -2643,7 +2877,7 @@ Owner address
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 ### event
 
@@ -2716,7 +2950,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -2875,7 +3109,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -3049,7 +3283,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -3222,7 +3456,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -3368,7 +3602,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -3430,7 +3664,7 @@ Author address
 createdAt: Date = ISO8601DateSchema;
 ```
 
-Created at date
+Created at date. On wire it is a ISO 8601 date and time string.
 
 #### data.approval.id
 
@@ -3446,7 +3680,7 @@ ID of the approval
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 ### event
 
@@ -3512,7 +3746,7 @@ Version of the event
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 

@@ -46,7 +46,7 @@ An event sent to webhook when a channel is created.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -112,7 +112,7 @@ Chain ID where the channel was created
 createdAt: Date = ISO8601DateSchema;
 ```
 
-Created at date
+Created at date. On wire it is a ISO 8601 date and time string.
 
 #### data.channel.description
 
@@ -136,7 +136,7 @@ Hook address
 id: bigint = StringBigintSchema;
 ```
 
-ID of the channel
+ID of the channel. On wire it is a stringified bigint.
 
 #### data.channel.metadata
 
@@ -171,7 +171,7 @@ Owner address
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 ### event
 

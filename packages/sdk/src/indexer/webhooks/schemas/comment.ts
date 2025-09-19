@@ -50,10 +50,25 @@ export type CommentModerationStatus = z.infer<
 
 const CommentEventDataSchema = z.object({
   id: HexSchema,
+  /**
+   * Created at date. On wire it is a ISO 8601 date and time string.
+   */
   createdAt: ISO8601DateSchema,
+  /**
+   * Updated at date. On wire it is a ISO 8601 date and time string.
+   */
   updatedAt: ISO8601DateSchema,
+  /**
+   * Channel ID. On wire it is a stringified bigint.
+   */
   channelId: StringBigintSchema,
+  /**
+   * Author address.
+   */
   author: HexSchema,
+  /**
+   * App address.
+   */
   app: HexSchema,
   content: z.string(),
   commentType: z.number().int(),
@@ -123,11 +138,11 @@ export const CommentHookMetadataSetEventSchema = z
          */
         id: HexSchema,
         /**
-         * Updated at date
+         * Updated at date. On wire it is a ISO 8601 date and time string.
          */
         updatedAt: ISO8601DateSchema,
         /**
-         * Hook metadata
+         * Hook metadata. On wire it is a ISO 8601 date and time string.
          */
         hookMetadata: MetadataArraySchema,
       }),
@@ -166,11 +181,11 @@ export const CommentDeletedEventSchema = z
          */
         id: HexSchema,
         /**
-         * Deleted at date
+         * Deleted at date. On wire it is a ISO 8601 date and time string
          */
         deletedAt: ISO8601DateSchema,
         /**
-         * Updated at date
+         * Updated at date. On wire it is a ISO 8601 date and time string
          */
         updatedAt: ISO8601DateSchema,
       }),
@@ -203,7 +218,7 @@ export const CommentEditedEventSchema = z
          */
         id: HexSchema,
         /**
-         * Updated at date
+         * Updated at date. On wire it is a ISO 8601 date and time string
          */
         updatedAt: ISO8601DateSchema,
         /**
@@ -252,7 +267,7 @@ export const CommentModerationStatusUpdatedEventSchema = z
          */
         moderationStatus: CommentModerationStatusSchema,
         /**
-         * Moderation status changed at date
+         * Moderation status changed at date. On wire it is a ISO 8601 date and time string
          */
         moderationStatusChangedAt: ISO8601DateSchema,
       }),

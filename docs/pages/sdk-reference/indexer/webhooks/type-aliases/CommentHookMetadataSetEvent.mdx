@@ -42,7 +42,7 @@ type CommentHookMetadataSetEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:143](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L143)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:158](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L158)
 
 An event sent to webhook when a comment hook metadata is set.
 
@@ -54,7 +54,7 @@ An event sent to webhook when a comment hook metadata is set.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -119,7 +119,7 @@ hookMetadata: {
 }[] = MetadataArraySchema;
 ```
 
-Hook metadata
+Hook metadata. On wire it is a ISO 8601 date and time string.
 
 #### data.comment.id
 
@@ -135,7 +135,7 @@ ID of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 #### data.hookMetadataOperation
 

@@ -21,7 +21,7 @@ type CommentModerationStatusUpdatedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:263](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L263)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:278](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L278)
 
 An event sent to webhook when a comment moderation status is updated.
 
@@ -75,7 +75,7 @@ Moderation status of the comment
 moderationStatusChangedAt: Date = ISO8601DateSchema;
 ```
 
-Moderation status changed at date
+Moderation status changed at date. On wire it is a ISO 8601 date and time string
 
 ### event
 

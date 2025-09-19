@@ -265,7 +265,7 @@ type CommentAddedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:102](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L102)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:117](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L117)
 
 An event sent to webhook when a comment is added.
 
@@ -277,7 +277,7 @@ An event sent to webhook when a comment is added.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -780,6 +780,246 @@ comment:
 ```
 
 Comment data
+
+##### Type declaration
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "root";
+  updatedAt: Date;
+}
+```
+
+```ts
+{
+  app: `0x${string}`;
+  author: `0x${string}`;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  id: `0x${string}`;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationStatus: "approved" | "pending" | "rejected";
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+  })[];
+  type: "reply";
+  updatedAt: Date;
+}
+```
 
 #### data.zeroExSwap
 

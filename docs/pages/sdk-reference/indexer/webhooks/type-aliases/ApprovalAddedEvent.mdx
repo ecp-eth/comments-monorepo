@@ -39,7 +39,7 @@ An event sent to webhook when an approval is added
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -101,7 +101,7 @@ Author address
 createdAt: Date = ISO8601DateSchema;
 ```
 
-Created at date
+Created at date. On wire it is a ISO 8601 date and time string.
 
 #### data.approval.id
 
@@ -117,7 +117,7 @@ ID of the approval
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string.
 
 ### event
 

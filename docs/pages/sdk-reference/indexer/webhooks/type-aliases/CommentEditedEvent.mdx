@@ -126,7 +126,7 @@ type CommentEditedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:227](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L227)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L242)
 
 An event sent to webhook when a comment is edited.
 
@@ -138,7 +138,7 @@ An event sent to webhook when a comment is edited.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -513,7 +513,7 @@ References of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string
 
 ### event
 

@@ -42,15 +42,15 @@ export const ChannelCreatedEventSchema = z
     data: z.object({
       channel: z.object({
         /**
-         * ID of the channel
+         * ID of the channel. On wire it is a stringified bigint.
          */
         id: StringBigintSchema,
         /**
-         * Created at date
+         * Created at date. On wire it is a ISO 8601 date and time string.
          */
         createdAt: ISO8601DateSchema,
         /**
-         * Updated at date
+         * Updated at date. On wire it is a ISO 8601 date and time string.
          */
         updatedAt: ISO8601DateSchema,
         /**

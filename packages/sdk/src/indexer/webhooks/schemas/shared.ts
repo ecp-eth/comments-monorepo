@@ -61,7 +61,7 @@ export const EventFromChainSchema = z.object({
    */
   chainId: z.number().int(),
   /**
-   * Block number
+   * Block number. On wire it is a stringified bigint.
    */
   blockNumber: StringBigintSchema,
   /**

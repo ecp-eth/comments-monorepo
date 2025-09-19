@@ -25,7 +25,7 @@ type CommentDeletedEvent = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L182)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:197](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L197)
 
 An event sent to webhook when a comment is deleted.
 
@@ -37,7 +37,7 @@ An event sent to webhook when a comment is deleted.
 blockNumber: bigint = StringBigintSchema;
 ```
 
-Block number
+Block number. On wire it is a stringified bigint.
 
 ### chainId
 
@@ -79,7 +79,7 @@ Updated comment data
 deletedAt: Date = ISO8601DateSchema;
 ```
 
-Deleted at date
+Deleted at date. On wire it is a ISO 8601 date and time string
 
 #### data.comment.id
 
@@ -95,7 +95,7 @@ ID of the comment
 updatedAt: Date = ISO8601DateSchema;
 ```
 
-Updated at date
+Updated at date. On wire it is a ISO 8601 date and time string
 
 ### event
 

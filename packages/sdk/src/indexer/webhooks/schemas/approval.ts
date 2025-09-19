@@ -39,11 +39,11 @@ export const ApprovalAddedEventSchema = z
          */
         id: z.string(),
         /**
-         * Created at date
+         * Created at date. On wire it is a ISO 8601 date and time string.
          */
         createdAt: ISO8601DateSchema,
         /**
-         * Updated at date
+         * Updated at date. On wire it is a ISO 8601 date and time string.
          */
         updatedAt: ISO8601DateSchema,
         /**
