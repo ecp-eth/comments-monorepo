@@ -97,6 +97,14 @@ export class EventOutboxFanOutService {
               FROM claimed_events e
               JOIN ${schema.appWebhook} ON (
                 ${schema.appWebhook.paused} = FALSE 
+                AND
+                ${schema.appWebhook.createdAt} <= e.created_at
+                AND
+                -- prevents from sending the events that the webhook has not been subscribed to previously
+                -- on reindex. For example if the webhook was updated to subscribe to more events than previously
+                -- then on reindex it would send the past events to the webhook. This guarantees that the webhook will pick only 
+                -- newer events.
+                (${schema.appWebhook.lastProcessedEventId} < e.id OR ${schema.appWebhook.lastProcessedEventId} IS NULL)
                 AND 
                 (
                   ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]

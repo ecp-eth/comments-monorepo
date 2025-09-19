@@ -313,11 +313,29 @@ export const appWebhook = offchainSchema.table(
     eventFilter: text().array().notNull().default([]).$type<EventTypes[]>(),
     paused: boolean().notNull().default(false),
     pausedAt: timestamp({ withTimezone: true }),
+    /**
+     * This is used to track the last event that was processed by the webhook.
+     *
+     * By being processed we mean that event has been picked up and tried to be delivered.
+     * It doesn't mean that the delivery was successful or not. We use FIFO per webhook to deliver the events.
+     * If the delivery fails it will be retried later but it doesn't block next event from being processed.
+     */
+    lastProcessedEventId: bigint({ mode: "bigint" }).references(
+      () => eventOutbox.id,
+      {
+        onDelete: "set null",
+        onUpdate: "set null",
+      },
+    ),
   },
   (table) => [
     index("aw_by_event_idx").using("gin", table.eventFilter),
     index("aw_by_paused_status_idx").on(table.paused),
     index("aw_by_id_and_app_id_idx").on(table.id, table.appId),
+    index("aw_by_created_at_idx").on(table.createdAt),
+    index("aw_subscription_lookup_idx")
+      .on(table.paused, table.createdAt, table.lastProcessedEventId)
+      .where(sql`${table.paused} = FALSE`),
   ],
 );
 
