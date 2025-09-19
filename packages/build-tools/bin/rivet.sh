@@ -100,18 +100,6 @@ install_foundry() {
 
     # Run foundryup to complete installation
     foundryup
-    
-    # Verify foundryup worked
-    if ! command -v forge >/dev/null 2>&1; then
-        echo "❌ Foundry installation failed. Please run these commands manually:"
-        if is_user_shell_zsh; then
-            echo "   source ~/.zshenv # or start a new terminal"
-        else
-            echo "   source ~/.bashrc # or start a new terminal"
-        fi
-        echo "   foundryup"
-        exit 1
-    fi
 }
 
 # Function to update foundry to target version
