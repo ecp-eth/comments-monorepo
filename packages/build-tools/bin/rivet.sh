@@ -161,20 +161,38 @@ main() {
     
     echo "✅ Foundry $TARGET_VERSION is ready"
     
+    # Set up traps for common signals
+    # Note: SIGKILL (9) cannot be trapped
+    trap 'cleanup' HUP INT QUIT TERM PIPE
+
+    cleanup() {
+        # Kill child process if it exists
+        if [ -n "$PID" ]; then
+            kill -TERM "$PID" 2>/dev/null
+        fi
+        exit 1
+    }
+    
     # Pass all arguments to the global foundry command
     # Determine which foundry command to use based on the script name or first argument
     if [ "$(basename "$0")" = "forge" ] || [ "$1" = "forge" ]; then
-        forge "${@:2}"
+        forge "${@:2}" &
     elif [ "$(basename "$0")" = "cast" ] || [ "$1" = "cast" ]; then
-        cast "${@:2}"
+        cast "${@:2}" &
     elif [ "$(basename "$0")" = "anvil" ] || [ "$1" = "anvil" ]; then
-        anvil "${@:2}"
+        anvil "${@:2}" &
     elif [ "$(basename "$0")" = "chisel" ] || [ "$1" = "chisel" ]; then
-        chisel "${@:2}"
+        chisel "${@:2}" &
     else
         # Default to forge if no specific command is detected
-        forge "$@"
+        forge "$@" &
     fi
+    
+    PID=$!
+    wait $PID
+    trap - HUP INT QUIT TERM PIPE
+    wait $PID
+    exit $?
 }
 
 # Run main function
