@@ -7,6 +7,12 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
+  // without baseUrl the `%logo` template in og:image path will be without the origin, causing broken og:image
+  baseUrl:
+    process.env.VITE_BASE_URL ??
+    (process.env.NODE_ENV === "development"
+      ? "http://localhost"
+      : "https://docs.ethcomments.xyz"),
   title: "Ethereum Comments Protocol",
   description:
     "A decentralized protocol for adding comments to any Ethereum address or transaction",
