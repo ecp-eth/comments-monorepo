@@ -5,6 +5,7 @@ import {
   ChevronUpIcon,
   LogOutIcon,
   User2Icon,
+  FileTextIcon,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -57,6 +58,13 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/terms">
+                <FileTextIcon /> <span>Terms and conditions</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

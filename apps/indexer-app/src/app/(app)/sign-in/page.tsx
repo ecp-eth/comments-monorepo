@@ -20,6 +20,7 @@ import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
 import { cn, createFetchUrl } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
+import Link from "next/link";
 
 export default function SignInPage() {
   const auth = useAuth();
@@ -177,7 +178,11 @@ export default function SignInPage() {
         {/* Footer Info */}
         <div className="pt-8">
           <p className="text-xs text-muted-foreground">
-            By connecting, you agree to our terms of service and privacy policy.
+            By signing in, you agree to the{" "}
+            <Link href="/terms" className="underline">
+              terms of service
+            </Link>
+            .
           </p>
         </div>
       </div>
