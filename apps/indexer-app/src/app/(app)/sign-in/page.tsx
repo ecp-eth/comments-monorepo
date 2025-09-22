@@ -132,9 +132,9 @@ export default function SignInPage() {
             </svg>
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">ECP Indexer</h1>
+            <h1 className="text-3xl font-bold">ECP Dashboard</h1>
             <p className="text-muted-foreground text-lg">
-              Build your apps on ECP Indexer
+              Build your apps on Ethereum Comments Protocol
             </p>
           </div>
         </div>
@@ -143,7 +143,8 @@ export default function SignInPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Welcome!</h2>
           <p className="text-muted-foreground max-w-sm">
-            Connect your wallet to start building your apps on ECP Indexer.
+            Connect your wallet to start building your apps on Ethereum Comments
+            Protocol.
           </p>
         </div>
 
