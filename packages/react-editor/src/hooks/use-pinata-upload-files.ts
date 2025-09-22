@@ -2,6 +2,7 @@ import { PinataSDK, type UploadResponse } from "pinata";
 import { useMemo, useRef, useState } from "react";
 import type { UploadFilesService } from "../types.js";
 import { ALLOWED_UPLOAD_MIME_TYPES, MAX_UPLOAD_FILE_SIZE } from "../constants";
+import { createImageCleanupTransformer } from "../file-transformers/image-cleanup";
 
 /**
  * Function to generate an upload URL for a file.
@@ -11,6 +12,8 @@ export type PinataGenerateUploadUrlFunction = (
 ) => Promise<string>;
 
 export type UsePinataUploadFilesReturn = UploadFilesService<UploadResponse>;
+
+export type UsePinataUploadFilesFileTransformer = (file: File) => Promise<File>;
 
 export type UsePinataUploadFilesOptions = {
   /**
@@ -33,6 +36,10 @@ export type UsePinataUploadFilesOptions = {
    * Function to generate an upload URL for a file.
    */
   generateUploadUrl: PinataGenerateUploadUrlFunction;
+  /**
+   * File transformers to apply to the file before uploading.
+   */
+  fileTransformers?: UsePinataUploadFilesFileTransformer[];
 };
 
 /**
@@ -45,6 +52,10 @@ export function usePinataUploadFiles({
   maxFileSize = MAX_UPLOAD_FILE_SIZE,
   allowedMimeTypes = ALLOWED_UPLOAD_MIME_TYPES,
   generateUploadUrl,
+  // for the safety of end users and intuitiveness of the hook
+  // we apply image cleanup by default to remove metadata to avoid
+  // leaking end user's location and other sensitive information
+  fileTransformers = [createImageCleanupTransformer()],
 }: UsePinataUploadFilesOptions): UsePinataUploadFilesReturn {
   const [pinata] = useState(() => {
     return new PinataSDK({
@@ -62,6 +73,11 @@ export function usePinataUploadFiles({
     ) => {
       try {
         const uploadUrl = await generateUploadUrlRef.current(file.name);
+
+        // apply file transformers
+        for (const transformer of fileTransformers) {
+          file.file = await transformer(file.file);
+        }
 
         const uploadResponse = await pinata.upload.public
           .file(file.file)
@@ -109,5 +125,5 @@ export function usePinataUploadFiles({
       uploadFile,
       uploadFiles,
     };
-  }, [pinata]);
+  }, [pinata, fileTransformers]);
 }
