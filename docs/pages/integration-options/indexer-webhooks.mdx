@@ -1,0 +1,102 @@
+# Integration Options
+
+## Indexer Webhooks
+
+Manage your apps, webhooks, and deliveries at `https://dashboard.ethcomments.xyz`.
+
+### What you configure
+
+- **App**: A container for your webhooks. Each app has a generated secret used to sign deliveries.
+- **Webhook**: Subscribes to one or more event types and delivers to your HTTPS endpoint. Supports auth (no auth, HTTP Basic, or a custom header).
+- **Deliveries**: Individual attempts to send an event to your endpoint. Logged with status, response code, and retries.
+
+### Delivery semantics
+
+- **Ordering**: In-order delivery per webhook subscription (FIFO per subscription identifier).
+- **Non-blocking**: A failed delivery does not block subsequent events for that subscription.
+- **Retries**: Failed deliveries are retried with exponential backoff up to 20 total attempts.
+- **Timeouts**: Request timeout is 5 seconds per attempt.
+- **Success**: Any 2xx–3xx status code is treated as success; redirects are not followed.
+- **Idempotency**: Each event includes a `uid` you can use to deduplicate.
+
+### Event schema and SDK
+
+Use the SDK to parse and verify webhook requests and access strongly typed events.
+
+- SDK reference: see [@ecp.eth/sdk/indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx).
+  - Functions: [`constructEventFromRequest`](/sdk-reference/indexer/webhooks/functions/constructEventFromRequest.mdx), [`constructEvent`](/sdk-reference/indexer/webhooks/functions/constructEvent.mdx)
+  - Event types and schemas: see the Type Aliases and Variables on the same page (e.g., `CommentAddedEvent`, `ChannelCreatedEvent`, etc.).
+
+#### Verify and parse in a Next.js/Fetch handler
+
+```ts
+import { constructEventFromRequest } from "@ecp.eth/sdk/indexer/webhooks";
+
+export async function POST(request: Request) {
+  // Your app secret from the Indexer App dashboard
+  const event = await constructEventFromRequest({
+    appSecret: process.env.APP_SECRET!,
+    request,
+  });
+
+  switch (event.event) {
+    case "comment:added":
+      // handle event.data
+      break;
+    case "channel:created":
+      // ...
+      break;
+  }
+
+  return new Response("ok");
+}
+```
+
+#### Verify and parse with raw headers/body
+
+```ts
+import { constructEvent } from "@ecp.eth/sdk/indexer/webhooks";
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  const signature = request.headers.get("x-ecp-webhook-signature")!;
+  const timestamp = request.headers.get("x-ecp-webhook-timestamp")!;
+
+  const event = constructEvent({
+    appSecret: process.env.APP_SECRET!,
+    requestBody: body,
+    requestSignature: signature,
+    requestTimestamp: timestamp,
+  });
+
+  return new Response("ok");
+}
+```
+
+See the SDK pages for the exact shapes of all events and fields.
+
+### Authentication to your endpoint
+
+- **No auth**: No headers added by the Indexer.
+- **HTTP Basic**: We will send the `Authorization: Basic ...` header you configure.
+- **Custom header**: Provide a name and value; we will include that header with every delivery.
+
+Configure these per webhook in the dashboard at `https://dashboard.ethcomments.xyz`.
+
+### Data stored and retention
+
+- We store the app name and its generated secret key.
+- For each webhook: name, endpoint URL, subscribed event types, selected authentication config, and delivery logs.
+- When you delete a webhook, its delivery logs are deleted. When you delete an app, its webhooks and logs are deleted.
+
+### Recommendations
+
+- Validate the signature for each request using the SDK.
+- Use `uid` for idempotency to safely handle retries.
+- Respond quickly (under 5s) and perform heavy work asynchronously.
+- Make your endpoint highly available and accept JSON requests over HTTPS.
+
+### Managing and testing
+
+- Create apps, add webhooks, and view delivery logs at `https://dashboard.ethcomments.xyz`.
+- Use the dashboard to send a "Test" event to verify your endpoint. The test payload type is documented at [`TestEvent`](/sdk-reference/indexer/webhooks/type-aliases/TestEvent.mdx).

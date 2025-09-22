@@ -62,6 +62,10 @@ export default defineConfig({
           text: "Share to ECP",
           link: "/integration-options/share-to-ecp",
         },
+        {
+          text: "Indexer Webhooks",
+          link: "/integration-options/indexer-webhooks",
+        },
       ],
     },
     {
