@@ -1,4 +1,11 @@
-import { UsePinataUploadFilesFileTransformer } from "../hooks/use-pinata-upload-files";
+import { type UsePinataUploadFilesFileTransformer } from "../hooks/use-pinata-upload-files";
+
+const SUPPORTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/webp",
+  "image/png",
+] as const;
+type SupportedImageType = (typeof SUPPORTED_IMAGE_TYPES)[number];
 
 /**
  * This function creates a file transformer that cleanups image metadata
@@ -14,11 +21,19 @@ export function createImageCleanupTransformer({
   outType = undefined,
   quality = 0.9,
 }: {
-  outType?: "image/jpeg" | "image/webp" | "image/png";
+  outType?: SupportedImageType;
   quality?: number;
 } = {}): UsePinataUploadFilesFileTransformer {
   return async (file) => {
+    if (
+      !file.type.startsWith("image/") ||
+      !SUPPORTED_IMAGE_TYPES.includes(file.type as SupportedImageType)
+    ) {
+      return file;
+    }
+
     const outputFileType = file.type ?? outType;
+
     const img = new Image();
     const fileObjectUrl = URL.createObjectURL(file);
     img.src = fileObjectUrl;
