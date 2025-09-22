@@ -1,6 +1,6 @@
-# Ethereum Comments Protocol Indexer App
+# Ethereum Comments Protocol Dashboard App
 
-The Ethereum Comments Protocol Indexer App is a [Next.js](https://nextjs.org/) management dashboard that enables developers to manage their applications and webhooks for [Ethereum Comments Protocol](https://docs.ethcomments.xyz/) events. Monitor webhook deliveries, view analytics, and configure event subscriptions through an intuitive web interface.
+The Ethereum Comments Protocol Dashboard App is a [Next.js](https://nextjs.org/) management dashboard that enables developers to manage their applications and webhooks for [Ethereum Comments Protocol](https://docs.ethcomments.xyz/) events. Monitor webhook deliveries, view analytics, and configure event subscriptions through an intuitive web interface. Visit [dashboard.ethcomments.xyz](https://dashboard.ethcomments.xyz) to use the app.
 
 ## Features
 
@@ -176,6 +176,6 @@ The indexer app is built with modern web technologies:
 
 ## Related Links
 
+- [ECP Dashboard App](https://dashboard.ethcomments.xyz)
 - [Ethereum Comments Protocol Documentation](https://docs.ethcomments.xyz/)
-- [ECP Indexer Documentation](../indexer/README.md)
 - [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer-app)
