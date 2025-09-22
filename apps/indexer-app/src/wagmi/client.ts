@@ -11,6 +11,6 @@ export const webConfig = getDefaultConfig({
   // do not use ssr for now because we are using account state to protect some routes
   // also there is nothing really worth pre-rendering on the server side
   // because layouts are client only
-  appName: "ECP Indexer App",
+  appName: "ECP Dashboard App",
   projectId: publicEnv.NEXT_PUBLIC_WC_PROJECT_ID,
 });

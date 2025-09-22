@@ -178,5 +178,4 @@ The indexer app is built with modern web technologies:
 
 - [ECP Dashboard App](https://dashboard.ethcomments.xyz)
 - [Ethereum Comments Protocol Documentation](https://docs.ethcomments.xyz/)
-- [ECP Indexer Documentation](../indexer/README.md)
 - [Source code](https://github.com/ecp-eth/comments-monorepo/tree/main/apps/indexer-app)

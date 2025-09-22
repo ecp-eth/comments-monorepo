@@ -19,10 +19,11 @@ export default function TermsPage() {
           <section className="mb-6">
             <h2 className="text-xl font-semibold mb-3">2. Service Overview</h2>
             <p className="mb-2">
-              The Indexer App is a web application that allows you to manage
-              your applications and configure outbound webhooks for events. The
-              App does not create or host user content; it provides tooling for
-              receiving event notifications at your specified endpoints.
+              The ECP Dashboard App is a web application that allows you to
+              manage your applications and configure outbound webhooks for
+              events. The App does not create or host user content; it provides
+              tooling for receiving event notifications at your specified
+              endpoints.
             </p>
             <p>
               You are responsible for your endpoint availability, correctness,

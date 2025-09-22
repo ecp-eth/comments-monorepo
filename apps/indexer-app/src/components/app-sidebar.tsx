@@ -34,7 +34,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="flex flex-row items-center gap-2 text-base h-16 px-4">
         <Logo width={24} height={24} />
-        <span className="font-semibold">ECP Indexer</span>
+        <span className="font-semibold">ECP Dashboard</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
