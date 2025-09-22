@@ -15,6 +15,24 @@ export class EventOutboxService {
     this.db = options.db;
   }
 
+  async getOutboxHeadPosition(
+    tx?: PgTransaction<
+      PgQueryResultHKT,
+      typeof schema,
+      ExtractTablesWithRelations<typeof schema>
+    >,
+  ): Promise<bigint> {
+    const connection = tx ?? this.db;
+
+    const result = await connection.query.eventOutbox.findFirst({
+      orderBy(fields, operators) {
+        return [operators.desc(fields.id)];
+      },
+    });
+
+    return result?.id ?? 0n;
+  }
+
   async publishEvent({
     event,
     aggregateId,
