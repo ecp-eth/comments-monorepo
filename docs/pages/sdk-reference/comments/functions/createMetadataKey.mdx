@@ -12,7 +12,7 @@ function createMetadataKey(keyString, valueType): `0x${string}`;
 
 Defined in: [packages/sdk/src/comments/metadata.ts:14](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L14)
 
-Creates a metadata key by encoding a string in the format "type key" using abi.encodePacked
+Creates a metadata key by encoding a string in the format "type key".
 
 ## Parameters
 
@@ -32,7 +32,7 @@ The type of the value MetadataType
 
 `` `0x${string}` ``
 
-The hex-encoded bytes of the "type key" string of length 32 bytes
+The hex-encoded bytes of the "type key" string of length 32 bytes padded from the left with leading zeros.
 
 ## Throws
 

@@ -3,11 +3,11 @@ import type { Hex } from "../core/schemas.js";
 import type { Json, JsonObject, MetadataEntry } from "./types.js";
 
 /**
- * Creates a metadata key by encoding a string in the format "type key" using abi.encodePacked
+ * Creates a metadata key by encoding a string in the format "type key".
  *
  * @param keyString - The key string (e.g., "status", "author", "url")
  * @param valueType - The type of the value MetadataType
- * @returns The hex-encoded bytes of the "type key" string of length 32 bytes
+ * @returns The hex-encoded bytes of the "type key" string of length 32 bytes padded from the left with leading zeros.
  *
  * @throws If the value type + key string exceeds 32 bytes
  */
@@ -386,7 +386,7 @@ export function convertContractToRecordFormat(
  * This should be maintained by applications to properly convert from contract format
  *
  * @param knownKeys - Array of known key-type pairs
- * @returns Mapping from hashed key to original key and type
+ * @returns Mapping from hex-encoded key to original key and type
  */
 export function createKeyTypeMap(
   knownKeys: Array<{
