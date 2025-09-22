@@ -7,13 +7,10 @@
 # Function: decodeMetadataTypes()
 
 ```ts
-function decodeMetadataTypes(metadataEntries): Record<Hex, {
-  key: string;
-  type: MetadataType;
-}>;
+function decodeMetadataTypes(metadataEntries): MetadataKeyTypeMap;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:362](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L362)
+Defined in: [packages/sdk/src/comments/metadata.ts:447](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L447)
 
 Decodes metadata types from on-chain metadata entries by reverse-engineering
 the type information from the encoded key field. Works without requiring
@@ -29,9 +26,6 @@ Array of MetadataEntry from contracts
 
 ## Returns
 
-`Record`\<[`Hex`](/sdk-reference/core/type-aliases/Hex.mdx), \{
-  `key`: `string`;
-  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
-\}\>
+[`MetadataKeyTypeMap`](/sdk-reference/comments/type-aliases/MetadataKeyTypeMap.mdx)
 
 Mapping from hashed key to original key and type information

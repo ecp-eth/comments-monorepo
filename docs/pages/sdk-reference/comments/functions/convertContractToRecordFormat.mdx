@@ -10,7 +10,7 @@
 function convertContractToRecordFormat(metadataEntries, keyTypeMap?): MetadataRecord;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:269](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L269)
+Defined in: [packages/sdk/src/comments/metadata.ts:349](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L349)
 
 Converts from contract MetadataEntry array format to JS/SDK Record format
 Note: This requires knowledge of the original key string and type, which are lost
@@ -27,15 +27,40 @@ Array of MetadataEntry from contracts
 
 ### keyTypeMap?
 
-`Record`\<`` `0x${string}` ``, \{
-  `key`: `string`;
-  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
-\}\>
+[`MetadataKeyTypeMap`](/sdk-reference/comments/type-aliases/MetadataKeyTypeMap.mdx)
 
-Optional mapping of known keys to their original string and type
+Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key.
 
 ## Returns
 
 [`MetadataRecord`](/sdk-reference/comments/type-aliases/MetadataRecord.mdx)
 
 The metadata in Record format
+
+## Examples
+
+```ts
+// if key to type map provided is provided
+const result = convertContractToRecordFormat(metadataEntries, createKeyTypeMap([{ key: "status", type: "string" }]));
+console.log(result);
+// {
+//   "strin status": {
+//     key: "status",
+//     type: "string",
+//     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//   },
+}
+```
+
+```ts
+// if key to type map not provided returns object like this
+const result = convertContractToRecordFormat(metadataEntries);
+console.log(result);
+// {
+//   "0x0000000000000000000000000000000000000000000000000000000000000000": {
+//     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//     type: "bytes",
+//     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//   },
+}
+```

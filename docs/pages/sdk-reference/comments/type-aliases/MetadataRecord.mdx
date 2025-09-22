@@ -7,13 +7,39 @@
 # Type Alias: MetadataRecord
 
 ```ts
-type MetadataRecord = Record<string, {
+type MetadataRecord = Record<string | Hex, {
   key: string;
   type: MetadataType;
   value: Hex;
 }>;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:235](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L235)
+Defined in: [packages/sdk/src/comments/metadata.ts:283](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L283)
 
 JS/SDK/Indexer format for metadata storage
+
+The keys is either in format "type key" if the key to type map has been provided, or just the hex hash of the key if not.
+
+## Examples
+
+```ts
+// "key to type map provided"
+{
+  "string status": {
+    key: "status",
+    type: "string",
+    value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  },
+}
+```
+
+```ts
+// "key to type map not provided"
+{
+  "0x0000000000000000000000000000000000000000000000000000000000000000": {
+    key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+    type: "bytes",
+    value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  },
+}
+```

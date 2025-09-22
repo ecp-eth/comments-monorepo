@@ -10,7 +10,7 @@
 function createMetadataEntries(metadata): MetadataEntry[];
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:162](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L162)
+Defined in: [packages/sdk/src/comments/metadata.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L180)
 
 Creates multiple metadata entries from an object with explicit types
 
@@ -34,3 +34,22 @@ An object with key-value pairs and their types
 [`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)[]
 
 Array of MetadataEntry
+
+## Example
+
+```ts
+const metadata = {
+  "status": {
+    type: "string",
+    value: "status",
+  },
+};
+const metadataEntries = createMetadataEntries(metadata);
+console.log(metadataEntries);
+// [
+//   {
+//     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//   },
+// ]
+```
