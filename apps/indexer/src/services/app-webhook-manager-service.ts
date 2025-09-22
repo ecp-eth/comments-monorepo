@@ -164,20 +164,31 @@ export class AppWebhookManager implements IAppWebhookManager {
         };
       }
 
-      const eventOutboxHead =
-        await this.eventOutboxService.getOutboxHeadPosition(tx);
-
       const eventActivations: Record<EventTypes, string> = {
         ...appWebhook.eventActivations,
-        ...patches.eventFilter?.reduce(
-          (acc, event) => {
-            acc[event] = eventOutboxHead.toString();
-
-            return acc;
-          },
-          {} as Record<EventTypes, string>,
-        ),
       };
+
+      // If the event filter is updated, we need to update the event activations
+      if (patches.eventFilter) {
+        const eventOutboxHead =
+          await this.eventOutboxService.getOutboxHeadPosition(tx);
+        const oldSet = new Set(appWebhook.eventFilter);
+        const newSet = new Set(patches.eventFilter);
+        const addedEvents = Array.from(newSet).filter(
+          (event) => !oldSet.has(event),
+        );
+        const removedEvents = Array.from(oldSet).filter(
+          (event) => !newSet.has(event),
+        );
+
+        for (const event of addedEvents) {
+          eventActivations[event] = eventOutboxHead.toString();
+        }
+
+        for (const event of removedEvents) {
+          delete eventActivations[event];
+        }
+      }
 
       const [updatedAppWebhook] = await tx
         .update(schema.appWebhook)
