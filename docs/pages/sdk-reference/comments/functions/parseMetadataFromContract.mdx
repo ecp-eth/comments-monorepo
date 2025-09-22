@@ -10,7 +10,7 @@
 function parseMetadataFromContract(metadata, keyTypeMap?): MetadataRecord;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:347](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L347)
+Defined in: [packages/sdk/src/comments/metadata.ts:432](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L432)
 
 Convenience function to convert metadata from contracts for JS/SDK use
 
@@ -24,12 +24,9 @@ MetadataEntry array from contract
 
 ### keyTypeMap?
 
-`Record`\<`` `0x${string}` ``, \{
-  `key`: `string`;
-  `type`: [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx);
-\}\>
+[`MetadataKeyTypeMap`](/sdk-reference/comments/type-aliases/MetadataKeyTypeMap.mdx)
 
-Optional mapping of known keys
+Optional mapping of known keys. If not provided, the key in the record will be the hex hash of the key.
 
 ## Returns
 

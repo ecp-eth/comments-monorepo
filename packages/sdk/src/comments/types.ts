@@ -26,7 +26,7 @@ export enum AuthorAuthMethod {
  * Metadata entry structure that matches the smart contract
  */
 export type MetadataEntry = {
-  /** UTF-8 encoded string of format "type key" */
+  /** 32 bytes hex encoded value of the UTF-8 string of format "type key". */
   key: Hex;
   /** The metadata value as bytes */
   value: Hex;

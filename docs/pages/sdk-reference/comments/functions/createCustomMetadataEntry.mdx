@@ -13,7 +13,7 @@ function createCustomMetadataEntry(
    encodedValue): MetadataEntry;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L184)
+Defined in: [packages/sdk/src/comments/metadata.ts:210](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L210)
 
 Creates a metadata entry with a custom type
 
@@ -23,22 +23,33 @@ Creates a metadata entry with a custom type
 
 `string`
 
-The key string
+The key string e.g. "status", "author", etc.
 
 ### valueType
 
 [`MetadataType`](/sdk-reference/comments/type-aliases/MetadataType.mdx)
 
-The type string MetadataType
+The type string MetadataType e.g. "string", "uint256", etc.
 
 ### encodedValue
 
 `` `0x${string}` ``
 
-The pre-encoded value as hex
+The pre-hex-encoded value as hex. For example by using encodeStringValue, encodeBoolValue, encodeNumberValue, encodeJsonValue, etc.
 
 ## Returns
 
 [`MetadataEntry`](/sdk-reference/comments/type-aliases/MetadataEntry.mdx)
 
 The MetadataEntry
+
+## Example
+
+```ts
+const metadataEntry = createCustomMetadataEntry("status", "string", encodeStringValue("status"));
+console.log(metadataEntry);
+// {
+//   key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+//   value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+// }
+```

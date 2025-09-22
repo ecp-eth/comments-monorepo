@@ -7,7 +7,9 @@ import type { Json, JsonObject, MetadataEntry } from "./types.js";
  *
  * @param keyString - The key string (e.g., "status", "author", "url")
  * @param valueType - The type of the value MetadataType
- * @returns The keccak256 hash of the abi.encodePacked "type key" string
+ * @returns The hex-encoded bytes of the "type key" string of length 32 bytes
+ *
+ * @throws If the value type + key string exceeds 32 bytes
  */
 export function createMetadataKey(
   keyString: string,
@@ -85,9 +87,9 @@ export function encodeJsonValue(value: JsonObject): Hex {
 /**
  * Creates a metadata entry from a key-value pair with explicit type specification
  *
- * @param keyString - The key string
+ * @param keyString - The key string e.g. "status", "author", etc.
  * @param valueType - The metadata type (string, bool, uint256, etc.)
- * @param value - The value (string, boolean, number, bigint, or JsonObject)
+ * @param value - The value (string, boolean, number, bigint, or JsonObject). Will be encoded to the appropriate type.
  * @returns The MetadataEntry
  */
 export function createMetadataEntry(
@@ -158,6 +160,22 @@ export function createMetadataEntry(
  *
  * @param metadata - An object with key-value pairs and their types
  * @returns Array of MetadataEntry
+ *
+ * @example
+ * const metadata = {
+ *   "status": {
+ *     type: "string",
+ *     value: "status",
+ *   },
+ * };
+ * const metadataEntries = createMetadataEntries(metadata);
+ * console.log(metadataEntries);
+ * // [
+ * //   {
+ * //     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   },
+ * // ]
  */
 export function createMetadataEntries(
   metadata: Record<
@@ -176,10 +194,18 @@ export function createMetadataEntries(
 /**
  * Creates a metadata entry with a custom type
  *
- * @param keyString - The key string
- * @param valueType - The type string MetadataType
- * @param encodedValue - The pre-encoded value as hex
+ * @param keyString - The key string e.g. "status", "author", etc.
+ * @param valueType - The type string MetadataType e.g. "string", "uint256", etc.
+ * @param encodedValue - The pre-hex-encoded value as hex. For example by using encodeStringValue, encodeBoolValue, encodeNumberValue, encodeJsonValue, etc.
  * @returns The MetadataEntry
+ *
+ * @example
+ * const metadataEntry = createCustomMetadataEntry("status", "string", encodeStringValue("status"));
+ * console.log(metadataEntry);
+ * // {
+ * //   key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * // }
  */
 export function createCustomMetadataEntry(
   keyString: string,
@@ -231,14 +257,44 @@ export const MetadataTypeValues = {
 
 /**
  * JS/SDK/Indexer format for metadata storage
+ *
+ * The keys is either in format "type key" if the key to type map has been provided, or just the hex hash of the key if not.
+ *
+ * @example
+ * // "key to type map provided"
+ * {
+ *   "string status": {
+ *     key: "status",
+ *     type: "string",
+ *     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ *   },
+ * }
+ *
+ * @example
+ * // "key to type map not provided"
+ * {
+ *   "0x0000000000000000000000000000000000000000000000000000000000000000": {
+ *     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ *     type: "bytes",
+ *     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ *   },
+ * }
  */
 export type MetadataRecord = Record<
-  string,
+  string | Hex,
   {
     key: string;
     type: MetadataType;
     value: Hex;
   }
+>;
+
+/**
+ * Mapping of known hex-encoded keys to their original key and type
+ */
+export type MetadataKeyTypeMap = Record<
+  Hex,
+  { key: string; type: MetadataType }
 >;
 
 /**
@@ -263,12 +319,36 @@ export function convertRecordToContractFormat(
  * common patterns used in the codebase.
  *
  * @param metadataEntries - Array of MetadataEntry from contracts
- * @param keyTypeMap - Optional mapping of known keys to their original string and type
+ * @param keyTypeMap - Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key.
  * @returns The metadata in Record format
+ *
+ * @example
+ * // if key to type map provided is provided
+ * const result = convertContractToRecordFormat(metadataEntries, createKeyTypeMap([{ key: "status", type: "string" }]));
+ * console.log(result);
+ * // {
+ * //   "strin status": {
+ * //     key: "status",
+ * //     type: "string",
+ * //     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   },
+ * }
+ *
+ * @example
+ * // if key to type map not provided returns object like this
+ * const result = convertContractToRecordFormat(metadataEntries);
+ * console.log(result);
+ * // {
+ * //   "0x0000000000000000000000000000000000000000000000000000000000000000": {
+ * //     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //     type: "bytes",
+ * //     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   },
+ * }
  */
 export function convertContractToRecordFormat(
   metadataEntries: MetadataEntry[],
-  keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
+  keyTypeMap?: MetadataKeyTypeMap,
 ): MetadataRecord {
   const result: MetadataRecord = {};
 
@@ -309,9 +389,14 @@ export function convertContractToRecordFormat(
  * @returns Mapping from hashed key to original key and type
  */
 export function createKeyTypeMap(
-  knownKeys: Array<{ key: string; type: MetadataType }>,
-): Record<Hex, { key: string; type: MetadataType }> {
-  const map: Record<Hex, { key: string; type: MetadataType }> = {};
+  knownKeys: Array<{
+    /** The original key e.g. "status", "author", etc. */
+    key: string;
+    /** The type of the key e.g. "string", "uint256", etc. */
+    type: MetadataType;
+  }>,
+): MetadataKeyTypeMap {
+  const map: MetadataKeyTypeMap = {};
 
   for (const keyType of knownKeys) {
     const hashedKey = createMetadataKey(keyType.key, keyType.type);
@@ -341,12 +426,12 @@ export function prepareMetadataForContract(
  * Convenience function to convert metadata from contracts for JS/SDK use
  *
  * @param metadata - MetadataEntry array from contract
- * @param keyTypeMap - Optional mapping of known keys
+ * @param keyTypeMap - Optional mapping of known keys. If not provided, the key in the record will be the hex hash of the key.
  * @returns Metadata in Record format
  */
 export function parseMetadataFromContract(
   metadata: MetadataEntry[],
-  keyTypeMap?: Record<Hex, { key: string; type: MetadataType }>,
+  keyTypeMap?: MetadataKeyTypeMap,
 ): MetadataRecord {
   return convertContractToRecordFormat(metadata, keyTypeMap);
 }
@@ -361,8 +446,8 @@ export function parseMetadataFromContract(
  */
 export function decodeMetadataTypes(
   metadataEntries: MetadataEntry[],
-): Record<Hex, { key: string; type: MetadataType }> {
-  const map: Record<Hex, { key: string; type: MetadataType }> = {};
+): MetadataKeyTypeMap {
+  const map: MetadataKeyTypeMap = {};
 
   for (const entry of metadataEntries) {
     try {
@@ -417,7 +502,7 @@ export function decodeMetadataTypes(
  * Decodes a string value from encoded metadata bytes
  *
  * @param encodedValue - The hex-encoded bytes
- * @returns The decoded string value
+ * @returns The decoded string value. If the value can't be decoded, it will return an empty string.
  */
 export function decodeStringValue(encodedValue: Hex): string | Json {
   // For strings, we need to handle both regular strings and JSON objects
@@ -446,7 +531,7 @@ export function decodeStringValue(encodedValue: Hex): string | Json {
  * Decodes a boolean value from encoded metadata bytes
  *
  * @param encodedValue - The hex-encoded bytes (32 bytes, 1 for true, 0 for false)
- * @returns The decoded boolean value
+ * @returns The decoded boolean value. If the value can't be decoded, it will return false.
  */
 export function decodeBoolValue(encodedValue: Hex): boolean {
   try {
@@ -463,7 +548,7 @@ export function decodeBoolValue(encodedValue: Hex): boolean {
  *
  * @param encodedValue - The hex-encoded bytes (32 bytes big-endian)
  * @param isSigned - Whether the number is signed (for two's complement handling)
- * @returns The decoded number value (as bigint for safety)
+ * @returns The decoded number value (as bigint for safety). If the value can't be decoded, it will return 0n.
  */
 export function decodeNumberValue(
   encodedValue: Hex,

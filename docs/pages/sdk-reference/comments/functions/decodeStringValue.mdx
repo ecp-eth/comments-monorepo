@@ -10,7 +10,7 @@
 function decodeStringValue(encodedValue): Json;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:422](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L422)
+Defined in: [packages/sdk/src/comments/metadata.ts:507](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L507)
 
 Decodes a string value from encoded metadata bytes
 
@@ -26,4 +26,4 @@ The hex-encoded bytes
 
 [`Json`](/sdk-reference/comments/type-aliases/Json.mdx)
 
-The decoded string value
+The decoded string value. If the value can't be decoded, it will return an empty string.
