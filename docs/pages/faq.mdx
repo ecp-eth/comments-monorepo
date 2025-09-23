@@ -61,3 +61,26 @@ Yes. We have made the following tradeoffs with the contract design:
 1. Deduplication of identical comments by the same author should be done via using a different deadline for each comment.
 1. Metadata is limited to 1000 items to prevent gas-DOS attacks.
 1. An approval gives the app the permission to delete comments, including comments posted by another app for this user.
+
+## Does ECP support reposting or quoting an existing comment?
+
+If we define a **repost** as re-publishing an existing comment _without adding any new content_—while preserving the original comment’s text, author, and metadata—then yes:  
+a repost is represented as a **reaction comment** (`commentType = 1`, see [commentType](./comment-data-props.mdx#commentType)) with the `content` field set to `"repost"`.  
+It is then up to the indexer and client UI to render the repost appropriately.
+
+A **quote-post**, however, is usually more complex. Many platforms treat a quote-post as a way to **add commentary to the original comment**.  
+Our recommended approach is described in the [ECPIP draft spec](https://github.com/ecp-eth/ECPIP/discussions/2).  
+In short, a quote-post is created by including [CAIP-373 URIs](https://chainagnostic.org/CAIPs/caip-373) in the `content` field of the comment (`commentType = 0`).  
+The client should extract the CAIP-373 URIs from the `content` field and render both the original comment and the accompanying commentary.
+
+Here is an example of quote-post comment data:
+
+```json
+{
+  "commentType": 0,
+  "content": "Key insight:\n\neip155:8453:0xb262C9278fBcac384Ef59Fc49E24d800152E19b1:call:0x8c20d5876bbab7fa5d988676b01e9b5b72913319de5b835063fa8751ea1155078de81034"
+}
+```
+
+- [ECPIP draft spec](https://github.com/ecp-eth/ECPIP/discussions/2).
+- [CAIP-373 URIs](https://chainagnostic.org/CAIPs/caip-373)
