@@ -185,10 +185,10 @@ export async function resolveCommentReferences(
 
   let status: CommentSelectType["referencesResolutionStatus"] = "partial";
 
-  if (failed === count) {
-    status = "failed";
-  } else if (resolved === count) {
+  if (resolved === count) {
     status = "success";
+  } else if (failed === count) {
+    status = "failed";
   }
 
   return {
