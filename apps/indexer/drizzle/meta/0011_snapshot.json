@@ -63,9 +63,7 @@
         "api_keys_name_unique": {
           "name": "api_keys_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -133,12 +131,8 @@
           "tableFrom": "app",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -193,12 +187,8 @@
           "tableFrom": "app_signing_keys",
           "tableTo": "app",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -208,10 +198,7 @@
         "ask_one_active_secret_uq": {
           "name": "ask_one_active_secret_uq",
           "nullsNotDistinct": true,
-          "columns": [
-            "app_id",
-            "revoked_at"
-          ]
+          "columns": ["app_id", "revoked_at"]
         }
       },
       "policies": {},
@@ -399,12 +386,8 @@
           "tableFrom": "app_webhook",
           "tableTo": "app",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -413,12 +396,8 @@
           "tableFrom": "app_webhook",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -721,12 +700,8 @@
           "tableFrom": "app_webhook_delivery",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -735,12 +710,8 @@
           "tableFrom": "app_webhook_delivery",
           "tableTo": "app",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -749,12 +720,8 @@
           "tableFrom": "app_webhook_delivery",
           "tableTo": "app_webhook",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_webhook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_webhook_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -763,12 +730,8 @@
           "tableFrom": "app_webhook_delivery",
           "tableTo": "event_outbox",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -778,10 +741,7 @@
         "awd_dedupe_deliveries_uq": {
           "name": "awd_dedupe_deliveries_uq",
           "nullsNotDistinct": false,
-          "columns": [
-            "app_webhook_id",
-            "event_id"
-          ]
+          "columns": ["app_webhook_id", "event_id"]
         }
       },
       "policies": {},
@@ -1014,12 +974,8 @@
           "tableFrom": "app_webhook_delivery_attempt",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1028,12 +984,8 @@
           "tableFrom": "app_webhook_delivery_attempt",
           "tableTo": "app",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1042,12 +994,8 @@
           "tableFrom": "app_webhook_delivery_attempt",
           "tableTo": "app_webhook",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_webhook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_webhook_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1056,12 +1004,8 @@
           "tableFrom": "app_webhook_delivery_attempt",
           "tableTo": "app_webhook_delivery",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "app_webhook_delivery_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["app_webhook_delivery_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1070,12 +1014,8 @@
           "tableFrom": "app_webhook_delivery_attempt",
           "tableTo": "event_outbox",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1135,10 +1075,7 @@
       "compositePrimaryKeys": {
         "comment_classification_results_comment_id_revision_pk": {
           "name": "comment_classification_results_comment_id_revision_pk",
-          "columns": [
-            "comment_id",
-            "revision"
-          ]
+          "columns": ["comment_id", "revision"]
         }
       },
       "uniqueConstraints": {},
@@ -1212,10 +1149,7 @@
       "compositePrimaryKeys": {
         "comment_moderation_statuses_comment_id_revision_pk": {
           "name": "comment_moderation_statuses_comment_id_revision_pk",
-          "columns": [
-            "comment_id",
-            "revision"
-          ]
+          "columns": ["comment_id", "revision"]
         }
       },
       "uniqueConstraints": {},
@@ -1294,10 +1228,7 @@
       "compositePrimaryKeys": {
         "comment_reference_resolution_results_comment_id_revision_pk": {
           "name": "comment_reference_resolution_results_comment_id_revision_pk",
-          "columns": [
-            "comment_id",
-            "revision"
-          ]
+          "columns": ["comment_id", "revision"]
         }
       },
       "uniqueConstraints": {},
@@ -1504,9 +1435,7 @@
         "event_outbox_eventUid_unique": {
           "name": "event_outbox_eventUid_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "event_uid"
-          ]
+          "columns": ["event_uid"]
         }
       },
       "policies": {},
@@ -1644,12 +1573,8 @@
           "tableFrom": "user_auth_credentials",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1659,10 +1584,7 @@
         "user_auth_credentials_by_method_and_identifier_uq": {
           "name": "user_auth_credentials_by_method_and_identifier_uq",
           "nullsNotDistinct": false,
-          "columns": [
-            "method",
-            "identifier"
-          ]
+          "columns": ["method", "identifier"]
         }
       },
       "policies": {},
@@ -1752,12 +1674,8 @@
           "tableFrom": "user_auth_session",
           "tableTo": "user",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -1766,12 +1684,8 @@
           "tableFrom": "user_auth_session",
           "tableTo": "user_auth_credentials",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "user_auth_credentials_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_auth_credentials_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -1836,12 +1750,8 @@
           "tableFrom": "user_auth_session_siwe_refresh_token",
           "tableTo": "user_auth_session",
           "schemaTo": "ecp_indexer_schema",
-          "columnsFrom": [
-            "user_auth_session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_auth_session_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }

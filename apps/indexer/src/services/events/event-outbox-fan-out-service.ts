@@ -119,7 +119,7 @@ export class EventOutboxFanOutService {
                 -- newer events.
                 e.id > GREATEST(${schema.appWebhook.eventOutboxPosition}, (${schema.appWebhook.eventActivations}->>(e.event_type))::bigint)
               )
-              ON CONFLICT (app_webhook_id, event_id) DO NOTHING
+              ON CONFLICT (app_webhook_id, event_id, retry_number) DO NOTHING
               RETURNING 1
             )
 

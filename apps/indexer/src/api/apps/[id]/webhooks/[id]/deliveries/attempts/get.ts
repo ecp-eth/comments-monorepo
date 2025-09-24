@@ -14,12 +14,12 @@ import { AppManagerAppNotFoundError } from "../../../../../../../services/app-ma
 import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../../services/app-webhook-manager-service";
 import { formatResponseUsingZodSchema } from "../../../../../../../lib/response-formatters";
 
-export const AppWebhookDeliveriesGetRequestParamsSchema = z.object({
+export const AppWebhookDeliveryAttemptsGetRequestParamsSchema = z.object({
   appId: z.string().uuid(),
   webhookId: z.string().uuid(),
 });
 
-const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
+const AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema = z.preprocess(
   (val) => {
     try {
       if (typeof val !== "string") {
@@ -36,10 +36,10 @@ const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
   }),
 );
 
-export const AppWebhookDeliveriesGetRequestQuerySchema = z
+export const AppWebhookDeliveryAttemptsGetRequestQuerySchema = z
   .object({
-    before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
-    after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
+    before: AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema.optional(),
+    after: AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema.optional(),
     limit: z.coerce.number().int().positive().max(100).default(10),
   })
   .refine(
@@ -53,7 +53,7 @@ export const AppWebhookDeliveriesGetRequestQuerySchema = z
     { message: "Cannot use both before and after" },
   );
 
-export const AppWebhookDeliverySchema = z.object({
+export const AppWebhookDeliveryAttemptSchema = z.object({
   id: OpenAPIBigintStringSchema,
   attemptedAt: OpenAPIDateStringSchema,
   attemptNumber: z.number(),
@@ -67,24 +67,24 @@ export const AppWebhookDeliverySchema = z.object({
   }),
 });
 
-export const AppWebhookDeliveriesCursorSchema = z
+export const AppWebhookDeliveryAttemptsCursorSchema = z
   .object({
     id: OpenAPIBigintStringSchema,
   })
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
-export const AppWebhookDeliveriesGetResponseSchema = z.object({
+export const AppWebhookDeliveryAttemptsGetResponseSchema = z.object({
   results: z.array(
     z.object({
-      cursor: AppWebhookDeliveriesCursorSchema,
-      item: AppWebhookDeliverySchema,
+      cursor: AppWebhookDeliveryAttemptsCursorSchema,
+      item: AppWebhookDeliveryAttemptSchema,
     }),
   ),
   pageInfo: z.object({
     hasPreviousPage: z.boolean(),
     hasNextPage: z.boolean(),
-    startCursor: AppWebhookDeliveriesCursorSchema.optional(),
-    endCursor: AppWebhookDeliveriesCursorSchema.optional(),
+    startCursor: AppWebhookDeliveryAttemptsCursorSchema.optional(),
+    endCursor: AppWebhookDeliveryAttemptsCursorSchema.optional(),
   }),
 });
 
@@ -97,15 +97,15 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
       description: "Get a list of delivery attempts for a webhook",
       middleware: siweMiddleware,
       request: {
-        params: AppWebhookDeliveriesGetRequestParamsSchema,
-        query: AppWebhookDeliveriesGetRequestQuerySchema,
+        params: AppWebhookDeliveryAttemptsGetRequestParamsSchema,
+        query: AppWebhookDeliveryAttemptsGetRequestQuerySchema,
       },
       responses: {
         200: {
           description: "Paginated list of delivery attempts",
           content: {
             "application/json": {
-              schema: AppWebhookDeliveriesGetResponseSchema,
+              schema: AppWebhookDeliveryAttemptsGetResponseSchema,
             },
           },
         },
@@ -221,18 +221,21 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
         const endCursor = pageResults[pageResults.length - 1];
 
         return c.json(
-          formatResponseUsingZodSchema(AppWebhookDeliveriesGetResponseSchema, {
-            results: pageResults.map((item) => ({
-              cursor: item,
-              item,
-            })),
-            pageInfo: {
-              hasNextPage,
-              hasPreviousPage,
-              startCursor,
-              endCursor,
+          formatResponseUsingZodSchema(
+            AppWebhookDeliveryAttemptsGetResponseSchema,
+            {
+              results: pageResults.map((item) => ({
+                cursor: item,
+                item,
+              })),
+              pageInfo: {
+                hasNextPage,
+                hasPreviousPage,
+                startCursor,
+                endCursor,
+              },
             },
-          }),
+          ),
           200,
         );
       } catch (error) {
