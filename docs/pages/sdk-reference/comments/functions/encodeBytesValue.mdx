@@ -1,0 +1,33 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / encodeBytesValue
+
+# Function: encodeBytesValue()
+
+```ts
+function encodeBytesValue(value): `0x${string}`;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:675](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L675)
+
+Encodes a bytes value as bytes for metadata
+
+## Parameters
+
+### value
+
+The bytes value to use
+
+`` `0x${string}` `` | `Uint8Array`\<`ArrayBufferLike`\>
+
+## Returns
+
+`` `0x${string}` ``
+
+The bytes as is if valid
+
+## Throws
+
+If the value is not a valid hex string

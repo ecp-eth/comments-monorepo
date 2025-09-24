@@ -1,0 +1,41 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeJsonValue
+
+# Function: decodeJsonValue()
+
+```ts
+function decodeJsonValue(value): JsonObject;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:294](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L294)
+
+Decodes a JSON object from encoded metadata bytes
+
+## Parameters
+
+### value
+
+`` `0x${string}` ``
+
+The hex-encoded bytes of the JSON string
+
+## Returns
+
+[`JsonObject`](/sdk-reference/comments/type-aliases/JsonObject.mdx)
+
+The decoded JSON object
+
+## Throws
+
+If the value is not a valid JSON object
+
+## Example
+
+```ts
+const decodedValue = decodeJsonValue("0x0000000000000000000000000000000000000000000000000000000000000000");
+console.log(decodedValue);
+// { test: true }
+```

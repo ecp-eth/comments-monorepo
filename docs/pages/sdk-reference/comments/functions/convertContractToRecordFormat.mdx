@@ -10,7 +10,7 @@
 function convertContractToRecordFormat(metadataEntries, keyTypeMap?): MetadataRecord;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:349](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L349)
+Defined in: [packages/sdk/src/comments/metadata.ts:521](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L521)
 
 Converts from contract MetadataEntry array format to JS/SDK Record format
 Note: This requires knowledge of the original key string and type, which are lost
@@ -29,7 +29,7 @@ Array of MetadataEntry from contracts
 
 [`MetadataKeyTypeMap`](/sdk-reference/comments/type-aliases/MetadataKeyTypeMap.mdx)
 
-Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key.
+Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key and the type will be "bytes".
 
 ## Returns
 
