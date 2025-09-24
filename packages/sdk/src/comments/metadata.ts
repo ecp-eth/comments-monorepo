@@ -295,7 +295,11 @@ export function decodeJsonValue(value: Hex): JsonObject {
   const stringValue = hexToString(value);
   const parsedValue = JSON.parse(stringValue);
 
-  if (parsedValue != null && typeof parsedValue === "object") {
+  if (
+    parsedValue != null &&
+    typeof parsedValue === "object" &&
+    !Array.isArray(parsedValue)
+  ) {
     return parsedValue;
   }
 
@@ -315,7 +319,7 @@ export function decodeJsonValue(value: Hex): JsonObject {
 export function createMetadataEntry(
   keyString: string,
   valueType: MetadataType,
-  value: string | boolean | number | bigint | JsonObject | Hex,
+  value: string | boolean | number | bigint | JsonObject | Hex | Uint8Array,
 ): MetadataEntry {
   switch (valueType) {
     case "address": {
@@ -388,7 +392,12 @@ export function createMetadataEntry(
         };
       }
 
-      if (typeof value === "object" && value !== null) {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value) &&
+        !(value instanceof Uint8Array)
+      ) {
         return {
           key: createMetadataKey(keyString, valueType),
           value: encodeJsonValue(value),

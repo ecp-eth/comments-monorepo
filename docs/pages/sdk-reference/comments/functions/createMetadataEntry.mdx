@@ -13,7 +13,7 @@ function createMetadataEntry(
    value): MetadataEntry;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:315](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L315)
+Defined in: [packages/sdk/src/comments/metadata.ts:319](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L319)
 
 Creates a metadata entry from a key-value pair with explicit type specification
 
@@ -35,7 +35,7 @@ The metadata type (string, bool, uint256, etc.)
 
 The value (string, boolean, number, bigint, or JsonObject). Will be encoded to the appropriate type.
 
-`string` | `number` | `bigint` | `boolean` | [`JsonObject`](/sdk-reference/comments/type-aliases/JsonObject.mdx)
+`string` | `number` | `bigint` | `boolean` | [`JsonObject`](/sdk-reference/comments/type-aliases/JsonObject.mdx) | `Uint8Array`\<`ArrayBufferLike`\>
 
 ## Returns
 
