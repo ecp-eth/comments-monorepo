@@ -23,6 +23,7 @@ import { setupAuthSiweNonce } from "./auth/siwe/nonce/get";
 import { setupAuthSiweVerify } from "./auth/siwe/verify/post";
 import { setupAuthSiweRefresh } from "./auth/siwe/refresh/post";
 import { setupUsersMe } from "./users/me/get";
+import { setupUsersMeDelete } from "./users/me/delete";
 import { setupAppCreate } from "./apps/post";
 import { setupAppDelete } from "./apps/[id]/delete";
 import { setupAppSecretRefresh } from "./apps/[id]/secret/refresh/post";
@@ -75,6 +76,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAuthSiweVerify(app);
   setupAuthSiweRefresh(app);
   setupUsersMe(app);
+  setupUsersMeDelete(app);
   setupAppCreate(app);
   setupAppDelete(app);
   setupAppSecretRefresh(app);
