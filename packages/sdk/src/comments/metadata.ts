@@ -279,7 +279,7 @@ export function decodeNumberValue(
  * @returns The hex-encoded bytes of the JSON string
  */
 export function encodeJsonValue(value: JsonObject): Hex {
-  if (typeof value !== "object" || value === null) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw new Error(`Invalid JSON value: expected object, got ${typeof value}`);
   }
 
