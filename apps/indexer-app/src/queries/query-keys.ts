@@ -32,9 +32,31 @@ export function createWebhooksQueryKey({
   return ["webhooks", appId, page, limit] as const;
 }
 
+export function createWebhookDeliveriesQueryKey(params: {
+  appId: string;
+  webhookId: string;
+  page?: {
+    cursor: string;
+    direction: "previous" | "next";
+  };
+  limit?: number;
+  status?: ("pending" | "processing" | "failed" | "success")[];
+}) {
+  return [
+    "webhook-deliveries",
+    params.appId,
+    params.webhookId,
+    params.page?.cursor,
+    params.page?.direction,
+    params.limit,
+    params.status?.toSorted(),
+  ] as const;
+}
+
 export function createWebhookDeliveryAttemptsQueryKey(params: {
   appId: string;
   webhookId: string;
+  deliveryId?: string;
   page?: {
     cursor: string;
     direction: "previous" | "next";
@@ -45,6 +67,7 @@ export function createWebhookDeliveryAttemptsQueryKey(params: {
     "webhook-delivery-attempts",
     params.appId,
     params.webhookId,
+    params.deliveryId,
     params.page?.cursor,
     params.page?.direction,
     params.limit,

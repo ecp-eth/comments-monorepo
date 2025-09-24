@@ -36,6 +36,7 @@ import { EventOutboxService } from "./events/event-outbox-service.ts";
 import { resolveCommentReferences } from "../lib/resolve-comment-references.ts";
 import { CommentReferencesResolutionService } from "./comment-references-resolution-service.ts";
 import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
+import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-service.ts";
 
 export { db };
 
@@ -200,3 +201,7 @@ export const commentReferencesResolutionService =
     },
     commentReferencesCacheService: commentReferencesCacheService,
   });
+
+export const appWebhookDeliveryManager = new AppWebhookDeliveryManager({
+  db,
+});

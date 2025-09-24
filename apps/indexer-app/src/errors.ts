@@ -18,3 +18,17 @@ export class UnauthorizedError extends Error {
     this.name = "UnauthorizedError";
   }
 }
+
+/**
+ * This is just error wrapper that can be used to dinstinguish between errors
+ * which we want to show in toast with the provided message.
+ */
+export class KnownMutationError extends Error {
+  constructor(
+    message: string,
+    public readonly cause?: Error,
+  ) {
+    super(message);
+    this.name = "KnownMutationError";
+  }
+}

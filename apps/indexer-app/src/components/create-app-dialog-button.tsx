@@ -92,6 +92,14 @@ export function CreateAppDialogButton({
     }
   });
 
+  const handleOpenChange = (open: boolean) => {
+    if (createAppMutation.isPending) {
+      return;
+    }
+
+    setIsOpen(open);
+  };
+
   useEffect(() => {
     if (!isOpen) {
       form.reset();
@@ -100,13 +108,7 @@ export function CreateAppDialogButton({
 
   if (isMobile) {
     return (
-      <Drawer
-        open={isOpen}
-        onOpenChange={(open) => {
-          setIsOpen(open);
-        }}
-        direction="bottom"
-      >
+      <Drawer open={isOpen} onOpenChange={handleOpenChange} direction="bottom">
         <Form {...form}>
           <form
             id="create-app-dialog-form"
@@ -157,6 +159,14 @@ export function CreateAppDialogButton({
                     "Create"
                   )}
                 </Button>
+                <Button
+                  disabled={createAppMutation.isPending}
+                  variant="outline"
+                  type="button"
+                  onClick={() => handleOpenChange(false)}
+                >
+                  Cancel
+                </Button>
               </DrawerFooter>
             </DrawerContent>
           </form>
@@ -166,12 +176,7 @@ export function CreateAppDialogButton({
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <Form {...form}>
         <form
           id="create-app-dialog-form"
@@ -207,6 +212,14 @@ export function CreateAppDialogButton({
               />
             </div>
             <DialogFooter>
+              <Button
+                disabled={createAppMutation.isPending}
+                variant="outline"
+                type="button"
+                onClick={() => handleOpenChange(false)}
+              >
+                Cancel
+              </Button>
               <Button
                 className="gap-2"
                 type="submit"
