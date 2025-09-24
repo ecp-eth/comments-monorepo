@@ -1,4 +1,12 @@
-import { stringToHex, toHex, pad, hexToString, isAddress, isHex } from "viem";
+import {
+  stringToHex,
+  toHex,
+  pad,
+  hexToString,
+  isAddress,
+  isHex,
+  size,
+} from "viem";
 import type { Hex } from "../core/schemas.js";
 import type { Json, JsonObject, MetadataEntry } from "./types.js";
 
@@ -352,11 +360,28 @@ export function createMetadataEntry(
         value: encodeBoolValue(value),
       };
     }
-    case "bytes":
+    case "bytes": {
+      if (!isHex(value)) {
+        throw new Error(
+          `Value must be hex for ${valueType} type, got ${typeof value}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value,
+      };
+    }
     case "bytes32": {
       if (!isHex(value)) {
         throw new Error(
           `Value must be hex for ${valueType} type, got ${typeof value}`,
+        );
+      }
+
+      if (size(value) > 32) {
+        throw new Error(
+          `Value must be 32 bytes for ${valueType} type, got ${size(value)}`,
         );
       }
 
