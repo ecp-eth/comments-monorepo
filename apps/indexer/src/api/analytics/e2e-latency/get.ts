@@ -113,6 +113,7 @@ export function setupAnalyticsE2ELatencyGet(app: OpenAPIHono) {
                 CASE WHEN (response_status BETWEEN 200 AND 399) THEN attempted_at END
               ) AS success_at
             FROM ${schema.appWebhookDeliveryAttempt} a
+            JOIN ${schema.appWebhookDelivery} d ON (d.id = a.app_webhook_delivery_id AND d.retry_number = 0)
             WHERE
               a.attempted_at >= ${from}::timestamptz
               AND a.attempted_at < ${to}::timestamptz

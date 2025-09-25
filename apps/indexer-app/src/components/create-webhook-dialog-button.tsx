@@ -152,6 +152,14 @@ export function CreateWebhookDialogButton({
     }
   }, [formAuthType, form]);
 
+  const handleOpenChange = (open: boolean) => {
+    if (createWebhookMutation.isPending) {
+      return;
+    }
+
+    setIsOpen(open);
+  };
+
   const formContent = (
     <div className="flex flex-col gap-4">
       <FormField
@@ -401,13 +409,7 @@ export function CreateWebhookDialogButton({
 
   if (isMobile) {
     return (
-      <Drawer
-        open={isOpen}
-        onOpenChange={(open) => {
-          setIsOpen(open);
-        }}
-        direction="bottom"
-      >
+      <Drawer open={isOpen} onOpenChange={handleOpenChange} direction="bottom">
         <Form {...form}>
           <form id={formID} onSubmit={handleSubmit} className={formClassName}>
             <DrawerTrigger asChild>
@@ -436,6 +438,14 @@ export function CreateWebhookDialogButton({
                     <span>Create</span>
                   )}
                 </Button>
+                <Button
+                  disabled={createWebhookMutation.isPending}
+                  variant="outline"
+                  type="button"
+                  onClick={() => handleOpenChange(false)}
+                >
+                  Cancel
+                </Button>
               </DrawerFooter>
             </DrawerContent>
           </form>
@@ -445,12 +455,7 @@ export function CreateWebhookDialogButton({
   }
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-      }}
-    >
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <Form {...form}>
         <form id={formID} onSubmit={handleSubmit} className={formClassName}>
           <DialogTrigger asChild>
@@ -464,6 +469,14 @@ export function CreateWebhookDialogButton({
             </DialogHeader>
             <div className="overflow-y-auto -m-2 p-2">{formContent}</div>
             <DialogFooter>
+              <Button
+                disabled={createWebhookMutation.isPending}
+                variant="outline"
+                type="button"
+                onClick={() => handleOpenChange(false)}
+              >
+                Cancel
+              </Button>
               <Button
                 className="gap-2"
                 disabled={createWebhookMutation.isPending}

@@ -9,7 +9,7 @@ import {
   type AppWebhookUpdateResponseSchemaType,
 } from "@/api/schemas/apps";
 import { useAuth } from "@/components/auth-provider";
-import { UnauthorizedError } from "@/errors";
+import { KnownMutationError, UnauthorizedError } from "@/errors";
 import { secureFetch } from "@/lib/secure-fetch";
 import { createFetchUrl } from "@/lib/utils";
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
@@ -241,6 +241,60 @@ export function useSendTestWebhookEventMutation({
       }
 
       return;
+    },
+    ...options,
+  });
+}
+
+type UseRetryWebhookDeliveryMutationOptions = Omit<
+  UseMutationOptions<true, Error, string>,
+  "mutationFn"
+> & {
+  appId: string;
+  webhookId: string;
+};
+
+export function useRetryWebhookDeliveryMutation({
+  appId,
+  webhookId,
+  ...options
+}: UseRetryWebhookDeliveryMutationOptions) {
+  const auth = useAuth();
+
+  return useMutation({
+    mutationFn: async (deliveryId: string): Promise<true> => {
+      const appWebhookDeliveryRetryResponse = await secureFetch(
+        auth,
+        async ({ headers }) => {
+          return fetch(
+            createFetchUrl(
+              `/api/apps/${appId}/webhooks/${webhookId}/deliveries/${deliveryId}/retry`,
+            ),
+            {
+              headers: {
+                ...headers,
+              },
+              method: "POST",
+            },
+          );
+        },
+      );
+
+      if (appWebhookDeliveryRetryResponse.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (appWebhookDeliveryRetryResponse.status === 400) {
+        throw new KnownMutationError("Succeeded deliveries cannot be retried");
+      }
+
+      if (!appWebhookDeliveryRetryResponse.ok) {
+        throw new Error(
+          `Failed to retry webhook delivery: ${appWebhookDeliveryRetryResponse.statusText}`,
+        );
+      }
+
+      return true;
     },
     ...options,
   });

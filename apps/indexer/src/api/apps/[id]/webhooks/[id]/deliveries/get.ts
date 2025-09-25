@@ -4,29 +4,29 @@ import {
   appWebhookManager,
   db,
   siweMiddleware,
-} from "../../../../../../../services";
+} from "../../../../../../services";
 import {
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIDateStringSchema,
-} from "../../../../../../../lib/schemas";
-import { AppManagerAppNotFoundError } from "../../../../../../../services/app-manager-service";
-import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../../services/app-webhook-manager-service";
-import { formatResponseUsingZodSchema } from "../../../../../../../lib/response-formatters";
+} from "../../../../../../lib/schemas";
+import { AppManagerAppNotFoundError } from "../../../../../../services/app-manager-service";
+import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../services/app-webhook-manager-service";
+import { formatResponseUsingZodSchema } from "../../../../../../lib/response-formatters";
 
-export const AppWebhookDeliveryAttemptsGetRequestParamsSchema = z.object({
+export const AppWebhookDeliveriesGetRequestParamsSchema = z.object({
   appId: z.string().uuid(),
   webhookId: z.string().uuid(),
 });
 
-const AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema = z.preprocess(
+const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
   (val) => {
     try {
       if (typeof val !== "string") {
         return val;
       }
 
-      return JSON.parse(Buffer.from(val, "base64url").toString("ascii"));
+      return JSON.parse(Buffer.from(val, "base64url").toString("utf8"));
     } catch {
       return val;
     }
@@ -36,15 +36,70 @@ const AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema = z.preprocess(
   }),
 );
 
-export const AppWebhookDeliveryAttemptsGetRequestQuerySchema = z
+const AppWebhookDeliveriesStatusSchema = z.enum([
+  "pending",
+  "processing",
+  "failed",
+  "success",
+]);
+
+export const AppWebhookDeliveriesGetRequestQuerySchema = z
   .object({
-    before: AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema.optional(),
-    after: AppWebhookDeliveryAttemptsGetRequestQueryCursorSchema.optional(),
+    before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
+    after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
     limit: z.coerce.number().int().positive().max(100).default(10),
-    webhookDeliveryId: z.coerce.bigint().optional().openapi({
-      description: "A bigint ID of the webhook delivery as string",
-      pattern: "^\\d+$",
-    }),
+    status: AppWebhookDeliveriesStatusSchema.or(
+      AppWebhookDeliveriesStatusSchema.array(),
+    )
+      .or(
+        z.string().transform((val, ctx) => {
+          const statuses = val.split(",").map((item) => item.trim());
+          const parsed =
+            AppWebhookDeliveriesStatusSchema.array().safeParse(statuses);
+
+          if (!parsed.success) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Invalid status",
+            });
+
+            return z.NEVER;
+          }
+
+          return parsed.data;
+        }),
+      )
+      .default([])
+      .transform((val) => {
+        if (Array.isArray(val)) {
+          return val;
+        }
+
+        return [val];
+      })
+      .openapi({
+        type: undefined,
+        description:
+          "Filter by status. It can be a single status or a comma separated list of statuses.",
+        oneOf: [
+          {
+            type: "string",
+            enum: ["pending", "processing", "failed", "success"],
+          },
+          {
+            type: "array",
+            items: {
+              type: "string",
+              enum: ["pending", "processing", "failed", "success"],
+            },
+          },
+          {
+            type: "string",
+            format: "comma-separated-list",
+            description: 'E.g. "pending,processing,failed,success"',
+          },
+        ],
+      }),
   })
   .refine(
     (data) => {
@@ -57,59 +112,56 @@ export const AppWebhookDeliveryAttemptsGetRequestQuerySchema = z
     { message: "Cannot use both before and after" },
   );
 
-export const AppWebhookDeliveryAttemptSchema = z.object({
+export const AppWebhookDeliverySchema = z.object({
   id: OpenAPIBigintStringSchema,
-  attemptedAt: OpenAPIDateStringSchema,
-  attemptNumber: z.number(),
-  responseStatus: z.number(),
-  responseMs: z.number(),
-  error: z.string().nullable(),
-  delivery: z.object({
-    event: z.object({
-      eventType: z.string(),
-    }),
+  createdAt: OpenAPIDateStringSchema,
+  nextAttemptAt: OpenAPIDateStringSchema,
+  attemptsCount: z.number().int().nonnegative(),
+  status: z.enum(["pending", "processing", "failed", "success"]),
+  event: z.object({
+    eventType: z.string(),
   }),
 });
 
-export const AppWebhookDeliveryAttemptsCursorSchema = z
+export const AppWebhookDeliveriesCursorSchema = z
   .object({
     id: OpenAPIBigintStringSchema,
   })
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
-export const AppWebhookDeliveryAttemptsGetResponseSchema = z.object({
+export const AppWebhookDeliveriesGetResponseSchema = z.object({
   results: z.array(
     z.object({
-      cursor: AppWebhookDeliveryAttemptsCursorSchema,
-      item: AppWebhookDeliveryAttemptSchema,
+      cursor: AppWebhookDeliveriesCursorSchema,
+      item: AppWebhookDeliverySchema,
     }),
   ),
   pageInfo: z.object({
     hasPreviousPage: z.boolean(),
     hasNextPage: z.boolean(),
-    startCursor: AppWebhookDeliveryAttemptsCursorSchema.optional(),
-    endCursor: AppWebhookDeliveryAttemptsCursorSchema.optional(),
+    startCursor: AppWebhookDeliveriesCursorSchema.optional(),
+    endCursor: AppWebhookDeliveriesCursorSchema.optional(),
   }),
 });
 
-export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
+export function setupAppWebhookDeliveriesGet(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
-      path: "/api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts",
+      path: "/api/apps/{appId}/webhooks/{webhookId}/deliveries",
       tags: ["apps", "webhooks", "deliveries"],
-      description: "Get a list of delivery attempts for a webhook",
+      description: "Get a list of deliveries for a webhook",
       middleware: siweMiddleware,
       request: {
-        params: AppWebhookDeliveryAttemptsGetRequestParamsSchema,
-        query: AppWebhookDeliveryAttemptsGetRequestQuerySchema,
+        params: AppWebhookDeliveriesGetRequestParamsSchema,
+        query: AppWebhookDeliveriesGetRequestQuerySchema,
       },
       responses: {
         200: {
-          description: "Paginated list of delivery attempts",
+          description: "Paginated list of deliveries",
           content: {
             "application/json": {
-              schema: AppWebhookDeliveryAttemptsGetResponseSchema,
+              schema: AppWebhookDeliveriesGetResponseSchema,
             },
           },
         },
@@ -149,7 +201,7 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
     },
     async (c) => {
       const { appId, webhookId } = c.req.valid("param");
-      const { before, after, limit, webhookDeliveryId } = c.req.valid("query");
+      const { before, after, limit, status } = c.req.valid("query");
 
       try {
         const { app } = await appManager.getApp({
@@ -164,18 +216,13 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
 
         const previousDeliveries =
           before || after
-            ? await db.query.appWebhookDeliveryAttempt.findFirst({
+            ? await db.query.appWebhookDelivery.findFirst({
                 where(fields, operators) {
                   return operators.and(
-                    ...(webhookDeliveryId
-                      ? [
-                          operators.eq(
-                            fields.appWebhookDeliveryId,
-                            webhookDeliveryId,
-                          ),
-                        ]
-                      : []),
                     operators.eq(fields.appWebhookId, appWebhook.id),
+                    ...(status.length > 0
+                      ? [operators.inArray(fields.status, status)]
+                      : []),
                     ...(before ? [operators.gt(fields.id, before.id)] : []),
                     ...(after && !before
                       ? [operators.lt(fields.id, after.id)]
@@ -185,13 +232,13 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
               })
             : undefined;
 
-        const results = await db.query.appWebhookDeliveryAttempt.findMany({
+        const results = await db.query.appWebhookDelivery.findMany({
           where(fields, operators) {
             return operators.and(
-              ...(webhookDeliveryId
-                ? [operators.eq(fields.appWebhookDeliveryId, webhookDeliveryId)]
-                : []),
               operators.eq(fields.appWebhookId, appWebhook.id),
+              ...(status.length > 0
+                ? [operators.inArray(fields.status, status)]
+                : []),
               ...(before ? [operators.gt(fields.id, before.id)] : []),
               ...(after && !before ? [operators.lt(fields.id, after.id)] : []),
             );
@@ -205,13 +252,9 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
             return operators.desc(fields.id);
           },
           with: {
-            delivery: {
-              with: {
-                event: {
-                  columns: {
-                    eventType: true,
-                  },
-                },
+            event: {
+              columns: {
+                eventType: true,
               },
             },
           },
@@ -236,21 +279,18 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
         const endCursor = pageResults[pageResults.length - 1];
 
         return c.json(
-          formatResponseUsingZodSchema(
-            AppWebhookDeliveryAttemptsGetResponseSchema,
-            {
-              results: pageResults.map((item) => ({
-                cursor: item,
-                item,
-              })),
-              pageInfo: {
-                hasNextPage,
-                hasPreviousPage,
-                startCursor,
-                endCursor,
-              },
+          formatResponseUsingZodSchema(AppWebhookDeliveriesGetResponseSchema, {
+            results: pageResults.map((item) => ({
+              cursor: item,
+              item,
+            })),
+            pageInfo: {
+              hasNextPage,
+              hasPreviousPage,
+              startCursor,
+              endCursor,
             },
-          ),
+          }),
           200,
         );
       } catch (error) {

@@ -112,7 +112,8 @@ export function setupAnalyticsSlaBandsGet(app: OpenAPIHono) {
               e.created_at,
               MIN(a.attempted_at) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS success_at
             FROM ${schema.eventOutbox} e
-            LEFT JOIN ${schema.appWebhookDeliveryAttempt} a ON (a.event_id = e.id)
+            LEFT JOIN ${schema.appWebhookDelivery} d ON (d.event_id = e.id AND d.retry_number = 0)
+            LEFT JOIN ${schema.appWebhookDeliveryAttempt} a ON (a.app_webhook_delivery_id = d.id)
             WHERE
               ${sql.join(filters, sql` AND `)}
             GROUP BY 1, 2

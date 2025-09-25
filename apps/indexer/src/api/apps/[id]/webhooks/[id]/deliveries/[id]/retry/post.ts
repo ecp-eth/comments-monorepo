@@ -13,10 +13,13 @@ import {
 import { AppManagerAppNotFoundError } from "../../../../../../../../services/app-manager-service";
 import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../../../services/app-webhook-manager-service";
 import { formatResponseUsingZodSchema } from "../../../../../../../../lib/response-formatters";
-import { AppWebhookDeliveryManagerDeliveryNotFoundError } from "../../../../../../../../services/app-webhook-delivery-manager-service";
+import {
+  AppWebhookDeliveryManagerDeliveryNotFoundError,
+  AppWebhookDeliveryManagerFailedToRetryDeliveryError,
+} from "../../../../../../../../services/app-webhook-delivery-manager-service";
 
 export const AppWebhookDeliveryRetryRequestParamsSchema = z.object({
-  id: z.string().uuid(),
+  appId: z.string().uuid(),
   webhookId: z.string().uuid(),
   deliveryId: z.coerce.bigint(),
 });
@@ -35,7 +38,7 @@ export function setupAppWebhookDeliveryRetry(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/api/apps/{id}/webhooks/{webhookId}/deliveries/{deliveryId}/retry",
+      path: "/api/apps/{appId}/webhooks/{webhookId}/deliveries/{deliveryId}/retry",
       tags: ["apps", "webhooks", "deliveries"],
       description: "Retry a delivery",
       middleware: siweMiddleware,
@@ -86,11 +89,11 @@ export function setupAppWebhookDeliveryRetry(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { id, webhookId, deliveryId } = c.req.valid("param");
+      const { appId, webhookId, deliveryId } = c.req.valid("param");
 
       try {
         const { app } = await appManager.getApp({
-          id,
+          id: appId,
           ownerId: c.get("user").id,
         });
         const { appWebhook } = await appWebhookManager.getAppWebhook({
@@ -122,6 +125,12 @@ export function setupAppWebhookDeliveryRetry(app: OpenAPIHono) {
 
         if (error instanceof AppWebhookDeliveryManagerDeliveryNotFoundError) {
           return c.json({ message: "Delivery not found" }, 404);
+        }
+
+        if (
+          error instanceof AppWebhookDeliveryManagerFailedToRetryDeliveryError
+        ) {
+          return c.json({ message: "Failed to retry delivery" }, 400);
         }
 
         throw error;

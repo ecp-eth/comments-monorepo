@@ -11110,6 +11110,13 @@ paths:
           required: false
           name: limit
           in: query
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: A bigint ID of the webhook delivery as string
+          required: false
+          name: webhookDeliveryId
+          in: query
       responses:
         '200':
           description: Paginated list of delivery attempts
@@ -11250,7 +11257,7 @@ paths:
                     description: The error message
                 required:
                   - message
-  /api/apps/{id}/webhooks/{webhookId}/deliveries/{deliveryId}/retry:
+  /api/apps/{appId}/webhooks/{webhookId}/deliveries/{deliveryId}/retry:
     post:
       tags:
         - apps
@@ -11262,7 +11269,7 @@ paths:
             type: string
             format: uuid
           required: true
-          name: id
+          name: appId
           in: path
         - schema:
             type: string
@@ -11344,6 +11351,231 @@ paths:
                   - message
         '404':
           description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+  /api/apps/{appId}/webhooks/{webhookId}/deliveries:
+    get:
+      tags:
+        - apps
+        - webhooks
+        - deliveries
+      description: Get a list of deliveries for a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: before
+          in: query
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: after
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 10
+          required: false
+          name: limit
+          in: query
+        - schema:
+            anyOf:
+              - type: string
+                enum: &ref_5
+                  - pending
+                  - processing
+                  - failed
+                  - success
+              - type: array
+                items:
+                  type: string
+                  enum: *ref_5
+              - type: string
+            default: []
+            description: >-
+              Filter by status. It can be a single status or a comma separated
+              list of statuses.
+            oneOf:
+              - type: string
+                enum:
+                  - pending
+                  - processing
+                  - failed
+                  - success
+              - type: array
+                items:
+                  type: string
+                  enum:
+                    - pending
+                    - processing
+                    - failed
+                    - success
+              - type: string
+                format: comma-separated-list
+                description: E.g. "pending,processing,failed,success"
+          required: false
+          name: status
+          in: query
+      responses:
+        '200':
+          description: Paginated list of deliveries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cursor:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                          required:
+                            - id
+                        item:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                            createdAt:
+                              type: string
+                              description: A date string in ISO 8601 format
+                            nextAttemptAt:
+                              type: string
+                              description: A date string in ISO 8601 format
+                            attemptsCount:
+                              type: integer
+                              minimum: 0
+                            status:
+                              type: string
+                              enum:
+                                - pending
+                                - processing
+                                - failed
+                                - success
+                            event:
+                              type: object
+                              properties:
+                                eventType:
+                                  type: string
+                              required:
+                                - eventType
+                          required:
+                            - id
+                            - createdAt
+                            - nextAttemptAt
+                            - attemptsCount
+                            - status
+                            - event
+                      required:
+                        - cursor
+                        - item
+                  pageInfo:
+                    type: object
+                    properties:
+                      hasPreviousPage:
+                        type: boolean
+                      hasNextPage:
+                        type: boolean
+                      startCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                      endCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                    required:
+                      - hasPreviousPage
+                      - hasNextPage
+                required:
+                  - results
+                  - pageInfo
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Webhook or app not found
           content:
             application/json:
               schema:
@@ -11896,7 +12128,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: &ref_5
+            enum: &ref_6
               - hour
               - day
               - week
@@ -12039,7 +12271,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_5
+            enum: *ref_6
             default: day
           required: false
           name: bucket
@@ -12166,7 +12398,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_5
+            enum: *ref_6
             default: day
           required: false
           name: bucket
@@ -12289,7 +12521,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_5
+            enum: *ref_6
             default: day
           required: false
           name: bucket
@@ -12423,7 +12655,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_5
+            enum: *ref_6
             default: day
           required: false
           name: bucket
@@ -12561,7 +12793,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_5
+            enum: *ref_6
             default: day
           required: false
           name: bucket

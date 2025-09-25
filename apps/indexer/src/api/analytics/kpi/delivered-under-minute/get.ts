@@ -102,6 +102,7 @@ export function setupAnalyticsKpiDeliveredUnderMinuteGet(app: OpenAPIHono) {
               e.created_at,
               MIN(a.attempted_at) FILTER (WHERE a.response_status BETWEEN 200 AND 399) AS success_at
             FROM ${schema.appWebhookDeliveryAttempt} a
+            JOIN ${schema.appWebhookDelivery} d ON (d.id = a.app_webhook_delivery_id AND d.retry_number = 0)
             JOIN ${schema.eventOutbox} e ON e.id = a.event_id
             WHERE 
               ${sql.join(filters, sql` AND `)}

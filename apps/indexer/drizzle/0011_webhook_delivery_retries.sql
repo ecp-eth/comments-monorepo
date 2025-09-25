@@ -1,3 +1,0 @@
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery" DROP CONSTRAINT "awd_dedupe_deliveries_uq";--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery" ADD COLUMN "retry_number" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
-ALTER TABLE "ecp_indexer_schema"."app_webhook_delivery" ADD CONSTRAINT "awd_dedupe_deliveries_uq" UNIQUE("app_webhook_id","event_id","retry_number");

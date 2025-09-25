@@ -453,6 +453,9 @@ export const appWebhookDelivery = offchainSchema.table(
       table.appId,
       table.appWebhookId,
     ),
+    // drizzle doesn't support defining INCLUDE on the index
+    // include is useful if you want sort by created_at but also filter
+    // by appWebhookId + status IN (...)
     index("awd_by_webhook_created_at_range_idx").on(
       table.appWebhookId,
       table.createdAt,
@@ -470,6 +473,7 @@ export const appWebhookDelivery = offchainSchema.table(
     index("aws_inflight_idx")
       .on(table.appWebhookId, table.status, table.leaseUntil)
       .where(sql`${table.status} = 'processing'`),
+    index("awd_by_event_retry_number_idx").on(table.eventId, table.retryNumber),
   ],
 );
 

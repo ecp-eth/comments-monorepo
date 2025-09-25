@@ -1,3 +1,4 @@
+import { and, eq } from "drizzle-orm";
 import { schema } from "../../schema";
 import type { AppWebhookDeliverySelectType } from "../../schema.offchain";
 import type { DB } from "./db";
@@ -19,15 +20,19 @@ export class AppWebhookDeliveryManager implements IAppWebhookDeliveryManager {
       RetryDeliveryParamsSchema.parse(params);
 
     return await this.db.transaction(async (tx) => {
-      const delivery = await tx.query.appWebhookDelivery.findFirst({
-        where(fields, operators) {
-          return operators.and(
-            operators.eq(fields.id, deliveryId),
-            operators.eq(fields.appId, appId),
-            operators.eq(fields.appWebhookId, webhookId),
-          );
-        },
-      });
+      const [delivery] = await tx
+        .select()
+        .from(schema.appWebhookDelivery)
+        .where(
+          and(
+            eq(schema.appWebhookDelivery.id, deliveryId),
+            eq(schema.appWebhookDelivery.appId, appId),
+            eq(schema.appWebhookDelivery.appWebhookId, webhookId),
+          ),
+        )
+        .for("update")
+        .limit(1)
+        .execute();
 
       if (!delivery) {
         throw new AppWebhookDeliveryManagerDeliveryNotFoundError();
