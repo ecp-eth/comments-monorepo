@@ -224,12 +224,19 @@ export function decodeBoolValue(encodedValue: Hex): boolean {
 }
 
 /**
- * Encodes a number value as bytes for metadata
+ * Encodes a number value as bytes for metadata.
+ *
+ * Be careful this function works only with integers, decimal numbers are not supported.
  *
  * @param value - The number value to encode
  * @returns The hex-encoded bytes (32 bytes big-endian)
+ * @throws If the value is not an integer
  */
 export function encodeNumberValue(value: number | bigint): Hex {
+  if (typeof value === "number" && !Number.isInteger(value)) {
+    throw new Error("Value must be integer");
+  }
+
   // Handle negative numbers using two's complement
   if (typeof value === "number" && value < 0) {
     // Convert to bigint for proper two's complement handling
@@ -248,7 +255,9 @@ export function encodeNumberValue(value: number | bigint): Hex {
 }
 
 /**
- * Decodes a number value from encoded metadata bytes
+ * Decodes a number value from encoded metadata bytes.
+ *
+ * Be careful this returns only big ints, decimal numbers are not supported.
  *
  * @param encodedValue - The hex-encoded bytes (32 bytes big-endian)
  * @param isSigned - Whether the number is signed (for two's complement handling)

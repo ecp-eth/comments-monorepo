@@ -387,6 +387,10 @@ describe("encodeNumberValue", () => {
     const encodedValue = encodeNumberValue(value);
     expect(encodedValue).toStrictEqual(expectedValue);
   });
+
+  it("should throw an error if the value is not an integer", () => {
+    expect(() => encodeNumberValue(1.5)).toThrow("Value must be integer");
+  });
 });
 
 describe("decodeNumberValue", () => {

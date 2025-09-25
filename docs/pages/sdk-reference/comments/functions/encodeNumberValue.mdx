@@ -10,9 +10,11 @@
 function encodeNumberValue(value): `0x${string}`;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:232](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L232)
+Defined in: [packages/sdk/src/comments/metadata.ts:235](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L235)
 
-Encodes a number value as bytes for metadata
+Encodes a number value as bytes for metadata.
+
+Be careful this function works only with integers, decimal numbers are not supported.
 
 ## Parameters
 
@@ -27,3 +29,7 @@ The number value to encode
 `` `0x${string}` ``
 
 The hex-encoded bytes (32 bytes big-endian)
+
+## Throws
+
+If the value is not an integer
