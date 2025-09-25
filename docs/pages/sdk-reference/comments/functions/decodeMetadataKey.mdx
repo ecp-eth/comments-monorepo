@@ -1,0 +1,45 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeMetadataKey
+
+# Function: decodeMetadataKey()
+
+```ts
+function decodeMetadataKey(key): MetadataKeyDefinition;
+```
+
+Defined in: [packages/sdk/src/comments/metadata.ts:142](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L142)
+
+Decodes a metadata key from a hex-encoded key
+
+## Parameters
+
+### key
+
+`` `0x${string}` ``
+
+The hex-encoded key
+
+## Returns
+
+[`MetadataKeyDefinition`](/sdk-reference/comments/type-aliases/MetadataKeyDefinition.mdx)
+
+The decoded metadata key
+
+## Throws
+
+If the metadata type is unknown
+
+## Throws
+
+If the key is not a valid hex string
+
+## Example
+
+```ts
+const decodedKey = decodeMetadataKey("0x0000000000000000000000000000000000000000737472696e67207469746c65");
+console.log(decodedKey);
+// { key: "title", type: "string" }
+```

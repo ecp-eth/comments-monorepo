@@ -1,222 +1,14 @@
-import { stringToHex, toHex, pad } from "viem";
+import {
+  stringToHex,
+  toHex,
+  pad,
+  hexToString,
+  isAddress,
+  isHex,
+  size,
+} from "viem";
 import type { Hex } from "../core/schemas.js";
 import type { Json, JsonObject, MetadataEntry } from "./types.js";
-
-/**
- * Creates a metadata key by encoding a string in the format "type key".
- *
- * @param keyString - The key string (e.g., "status", "author", "url")
- * @param valueType - The type of the value MetadataType
- * @returns The hex-encoded bytes of the "type key" string of length 32 bytes padded from the left with leading zeros.
- *
- * @throws If the value type + key string exceeds 32 bytes
- */
-export function createMetadataKey(
-  keyString: string,
-  valueType: MetadataType,
-): Hex {
-  const keyTypeString = `${valueType} ${keyString}`;
-
-  // Check if the UTF-8 encoded key exceeds 32 bytes
-  const keyBytes = new TextEncoder().encode(keyTypeString);
-  if (keyBytes.length > 32) {
-    throw new Error(
-      `Metadata key "${keyTypeString}" exceeds maximum length of 32 bytes`,
-    );
-  }
-
-  // Convert to hex and pad to exactly 32 bytes
-  const hexString = stringToHex(keyTypeString);
-  return pad(hexString, { size: 32 });
-}
-
-/**
- * Encodes a string value as bytes for metadata
- *
- * @param value - The string value to encode
- * @returns The hex-encoded bytes
- */
-export function encodeStringValue(value: string): Hex {
-  return stringToHex(value);
-}
-
-/**
- * Encodes a boolean value as bytes for metadata
- *
- * @param value - The boolean value to encode
- * @returns The hex-encoded bytes (32 bytes, 1 for true, 0 for false)
- */
-export function encodeBoolValue(value: boolean): Hex {
-  return toHex(value ? 1 : 0, { size: 32 });
-}
-
-/**
- * Encodes a number value as bytes for metadata
- *
- * @param value - The number value to encode
- * @returns The hex-encoded bytes (32 bytes big-endian)
- */
-export function encodeNumberValue(value: number | bigint): Hex {
-  // Handle negative numbers using two's complement
-  if (typeof value === "number" && value < 0) {
-    // Convert to bigint for proper two's complement handling
-    const bigintValue = BigInt(value);
-    // Use two's complement: for a 256-bit number, this is 2^256 + value
-    const twosComplement = (1n << 256n) + bigintValue;
-    return toHex(twosComplement, { size: 32 });
-  } else if (typeof value === "bigint" && value < 0n) {
-    // Two's complement for bigint negative values
-    const twosComplement = (1n << 256n) + value;
-    return toHex(twosComplement, { size: 32 });
-  } else {
-    // Positive numbers work as before
-    return toHex(value, { size: 32 });
-  }
-}
-
-/**
- * Encodes a JSON object as bytes for metadata
- *
- * @param value - The JSON object to encode
- * @returns The hex-encoded bytes of the JSON string
- */
-export function encodeJsonValue(value: JsonObject): Hex {
-  return stringToHex(JSON.stringify(value));
-}
-
-/**
- * Creates a metadata entry from a key-value pair with explicit type specification
- *
- * @param keyString - The key string e.g. "status", "author", etc.
- * @param valueType - The metadata type (string, bool, uint256, etc.)
- * @param value - The value (string, boolean, number, bigint, or JsonObject). Will be encoded to the appropriate type.
- * @returns The MetadataEntry
- */
-export function createMetadataEntry(
-  keyString: string,
-  valueType: MetadataType,
-  value: string | boolean | number | bigint | JsonObject,
-): MetadataEntry {
-  if (valueType === "string") {
-    if (typeof value === "string") {
-      return {
-        key: createMetadataKey(keyString, valueType),
-        value: encodeStringValue(value),
-      };
-    }
-
-    if (typeof value === "object" && value !== null) {
-      return {
-        key: createMetadataKey(keyString, valueType),
-        value: encodeJsonValue(value),
-      };
-    }
-
-    throw new Error(
-      `Value must be string or object for string type, got ${typeof value}`,
-    );
-  }
-
-  if (valueType === "bool") {
-    if (typeof value !== "boolean") {
-      throw new Error(
-        `Value must be boolean for bool type, got ${typeof value}`,
-      );
-    }
-
-    return {
-      key: createMetadataKey(keyString, valueType),
-      value: encodeBoolValue(value),
-    };
-  }
-
-  if (
-    valueType === "uint256" ||
-    valueType === "uint8" ||
-    valueType === "uint16" ||
-    valueType === "uint32" ||
-    valueType === "uint64" ||
-    valueType === "uint128" ||
-    valueType === "int256" ||
-    valueType === "int128"
-  ) {
-    if (typeof value !== "number" && typeof value !== "bigint") {
-      throw new Error(
-        `Value must be number or bigint for ${valueType} type, got ${typeof value}`,
-      );
-    }
-
-    return {
-      key: createMetadataKey(keyString, valueType),
-      value: encodeNumberValue(value),
-    };
-  }
-
-  throw new Error(`Unsupported metadata type: ${valueType}`);
-}
-
-/**
- * Creates multiple metadata entries from an object with explicit types
- *
- * @param metadata - An object with key-value pairs and their types
- * @returns Array of MetadataEntry
- *
- * @example
- * const metadata = {
- *   "status": {
- *     type: "string",
- *     value: "status",
- *   },
- * };
- * const metadataEntries = createMetadataEntries(metadata);
- * console.log(metadataEntries);
- * // [
- * //   {
- * //     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
- * //     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
- * //   },
- * // ]
- */
-export function createMetadataEntries(
-  metadata: Record<
-    string,
-    {
-      type: MetadataType;
-      value: string | boolean | number | bigint | JsonObject;
-    }
-  >,
-): MetadataEntry[] {
-  return Object.entries(metadata).map(([key, { type, value }]) =>
-    createMetadataEntry(key, type, value),
-  );
-}
-
-/**
- * Creates a metadata entry with a custom type
- *
- * @param keyString - The key string e.g. "status", "author", etc.
- * @param valueType - The type string MetadataType e.g. "string", "uint256", etc.
- * @param encodedValue - The pre-hex-encoded value as hex. For example by using encodeStringValue, encodeBoolValue, encodeNumberValue, encodeJsonValue, etc.
- * @returns The MetadataEntry
- *
- * @example
- * const metadataEntry = createCustomMetadataEntry("status", "string", encodeStringValue("status"));
- * console.log(metadataEntry);
- * // {
- * //   key: "0x0000000000000000000000000000000000000000000000000000000000000000",
- * //   value: "0x0000000000000000000000000000000000000000000000000000000000000000",
- * // }
- */
-export function createCustomMetadataEntry(
-  keyString: string,
-  valueType: MetadataType,
-  encodedValue: Hex,
-): MetadataEntry {
-  return {
-    key: createMetadataKey(keyString, valueType),
-    value: encodedValue,
-  };
-}
 
 /**
  * Type representing the supported on-chain serializable types
@@ -289,13 +81,436 @@ export type MetadataRecord = Record<
   }
 >;
 
+export type MetadataKeyDefinition = {
+  /**
+   * The original key e.g. "status", "author", etc.
+   */
+  key: string;
+  /**
+   * The type of the key e.g. "string", "uint256", etc.
+   */
+  type: MetadataType;
+};
+
 /**
  * Mapping of known hex-encoded keys to their original key and type
  */
-export type MetadataKeyTypeMap = Record<
-  Hex,
-  { key: string; type: MetadataType }
->;
+export type MetadataKeyTypeMap = Record<Hex, MetadataKeyDefinition>;
+
+/**
+ * Creates a metadata key by encoding a string in the format "type key".
+ *
+ * @param keyString - The key string (e.g., "status", "author", "url")
+ * @param valueType - The type of the value MetadataType
+ * @returns The hex-encoded bytes of the "type key" string of length 32 bytes padded from the left with leading zeros.
+ *
+ * @throws If the value type + key string exceeds 32 bytes
+ */
+export function createMetadataKey(
+  keyString: string,
+  valueType: MetadataType,
+): Hex {
+  const keyTypeString = `${valueType} ${keyString}`;
+
+  // Check if the UTF-8 encoded key exceeds 32 bytes
+  const keyBytes = new TextEncoder().encode(keyTypeString);
+  if (keyBytes.length > 32) {
+    throw new Error(
+      `Metadata key "${keyTypeString}" exceeds maximum length of 32 bytes`,
+    );
+  }
+
+  // Convert to hex and pad from left to exactly 32 bytes
+  const hexString = stringToHex(keyTypeString);
+  return pad(hexString, { size: 32 });
+}
+
+/**
+ * Decodes a metadata key from a hex-encoded key
+ *
+ * @param key - The hex-encoded key
+ * @returns The decoded metadata key
+ *
+ * @throws If the metadata type is unknown
+ * @throws If the key is not a valid hex string
+ *
+ * @example
+ * const decodedKey = decodeMetadataKey("0x0000000000000000000000000000000000000000737472696e67207469746c65");
+ * console.log(decodedKey);
+ * // { key: "title", type: "string" }
+ */
+export function decodeMetadataKey(key: Hex): MetadataKeyDefinition {
+  const stringKey = hexToString(key, { size: 32 });
+  const trimmedStringKey = stringKey.replace(/\0/g, "").trim();
+  const spaceIndex = trimmedStringKey.indexOf(" ");
+
+  if (spaceIndex === -1) {
+    throw new Error(
+      `Malformed metadata key "${stringKey}" space delimiter is missing`,
+    );
+  }
+
+  const type = trimmedStringKey.substring(0, spaceIndex);
+  const originalKey = trimmedStringKey.substring(spaceIndex + 1);
+
+  if (Object.values(MetadataTypeValues).includes(type as MetadataType)) {
+    return {
+      key: originalKey,
+      type: type as MetadataType,
+    };
+  }
+
+  throw new Error(`Unknown metadata type: ${type}`);
+}
+
+/**
+ * Encodes a string value as bytes for metadata
+ *
+ * @param value - The string value to encode
+ * @returns The hex-encoded bytes
+ */
+export function encodeStringValue(value: string): Hex {
+  return stringToHex(value);
+}
+
+/**
+ * Decodes a string value from encoded metadata bytes.
+ *
+ * If the string is valid JSON value, it returns the parsed JSON value. Otherwise it returns string.
+ *
+ * @param encodedValue - The hex-encoded bytes
+ * @returns The decoded string value. If the value can't be decoded, it will return an empty string.
+ */
+export function decodeStringValue(encodedValue: Hex): string | Json {
+  // For strings, we need to handle both regular strings and JSON objects
+  try {
+    const decoded = hexToString(encodedValue);
+
+    // Try to parse as JSON first (for objects), fall back to string
+    try {
+      return JSON.parse(decoded);
+    } catch {
+      return decoded;
+    }
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Encodes a boolean value as bytes for metadata
+ *
+ * @param value - The boolean value to encode
+ * @returns The hex-encoded bytes (32 bytes, 1 for true, 0 for false)
+ */
+export function encodeBoolValue(value: boolean): Hex {
+  return toHex(value ? 1 : 0, { size: 32 });
+}
+
+/**
+ * Decodes a boolean value from encoded metadata bytes
+ *
+ * @param encodedValue - The hex-encoded bytes (32 bytes, 1 for true, 0 for false)
+ * @returns The decoded boolean value. If the value can't be decoded, it will return false.
+ */
+export function decodeBoolValue(encodedValue: Hex): boolean {
+  try {
+    // Convert hex to bigint and check if it's 1 (true) or 0 (false)
+    const value = BigInt(encodedValue);
+    return value === 1n;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Encodes a number value as bytes for metadata.
+ *
+ * Be careful this function works only with integers, decimal numbers are not supported.
+ *
+ * @param value - The number value to encode
+ * @returns The hex-encoded bytes (32 bytes big-endian)
+ * @throws If the value is not an integer
+ */
+export function encodeNumberValue(value: number | bigint): Hex {
+  if (typeof value === "number" && !Number.isInteger(value)) {
+    throw new Error("Value must be integer");
+  }
+
+  // Handle negative numbers using two's complement
+  if (typeof value === "number" && value < 0) {
+    // Convert to bigint for proper two's complement handling
+    const bigintValue = BigInt(value);
+    // Use two's complement: for a 256-bit number, this is 2^256 + value
+    const twosComplement = (1n << 256n) + bigintValue;
+    return toHex(twosComplement, { size: 32 });
+  } else if (typeof value === "bigint" && value < 0n) {
+    // Two's complement for bigint negative values
+    const twosComplement = (1n << 256n) + value;
+    return toHex(twosComplement, { size: 32 });
+  } else {
+    // Positive numbers work as before
+    return toHex(value, { size: 32 });
+  }
+}
+
+/**
+ * Decodes a number value from encoded metadata bytes.
+ *
+ * Be careful this returns only big ints, decimal numbers are not supported.
+ *
+ * @param encodedValue - The hex-encoded bytes (32 bytes big-endian)
+ * @param isSigned - Whether the number is signed (for two's complement handling)
+ * @returns The decoded number value (as bigint for safety). If the value can't be decoded, it will return 0n.
+ */
+export function decodeNumberValue(
+  encodedValue: Hex,
+  isSigned: boolean = false,
+): bigint {
+  try {
+    const value = BigInt(encodedValue);
+
+    if (isSigned && value > (1n << 255n) - 1n) {
+      // Handle two's complement for negative numbers
+      return value - (1n << 256n);
+    }
+
+    return value;
+  } catch {
+    return 0n;
+  }
+}
+
+/**
+ * Encodes a JSON object as bytes for metadata
+ *
+ * @param value - The JSON object to encode
+ * @returns The hex-encoded bytes of the JSON string
+ */
+export function encodeJsonValue(value: JsonObject): Hex {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error(`Invalid JSON value: expected object, got ${typeof value}`);
+  }
+
+  return stringToHex(JSON.stringify(value));
+}
+
+/**
+ * Decodes a JSON object from encoded metadata bytes
+ *
+ * @param value - The hex-encoded bytes of the JSON string
+ * @returns The decoded JSON object
+ *
+ * @throws If the value is not a valid JSON object
+ *
+ * @example
+ * const decodedValue = decodeJsonValue("0x0000000000000000000000000000000000000000000000000000000000000000");
+ * console.log(decodedValue);
+ * // { test: true }
+ */
+export function decodeJsonValue(value: Hex): JsonObject {
+  const stringValue = hexToString(value);
+  const parsedValue = JSON.parse(stringValue);
+
+  if (
+    parsedValue != null &&
+    typeof parsedValue === "object" &&
+    !Array.isArray(parsedValue)
+  ) {
+    return parsedValue;
+  }
+
+  throw new Error(
+    `Invalid JSON value: expected object, got ${typeof parsedValue}`,
+  );
+}
+
+/**
+ * Creates a metadata entry from a key-value pair with explicit type specification
+ *
+ * @param keyString - The key string e.g. "status", "author", etc.
+ * @param valueType - The metadata type (string, bool, uint256, etc.)
+ * @param value - The value (string, boolean, number, bigint, or JsonObject). Will be encoded to the appropriate type.
+ * @returns The MetadataEntry
+ */
+export function createMetadataEntry(
+  keyString: string,
+  valueType: MetadataType,
+  value: string | boolean | number | bigint | JsonObject | Hex | Uint8Array,
+): MetadataEntry {
+  switch (valueType) {
+    case "address": {
+      if (typeof value !== "string") {
+        throw new Error(
+          `Value must be string for address type, got ${typeof value}`,
+        );
+      }
+
+      if (!isAddress(value)) {
+        throw new Error(
+          `Value must be a valid address for address type, got ${value}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value: encodeAddressValue(value),
+      };
+    }
+    case "bool": {
+      if (typeof value !== "boolean") {
+        throw new Error(
+          `Value must be boolean for bool type, got ${typeof value}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value: encodeBoolValue(value),
+      };
+    }
+    case "bytes": {
+      if (!isHex(value)) {
+        throw new Error(
+          `Value must be hex for ${valueType} type, got ${typeof value}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value,
+      };
+    }
+    case "bytes32": {
+      if (!isHex(value)) {
+        throw new Error(
+          `Value must be hex for ${valueType} type, got ${typeof value}`,
+        );
+      }
+
+      if (size(value) > 32) {
+        throw new Error(
+          `Value must be 32 bytes for ${valueType} type, got ${size(value)}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value,
+      };
+    }
+    case "int128":
+    case "int256":
+    case "uint8":
+    case "uint16":
+    case "uint32":
+    case "uint64":
+    case "uint128":
+    case "uint256": {
+      if (typeof value !== "number" && typeof value !== "bigint") {
+        throw new Error(
+          `Value must be number or bigint for ${valueType} type, got ${typeof value}`,
+        );
+      }
+
+      return {
+        key: createMetadataKey(keyString, valueType),
+        value: encodeNumberValue(value),
+      };
+    }
+    case "string": {
+      if (typeof value === "string") {
+        return {
+          key: createMetadataKey(keyString, valueType),
+          value: encodeStringValue(value),
+        };
+      }
+
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value) &&
+        !(value instanceof Uint8Array)
+      ) {
+        return {
+          key: createMetadataKey(keyString, valueType),
+          value: encodeJsonValue(value),
+        };
+      }
+
+      throw new Error(
+        `Value must be string or object for string type, got ${typeof value}`,
+      );
+    }
+    default: {
+      valueType satisfies never;
+      throw new Error(`Unsupported metadata type: ${valueType}`);
+    }
+  }
+}
+
+/**
+ * Creates multiple metadata entries from an object with explicit types
+ *
+ * @param metadata - An object with key-value pairs and their types
+ * @returns Array of MetadataEntry
+ *
+ * @example
+ * const metadata = {
+ *   "status": {
+ *     type: "string",
+ *     value: "status",
+ *   },
+ * };
+ * const metadataEntries = createMetadataEntries(metadata);
+ * console.log(metadataEntries);
+ * // [
+ * //   {
+ * //     key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //     value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   },
+ * // ]
+ */
+export function createMetadataEntries(
+  metadata: Record<
+    string,
+    {
+      type: MetadataType;
+      value: string | boolean | number | bigint | JsonObject;
+    }
+  >,
+): MetadataEntry[] {
+  return Object.entries(metadata).map(([key, { type, value }]) =>
+    createMetadataEntry(key, type, value),
+  );
+}
+
+/**
+ * Creates a metadata entry with a custom type
+ *
+ * @param keyString - The key string e.g. "status", "author", etc.
+ * @param valueType - The type string MetadataType e.g. "string", "uint256", etc.
+ * @param encodedValue - The pre-hex-encoded value as hex. For example by using encodeStringValue, encodeBoolValue, encodeNumberValue, encodeJsonValue, etc.
+ * @returns The MetadataEntry
+ *
+ * @example
+ * const metadataEntry = createCustomMetadataEntry("status", "string", encodeStringValue("status"));
+ * console.log(metadataEntry);
+ * // {
+ * //   key: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * //   value: "0x0000000000000000000000000000000000000000000000000000000000000000",
+ * // }
+ */
+export function createCustomMetadataEntry(
+  keyString: string,
+  valueType: MetadataType,
+  encodedValue: Hex,
+): MetadataEntry {
+  return {
+    key: createMetadataKey(keyString, valueType),
+    value: encodedValue,
+  };
+}
 
 /**
  * Converts from JS/SDK Record format to contract MetadataEntry array format
@@ -319,7 +534,7 @@ export function convertRecordToContractFormat(
  * common patterns used in the codebase.
  *
  * @param metadataEntries - Array of MetadataEntry from contracts
- * @param keyTypeMap - Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key.
+ * @param keyTypeMap - Optional mapping of known keys to their original string and type. If not provided, the key in the record will be the hex hash of the key and the type will be "bytes".
  * @returns The metadata in Record format
  *
  * @example
@@ -399,8 +614,8 @@ export function createKeyTypeMap(
   const map: MetadataKeyTypeMap = {};
 
   for (const keyType of knownKeys) {
-    const hashedKey = createMetadataKey(keyType.key, keyType.type);
-    map[hashedKey] = keyType;
+    const metadataKey = createMetadataKey(keyType.key, keyType.type);
+    map[metadataKey] = keyType;
   }
 
   return map;
@@ -451,44 +666,9 @@ export function decodeMetadataTypes(
 
   for (const entry of metadataEntries) {
     try {
-      // The key is padded to 32 bytes with null bytes
-      // We need to convert to bytes array, find actual content length, then convert back
-      const keyBytes = new Uint8Array(
-        entry.key
-          .slice(2)
-          .match(/.{2}/g)
-          ?.map((byte) => parseInt(byte, 16)) || [],
-      );
+      const decodedKey = decodeMetadataKey(entry.key);
 
-      // Find the last non-zero byte
-      let actualLength = keyBytes.length;
-      while (actualLength > 0 && keyBytes[actualLength - 1] === 0) {
-        actualLength--;
-      }
-
-      // Extract only the actual content
-      const actualBytes = keyBytes.slice(0, actualLength);
-
-      // Convert back to string
-      const keyString = new TextDecoder().decode(actualBytes);
-
-      // Filter out null bytes and trim the string
-      const cleanKeyString = keyString.replace(/\0/g, "").trim();
-
-      // Parse the format "type key" to extract type and original key
-      const spaceIndex = cleanKeyString.indexOf(" ");
-
-      if (spaceIndex > 0) {
-        const type = cleanKeyString
-          .substring(0, spaceIndex)
-          .trim() as MetadataType;
-        const originalKey = cleanKeyString.substring(spaceIndex + 1).trim();
-
-        // Validate it's a known MetadataType using the constants object values
-        if (Object.values(MetadataTypeValues).includes(type)) {
-          map[entry.key] = { key: originalKey, type };
-        }
-      }
+      map[entry.key] = decodedKey;
     } catch (error) {
       // If we can't parse the key, skip it
       console.warn(`Could not parse metadata key ${entry.key}:`, error);
@@ -499,73 +679,21 @@ export function decodeMetadataTypes(
 }
 
 /**
- * Decodes a string value from encoded metadata bytes
+ * Encodes an address value as bytes for metadata
  *
- * @param encodedValue - The hex-encoded bytes
- * @returns The decoded string value. If the value can't be decoded, it will return an empty string.
+ * @param value - The address value to use
+ * @returns The address as is if valid
+ *
+ * @throws If the value is not a valid address in hex format
  */
-export function decodeStringValue(encodedValue: Hex): string | Json {
-  // For strings, we need to handle both regular strings and JSON objects
-  try {
-    const decoded = new TextDecoder().decode(
-      new Uint8Array(
-        encodedValue
-          .slice(2)
-          .match(/.{2}/g)
-          ?.map((byte) => parseInt(byte, 16)) || [],
-      ),
+export function encodeAddressValue(value: Hex): Hex {
+  if (!isAddress(value)) {
+    throw new Error(
+      `Value must be a valid address for address type, got ${value}`,
     );
-
-    // Try to parse as JSON first (for objects), fall back to string
-    try {
-      return JSON.parse(decoded);
-    } catch {
-      return decoded;
-    }
-  } catch {
-    return "";
   }
-}
 
-/**
- * Decodes a boolean value from encoded metadata bytes
- *
- * @param encodedValue - The hex-encoded bytes (32 bytes, 1 for true, 0 for false)
- * @returns The decoded boolean value. If the value can't be decoded, it will return false.
- */
-export function decodeBoolValue(encodedValue: Hex): boolean {
-  try {
-    // Convert hex to bigint and check if it's 1 (true) or 0 (false)
-    const value = BigInt(encodedValue);
-    return value === 1n;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Decodes a number value from encoded metadata bytes
- *
- * @param encodedValue - The hex-encoded bytes (32 bytes big-endian)
- * @param isSigned - Whether the number is signed (for two's complement handling)
- * @returns The decoded number value (as bigint for safety). If the value can't be decoded, it will return 0n.
- */
-export function decodeNumberValue(
-  encodedValue: Hex,
-  isSigned: boolean = false,
-): bigint {
-  try {
-    const value = BigInt(encodedValue);
-
-    if (isSigned && value > (1n << 255n) - 1n) {
-      // Handle two's complement for negative numbers
-      return value - (1n << 256n);
-    }
-
-    return value;
-  } catch {
-    return 0n;
-  }
+  return value;
 }
 
 /**
@@ -577,6 +705,22 @@ export function decodeNumberValue(
 export function decodeAddressValue(encodedValue: Hex): Hex {
   // Addresses are stored as-is in hex format
   return encodedValue as Hex;
+}
+
+/**
+ * Encodes a bytes value as bytes for metadata
+ *
+ * @param value - The bytes value to use
+ * @returns The bytes as is if valid
+ *
+ * @throws If the value is not a valid hex string
+ */
+export function encodeBytesValue(value: Hex | Uint8Array): Hex {
+  if (isHex(value)) {
+    return value;
+  }
+
+  return toHex(value);
 }
 
 /**
@@ -622,6 +766,7 @@ export function decodeMetadataValue(
     case "bytes":
       return decodeBytesValue(entry.value);
     default:
+      (type) satisfies never;
       return entry.value; // Return raw hex for unknown types
   }
 }

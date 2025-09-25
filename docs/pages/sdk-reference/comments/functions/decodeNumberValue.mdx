@@ -10,9 +10,11 @@
 function decodeNumberValue(encodedValue, isSigned): bigint;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:553](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L553)
+Defined in: [packages/sdk/src/comments/metadata.ts:266](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L266)
 
-Decodes a number value from encoded metadata bytes
+Decodes a number value from encoded metadata bytes.
+
+Be careful this returns only big ints, decimal numbers are not supported.
 
 ## Parameters
 

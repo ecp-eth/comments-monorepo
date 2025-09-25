@@ -10,9 +10,11 @@
 function decodeStringValue(encodedValue): Json;
 ```
 
-Defined in: [packages/sdk/src/comments/metadata.ts:507](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L507)
+Defined in: [packages/sdk/src/comments/metadata.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/metadata.ts#L184)
 
-Decodes a string value from encoded metadata bytes
+Decodes a string value from encoded metadata bytes.
+
+If the string is valid JSON value, it returns the parsed JSON value. Otherwise it returns string.
 
 ## Parameters
 
