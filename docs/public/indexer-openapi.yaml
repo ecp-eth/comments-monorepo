@@ -9533,6 +9533,25 @@ paths:
                     description: The error message
                 required:
                   - message
+    delete:
+      tags:
+        - user
+      description: Delete the current user
+      responses:
+        '204':
+          description: User deleted successfully
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
   /api/apps:
     post:
       tags:
