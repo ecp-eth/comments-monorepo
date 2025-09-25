@@ -36,12 +36,12 @@ export class CommentReferencesCacheService
         and(
           eq(schema.commentReferenceResolutionResults.commentId, commentId),
           eq(
-            schema.commentReferenceResolutionResults.revision,
+            schema.commentReferenceResolutionResults.commentRevision,
             commentRevision,
           ),
         ),
       )
-      .orderBy(desc(schema.commentReferenceResolutionResults.revision))
+      .orderBy(desc(schema.commentReferenceResolutionResults.commentRevision))
       .limit(1);
 
     return result[0] ?? null;
@@ -63,14 +63,14 @@ export class CommentReferencesCacheService
         .insert(schema.commentReferenceResolutionResults)
         .values({
           commentId,
-          revision: commentRevision,
+          commentRevision: commentRevision,
           references,
           referencesResolutionStatus,
         })
         .onConflictDoUpdate({
           target: [
             schema.commentReferenceResolutionResults.commentId,
-            schema.commentReferenceResolutionResults.revision,
+            schema.commentReferenceResolutionResults.commentRevision,
           ],
           set: {
             references,

@@ -28,7 +28,10 @@ export class ClassificationCacheService
         },
         where: and(
           eq(schema.commentClassificationResults.commentId, commentId),
-          eq(schema.commentClassificationResults.revision, commentRevision),
+          eq(
+            schema.commentClassificationResults.commentRevision,
+            commentRevision,
+          ),
         ),
       })
       .execute();
@@ -45,14 +48,14 @@ export class ClassificationCacheService
       .insert(schema.commentClassificationResults)
       .values({
         commentId: params.commentId,
-        revision: params.commentRevision,
+        commentRevision: params.commentRevision,
         labels: params.result.labels,
         score: params.result.score,
       })
       .onConflictDoUpdate({
         target: [
           schema.commentClassificationResults.commentId,
-          schema.commentClassificationResults.revision,
+          schema.commentClassificationResults.commentRevision,
         ],
         set: {
           labels: params.result.labels,
@@ -71,7 +74,10 @@ export class ClassificationCacheService
       .where(
         and(
           eq(schema.commentClassificationResults.commentId, commentId),
-          eq(schema.commentClassificationResults.revision, commentRevision),
+          eq(
+            schema.commentClassificationResults.commentRevision,
+            commentRevision,
+          ),
         ),
       )
       .execute();

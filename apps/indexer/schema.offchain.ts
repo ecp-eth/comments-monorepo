@@ -52,9 +52,11 @@ export const commentClassificationResults = offchainSchema.table(
     updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     labels: jsonb().notNull().$type<CommentModerationLabelsWithScore>(),
     score: doublePrecision().notNull(),
-    revision: integer().notNull().default(0),
+    commentRevision: integer().notNull().default(0),
   },
-  (table) => [primaryKey({ columns: [table.commentId, table.revision] })],
+  (table) => [
+    primaryKey({ columns: [table.commentId, table.commentRevision] }),
+  ],
 );
 
 export const commentReferenceResolutionResults = offchainSchema.table(
@@ -71,11 +73,11 @@ export const commentReferenceResolutionResults = offchainSchema.table(
     })
       .notNull()
       .default("pending"),
-    revision: integer().notNull().default(0),
+    commentRevision: integer().notNull().default(0),
   },
   (table) => [
     primaryKey({
-      columns: [table.commentId, table.revision],
+      columns: [table.commentId, table.commentRevision],
     }),
     check(
       "comment_reference_resolution_status_enum",
@@ -101,10 +103,10 @@ export const commentModerationStatuses = offchainSchema.table(
       .default("pending")
       .$type<ModerationStatus>(),
     updatedBy: text().notNull().default("premoderation"),
-    revision: integer().notNull(),
+    commentRevision: integer().notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.commentId, table.revision] }),
+    primaryKey({ columns: [table.commentId, table.commentRevision] }),
     check(
       "moderation_status_enum",
       sql`${table.moderationStatus} IN ('pending', 'approved', 'rejected')`,

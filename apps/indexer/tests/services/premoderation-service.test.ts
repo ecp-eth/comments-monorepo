@@ -131,7 +131,7 @@ describe("PremoderationService", () => {
         createdAt: new Date(),
         moderationStatus: "approved",
         updatedAt: new Date(),
-        revision: 0,
+        commentRevision: 0,
         commentId: "0x123" as Hex,
         updatedBy: "premoderation",
       };
@@ -193,7 +193,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -237,7 +237,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "approved",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -281,7 +281,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -368,7 +368,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -419,7 +419,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "approved",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -470,7 +470,7 @@ describe("PremoderationService", () => {
         commentId: mockComment.id,
         moderationStatus: "pending",
         updatedAt: expect.any(Date),
-        revision: mockComment.revision,
+        commentRevision: mockComment.revision,
         updatedBy: "premoderation",
       });
     });
@@ -497,7 +497,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: new Date(),
-        revision: 0,
+        commentRevision: 0,
       } as CommentModerationStatusesSelectType);
       vi.mocked(commentFindFirstMock).mockResolvedValueOnce(undefined);
 
@@ -522,7 +522,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: new Date(),
-        revision: 0,
+        commentRevision: 0,
       } as CommentModerationStatusesSelectType);
       vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
 
@@ -547,7 +547,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: new Date(),
-        revision: 0,
+        commentRevision: 0,
       } as CommentModerationStatusesSelectType);
       vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
       vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
@@ -569,7 +569,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
-        revision: 0,
+        commentRevision: 0,
         updatedBy: "premoderation",
       });
 
@@ -604,7 +604,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: new Date(),
-        revision: 1,
+        commentRevision: 1,
       } as CommentModerationStatusesSelectType);
       vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
       vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
@@ -626,7 +626,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: expect.any(Date),
-        revision: 1,
+        commentRevision: 1,
         updatedBy: "premoderation",
       });
 
@@ -661,7 +661,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "approved" as ModerationStatus,
         updatedAt: new Date(),
-        revision: 1,
+        commentRevision: 1,
       } as CommentModerationStatusesSelectType);
       vi.mocked(commentFindFirstMock).mockResolvedValueOnce(mockedComment);
       vi.mocked(dbUpdateExecuteMock).mockResolvedValueOnce([mockedComment]);
@@ -682,7 +682,7 @@ describe("PremoderationService", () => {
         commentId: "0x123" as Hex,
         moderationStatus: "pending" as ModerationStatus,
         updatedAt: expect.any(Date),
-        revision: 1,
+        commentRevision: 1,
         updatedBy: "premoderation",
       });
 

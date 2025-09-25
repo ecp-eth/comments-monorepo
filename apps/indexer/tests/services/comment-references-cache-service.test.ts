@@ -137,14 +137,14 @@ describe("CommentReferencesCacheService", () => {
       );
       expect(dbInsertValuesMock).toHaveBeenCalledWith({
         commentId: mockCommentId,
-        revision: mockCommentRevision,
+        commentRevision: mockCommentRevision,
         references: mockReference,
         referencesResolutionStatus: mockStatus,
       });
       expect(dbOnConflictDoUpdateMock).toHaveBeenCalledWith({
         target: [
           schema.commentReferenceResolutionResults.commentId,
-          schema.commentReferenceResolutionResults.revision,
+          schema.commentReferenceResolutionResults.commentRevision,
         ],
         set: {
           references: mockReference,

@@ -72,7 +72,7 @@ export class PremoderationService implements ICommentPremoderationService {
             commentId: comment.id,
             moderationStatus: status,
             updatedAt: changedAt,
-            revision: comment.revision,
+            commentRevision: comment.revision,
             updatedBy: "premoderation",
           })
           .execute();
@@ -127,7 +127,7 @@ export class PremoderationService implements ICommentPremoderationService {
             commentId: comment.id,
             moderationStatus: status,
             updatedAt: changedAt,
-            revision: comment.revision,
+            commentRevision: comment.revision,
             updatedBy: "premoderation",
           })
           .execute();
@@ -183,13 +183,13 @@ export class PremoderationService implements ICommentPremoderationService {
           commentId,
           moderationStatus: status,
           updatedAt: changedAt,
-          revision: commentModerationStatus.revision,
+          commentRevision: commentModerationStatus.commentRevision,
           updatedBy,
         })
         .onConflictDoUpdate({
           target: [
             schema.commentModerationStatuses.commentId,
-            schema.commentModerationStatuses.revision,
+            schema.commentModerationStatuses.commentRevision,
           ],
           set: {
             moderationStatus: status,
@@ -244,8 +244,8 @@ export class PremoderationService implements ICommentPremoderationService {
             eq(schema.commentModerationStatuses.commentId, commentId),
             eq(schema.commentModerationStatuses.moderationStatus, "pending"),
             lt(
-              schema.commentModerationStatuses.revision,
-              commentModerationStatus.revision,
+              schema.commentModerationStatuses.commentRevision,
+              commentModerationStatus.commentRevision,
             ),
           ),
         )
@@ -269,7 +269,7 @@ export class PremoderationService implements ICommentPremoderationService {
     return this.db.query.commentModerationStatuses.findFirst({
       where: and(
         eq(schema.commentModerationStatuses.commentId, commentId),
-        eq(schema.commentModerationStatuses.revision, commentRevision),
+        eq(schema.commentModerationStatuses.commentRevision, commentRevision),
       ),
     });
   }
@@ -279,7 +279,7 @@ export class PremoderationService implements ICommentPremoderationService {
   ): Promise<CommentModerationStatusesSelectType | undefined> {
     return this.db.query.commentModerationStatuses.findFirst({
       where: eq(schema.commentModerationStatuses.commentId, commentId),
-      orderBy: desc(schema.commentModerationStatuses.revision),
+      orderBy: desc(schema.commentModerationStatuses.commentRevision),
     });
   }
 

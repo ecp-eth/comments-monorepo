@@ -96,6 +96,8 @@ export class CommentReferencesResolutionService
 
       return latestReferenceResult;
     } catch (error) {
+      console.error(error);
+
       Sentry.captureException(error, {
         extra: {
           commentId,
