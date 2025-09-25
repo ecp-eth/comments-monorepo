@@ -9,9 +9,14 @@ import { CommentReportsService } from "./comment-reports-service.ts";
 import { CommentModerationService } from "../management/services/comment-moderation-service.ts";
 import { type Hex } from "@ecp.eth/sdk/core";
 import { ensByAddressResolverService } from "./ens-by-address-resolver.ts";
-import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
 import { ReportsNotificationsService } from "./reports-notifications-service.ts";
 import { TelegramNotificationsService } from "./telegram-notifications-service.ts";
+import { ensByNameResolverService } from "./ens-by-name-resolver.ts";
+import { erc20ByAddressResolverService } from "./erc20-by-address-resolver.ts";
+import { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
+import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
+import { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
+import { urlResolverService } from "./url-resolver.ts";
 import { NoopAdminBotService } from "./admin-noop-bot-service.ts";
 import { AdminTelegramBotService } from "./admin-telegram-bot-service/index.ts";
 import { StartCommand } from "./admin-telegram-bot-service/commands/start.ts";
@@ -28,16 +33,11 @@ import { createSiweMiddleware } from "../middleware/siwe.ts";
 import { AppManager } from "./app-manager-service.ts";
 import { AppWebhookManager } from "./app-webhook-manager-service.ts";
 import { EventOutboxService } from "./events/event-outbox-service.ts";
+import { resolveCommentReferences } from "../lib/resolve-comment-references.ts";
+import { CommentReferencesResolutionService } from "./comment-references-resolution-service.ts";
+import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
 
 export { db };
-
-export { ensByAddressResolverService } from "./ens-by-address-resolver.ts";
-export { ensByNameResolverService } from "./ens-by-name-resolver.ts";
-export { erc20ByAddressResolverService } from "./erc20-by-address-resolver.ts";
-export { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
-export { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
-export { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
-export { urlResolverService } from "./url-resolver.ts";
 
 function resolveAuthor(author: Hex): Promise<string | Hex> {
   return ensByAddressResolverService.load(author).then((data) => {
@@ -181,3 +181,22 @@ export const appWebhookManager = new AppWebhookManager({
   db,
   eventOutboxService,
 });
+
+export const commentReferencesCacheService = new CommentReferencesCacheService(
+  db,
+);
+
+export const commentReferencesResolutionService =
+  new CommentReferencesResolutionService({
+    resolveCommentReferences: resolveCommentReferences,
+    commentReferencesResolvers: {
+      ensByAddressResolver: ensByAddressResolverService,
+      ensByNameResolver: ensByNameResolverService,
+      erc20ByAddressResolver: erc20ByAddressResolverService,
+      erc20ByTickerResolver: erc20ByTickerResolverService,
+      farcasterByAddressResolver: farcasterByAddressResolverService,
+      farcasterByNameResolver: farcasterByNameResolverService,
+      urlResolver: urlResolverService,
+    },
+    commentReferencesCacheService: commentReferencesCacheService,
+  });

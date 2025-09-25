@@ -9,23 +9,10 @@ import {
   db,
   eventOutboxService,
   mutedAccountsManagementService,
+  commentReferencesResolutionService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
-import {
-  resolveCommentReferences,
-  type ResolveCommentReferencesOptions,
-} from "../lib/resolve-comment-references.ts";
-import {
-  ensByAddressResolverService,
-  ensByNameResolverService,
-  erc20ByAddressResolverService,
-  erc20ByTickerResolverService,
-  farcasterByAddressResolverService,
-  farcasterByNameResolverService,
-  urlResolverService,
-} from "../services/index.ts";
-
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { env } from "../env.ts";
 import { eq } from "drizzle-orm";
@@ -38,16 +25,6 @@ import {
 } from "../events/comment/index.ts";
 import { schema } from "../../schema.ts";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
-
-const commentResolverReferences: ResolveCommentReferencesOptions = {
-  ensByAddressResolver: ensByAddressResolverService,
-  ensByNameResolver: ensByNameResolverService,
-  erc20ByAddressResolver: erc20ByAddressResolverService,
-  erc20ByTickerResolver: erc20ByTickerResolverService,
-  farcasterByAddressResolver: farcasterByAddressResolverService,
-  farcasterByNameResolver: farcasterByNameResolverService,
-  urlResolver: urlResolverService,
-};
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -142,13 +119,13 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         rootCommentId = parentComment.rootCommentId ?? parentComment.id;
       }
 
-      const referencesResolutionResult = await resolveCommentReferences(
-        {
-          chainId: context.chain.id,
+      const referencesResolutionResult =
+        await commentReferencesResolutionService.resolveFromCacheFirst({
+          commentId: event.args.commentId,
+          commentRevision: 0,
           content: event.args.content,
-        },
-        commentResolverReferences,
-      );
+          chainId: context.chain.id,
+        });
 
       // We need to check if the comment already has a moderation status
       // this is useful during the reindex process
@@ -402,16 +379,15 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       }
 
       const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
-
-      const referencesResolutionResult = await resolveCommentReferences(
-        {
-          chainId: context.chain.id,
-          content: event.args.content,
-        },
-        commentResolverReferences,
-      );
-
       const newCommentRevision = existingComment.revision + 1;
+
+      const referencesResolutionResult =
+        await commentReferencesResolutionService.resolveFromCacheFirst({
+          commentId: event.args.commentId,
+          content: event.args.content,
+          commentRevision: newCommentRevision,
+          chainId: context.chain.id,
+        });
 
       const moderationResult = await commentModerationService.moderateUpdate({
         comment: event.args,

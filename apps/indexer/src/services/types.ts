@@ -7,6 +7,7 @@ import type { CommentReportStatus } from "../management/types.ts";
 import type { Handler } from "hono";
 import type {
   CommentModerationStatusesSelectType,
+  CommentReferenceResolutionResultsSelectType,
   CommentReportSelectType,
 } from "../../schema.offchain.ts";
 
@@ -329,4 +330,55 @@ export interface ITelegramNotificationsService {
 export interface IAdminTelegramBotService {
   initialize: () => Promise<void>;
   handleWebhookRequest: Handler;
+}
+
+/**
+ * Interface for comment reference resolution service
+ */
+export type CommentReferencesResolutionServiceResolveFromCacheFirstParams =
+  Pick<CommentSelectType, "content" | "chainId"> & {
+    commentId: CommentSelectType["id"];
+    commentRevision: CommentSelectType["revision"];
+  };
+
+export type CommentReferencesResolutionServiceResolveFromCacheFirstResult = {
+  references: IndexerAPICommentReferencesSchemaType;
+  status: CommentSelectType["referencesResolutionStatus"];
+};
+
+export interface ICommentReferencesResolutionService {
+  /**
+   * Resolve references from cache first, only fetch from network if not in cache
+   */
+  resolveFromCacheFirst(
+    comment: CommentReferencesResolutionServiceResolveFromCacheFirstParams,
+  ): Promise<CommentReferencesResolutionServiceResolveFromCacheFirstResult>;
+}
+
+/**
+ * Interface for comment reference cache service
+ */
+export type CommentReferencesCacheServiceGetReferenceResolutionResultParams = {
+  commentId: Hex;
+  commentRevision: number;
+};
+
+export type CommentReferencesCacheServiceGetReferenceResolutionResult = Pick<
+  CommentReferenceResolutionResultsSelectType,
+  "references" | "referencesResolutionStatus" | "updatedAt"
+> | null;
+
+export type CommentReferencesCacheServiceUpdateReferenceResolutionResultParams =
+  Pick<CommentSelectType, "references" | "referencesResolutionStatus"> & {
+    commentId: CommentSelectType["id"];
+    commentRevision: CommentSelectType["revision"];
+  };
+
+export interface ICommentReferencesCacheService {
+  getReferenceResolutionResult(
+    params: CommentReferencesCacheServiceGetReferenceResolutionResultParams,
+  ): Promise<CommentReferencesCacheServiceGetReferenceResolutionResult>;
+  updateReferenceResolutionResult(
+    params: CommentReferencesCacheServiceUpdateReferenceResolutionResultParams,
+  ): Promise<void>;
 }

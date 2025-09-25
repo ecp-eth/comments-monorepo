@@ -78,6 +78,13 @@
       "when": 1758286752225,
       "tag": "0010_event_outbox_prevent_replay",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1758813519407,
+      "tag": "0011_lonely_bullseye",
+      "breakpoints": true
     }
   ]
 }

@@ -28,6 +28,7 @@ import type {
   EventOutboxAggregateType,
 } from "./src/events/types.ts";
 import type { WebhookAuthConfig } from "./src/webhooks/schemas.ts";
+import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
@@ -55,6 +56,39 @@ export const commentClassificationResults = offchainSchema.table(
   },
   (table) => [primaryKey({ columns: [table.commentId, table.revision] })],
 );
+
+export const commentReferenceResolutionResults = offchainSchema.table(
+  "comment_reference_resolution_results",
+  {
+    commentId: text().notNull().$type<Hex>(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    references: jsonb()
+      .notNull()
+      .$type<IndexerAPICommentReferencesSchemaType>(),
+    referencesResolutionStatus: text({
+      enum: ["success", "pending", "partial", "failed"],
+    })
+      .notNull()
+      .default("pending"),
+    revision: integer().notNull().default(0),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.commentId, table.revision],
+    }),
+    check(
+      "comment_reference_resolution_status_enum",
+      sql`${table.referencesResolutionStatus} IN ('success', 'pending', 'partial', 'failed')`,
+    ),
+    index("comment_reference_resolution_results_by_status_idx").on(
+      table.referencesResolutionStatus,
+    ),
+  ],
+);
+
+export type CommentReferenceResolutionResultsSelectType =
+  typeof commentReferenceResolutionResults.$inferSelect;
 
 export const commentModerationStatuses = offchainSchema.table(
   "comment_moderation_statuses",
