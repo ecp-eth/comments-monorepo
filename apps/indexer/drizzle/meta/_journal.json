@@ -85,6 +85,13 @@
       "when": 1758813519407,
       "tag": "0011_lonely_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1758834940059,
+      "tag": "0012_pink_stardust",
+      "breakpoints": true
     }
   ]
 }
