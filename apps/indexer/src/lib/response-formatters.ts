@@ -129,6 +129,10 @@ export const createUserDataAndFormatSingleCommentResponseResolver = (
     const slicedReplies = replies.slice(0, replyLimit);
     const startReply = slicedReplies[0];
     const endReply = slicedReplies[slicedReplies.length - 1];
+    const extra = {
+      moderationEnabled: env.MODERATION_ENABLED,
+      moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
+    };
 
     return {
       ...formatComment(comment),
@@ -139,10 +143,7 @@ export const createUserDataAndFormatSingleCommentResponseResolver = (
       ),
       viewerReactions: formatViewerReactions(viewerReactions),
       replies: {
-        extra: {
-          moderationEnabled: env.MODERATION_ENABLED,
-          moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
-        },
+        extra,
         results: slicedReplies.map((reply) => {
           const resolvedAuthorEnsData = resolveUserData(
             resolvedAuthorsEnsData,
@@ -163,6 +164,7 @@ export const createUserDataAndFormatSingleCommentResponseResolver = (
 
             // do not go deeper than first level of replies
             replies: {
+              extra,
               results: [],
               pagination: {
                 limit: 0,
