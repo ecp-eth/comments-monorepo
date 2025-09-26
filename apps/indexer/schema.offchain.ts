@@ -28,7 +28,7 @@ import type {
   EventOutboxAggregateType,
 } from "./src/events/types.ts";
 import type { WebhookAuthConfig } from "./src/webhooks/schemas.ts";
-import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { type IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export const offchainSchema = pgSchema(ECP_INDEXER_SCHEMA_NAME);
 
