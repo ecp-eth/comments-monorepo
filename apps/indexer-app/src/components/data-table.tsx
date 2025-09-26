@@ -48,6 +48,7 @@ type DataTableProps<TData = unknown> = {
   columns: ColumnDef<TData>[];
   state?: Partial<TableState>;
   tableActions?: React.ReactNode;
+  tableFilters?: React.ReactNode;
   pagination?: PaginationOptionsFunction<TData>;
 };
 
@@ -56,6 +57,7 @@ export function DataTable<TData = unknown>({
   columns,
   state,
   tableActions,
+  tableFilters,
   pagination,
 }: DataTableProps<TData>) {
   const paginationOptions = pagination?.();
@@ -86,6 +88,9 @@ export function DataTable<TData = unknown>({
   return (
     <div className="flex flex-col w-full justify-start gap-6">
       <div className="flex items-center justify-between">
+        {tableFilters && (
+          <div className="flex items-center gap-2">{tableFilters}</div>
+        )}
         {tableActions && (
           <div className="ml-auto flex items-center gap-2">{tableActions}</div>
         )}

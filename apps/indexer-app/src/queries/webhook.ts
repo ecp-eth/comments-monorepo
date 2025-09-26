@@ -8,8 +8,11 @@ import {
   type AppWebhookSchemaType,
   type AppWebhookListDeliveryAttemptsResponseSchemaType,
   AppWebhookListDeliveryAttemptsResponseSchema,
+  type AppWebhookListDeliveriesResponseSchemaType,
+  AppWebhookListDeliveriesResponseSchema,
 } from "@/api/schemas/apps";
 import {
+  createWebhookDeliveriesQueryKey,
   createWebhookDeliveryAttemptsQueryKey,
   createWebhookQueryKey,
 } from "./query-keys";
@@ -67,6 +70,93 @@ export function useWebhookQuery({
   });
 }
 
+type UseWebhookDeliveriesQueryOptions = Omit<
+  UseQueryOptions<
+    AppWebhookListDeliveriesResponseSchemaType,
+    Error,
+    AppWebhookListDeliveriesResponseSchemaType,
+    ReturnType<typeof createWebhookDeliveriesQueryKey>
+  >,
+  "queryKey" | "queryFn"
+> & {
+  appId: string;
+  webhookId: string;
+  page?: {
+    cursor: string;
+    direction: "previous" | "next";
+  };
+  limit?: number;
+  status?: ("pending" | "processing" | "failed" | "success")[];
+};
+
+export function useWebhookDeliveriesQuery({
+  appId,
+  webhookId,
+  page,
+  limit,
+  status,
+  ...options
+}: UseWebhookDeliveriesQueryOptions) {
+  const auth = useAuth();
+
+  return useQuery({
+    queryKey: createWebhookDeliveriesQueryKey({
+      appId,
+      webhookId,
+      page,
+      limit,
+      status,
+    }),
+    queryFn: async ({ signal }) => {
+      const response = await secureFetch(auth, async ({ headers }) => {
+        const url = createFetchUrl(
+          `/api/apps/${appId}/webhooks/${webhookId}/deliveries`,
+        );
+
+        if (page) {
+          if (page.direction === "next") {
+            url.searchParams.set("after", page.cursor);
+          } else {
+            url.searchParams.set("before", page.cursor);
+          }
+        }
+
+        if (limit) {
+          url.searchParams.set("limit", limit.toString());
+        }
+
+        if (status && status.length > 0) {
+          url.searchParams.set("status", status.join(","));
+        }
+
+        return fetch(url, {
+          signal,
+          headers,
+        });
+      });
+
+      if (response.status === 401) {
+        throw new UnauthorizedError();
+      }
+
+      if (response.status === 404) {
+        throw new WebhookNotFoundError();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch webhook deliveries: ${response.statusText}`,
+        );
+      }
+
+      return AppWebhookListDeliveriesResponseSchema.parse(
+        await response.json(),
+      );
+    },
+    ...options,
+  });
+}
+
 type UseWebhookDeliveryAttemptsQueryOptions = Omit<
   UseQueryOptions<
     AppWebhookListDeliveryAttemptsResponseSchemaType,
@@ -78,6 +168,7 @@ type UseWebhookDeliveryAttemptsQueryOptions = Omit<
 > & {
   appId: string;
   webhookId: string;
+  deliveryId?: string;
   page?: {
     cursor: string;
     direction: "previous" | "next";
@@ -88,6 +179,7 @@ type UseWebhookDeliveryAttemptsQueryOptions = Omit<
 export function useWebhookDeliveryAttemptsQuery({
   appId,
   webhookId,
+  deliveryId,
   page,
   limit,
   ...options
@@ -98,6 +190,7 @@ export function useWebhookDeliveryAttemptsQuery({
     queryKey: createWebhookDeliveryAttemptsQueryKey({
       appId,
       webhookId,
+      deliveryId,
       page,
       limit,
     }),
@@ -117,6 +210,10 @@ export function useWebhookDeliveryAttemptsQuery({
 
         if (limit) {
           url.searchParams.set("limit", limit.toString());
+        }
+
+        if (deliveryId) {
+          url.searchParams.set("webhookDeliveryId", deliveryId);
         }
 
         return fetch(url, {

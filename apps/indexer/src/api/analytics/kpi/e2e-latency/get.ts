@@ -112,6 +112,7 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
                 CASE WHEN (a.response_status BETWEEN 200 AND 399) THEN a.attempted_at END
               ) as first_success
             FROM ${schema.appWebhookDeliveryAttempt} a
+            JOIN ${schema.appWebhookDelivery} d ON (d.id = a.app_webhook_delivery_id AND d.retry_number = 0)
             JOIN webhooks ON (a.app_webhook_id = webhooks.id)
             WHERE 
               a.attempted_at >= ${fromToUse}::timestamptz 
