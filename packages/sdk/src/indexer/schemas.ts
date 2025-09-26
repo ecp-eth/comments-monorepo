@@ -346,7 +346,7 @@ export const IndexerAPICommentReferencesSchema = z
   }) as z.ZodType<
   z.output<typeof IndexerAPICommentReferenceSchema>[],
   z.ZodTypeDef,
-  // overwrite the input type as zod .catch() causes input type to became `unknown`
+  // overwrite the input type as zod `.or(z.unknown())`/`.catch()` causes input type to became `unknown`
   // stricten the input type here will help us to catch invalid input earlier in this case and avoid
   // unnecessary input type inferring in various places.
   z.input<typeof IndexerAPICommentReferenceSchema>[]

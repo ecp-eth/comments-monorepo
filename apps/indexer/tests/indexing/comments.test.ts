@@ -6,6 +6,7 @@ import { Event } from "ponder:registry";
 // Mock Sentry to avoid real reporting
 vi.mock("@sentry/node", () => ({
   captureMessage: vi.fn(),
+  captureException: vi.fn(),
 }));
 
 // Minimal stub for ponder schema used by the SUT
@@ -53,6 +54,16 @@ vi.mock("../../src/services/index.ts", async () => {
       getMutedAccount: vi.spyOn(
         services.mutedAccountsManagementService,
         "getMutedAccount",
+      ),
+    },
+    commentReferencesCacheService: {
+      getReferenceResolutionResult: vi.spyOn(
+        services.commentReferencesCacheService,
+        "getReferenceResolutionResult",
+      ),
+      updateReferenceResolutionResult: vi.spyOn(
+        services.commentReferencesCacheService,
+        "updateReferenceResolutionResult",
       ),
     },
     db: {
@@ -262,6 +273,14 @@ describe("initializeCommentEventsIndexing", () => {
         undefined,
       );
 
+      servicesMock.commentReferencesCacheService.getReferenceResolutionResult.mockResolvedValueOnce(
+        null,
+      );
+
+      servicesMock.commentReferencesCacheService.updateReferenceResolutionResult.mockResolvedValueOnce(
+        undefined,
+      );
+
       // @ts-expect-error -- mock
       servicesMock.db.insert.mockReturnValueOnce({
         values: vi.fn().mockReturnValueOnce({
@@ -285,6 +304,12 @@ describe("initializeCommentEventsIndexing", () => {
         servicesMock.eventOutboxService.publishEvent,
       ).toHaveBeenCalledOnce();
       expect(saveAndNotifyMock).toHaveBeenCalledOnce();
+
+      // should update the reference resolution result bcz getReferenceResolutionResult is null
+      expect(
+        servicesMock.commentReferencesCacheService
+          .updateReferenceResolutionResult,
+      ).toHaveBeenCalledOnce();
     });
 
     it("skips when parent not found and parentId provided", async () => {
@@ -327,6 +352,14 @@ describe("initializeCommentEventsIndexing", () => {
       });
 
       servicesMock.mutedAccountsManagementService.getMutedAccount.mockResolvedValueOnce(
+        undefined,
+      );
+
+      servicesMock.commentReferencesCacheService.getReferenceResolutionResult.mockResolvedValueOnce(
+        null,
+      );
+
+      servicesMock.commentReferencesCacheService.updateReferenceResolutionResult.mockResolvedValueOnce(
         undefined,
       );
 
@@ -546,6 +579,13 @@ describe("initializeCommentEventsIndexing", () => {
           },
           saveAndNotify: saveAndNotifyMock,
         },
+      );
+
+      servicesMock.commentReferencesCacheService.getReferenceResolutionResult.mockResolvedValueOnce(
+        null,
+      );
+      servicesMock.commentReferencesCacheService.updateReferenceResolutionResult.mockResolvedValueOnce(
+        undefined,
       );
 
       servicesMock.db.transaction.mockImplementation((cb) => {
