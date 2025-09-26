@@ -7,7 +7,7 @@ const workerCommand = new Command()
     "-i, --indexer-url <url>",
     "The URL of the indexer",
     (value) => z.string().url().parse(value),
-    "https://localhost:42069",
+    "http://localhost:42069",
   );
 
 type WorkerCommandOptions = {
