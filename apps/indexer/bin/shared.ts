@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { z } from "zod";
 
-const workerCommand = new Command()
+export const workerCommand = new Command()
   .option("--no-wait-for-indexer", "Do not wait for indexer to be ready")
   .option(
     "-i, --indexer-url <url>",
@@ -15,6 +15,8 @@ type WorkerCommandOptions = {
   indexerUrl: string;
 };
 
-export function parseWorkerCommandOptions(): WorkerCommandOptions {
-  return workerCommand.parse().opts<WorkerCommandOptions>();
+export function parseWorkerCommandOptions<ExtraOptions = object>(
+  command: Command = workerCommand,
+): WorkerCommandOptions & ExtraOptions {
+  return command.parse().opts<WorkerCommandOptions & ExtraOptions>();
 }

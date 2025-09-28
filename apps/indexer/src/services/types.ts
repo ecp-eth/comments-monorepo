@@ -1,6 +1,6 @@
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { WebhookCallbackData } from "../utils/webhook.ts";
-import type { CommentSelectType } from "ponder:schema";
+import type { CommentSelectType } from "../../ponder.schema.ts";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { Convenience, Message } from "telegraf/types";
 import type { CommentReportStatus } from "../management/types.ts";
@@ -335,13 +335,19 @@ export interface IAdminTelegramBotService {
 /**
  * Interface for comment reference resolution service
  */
-export type CommentReferencesResolutionServiceResolveFromCacheFirstParams =
-  Pick<CommentSelectType, "content" | "chainId"> & {
-    commentId: CommentSelectType["id"];
-    commentRevision: CommentSelectType["revision"];
-  };
+export type CommentReferencesResolutionServiceResolveParams = {
+  content: CommentSelectType["content"];
+  chainId: CommentSelectType["chainId"];
+  commentId: CommentSelectType["id"];
+  commentRevision: CommentSelectType["revision"];
+};
 
 export type CommentReferencesResolutionServiceResolveFromCacheFirstResult = {
+  references: IndexerAPICommentReferencesSchemaType;
+  status: CommentSelectType["referencesResolutionStatus"];
+};
+
+export type CommentReferencesResolutionServiceResolveFromNetworkResult = {
   references: IndexerAPICommentReferencesSchemaType;
   status: CommentSelectType["referencesResolutionStatus"];
 };
@@ -351,8 +357,15 @@ export interface ICommentReferencesResolutionService {
    * Resolve references from cache first, only fetch from network if not in cache
    */
   resolveFromCacheFirst(
-    comment: CommentReferencesResolutionServiceResolveFromCacheFirstParams,
+    comment: CommentReferencesResolutionServiceResolveParams,
   ): Promise<CommentReferencesResolutionServiceResolveFromCacheFirstResult>;
+
+  /**
+   * Resolve references from network first, only reuse existing cache if network failed completely or partially
+   */
+  resolveFromNetworkFirst(
+    comment: CommentReferencesResolutionServiceResolveParams,
+  ): Promise<CommentReferencesResolutionServiceResolveFromNetworkResult>;
 }
 
 /**

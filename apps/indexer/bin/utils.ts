@@ -1,3 +1,15 @@
+import * as Sentry from "@sentry/node";
+import { env } from "../src/env.ts";
+
+export function initSentry(environmentNamePrefix: string) {
+  Sentry.init({
+    enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
+    debug: !(process.env.NODE_ENV === "production" && !!env.SENTRY_DSN),
+    dsn: env.SENTRY_DSN,
+    environment: `${environmentNamePrefix}-${process.env.NODE_ENV || "development"}`,
+  });
+}
+
 export async function waitForIndexerToBeReady(params: {
   signal: AbortSignal;
   indexerUrl: string;

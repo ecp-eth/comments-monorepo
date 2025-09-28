@@ -86,6 +86,10 @@ export const commentReferenceResolutionResults = offchainSchema.table(
     index("comment_reference_resolution_results_by_status_idx").on(
       table.referencesResolutionStatus,
     ),
+    index("comment_reference_resolution_results_by_created_at_idx").on(
+      table.createdAt,
+      table.referencesResolutionStatus,
+    ),
   ],
 );
 
