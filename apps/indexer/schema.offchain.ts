@@ -155,6 +155,7 @@ export const user = offchainSchema.table("user", {
   id: uuid().primaryKey().defaultRandom(),
   createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  deletedAt: timestamp({ withTimezone: true }),
   role: text({ enum: ["admin", "user"] })
     .notNull()
     .default("user"),

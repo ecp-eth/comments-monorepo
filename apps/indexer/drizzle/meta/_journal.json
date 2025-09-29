@@ -99,6 +99,13 @@
       "when": 1758894596238,
       "tag": "0013_lying_chameleon",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1759134810322,
+      "tag": "0014_clumsy_radioactive_man",
+      "breakpoints": true
     }
   ]
 }

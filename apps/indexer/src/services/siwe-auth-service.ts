@@ -321,6 +321,9 @@ export class SiweAuthService implements ISiweAuthService {
               operators.eq(fields.identifier, address),
             );
           },
+          with: {
+            user: true,
+          },
         });
 
         if (!authCredentials) {
@@ -335,15 +338,36 @@ export class SiweAuthService implements ISiweAuthService {
           }
 
           // create credentials and account
-          [authCredentials] = await tx
+          const [newCredentials] = await tx
             .insert(schema.userAuthCredentials)
             .values({ identifier: address, method: "siwe", userId: user.id })
             .returning()
             .execute();
-        }
 
-        if (!authCredentials) {
-          throw new SiweAuthService_FailedToCreateAuthCredentialsError();
+          if (!newCredentials) {
+            throw new SiweAuthService_FailedToCreateAuthCredentialsError();
+          }
+
+          authCredentials = {
+            ...newCredentials,
+            user,
+          };
+        } else if (authCredentials.user.deletedAt) {
+          // reactivate the user
+          const [reactivatedUser] = await tx
+            .update(schema.user)
+            .set({
+              deletedAt: null,
+            })
+            .where(eq(schema.user.id, authCredentials.userId))
+            .returning()
+            .execute();
+
+          if (!reactivatedUser) {
+            throw new SiweAuthService_FailedToReactivateUserError();
+          }
+
+          authCredentials.user = reactivatedUser;
         }
 
         // create session
@@ -709,5 +733,12 @@ export class SiweAuthService_InvalidRefreshTokenError extends SiweAuthService_Er
   constructor() {
     super(`Invalid refresh token`);
     this.name = "SiweAuthService_InvalidRefreshTokenError";
+  }
+}
+
+export class SiweAuthService_FailedToReactivateUserError extends SiweAuthService_Error {
+  constructor() {
+    super(`Failed to reactivate user`);
+    this.name = "SiweAuthService_FailedToReactivateUserError";
   }
 }
