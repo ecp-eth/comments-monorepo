@@ -45,7 +45,10 @@ export function setupUsersMeDelete(app: OpenAPIHono) {
         }
 
         const [deletedUser] = await tx
-          .delete(schema.user)
+          .update(schema.user)
+          .set({
+            deletedAt: new Date(),
+          })
           .where(eq(schema.user.id, user.id))
           .returning()
           .execute();
@@ -55,11 +58,6 @@ export function setupUsersMeDelete(app: OpenAPIHono) {
             message: "Not authenticated",
           });
         }
-
-        await tx
-          .delete(schema.userAuthCredentials)
-          .where(eq(schema.userAuthCredentials.userId, user.id))
-          .execute();
       });
 
       return c.newResponse(null, 204);

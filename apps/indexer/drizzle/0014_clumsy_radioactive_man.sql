@@ -1,0 +1,1 @@
+ALTER TABLE "ecp_indexer_schema"."user" ADD COLUMN "deleted_at" timestamp with time zone;

@@ -96,6 +96,10 @@ export function DeleteAccountDialog({
                 <DrawerDescription>
                   Are you sure you want to delete your account?
                 </DrawerDescription>
+                <p className="text-sm text-muted-foreground">
+                  All your data will be deleted after 7 days unless you
+                  reactivate the account by signing in again.
+                </p>
               </DrawerHeader>
               <div className="flex flex-col gap-4 p-4 text-sm">
                 <FormField
@@ -172,6 +176,10 @@ export function DeleteAccountDialog({
               <DialogDescription>
                 Are you sure you want to delete your account?
               </DialogDescription>
+              <p className="text-sm text-muted-foreground">
+                All your data will be deleted after 7 days unless you reactivate
+                the account by signing in again.
+              </p>
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <FormField
