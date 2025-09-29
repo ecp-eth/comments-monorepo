@@ -1,0 +1,1 @@
+CREATE INDEX "comment_reference_resolution_results_by_created_at_idx" ON "ecp_indexer_schema"."comment_reference_resolution_results" USING btree ("created_at","references_resolution_status");
