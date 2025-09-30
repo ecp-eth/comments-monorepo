@@ -40,6 +40,7 @@ import { setupAppUpdate } from "./apps/[id]/patch";
 import { setupAppWebhookDeliveryAttemptsGet } from "./apps/[id]/webhooks/[id]/deliveries/attempts/get";
 import { setupAppWebhookDeliveryRetry } from "./apps/[id]/webhooks/[id]/deliveries/[id]/retry/post";
 import { setupAppWebhookDeliveriesGet } from "./apps/[id]/webhooks/[id]/deliveries/get";
+import { setupAppNotificationsSeenPost } from "./apps/[id]/notifications/seen/post";
 import { setupAnalyticsKpiDeliveriesGet } from "./analytics/kpi/deliveries/get";
 import { setupAnalyticsKpiEventualSuccessGet } from "./analytics/kpi/eventual-success/get";
 import { setupAnalyticsKpiFirstAttemptSuccessGet } from "./analytics/kpi/first-attempt-success/get";
@@ -107,6 +108,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAnalyticsE2ELatencyGet(app);
   setupAnalyticsSlaBandsGet(app);
   setupAnalyticsErrorsGet(app);
+  setupAppNotificationsSeenPost(app);
 
   return app;
 }
