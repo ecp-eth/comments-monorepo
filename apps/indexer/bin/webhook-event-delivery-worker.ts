@@ -4,20 +4,14 @@
  * This script is used to deliver events to webhooks that are subscribed to the event.
  */
 import * as Sentry from "@sentry/node";
-import { env } from "../src/env.ts";
+import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
 import { db } from "../src/services/db.ts";
-import { waitForIndexerToBeReady } from "./utils.ts";
 import { WebhookEventDeliveryService } from "../src/services/events/webhook-event-delivery-service.ts";
 import { parseWorkerCommandOptions } from "./shared.ts";
 
 const options = parseWorkerCommandOptions();
 
-Sentry.init({
-  enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
-  debug: !(process.env.NODE_ENV === "production" && !!env.SENTRY_DSN),
-  dsn: env.SENTRY_DSN,
-  environment: `webhook-event-delivery-worker-${process.env.NODE_ENV || "development"}`,
-});
+initSentry("webhook-event-delivery-worker");
 
 console.log("Starting webhook event delivery worker");
 const abortController = new AbortController();

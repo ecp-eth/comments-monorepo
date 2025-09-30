@@ -12,6 +12,10 @@ import { type Readable } from "node:stream";
 import readline from "node:readline";
 
 const GRACE_SHUTDOWN_DELAY_MS = 5000;
+const INDEXER_URL =
+  process.env.NODE_ENV === "production"
+    ? "http://localhost:8080"
+    : "http://localhost:42069";
 const PROCESSES = [
   {
     name: "indexer",
@@ -21,14 +25,7 @@ const PROCESSES = [
   {
     name: "worker:fan-out",
     command: "pnpm",
-    args: [
-      "run",
-      "worker:fan-out",
-      "--indexer-url",
-      process.env.NODE_ENV === "production"
-        ? "http://localhost:8080"
-        : "http://localhost:42069",
-    ],
+    args: ["run", "worker:fan-out", "--indexer-url", INDEXER_URL],
   },
   {
     name: "worker:webhook-event-delivery",
@@ -37,9 +34,7 @@ const PROCESSES = [
       "run",
       "worker:webhook-event-delivery",
       "--indexer-url",
-      process.env.NODE_ENV === "production"
-        ? "http://localhost:8080"
-        : "http://localhost:42069",
+      INDEXER_URL,
     ],
   },
 ];

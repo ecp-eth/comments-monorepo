@@ -4,20 +4,14 @@
  * This script is used to fan out events from the event outbox to all webhooks that are subscribed to the event.
  */
 import * as Sentry from "@sentry/node";
-import { env } from "../src/env.ts";
+import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
 import { db } from "../src/services/db.ts";
 import { EventOutboxFanOutService } from "../src/services/events/event-outbox-fan-out-service.ts";
-import { waitForIndexerToBeReady } from "./utils.ts";
 import { parseWorkerCommandOptions } from "./shared.ts";
 
-const options = parseWorkerCommandOptions();
+initSentry("fan-out-worker");
 
-Sentry.init({
-  enabled: process.env.NODE_ENV === "production" && !!env.SENTRY_DSN,
-  debug: !(process.env.NODE_ENV === "production" && !!env.SENTRY_DSN),
-  dsn: env.SENTRY_DSN,
-  environment: `fan-out-worker-${process.env.NODE_ENV || "development"}`,
-});
+const options = parseWorkerCommandOptions();
 
 console.log("Starting fan out worker");
 const abortController = new AbortController();

@@ -18,6 +18,9 @@ import {
   CommentReactionsUpdatedEventSchema,
   type CommentReactionsUpdatedEvent,
   type CommentReactionsUpdatedEventInput,
+  type CommentReferencesUpdatedEventInput,
+  type CommentReferencesUpdatedEvent,
+  CommentReferencesUpdatedEventSchema,
 } from "./schemas.ts";
 import type {
   IndexerAPICommentReferencesSchemaType,
@@ -199,4 +202,31 @@ export function createCommentModerationStatusUpdatedEvent({
       },
     },
   } satisfies CommentModerationStatusUpdatedEventInput);
+}
+
+export function createCommentReferencesUpdatedEvent({
+  comment,
+}: {
+  comment: CommentSelectType;
+}): CommentReferencesUpdatedEvent {
+  if (!comment.referencesResolutionStatusChangedAt) {
+    throw new Error(
+      "Comment references resolution status changed at is required",
+    );
+  }
+
+  const uid = `comment:references:updated:${comment.chainId}:${comment.referencesResolutionStatusChangedAt.getTime()}:${comment.id}`;
+
+  return CommentReferencesUpdatedEventSchema.parse({
+    event: "comment:references:updated",
+    uid,
+    version: 1,
+    data: {
+      comment: {
+        ...comment,
+        referencesResolutionStatusChangedAt:
+          comment.referencesResolutionStatusChangedAt,
+      },
+    },
+  } satisfies CommentReferencesUpdatedEventInput);
 }

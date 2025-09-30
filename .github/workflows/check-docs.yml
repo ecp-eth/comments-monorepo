@@ -17,6 +17,7 @@ jobs:
     continue-on-error: true
     env:
       TURBO_UI: "false"
+      NODE_OPTIONS: "--max-old-space-size=4096"
     name: Build docs to check for out of sync files
     steps:
       - name: Check out code

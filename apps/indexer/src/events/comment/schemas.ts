@@ -19,6 +19,7 @@ import {
   EVENT_COMMENT_EDITED,
   EVENT_COMMENT_MODERATION_STATUS_UPDATED,
   EVENT_COMMENT_REACTIONS_UPDATED,
+  EVENT_COMMENT_REFERENCES_UPDATED,
   type CommentAddedEventSchema as OutputCommentAddedEventSchema,
   type CommentHookMetadataSetEventSchema as OutputCommentHookMetadataSetEventSchema,
   type CommentDeletedEventSchema as OutputCommentDeletedEventSchema,
@@ -35,6 +36,7 @@ export const CommentEvents = [
   EVENT_COMMENT_EDITED,
   EVENT_COMMENT_MODERATION_STATUS_UPDATED,
   EVENT_COMMENT_REACTIONS_UPDATED,
+  EVENT_COMMENT_REFERENCES_UPDATED,
 ] as const;
 
 export type CommentEvent = (typeof CommentEvents)[number];
@@ -185,6 +187,33 @@ export type CommentReactionsUpdatedEventInput = z.input<
 
 export type CommentReactionsUpdatedEvent = z.infer<
   typeof CommentReactionsUpdatedEventSchema
+>;
+
+export const CommentReferencesUpdatedEventSchema = z.object({
+  event: z.literal(EVENT_COMMENT_REFERENCES_UPDATED),
+  uid: z.string(),
+  version: z.literal(1),
+  data: z.object({
+    comment: z.object({
+      id: HexSchema,
+      references: IndexerAPICommentReferencesSchema,
+      referencesResolutionStatus: z.enum([
+        "pending",
+        "success",
+        "failed",
+        "partial",
+      ]),
+      referencesResolutionStatusChangedAt: dateToIsoStringSchema,
+    }),
+  }),
+});
+
+export type CommentReferencesUpdatedEventInput = z.input<
+  typeof CommentReferencesUpdatedEventSchema
+>;
+
+export type CommentReferencesUpdatedEvent = z.infer<
+  typeof CommentReferencesUpdatedEventSchema
 >;
 
 // assert that the schema output is the same as input to sdk

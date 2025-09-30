@@ -149,9 +149,57 @@ describe("CommentReferencesCacheService", () => {
         set: {
           references: mockReference,
           referencesResolutionStatus: mockStatus,
+          updatedAt: expect.any(Date),
         },
       });
       expect(dbExecuteMock).toHaveBeenCalledOnce();
+    });
+
+    test("should update updatedAt column when updating existing record", async () => {
+      const mockCommentId = "0x123" as Hex;
+      const mockCommentRevision = 0;
+      const mockReference: IndexerAPICommentReferencesSchemaType = [
+        {
+          type: "image",
+          url: "https://example.com",
+          position: { start: 0, end: 10 },
+          mediaType: "image/png",
+        },
+      ];
+      const mockStatus: CommentSelectType["referencesResolutionStatus"] =
+        "success";
+
+      // Capture what's being passed to onConflictDoUpdate
+      const capturedSetValues: any[] = [];
+
+      dbOnConflictDoUpdateMock.mockImplementation((options) => {
+        capturedSetValues.push(options.set);
+        return {
+          execute: dbExecuteMock,
+        };
+      });
+
+      await service.updateReferenceResolutionResult({
+        commentId: mockCommentId,
+        commentRevision: mockCommentRevision,
+        references: mockReference,
+        referencesResolutionStatus: mockStatus,
+      });
+
+      // Verify that onConflictDoUpdate was called
+      expect(capturedSetValues).toHaveLength(1);
+      const setValues = capturedSetValues[0];
+
+      // This assertion currently fails - proving the issue exists
+      expect(setValues).toHaveProperty("updatedAt");
+      expect(setValues.updatedAt).toBeDefined();
+
+      // Verify the fields that ARE currently being set
+      expect(setValues).toHaveProperty("references", mockReference);
+      expect(setValues).toHaveProperty(
+        "referencesResolutionStatus",
+        mockStatus,
+      );
     });
   });
 });

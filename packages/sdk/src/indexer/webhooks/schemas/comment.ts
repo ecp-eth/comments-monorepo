@@ -22,6 +22,8 @@ export const EVENT_COMMENT_MODERATION_STATUS_UPDATED =
   "comment:moderation:status:updated" as const;
 export const EVENT_COMMENT_REACTIONS_UPDATED =
   "comment:reactions:updated" as const;
+export const EVENT_COMMENT_REFERENCES_UPDATED =
+  "comment:references:updated" as const;
 
 /**
  * Comment events.
@@ -33,6 +35,7 @@ export const CommentEvents = [
   EVENT_COMMENT_EDITED,
   EVENT_COMMENT_MODERATION_STATUS_UPDATED,
   EVENT_COMMENT_REACTIONS_UPDATED,
+  EVENT_COMMENT_REFERENCES_UPDATED,
 ] as const;
 
 /**
@@ -311,4 +314,27 @@ export const CommentReactionsUpdatedEventSchema = z
 
 export type CommentReactionsUpdatedEvent = z.infer<
   typeof CommentReactionsUpdatedEventSchema
+>;
+
+export const CommentReferencesUpdatedEventSchema = z
+  .object({
+    event: z.literal(EVENT_COMMENT_REFERENCES_UPDATED),
+    data: z.object({
+      comment: z.object({
+        id: HexSchema,
+        references: IndexerAPICommentReferencesSchema,
+        referencesResolutionStatus: z.enum([
+          "pending",
+          "success",
+          "failed",
+          "partial",
+        ]),
+        referencesResolutionStatusChangedAt: ISO8601DateSchema,
+      }),
+    }),
+  })
+  .merge(EventV1Schema);
+
+export type CommentReferencesUpdatedEvent = z.infer<
+  typeof CommentReferencesUpdatedEventSchema
 >;

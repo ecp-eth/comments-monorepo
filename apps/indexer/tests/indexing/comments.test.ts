@@ -104,6 +104,7 @@ const { resolveCommentReferences } = await vi.importMock<
 resolveCommentReferences.mockResolvedValue({
   status: "success",
   references: [],
+  allResolvedPositions: [],
 });
 
 // Fake ponder to capture handlers
@@ -258,6 +259,7 @@ describe("initializeCommentEventsIndexing", () => {
       resolveCommentReferences.mockResolvedValueOnce({
         status: "success",
         references: [],
+        allResolvedPositions: [],
       });
 
       servicesMock.commentModerationService.moderate.mockResolvedValueOnce({

@@ -2,10 +2,10 @@ import type { DB } from "./db.ts";
 import { and, eq, desc } from "drizzle-orm";
 import { schema } from "../../schema.ts";
 import {
-  CommentReferencesCacheServiceGetReferenceResolutionResult,
-  CommentReferencesCacheServiceGetReferenceResolutionResultParams,
-  CommentReferencesCacheServiceUpdateReferenceResolutionResultParams,
-  ICommentReferencesCacheService,
+  type CommentReferencesCacheServiceGetReferenceResolutionResult,
+  type CommentReferencesCacheServiceGetReferenceResolutionResultParams,
+  type CommentReferencesCacheServiceUpdateReferenceResolutionResultParams,
+  type ICommentReferencesCacheService,
 } from "./types.ts";
 
 export class CommentReferencesCacheService
@@ -75,6 +75,7 @@ export class CommentReferencesCacheService
           set: {
             references,
             referencesResolutionStatus,
+            updatedAt: new Date(),
           },
         })
         .execute();

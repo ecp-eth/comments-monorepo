@@ -12,7 +12,7 @@ import {
   IndexerAPICommentReferenceURLVideoSchema,
   IndexerAPICommentReferenceURLWebPageSchema,
 } from "@ecp.eth/sdk/indexer";
-import type { CommentSelectType } from "ponder:schema";
+import type { CommentSelectType } from "../../ponder.schema.ts";
 import type { Hex } from "viem";
 import z from "zod";
 import type {
@@ -36,6 +36,8 @@ export type ResolveCommentReferencesOptions = {
   urlResolver: URLResolver;
 };
 
+type ResolveCommentReferenceStatus = "success" | "partial" | "failed";
+
 /**
  * This function resolves eth addresses, ens names and tickers (ERC20 symbols)
  * to their corresponding data.
@@ -50,13 +52,15 @@ export async function resolveCommentReferences(
   options: ResolveCommentReferencesOptions,
 ): Promise<{
   references: IndexerAPICommentReferencesSchemaType;
-  status: CommentSelectType["referencesResolutionStatus"];
+  status: ResolveCommentReferenceStatus;
+  allResolvedPositions: ResolveCommentReferencePosition[];
 }> {
   const promises: Promise<IndexerAPICommentReferenceSchemaType | null>[] = [];
 
   let pos = 0;
 
   const content = comment.content;
+  const allResolvedPositions: ResolveCommentReferencePosition[] = [];
 
   while (pos < content.length) {
     const restOfContent = content.slice(pos);
@@ -68,6 +72,7 @@ export async function resolveCommentReferences(
       const address = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(resolveEthAddress(address as Hex, position, options));
+      allResolvedPositions.push(position);
       pos += match[0].length;
 
       continue;
@@ -87,6 +92,7 @@ export async function resolveCommentReferences(
           options,
         ),
       );
+      allResolvedPositions.push(position);
       pos += match[0].length;
 
       continue;
@@ -99,6 +105,7 @@ export async function resolveCommentReferences(
       const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
 
       promises.push(resolveEnsName(ensName, position, options));
+      allResolvedPositions.push(position);
       pos += match[0].length;
 
       continue;
@@ -113,6 +120,7 @@ export async function resolveCommentReferences(
       promises.push(
         resolveFarcasterFname(fname as FarcasterName, position, options),
       );
+      allResolvedPositions.push(position);
       pos += match[0].length;
     }
 
@@ -126,6 +134,7 @@ export async function resolveCommentReferences(
       promises.push(
         resolveERC20TokenEthAddress(address, chainId, position, options),
       );
+      allResolvedPositions.push(position);
 
       pos += match[0].length;
 
@@ -145,6 +154,7 @@ export async function resolveCommentReferences(
           options,
         ),
       );
+      allResolvedPositions.push(position);
       pos += match[0].length;
 
       continue;
@@ -156,6 +166,7 @@ export async function resolveCommentReferences(
       const position = { start: pos, end: pos + match[0].length };
 
       promises.push(resolveURL(match[0], position, options));
+      allResolvedPositions.push(position);
       pos += match[0].length;
 
       continue;
@@ -183,7 +194,7 @@ export async function resolveCommentReferences(
     }
   }
 
-  let status: CommentSelectType["referencesResolutionStatus"] = "partial";
+  let status: ResolveCommentReferenceStatus = "partial";
 
   if (resolved === count) {
     status = "success";
@@ -194,10 +205,11 @@ export async function resolveCommentReferences(
   return {
     references,
     status,
+    allResolvedPositions,
   };
 }
 
-type ResolverPosition = {
+export type ResolveCommentReferencePosition = {
   start: number;
   end: number;
 };
@@ -234,7 +246,7 @@ const ERC_20_CAIP_19_REGEX =
 
 async function resolveEthAddress(
   address: Hex,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   options: ResolveCommentReferencesOptions,
 ): Promise<
   | IndexerAPICommentReferenceENSSchemaType
@@ -286,7 +298,7 @@ async function resolveERC20TokenEthAddress(
    * or we parsed caip19.
    */
   chainId: number | undefined,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   { erc20ByAddressResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
   const result = await erc20ByAddressResolver.load(address);
@@ -307,7 +319,7 @@ async function resolveERC20TokenEthAddress(
 
 async function resolveEnsName(
   name: string,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   { ensByNameResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceENSSchemaType | null> {
   const result = await ensByNameResolver.load(name);
@@ -330,7 +342,7 @@ async function resolveEnsName(
 
 async function resolveFarcasterFname(
   fname: FarcasterName,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   { farcasterByNameResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceFarcasterSchemaType | null> {
   const result = await farcasterByNameResolver.load(fname);
@@ -357,7 +369,7 @@ async function resolveFarcasterFname(
 async function resolveERC20TokenTicker(
   ticker: string,
   chainId: number,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   { erc20ByTickerResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
   const result = await erc20ByTickerResolver.load([ticker, chainId]);
@@ -393,7 +405,7 @@ type ResolveURLResultType = z.output<typeof ResolveURLResult>;
 
 async function resolveURL(
   url: string,
-  position: ResolverPosition,
+  position: ResolveCommentReferencePosition,
   { urlResolver }: ResolveCommentReferencesOptions,
 ): Promise<ResolveURLResultType> {
   const result = await urlResolver.load(url);
