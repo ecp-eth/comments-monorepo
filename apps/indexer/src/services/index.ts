@@ -39,6 +39,8 @@ import { CommentReferencesResolutionService } from "./comment-references-resolut
 import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
 import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-service.ts";
 import { NotificationService } from "./notification-service.ts";
+import { AppKeyAuthService } from "./app-key-auth-service.ts";
+import { createAppKeyMiddleware } from "../middleware/app-key.ts";
 
 export { db };
 
@@ -207,6 +209,14 @@ export const commentReferencesResolutionService =
 
 export const appWebhookDeliveryManager = new AppWebhookDeliveryManager({
   db,
+});
+
+export const appKeyAuthService = new AppKeyAuthService({
+  db,
+});
+
+export const appKeyMiddleware = createAppKeyMiddleware({
+  appKeyService: appKeyAuthService,
 });
 
 export const notificationService = new NotificationService({
