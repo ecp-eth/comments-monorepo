@@ -716,6 +716,9 @@ importers:
       mediabunny:
         specifier: ^1.15.2
         version: 1.15.2
+      node-cron:
+        specifier: ^4.2.1
+        version: 4.2.1
       node-html-parser:
         specifier: ^7.0.1
         version: 7.0.1
@@ -9720,6 +9723,10 @@ packages:
   node-addon-api@8.3.1:
     resolution: {integrity: sha512-lytcDEdxKjGJPTLEfW4mYMigRezMlyJY8W4wxJK8zE533Jlb8L8dRuObJFWg2P+AuOIxoCgKF+2Oq4d4Zd0OUA==}
     engines: {node: ^18 || ^20 || >= 21}
+
+  node-cron@4.2.1:
+    resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
+    engines: {node: '>=6.0.0'}
 
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
@@ -23567,6 +23574,8 @@ snapshots:
 
   node-addon-api@8.3.1:
     optional: true
+
+  node-cron@4.2.1: {}
 
   node-domexception@1.0.0: {}
 
