@@ -10137,6 +10137,7 @@ paths:
                       - comment:edited
                       - comment:moderation:status:updated
                       - comment:reactions:updated
+                      - comment:references:updated
                       - test
                   minItems: 1
                 auth:

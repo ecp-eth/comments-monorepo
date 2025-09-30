@@ -2,19 +2,15 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentEditedEvent
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / CommentReferencesUpdatedEvent
 
-# Type Alias: CommentEditedEvent
+# Type Alias: CommentReferencesUpdatedEvent
 
 ```ts
-type CommentEditedEvent = {
-  blockNumber: bigint;
-  chainId: number;
+type CommentReferencesUpdatedEvent = {
   data: {
      comment: {
-        content: string;
         id: `0x${string}`;
-        moderationStatus: "approved" | "pending" | "rejected";
         references: (
            | {
            address: `0x${string}`;
@@ -115,47 +111,26 @@ type CommentEditedEvent = {
               };
            }[];
         })[];
-        updatedAt: Date;
+        referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
+        referencesResolutionStatusChangedAt: Date;
      };
   };
-  event: "comment:edited";
-  logIndex: number;
-  txHash: `0x${string}`;
+  event: "comment:references:updated";
   uid: string;
   version: 1;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:245](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L245)
-
-An event sent to webhook when a comment is edited.
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:338](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L338)
 
 ## Type declaration
-
-### blockNumber
-
-```ts
-blockNumber: bigint = StringBigintSchema;
-```
-
-Block number. On wire it is a stringified bigint.
-
-### chainId
-
-```ts
-chainId: number;
-```
-
-Chain ID
 
 ### data
 
 ```ts
 data: {
   comment: {
-     content: string;
      id: `0x${string}`;
-     moderationStatus: "approved" | "pending" | "rejected";
      references: (
         | {
         address: `0x${string}`;
@@ -256,20 +231,17 @@ data: {
            };
         }[];
      })[];
-     updatedAt: Date;
+     referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
+     referencesResolutionStatusChangedAt: Date;
   };
 };
 ```
-
-Data of the event
 
 #### data.comment
 
 ```ts
 comment: {
-  content: string;
   id: `0x${string}`;
-  moderationStatus: "approved" | "pending" | "rejected";
   references: (
      | {
      address: `0x${string}`;
@@ -370,35 +342,16 @@ comment: {
         };
      }[];
   })[];
-  updatedAt: Date;
+  referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
+  referencesResolutionStatusChangedAt: Date;
 };
 ```
-
-Updated comment data
-
-#### data.comment.content
-
-```ts
-content: string;
-```
-
-Content of the comment
 
 #### data.comment.id
 
 ```ts
 id: `0x${string}` = HexSchema;
 ```
-
-ID of the comment
-
-#### data.comment.moderationStatus
-
-```ts
-moderationStatus: "approved" | "pending" | "rejected" = CommentModerationStatusSchema;
-```
-
-Moderation status of the comment
 
 #### data.comment.references
 
@@ -505,39 +458,23 @@ references: (
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
-References of the comment
-
-#### data.comment.updatedAt
+#### data.comment.referencesResolutionStatus
 
 ```ts
-updatedAt: Date = ISO8601DateSchema;
+referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
 ```
 
-Updated at date. On wire it is a ISO 8601 date and time string
+#### data.comment.referencesResolutionStatusChangedAt
+
+```ts
+referencesResolutionStatusChangedAt: Date = ISO8601DateSchema;
+```
 
 ### event
 
 ```ts
-event: "comment:edited";
+event: "comment:references:updated";
 ```
-
-Event type
-
-### logIndex
-
-```ts
-logIndex: number;
-```
-
-Log index
-
-### txHash
-
-```ts
-txHash: `0x${string}` = HexSchema;
-```
-
-Transaction hash
 
 ### uid
 

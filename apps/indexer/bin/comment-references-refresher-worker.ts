@@ -211,7 +211,7 @@ async function processFailedReferences() {
           })
           .where(eq(schema.comment.id, result.commentId));
 
-        eventOutboxService.publishEvent({
+        await eventOutboxService.publishEvent({
           tx,
           aggregateId: result.commentId,
           aggregateType: "comment",
