@@ -8,7 +8,11 @@
  * The script is supposed to be run as a cron job in sequential manner.
  */
 import * as Sentry from "@sentry/node";
-import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
+import {
+  initSentry,
+  waitForCommentsToBeIndexed,
+  waitForIndexerToBeReady,
+} from "./utils.ts";
 import { z } from "zod";
 import { db } from "../src/services/db.ts";
 import { schema } from "../schema.ts";
@@ -70,6 +74,12 @@ if (options.waitForIndexer) {
   });
 
   console.log("Indexer is ready");
+
+  await waitForCommentsToBeIndexed({
+    signal: abortController.signal,
+  });
+
+  console.log("Comments are indexed");
 }
 
 const commentReferencesCacheService = new CommentReferencesCacheService(db);
