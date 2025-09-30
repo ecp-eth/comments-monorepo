@@ -4,7 +4,10 @@ import {
   notificationService,
   siweMiddleware,
 } from "../../../../../services";
-import { APIErrorResponseSchema } from "../../../../../lib/schemas";
+import {
+  APIErrorResponseSchema,
+  OpenAPIENSNameOrAddressSchema,
+} from "../../../../../lib/schemas";
 import { NotificationTypeSchema } from "../../../../../notifications/schemas/shared";
 import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
 import { AppManagerAppNotFoundError } from "../../../../../services/app-manager-service";
@@ -31,6 +34,16 @@ export const AppNotificationsMarkAsSeenRequestBodySchema = z.object({
     description:
       "The date of the last seen notification, only unseen notifications created after this date will be marked as seen. If omitted all notifications will be marked as seen",
   }),
+  users: OpenAPIENSNameOrAddressSchema.or(
+    OpenAPIENSNameOrAddressSchema.array().min(1).max(20),
+  )
+    .transform((value) => {
+      return Array.isArray(value) ? value : [value];
+    })
+    .openapi({
+      description:
+        "The recipients whose notifications should be marked as seen, must contain at least one user",
+    }),
 });
 
 export const AppNotificationsMarkAsSeenResponseSchema = z.object({
@@ -101,7 +114,7 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
     },
     async (c) => {
       const { appId } = c.req.valid("param");
-      const { type, lastSeenNotificationDate } = c.req.valid("json");
+      const { type, lastSeenNotificationDate, users } = c.req.valid("json");
 
       try {
         const { app } = await appManager.getApp({
@@ -113,6 +126,7 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
           appId: app.id,
           types: type,
           lastSeenNotificationDate,
+          users,
         });
 
         return c.json(
