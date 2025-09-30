@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/node";
 import type { IndexingFunctionArgs } from "ponder:registry";
 import { env } from "../env.ts";
 import { base } from "viem/chains";
-import { Chain, createPublicClient, http, PublicClient } from "viem";
+import { type Chain, createPublicClient, http, type PublicClient } from "viem";
 import { parseSwap } from "@0x/0x-parser";
 import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
 import z from "zod";

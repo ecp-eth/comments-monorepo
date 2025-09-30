@@ -15,7 +15,7 @@ import {
   or,
 } from "ponder";
 import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
 import { GetCommentsQuerySchema } from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";

@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import { APIErrorResponseSchema } from "../../lib/schemas";
 import * as Sentry from "@sentry/node";
 

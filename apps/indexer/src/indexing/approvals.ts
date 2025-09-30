@@ -1,4 +1,4 @@
-import { ponder as Ponder } from "ponder:registry";
+import { type ponder as Ponder } from "ponder:registry";
 import { db, eventOutboxService } from "../services/index.ts";
 import {
   ponderEventToApprovalAddedEvent,

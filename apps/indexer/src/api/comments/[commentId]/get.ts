@@ -2,7 +2,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, desc, eq, inArray, isNotNull, isNull, or } from "ponder";
 import { IndexerAPICommentWithRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { createUserDataAndFormatSingleCommentResponseResolver } from "../../../lib/response-formatters";
 import { env } from "../../../env";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
@@ -13,7 +13,7 @@ import {
   GetCommentQuerySchema,
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
-import { Hex } from "@ecp.eth/sdk/core";
+import { type Hex } from "@ecp.eth/sdk/core";
 import { farcasterByAddressResolverService } from "../../../services/farcaster-by-address-resolver";
 import { ensByAddressResolverService } from "../../../services/ens-by-address-resolver";
 

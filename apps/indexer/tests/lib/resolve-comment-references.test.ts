@@ -13,7 +13,7 @@ import type {
   URLResolver,
   FarcasterByNameResolver,
 } from "../../src/resolvers";
-import { Hex } from "viem";
+import { type Hex } from "viem";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),

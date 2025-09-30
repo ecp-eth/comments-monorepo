@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { ponder as Ponder } from "ponder:registry";
+import { type ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,

@@ -10,7 +10,7 @@ import {
 } from "hono/utils/jwt/types";
 import type { Hex, PublicClient } from "viem";
 import z from "zod";
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { schema } from "../../schema.ts";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { eq } from "drizzle-orm";

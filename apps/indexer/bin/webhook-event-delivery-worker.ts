@@ -50,7 +50,7 @@ await webhookEventDeliveryService
   .catch((e) => {
     console.error("Webhook event delivery worker failed", e);
     Sentry.captureException(e);
-    Sentry.flush().then(() => {
+    void Sentry.flush().then(() => {
       process.exit(1);
     });
   });

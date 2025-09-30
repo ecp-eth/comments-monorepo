@@ -1,5 +1,5 @@
 import {
-  Env,
+  type Env,
   type Context,
   type HonoRequest,
   type MiddlewareHandler,

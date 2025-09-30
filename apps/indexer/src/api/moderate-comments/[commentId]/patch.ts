@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   ChangeModerationStatusOnCommentParamsSchema,
@@ -6,7 +6,7 @@ import {
 } from "../../../lib/schemas";
 import {
   authMiddleware,
-  AuthMiddlewareContext,
+  type AuthMiddlewareContext,
 } from "../../../middleware/auth";
 import { IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { resolveAuthorDataAndFormatCommentChangeModerationStatusResponse } from "../../../lib/response-formatters";
