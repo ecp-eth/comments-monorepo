@@ -206,14 +206,12 @@ async function processFailedReferences() {
           references: resolved.references,
           referencesResolutionStatus: resolved.status,
           referencesResolutionStatusChangedAt: new Date(),
+          updatedAt: new Date(),
         };
 
         await tx
           .update(schema.comment)
-          .set({
-            ...newRefs,
-            updatedAt: new Date(),
-          })
+          .set(newRefs)
           .where(eq(schema.comment.id, result.commentId));
 
         await eventOutboxService.publishEvent({
