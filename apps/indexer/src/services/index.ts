@@ -211,4 +211,5 @@ export const appWebhookDeliveryManager = new AppWebhookDeliveryManager({
 
 export const notificationService = new NotificationService({
   db,
+  ensByNameResolver: ensByNameResolverService,
 });
