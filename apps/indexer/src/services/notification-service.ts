@@ -1,22 +1,13 @@
 import type { DB } from "./db.ts";
 import type { NotificationTypeSchemaType } from "../notifications/schemas/shared.ts";
 import { schema } from "../../schema.ts";
-import {
-  and,
-  eq,
-  gt,
-  inArray,
-  isNotNull,
-  isNull,
-  type SQL,
-  sql,
-} from "drizzle-orm";
-import type { Hex } from "@ecp.eth/sdk/core";
+import { and, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import type { ENSByNameResolver } from "../resolvers/index.ts";
 import type {
   ENSNameSchemaType,
   ETHAddressSchemaType,
 } from "../lib/schemas.ts";
+import { resolveUsersByAddressOrEnsName } from "../lib/utils.ts";
 
 type NotificationServiceOptions = {
   db: DB;
@@ -53,7 +44,14 @@ export class NotificationService {
       throw new NotificationService_UsersRequiredError();
     }
 
-    const resolvedUsers = await this.resolveUsers(users);
+    const resolvedUsers = await resolveUsersByAddressOrEnsName(
+      users,
+      this.ensByNameResolver,
+    );
+
+    if (resolvedUsers.length === 0) {
+      throw new NotificationService_InvalidEnsNamesError();
+    }
 
     const result = await this.db
       .update(schema.appNotification)
@@ -82,47 +80,6 @@ export class NotificationService {
       .execute();
 
     return { count: result.rowCount ?? 0 };
-  }
-
-  private async resolveUsers(users: (Hex | string)[]): Promise<Hex[]> {
-    // if after resolution there are no users, throw an error
-    if (users.length === 0) {
-      throw new NotificationService_UsersRequiredError();
-    }
-
-    const resolvedUsers: Hex[] = [];
-    const usersToResolve: string[] = [];
-
-    for (const user of users) {
-      if (user.includes(".")) {
-        usersToResolve.push(user);
-      } else {
-        resolvedUsers.push(user as Hex);
-      }
-    }
-
-    if (usersToResolve.length > 0) {
-      const usersByEnsName =
-        await this.ensByNameResolver.loadMany(usersToResolve);
-
-      for (const result of usersByEnsName) {
-        if (result instanceof Error) {
-          throw result;
-        }
-
-        if (result == null) {
-          continue;
-        }
-
-        resolvedUsers.push(result.address);
-      }
-    }
-
-    if (usersToResolve.length === 0) {
-      throw new NotificationService_InvalidEnsNamesError();
-    }
-
-    return resolvedUsers;
   }
 }
 
