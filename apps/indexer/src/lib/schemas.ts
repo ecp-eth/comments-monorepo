@@ -14,6 +14,41 @@ export const OpenAPIHexSchema = HexSchema.openapi({
   pattern: "^0x[a-fA-F0-9]+$",
 });
 
+export const ETHAddressSchema = z.custom<Hex>(
+  (v) => /^0x[a-fA-F0-9]{40}$/.test(v),
+  {
+    message: "Invalid Ethereum address",
+  },
+);
+
+export type ETHAddressSchemaType = z.infer<typeof ETHAddressSchema>;
+
+export const OpenAPIETHAddressSchema = ETHAddressSchema.openapi({
+  description: "The Ethereum address of the user",
+  type: "string",
+  pattern: "^0x[a-fA-F0-9]{40}$",
+});
+
+export const ENSNameSchema = z.custom<`${string}.eth`>(
+  (v) => /^[a-zA-Z0-9.-]+\.eth$/.test(v),
+  {
+    message: "Invalid ENS name",
+  },
+);
+
+export type ENSNameSchemaType = z.infer<typeof ENSNameSchema>;
+
+export const OpenAPIENSNameSchema = ENSNameSchema.openapi({
+  description: "The ENS name of the user",
+  pattern: "^[a-zA-Z0-9.-]+\\.eth$",
+});
+
+export const OpenAPIENSNameOrAddressSchema = OpenAPIETHAddressSchema.or(
+  OpenAPIENSNameSchema,
+).openapi({
+  description: "The ENS name or address of the user",
+});
+
 /**
  * Path params schema for resolving an author ENS / Farcaster data.
  */
