@@ -296,6 +296,7 @@ export const appRelations = relations(app, ({ one, many }) => ({
   }),
   appSigningKeys: many(appSigningKeys),
   appWebhooks: many(appWebhook),
+  appNotification: many(appNotification),
 }));
 
 export const appSigningKeys = offchainSchema.table(
@@ -598,4 +599,159 @@ export const eventOutbox = offchainSchema.table(
     index("event_outbox_by_processed_at_idx").on(table.processedAt),
     index("event_outbox_by_created_at_idx").on(table.createdAt),
   ],
+);
+
+const notificationTypeColumnType = text({
+  enum: ["reply", "mention", "reaction", "quote"],
+});
+
+/**
+ * This table is used to store notifications all notifications in the system.
+ */
+export const notification = offchainSchema.table("notification", {
+  id: bigserial({ mode: "bigint" }).primaryKey(),
+  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  notificationType: notificationTypeColumnType.notNull(),
+});
+
+/**
+ * This table is used to store notification seen status for each app.
+ */
+export const appNotification = offchainSchema.table(
+  "app_notification",
+  {
+    notificationId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => notification.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    notificationType: notificationTypeColumnType.notNull(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    parentId: text().notNull(),
+    appSigner: text().notNull().$type<Hex>(),
+    recipientAddress: text().notNull().$type<Hex>(),
+    seenAt: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.notificationId, table.appId] }),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND created_at > ? ORDER BY created_at
+     */
+    index("an_by_app_recipient_created_at_unseen_at_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.createdAt, // > ?
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND notification_type IN () AND created_at > ? ORDER BY created_at
+     */
+    index("an_by_app_recipient_type_created_at_unseen_at_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.notificationType, // = ?, IN ()
+        table.createdAt, // > ?
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) ORDER BY created_at
+     * and use DISTINCT ON (recipient_address,notification_type, parent_id)
+     */
+    index("an_by_app_recipient_type_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
+      table.notificationId, // DISTINCT ON
+      table.parentId, // DISTINCT ON
+      table.createdAt, // ORDER BY
+    ),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NULL ORDER BY created_at
+     * and use DISTINCT ON (recipient_address, notification_type, parent_id)
+     */
+    index("an_by_app_recipient_type_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
+        table.notificationId, // DISTINCT ON
+        table.parentId, // DISTINCT ON
+        table.createdAt, // ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NOT NULL ORDER BY created_at
+     * and use DISTINCT ON (recipient_address, notification_type, parent_id)
+     */
+    index("an_by_app_recipient_type_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
+        table.notificationId, // DISTINCT ON
+        table.parentId, // DISTINCT ON
+        table.createdAt, // ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND lower(app_signer) IN (lower(?)) ORDER BY created_at
+     * and use DISTINCT ON (notification_type, parent_id)
+     */
+    index("an_by_app_recipient_app_signer_type_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // IN ()
+      sql`lower(${table.appSigner})`, // IN ()
+      table.notificationType, // DISTINCT ON
+      table.parentId, // DISTINCT ON
+      table.createdAt, // ORDER BY
+    ),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NOT NULL AND lower(app_signer) IN (lower(?)) ORDER BY created_at
+     * and use DISTINCT ON (notification_type, parent_id)
+     */
+    index("an_by_app_recipient_app_signer_type_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // IN ()
+        sql`lower(${table.appSigner})`, // IN ()
+        table.notificationType, // DISTINCT ON
+        table.parentId, // DISTINCT ON
+        table.createdAt, // ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    /**
+     * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NULL AND lower(app_signer) IN (lower(?)) ORDER BY created_at
+     * and use DISTINCT ON (notification_type, parent_id)
+     */
+    index("an_by_app_recipient_app_signer_type_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // IN ()
+        sql`lower(${table.appSigner})`, // IN ()
+        table.notificationType, // DISTINCT ON
+        table.parentId, // DISTINCT ON
+        table.createdAt, // ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+  ],
+);
+
+export const appNotificationRelations = relations(
+  appNotification,
+  ({ one }) => ({
+    notification: one(notification, {
+      fields: [appNotification.notificationId],
+      references: [notification.id],
+    }),
+    app: one(app, {
+      fields: [appNotification.appId],
+      references: [app.id],
+    }),
+  }),
 );
