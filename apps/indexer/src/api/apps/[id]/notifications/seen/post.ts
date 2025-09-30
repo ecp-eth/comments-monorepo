@@ -11,6 +11,10 @@ import {
 import { NotificationTypeSchema } from "../../../../../notifications/schemas/shared";
 import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
 import { AppManagerAppNotFoundError } from "../../../../../services/app-manager-service";
+import {
+  NotificationService_InvalidEnsNamesError,
+  NotificationService_UsersRequiredError,
+} from "../../../../../services/notification-service";
 
 export const AppNotificationsMarkAsSeenRequestParamsSchema = z.object({
   appId: z.string().uuid(),
@@ -141,6 +145,14 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
       } catch (error) {
         if (error instanceof AppManagerAppNotFoundError) {
           return c.json({ message: "App not found" }, 404);
+        }
+
+        if (error instanceof NotificationService_UsersRequiredError) {
+          return c.json({ message: "Users are required" }, 400);
+        }
+
+        if (error instanceof NotificationService_InvalidEnsNamesError) {
+          return c.json({ message: "Invalid ENS names" }, 400);
         }
 
         throw error;
