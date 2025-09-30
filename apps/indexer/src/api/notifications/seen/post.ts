@@ -1,26 +1,21 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
-  appManager,
+  appKeyMiddleware,
   notificationService,
-  siweMiddleware,
-} from "../../../../../services";
+} from "../../../services/index.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIENSNameOrAddressSchema,
-} from "../../../../../lib/schemas";
-import { NotificationTypeSchema } from "../../../../../notifications/schemas/shared";
-import { formatResponseUsingZodSchema } from "../../../../../lib/response-formatters";
-import { AppManagerAppNotFoundError } from "../../../../../services/app-manager-service";
+} from "../../../lib/schemas.ts";
+import { NotificationTypeSchema } from "../../../notifications/schemas/shared.ts";
+import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
 import {
   NotificationService_InvalidEnsNamesError,
   NotificationService_UsersRequiredError,
-} from "../../../../../services/notification-service";
+} from "../../../services/notification-service.ts";
+import { AppKeyAuthServiceError } from "../../../services/app-key-auth-service.ts";
 
-export const AppNotificationsMarkAsSeenRequestParamsSchema = z.object({
-  appId: z.string().uuid(),
-});
-
-export const AppNotificationsMarkAsSeenRequestBodySchema = z.object({
+export const NotificationsMarkAsSeenRequestBodySchema = z.object({
   type: NotificationTypeSchema.or(NotificationTypeSchema.array())
     .default([])
     .transform((value) => {
@@ -50,25 +45,24 @@ export const AppNotificationsMarkAsSeenRequestBodySchema = z.object({
     }),
 });
 
-export const AppNotificationsMarkAsSeenResponseSchema = z.object({
+export const NotificationsMarkAsSeenResponseSchema = z.object({
   count: z.number().int().nonnegative().openapi({
     description: "The number of notifications marked as seen",
   }),
 });
 
-export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
+export function setupNotificationsSeenPost(app: OpenAPIHono) {
   app.openapi(
     {
       method: "post",
-      path: "/api/apps/{appId}/notifications/seen",
+      path: "/api/notifications/seen",
       description: "Mark notifications as seen",
-      middleware: siweMiddleware,
+      middleware: appKeyMiddleware,
       request: {
-        params: AppNotificationsMarkAsSeenRequestParamsSchema,
         body: {
           content: {
             "application/json": {
-              schema: AppNotificationsMarkAsSeenRequestBodySchema,
+              schema: NotificationsMarkAsSeenRequestBodySchema,
             },
           },
         },
@@ -78,7 +72,7 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
           description: "Successfully marked notifications as seen",
           content: {
             "application/json": {
-              schema: AppNotificationsMarkAsSeenResponseSchema,
+              schema: NotificationsMarkAsSeenResponseSchema,
             },
           },
         },
@@ -98,14 +92,6 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
             },
           },
         },
-        404: {
-          description: "App not found",
-          content: {
-            "application/json": {
-              schema: APIErrorResponseSchema,
-            },
-          },
-        },
         500: {
           description: "Internal server error",
           content: {
@@ -117,14 +103,10 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { appId } = c.req.valid("param");
       const { type, lastSeenNotificationDate, users } = c.req.valid("json");
 
       try {
-        const { app } = await appManager.getApp({
-          id: appId,
-          ownerId: c.get("user").id,
-        });
+        const app = c.get("app");
 
         const { count } = await notificationService.markNotificationsAsSeen({
           appId: app.id,
@@ -134,17 +116,14 @@ export function setupAppNotificationsSeenPost(app: OpenAPIHono) {
         });
 
         return c.json(
-          formatResponseUsingZodSchema(
-            AppNotificationsMarkAsSeenResponseSchema,
-            {
-              count,
-            },
-          ),
+          formatResponseUsingZodSchema(NotificationsMarkAsSeenResponseSchema, {
+            count,
+          }),
           200,
         );
       } catch (error) {
-        if (error instanceof AppManagerAppNotFoundError) {
-          return c.json({ message: "App not found" }, 404);
+        if (error instanceof AppKeyAuthServiceError) {
+          return c.json({ message: "Invalid app key" }, 401);
         }
 
         if (error instanceof NotificationService_UsersRequiredError) {
