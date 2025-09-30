@@ -202,11 +202,16 @@ async function processFailedReferences() {
             break;
         }
 
+        const newRefs = {
+          references: resolved.references,
+          referencesResolutionStatus: resolved.status,
+          referencesResolutionStatusChangedAt: new Date(),
+        };
+
         await tx
           .update(schema.comment)
           .set({
-            references: resolved.references,
-            referencesResolutionStatus: resolved.status,
+            ...newRefs,
             updatedAt: new Date(),
           })
           .where(eq(schema.comment.id, result.commentId));
@@ -216,7 +221,10 @@ async function processFailedReferences() {
           aggregateId: result.commentId,
           aggregateType: "comment",
           event: createCommentReferencesUpdatedEvent({
-            comment: comment,
+            comment: {
+              ...comment,
+              ...newRefs,
+            },
           }),
         });
       });
