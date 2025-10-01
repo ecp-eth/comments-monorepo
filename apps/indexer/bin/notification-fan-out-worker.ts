@@ -1,22 +1,22 @@
 #!/usr/bin/env -S node --experimental-transform-types
 
 /**
- * This script is used to fan out events from the event outbox to all webhooks that are subscribed to the event.
+ * This script is used to fan out notifications to all app clients.
  */
 import * as Sentry from "@sentry/node";
-import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
 import { db } from "../src/services/db.ts";
-import { EventOutboxFanOutService } from "../src/services/events/event-outbox-fan-out-service.ts";
+import { NotificationOutboxFanOutService } from "../src/services/notifications/notification-outbox-fan-out-service.ts";
+import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
 import { parseWorkerCommandOptions } from "./shared.ts";
 
-initSentry("event-outbox-fan-out-worker");
+initSentry("notification-outbox-fan-out-worker");
 
 const options = parseWorkerCommandOptions();
 
-console.log("Starting event outbox fan out worker");
+console.log("Starting notification outbox fan out worker");
 const abortController = new AbortController();
 
-const eventOutboxFanOutService = new EventOutboxFanOutService({
+const notificationOutboxFanOutService = new NotificationOutboxFanOutService({
   db,
 });
 
@@ -39,18 +39,18 @@ if (options.waitForIndexer) {
   console.log("Indexer is ready");
 }
 
-await eventOutboxFanOutService
-  .fanOutEvents({
+await notificationOutboxFanOutService
+  .fanOutNotifications({
     signal: abortController.signal,
   })
   .then(() => {
-    console.log("Event outbox fan out was aborted");
+    console.log("Notification outbox fan out was aborted");
     process.exit(0);
   })
   .catch((e) => {
-    console.error("Event outbox fan out worker failed", e);
+    console.error("Notification outbox fan out worker failed", e);
     Sentry.captureException(e);
-    void Sentry.flush().then(() => {
+    Sentry.flush().then(() => {
       process.exit(1);
     });
   });
