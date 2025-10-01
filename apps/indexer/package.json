@@ -67,7 +67,8 @@
     "uuid": "^11.1.0",
     "viem": "^2.29.2",
     "xxhash-wasm": "^1.1.0",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "pinata": "^2.5.0"
   },
   "devDependencies": {
     "@ecp.eth/eslint-config": "workspace:*",

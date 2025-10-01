@@ -71,7 +71,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": ">=5.0.0",
-    "pinata": "^2.4.3",
+    "pinata": "^2.5.0",
     "react": "18 || 19",
     "viem": "^2.29.2"
   },
@@ -83,7 +83,7 @@
     "@types/node": "^22.13.1",
     "@types/react": "~19.1.0",
     "@types/react-dom": "~19.1.0",
-    "pinata": "^2.4.3",
+    "pinata": "^2.5.0",
     "eslint": "^9.19.0",
     "react": "~19.1.0",
     "react-dom": "~19.1.0",
