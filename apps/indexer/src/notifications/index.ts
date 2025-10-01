@@ -30,7 +30,7 @@ type CreateReplyNotificationParams = {
   }[];
 };
 
-export function createReplyNotification({
+export function createReplyNotifications({
   chainId,
   reply,
   parents,
@@ -82,7 +82,6 @@ type CreateReactionNotificationParams = {
     id: Hex;
     author: Hex;
     app: Hex;
-    commentType: number;
   };
   parent: {
     id: Hex;
