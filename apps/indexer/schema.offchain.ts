@@ -284,7 +284,15 @@ export const app = offchainSchema.table(
       }),
     name: text().notNull(),
   },
-  (table) => [index("app_by_owner_id_idx").on(table.ownerId)],
+  (table) => [
+    index("app_by_owner_id_idx").on(table.ownerId),
+    /**
+     * Used by queries WHERE app_id = ? AND created_at > ? for example in notification fan out service
+     * where we don't want to send the notifications for apps that were created after the notification was created
+     * (historical reindexing).
+     */
+    index("app_by_id_created_at_idx").on(table.id, table.createdAt),
+  ],
 );
 
 export type AppSelectType = typeof app.$inferSelect;
@@ -607,22 +615,55 @@ const notificationTypeColumnType = text({
 
 /**
  * This table is used to store notifications all notifications in the system.
+ * These notifications are then fan out to app clients.
  */
-export const notification = offchainSchema.table("notification", {
-  id: bigserial({ mode: "bigint" }).primaryKey(),
-  createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  notificationType: notificationTypeColumnType.notNull(),
-});
+export const notificationOutbox = offchainSchema.table(
+  "notification_outbox",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * For fan out services to track processed and uprocessed notifications
+     */
+    processedAt: timestamp({ withTimezone: true }),
+    notificationType: notificationTypeColumnType.notNull(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
+    recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
+    parentId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
+    appSigner: text().notNull().$type<Hex>(),
+  },
+  (table) => [
+    index("nt_by_created_at_unprocessed_idx")
+      .on(table.createdAt)
+      .where(sql`${table.processedAt} IS NULL`),
+  ],
+);
 
 /**
- * This table is used to store notification seen status for each app.
+ * This table is used to store notifications per each app. It is almost the same copy of the notificationOutbox table
+ * but it is used to store notifications per each app.
  */
 export const appNotification = offchainSchema.table(
   "app_notification",
   {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    notificationType: notificationTypeColumnType.notNull(),
     notificationId: bigint({ mode: "bigint" })
       .notNull()
-      .references(() => notification.id, {
+      .references(() => notificationOutbox.id, {
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
@@ -632,15 +673,29 @@ export const appNotification = offchainSchema.table(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    notificationType: notificationTypeColumnType.notNull(),
-    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
     parentId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
     appSigner: text().notNull().$type<Hex>(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
     recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * When the notification was seen by the recipient
+     */
     seenAt: timestamp({ withTimezone: true }),
   },
   (table) => [
-    primaryKey({ columns: [table.notificationId, table.appId] }),
+    unique("an_dedupe_notifications_uq").on(table.notificationId, table.appId),
     /**
      * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND created_at > ? ORDER BY created_at
      */
@@ -745,9 +800,9 @@ export const appNotification = offchainSchema.table(
 export const appNotificationRelations = relations(
   appNotification,
   ({ one }) => ({
-    notification: one(notification, {
+    notification: one(notificationOutbox, {
       fields: [appNotification.notificationId],
-      references: [notification.id],
+      references: [notificationOutbox.id],
     }),
     app: one(app, {
       fields: [appNotification.appId],
