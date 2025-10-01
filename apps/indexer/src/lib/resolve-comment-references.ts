@@ -25,6 +25,10 @@ import type {
   FarcasterByNameResolver,
   FarcasterName,
 } from "../resolvers/index.ts";
+import {
+  IPFS_URL_REGEX,
+  type IPFSResolver,
+} from "../resolvers/ipfs-resolver.ts";
 
 export type ResolveCommentReferencesOptions = {
   ensByAddressResolver: ENSByAddressResolver;
@@ -34,6 +38,7 @@ export type ResolveCommentReferencesOptions = {
   erc20ByTickerResolver: ERC20ByTickerResolver;
   erc20ByAddressResolver: ERC20ByAddressResolver;
   urlResolver: URLResolver;
+  ipfsResolver: IPFSResolver;
 };
 
 type ResolveCommentReferenceStatus = "success" | "partial" | "failed";
@@ -160,6 +165,18 @@ export async function resolveCommentReferences(
       continue;
     }
 
+    match = restOfContent.match(IPFS_URL_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+
+      promises.push(resolveIPFS(match[0], position, options));
+      allResolvedPositions.push(position);
+      pos += match[0].length;
+
+      continue;
+    }
+
     match = restOfContent.match(URL_REGEX);
 
     if (match) {
@@ -186,6 +203,7 @@ export async function resolveCommentReferences(
     if (result.status === "fulfilled") {
       resolved++;
 
+      // some resolvers returns null to indicate resolution succeed but no useful info found
       if (result.value) {
         references.push(result.value);
       }
@@ -409,6 +427,25 @@ async function resolveURL(
   { urlResolver }: ResolveCommentReferencesOptions,
 ): Promise<ResolveURLResultType> {
   const result = await urlResolver.load(url);
+
+  if (result) {
+    return (
+      ResolveURLResult.safeParse({
+        ...result,
+        position,
+      } satisfies ResolveURLResultType).data ?? null
+    );
+  }
+
+  return null;
+}
+
+async function resolveIPFS(
+  ipfsUrl: string,
+  position: ResolveCommentReferencePosition,
+  { ipfsResolver }: ResolveCommentReferencesOptions,
+): Promise<ResolveURLResultType> {
+  const result = await ipfsResolver.load(ipfsUrl);
 
   if (result) {
     return (

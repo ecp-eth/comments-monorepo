@@ -16,7 +16,8 @@ import type {
   URLResolver,
   FarcasterByNameResolver,
 } from "../resolvers/index.ts";
-import { type CommentReferencesCacheService } from "./comment-references-cache-service.ts";
+import type { IPFSResolver } from "../resolvers/ipfs-resolver.ts";
+import type { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
 import { type ResolveCommentReferencePosition } from "../lib/resolve-comment-references.ts";
 
 /**
@@ -30,6 +31,7 @@ type CommentReferencesResolvers = {
   farcasterByAddressResolver: FarcasterByAddressResolver;
   farcasterByNameResolver: FarcasterByNameResolver;
   urlResolver: URLResolver;
+  ipfsResolver: IPFSResolver;
 };
 
 type ResolveCommentReferencesHelperResult = {

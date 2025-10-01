@@ -17,6 +17,7 @@ import { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
 import { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
 import { urlResolverService } from "./url-resolver.ts";
+import { ipfsResolverService } from "./ipfs-resolver.ts";
 import { NoopAdminBotService } from "./admin-noop-bot-service.ts";
 import { AdminTelegramBotService } from "./admin-telegram-bot-service/index.ts";
 import { StartCommand } from "./admin-telegram-bot-service/commands/start.ts";
@@ -198,6 +199,7 @@ export const commentReferencesResolutionService =
       farcasterByAddressResolver: farcasterByAddressResolverService,
       farcasterByNameResolver: farcasterByNameResolverService,
       urlResolver: urlResolverService,
+      ipfsResolver: ipfsResolverService,
     },
     commentReferencesCacheService: commentReferencesCacheService,
   });
