@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "dotenv -c .local -- vocs dev -p 3004",
-    "build": "pnpm run ref:gen:all && pnpm run gen:sitemap && NODE_OPTIONS=\"--max-old-space-size=4096\" vocs build",
+    "build": "pnpm run ref:gen:all && pnpm run gen:sitemap && NODE_OPTIONS=\"--max-old-space-size=8192\" vocs build",
     "preview": "vocs preview",
     "check-types": "tsc --noEmit",
     "gen:sitemap": "tsx scripts/generate-sitemap.ts",
