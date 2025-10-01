@@ -10,6 +10,7 @@ import {
   eventOutboxService,
   mutedAccountsManagementService,
   commentReferencesResolutionService,
+  notificationOutboxService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
@@ -25,6 +26,13 @@ import {
 } from "../events/comment/index.ts";
 import { schema } from "../../schema.ts";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
+import type { Notifications } from "../notifications/types.ts";
+import {
+  createMentionNotification,
+  createReactionNotification,
+  createReplyNotifications,
+} from "../notifications/index.ts";
+import { resolveCommentParents } from "../lib/resolve-comment-parents.ts";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -67,6 +75,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
       const parentId = transformCommentParentId(event.args.parentId);
       let rootCommentId: Hex | null = null;
+      const notifications: Notifications[] = [];
 
       if (parentId) {
         const parentComment = await tx.query.comment.findFirst({
@@ -113,6 +122,32 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             })
             .where(eq(schema.comment.id, parentId))
             .execute();
+
+          notifications.push(
+            createReactionNotification({
+              chainId: context.chain.id,
+              parent: parentComment,
+              reaction: {
+                app: event.args.app,
+                author: event.args.author,
+                id: event.args.commentId,
+              },
+            }),
+          );
+        } else {
+          const parents = await resolveCommentParents(parentComment.id, tx);
+
+          notifications.push(
+            ...createReplyNotifications({
+              chainId: context.chain.id,
+              reply: {
+                id: event.args.commentId,
+                author: event.args.author,
+                app: event.args.app,
+              },
+              parents,
+            }),
+          );
         }
 
         // if parent comment doesn't have a root comment id then it is a root comment itself
@@ -126,6 +161,32 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           content: event.args.content,
           chainId: context.chain.id,
         });
+
+      referencesResolutionResult.references.forEach((reference) => {
+        if (reference.type === "ens" || reference.type === "farcaster") {
+          if (
+            reference.address.toLowerCase() === event.args.author.toLowerCase()
+          ) {
+            return;
+          }
+
+          notifications.push(
+            createMentionNotification({
+              chainId: context.chain.id,
+              comment: {
+                app: event.args.app,
+                author: event.args.author,
+                id: event.args.commentId,
+              },
+              mentionedUser: {
+                address: reference.address,
+              },
+            }),
+          );
+        }
+
+        // @todo add notification for quoted comments
+      });
 
       // We need to check if the comment already has a moderation status
       // this is useful during the reindex process
@@ -183,6 +244,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         }),
         aggregateId: insertedComment.id,
         aggregateType: "comment",
+        tx,
+      });
+
+      await notificationOutboxService.publishNotifications({
+        notifications,
         tx,
       });
     });
