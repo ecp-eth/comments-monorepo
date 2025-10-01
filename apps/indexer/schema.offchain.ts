@@ -626,6 +626,10 @@ export const notificationOutbox = offchainSchema.table(
      * For fan out services to track processed and uprocessed notifications
      */
     processedAt: timestamp({ withTimezone: true }),
+    /**
+     * Unique identifier for the deduplication
+     */
+    notificationUid: text().notNull().unique(),
     notificationType: notificationTypeColumnType.notNull(),
     /**
      * Author address of the comment that triggered the notification
@@ -639,6 +643,10 @@ export const notificationOutbox = offchainSchema.table(
      * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
      */
     parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
     /**
      * App signer that created the comment that triggered the notification
      */
@@ -677,6 +685,10 @@ export const appNotification = offchainSchema.table(
      * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
      */
     parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
     /**
      * App signer that created the comment that triggered the notification
      */

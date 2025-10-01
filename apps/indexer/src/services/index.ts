@@ -40,6 +40,7 @@ import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-servic
 import { NotificationService } from "./notification-service.ts";
 import { AppKeyAuthService } from "./app-key-auth-service.ts";
 import { createAppKeyMiddleware } from "../middleware/app-key.ts";
+import { NotificationOutboxService } from "./notifications/notification-outbox-service.ts";
 
 export { db };
 
@@ -220,4 +221,8 @@ export const appKeyMiddleware = createAppKeyMiddleware({
 export const notificationService = new NotificationService({
   db,
   ensByNameResolver: ensByNameResolverService,
+});
+
+export const notificationOutboxService = new NotificationOutboxService({
+  db,
 });
