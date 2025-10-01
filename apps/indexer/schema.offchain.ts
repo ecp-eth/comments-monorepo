@@ -703,7 +703,8 @@ export const appNotification = offchainSchema.table(
       .on(
         table.appId, // = ?
         sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        table.createdAt, // > ?
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NULL`),
     /**
@@ -714,7 +715,8 @@ export const appNotification = offchainSchema.table(
         table.appId, // = ?
         sql`lower(${table.recipientAddress})`, // = ?, IN ()
         table.notificationType, // = ?, IN ()
-        table.createdAt, // > ?
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NULL`),
     /**
@@ -726,7 +728,8 @@ export const appNotification = offchainSchema.table(
       sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
       table.notificationId, // DISTINCT ON
       table.parentId, // DISTINCT ON
-      table.createdAt, // ORDER BY
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
     ),
     /**
      * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NULL ORDER BY created_at
@@ -738,7 +741,8 @@ export const appNotification = offchainSchema.table(
         sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
         table.notificationId, // DISTINCT ON
         table.parentId, // DISTINCT ON
-        table.createdAt, // ORDER BY
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NULL`),
     /**
@@ -751,7 +755,8 @@ export const appNotification = offchainSchema.table(
         sql`lower(${table.recipientAddress})`, // IN (), DISTINCT ON
         table.notificationId, // DISTINCT ON
         table.parentId, // DISTINCT ON
-        table.createdAt, // ORDER BY
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
     /**
@@ -764,7 +769,8 @@ export const appNotification = offchainSchema.table(
       sql`lower(${table.appSigner})`, // IN ()
       table.notificationType, // DISTINCT ON
       table.parentId, // DISTINCT ON
-      table.createdAt, // ORDER BY
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
     ),
     /**
      * Used by queries WHERE app_id = ? AND lower(recipient_address) IN (lower(?)) AND seen_at IS NOT NULL AND lower(app_signer) IN (lower(?)) ORDER BY created_at
@@ -777,7 +783,8 @@ export const appNotification = offchainSchema.table(
         sql`lower(${table.appSigner})`, // IN ()
         table.notificationType, // DISTINCT ON
         table.parentId, // DISTINCT ON
-        table.createdAt, // ORDER BY
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
     /**
@@ -791,7 +798,8 @@ export const appNotification = offchainSchema.table(
         sql`lower(${table.appSigner})`, // IN ()
         table.notificationType, // DISTINCT ON
         table.parentId, // DISTINCT ON
-        table.createdAt, // ORDER BY
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
       )
       .where(sql`${table.seenAt} IS NULL`),
   ],
