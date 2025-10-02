@@ -6,8 +6,8 @@ import { useConfig, useSwitchChain } from "wagmi";
 import { submitCommentMutationFunction } from "../queries";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { usePostComment as usePostCommentSdk } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 export type OnRetryPostCommentParams = {
   comment: Comment;
@@ -35,7 +35,8 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postComment } = usePostCommentSdk();
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
@@ -70,16 +71,9 @@ export function useRetryPostComment({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({
-          signCommentResponse: { signature: appSignature, data: commentData },
-        }) {
-          const { txHash } = await postComment({
-            appSignature,
-            comment: commentData,
-          });
-
-          return txHash;
-        },
+        readContractAsync,
+        writeContractAsync,
+        signTypedDataAsync,
       });
 
       try {
@@ -115,8 +109,10 @@ export function useRetryPostComment({
     },
     [
       connectedAddress,
+      readContractAsync,
+      writeContractAsync,
+      signTypedDataAsync,
       switchChainAsync,
-      postComment,
       commentRetrySubmission,
       wagmiConfig,
     ],

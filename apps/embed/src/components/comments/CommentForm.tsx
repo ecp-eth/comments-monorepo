@@ -33,7 +33,7 @@ import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import { useEditComment, usePostComment } from "@ecp.eth/sdk/comments/react";
+import { useEditComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
@@ -53,6 +53,8 @@ import {
 import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { GaslessIndicator } from "../GaslessIndicator";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -263,6 +265,10 @@ function BaseCommentForm({
 
   const isSubmitting = submitMutation.isPending;
 
+  const ButtonWrapper = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
+    ? GaslessIndicator
+    : React.Fragment;
+
   return (
     <form
       action={async (formData) => {
@@ -309,12 +315,20 @@ function BaseCommentForm({
         }}
       />
       <div className="flex gap-2 justify-between">
-        {address && <CommentFormAuthor address={address} />}
+        {address && (
+          <>
+            <CommentFormAuthor address={address} />
+            {publicEnv.NEXT_PUBLIC_GASLESS_ENABLED && (
+              <GaslessIndicator enableTooltipOnClick />
+            )}
+          </>
+        )}
         <div className="flex gap-2 items-center ml-auto">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  className="w-8 h-8"
                   aria-label="Add media"
                   variant="outline"
                   size="icon"
@@ -330,9 +344,11 @@ function BaseCommentForm({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <Button type="submit" disabled={isSubmitting || disabled} size="sm">
-            {isSubmitting ? submitPendingLabel : submitIdleLabel}
-          </Button>
+          <ButtonWrapper>
+            <Button type="submit" disabled={isSubmitting || disabled} size="sm">
+              {isSubmitting ? submitPendingLabel : submitIdleLabel}
+            </Button>
+          </ButtonWrapper>
           {onCancel && (
             <Button
               disabled={isSubmitting}
@@ -378,8 +394,8 @@ export function CommentForm({
   const { targetUri, chainId } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
-
-  const { mutateAsync: postComment } = usePostComment();
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content, references }) => {
@@ -394,14 +410,9 @@ export function CommentForm({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ signCommentResponse }) {
-          const { txHash } = await postComment({
-            comment: signCommentResponse.data,
-            appSignature: signCommentResponse.signature,
-          });
-
-          return txHash;
-        },
+        readContractAsync,
+        signTypedDataAsync,
+        writeContractAsync: writeContractAsync,
       });
 
       try {
@@ -440,11 +451,13 @@ export function CommentForm({
       commentSubmission,
       onSubmitStartRef,
       parentId,
-      postComment,
       queryKey,
+      readContractAsync,
+      signTypedDataAsync,
       switchChainAsync,
       targetUri,
       wagmiConfig,
+      writeContractAsync,
     ],
   );
 
@@ -467,7 +480,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
   return (
     <div
       className="flex flex-row gap-2 items-center overflow-hidden"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}`}
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${publicEnv.NEXT_PUBLIC_GASLESS_ENABLED ? " for free" : ""}`}
     >
       <CommentAuthorAvatar author={queryResult.data ?? { address }} />
       <div className="flex-grow text-xs text-muted-foreground truncate">
