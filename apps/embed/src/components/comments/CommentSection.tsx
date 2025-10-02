@@ -28,6 +28,8 @@ import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { useAccount, useChainId } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
+import { GaslessIndicator } from "../GaslessIndicator";
+import { env } from "@/env";
 import { createCommentItemsQueryKey } from "./queries";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
@@ -133,6 +135,7 @@ export function CommentSection({
       className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
     >
       <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      {env.GASLESS_ENABLED && <GaslessIndicator />}
       <div className="mb-4">
         <CommentForm queryKey={queryKey} />
       </div>

@@ -18,6 +18,11 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
   }
 }
 
+// Eth submitter schema (same as demo app)
+export const SubmitterEnvSchema = z.object({
+  SUBMITTER_PRIVATE_KEY: HexSchema,
+});
+
 const ServerEnvSchema = z
   .object({
     APP_SIGNER_PRIVATE_KEY: HexSchema,
@@ -28,8 +33,24 @@ const ServerEnvSchema = z
     SENTRY_AUTH_TOKEN: z.string().optional(),
     PINATA_JWT: z.string().nonempty(),
     COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
+    // Gasless mode configuration
+    GASLESS_ENABLED: z
+      .enum(["1", "0"])
+      .default("0")
+      .transform((val) => val === "1"),
   })
-  .merge(publicEnvSchema);
+  .merge(publicEnvSchema)
+  .merge(SubmitterEnvSchema.partial())
+  .refine((data) => {
+    // If gasless is enabled, require submitter configuration
+    if (data.GASLESS_ENABLED) {
+      const submitterResult = SubmitterEnvSchema.safeParse(data);
+      if (!submitterResult.success) {
+        throw submitterResult.error;
+      }
+    }
+    return true;
+  });
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
