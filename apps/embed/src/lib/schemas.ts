@@ -24,21 +24,31 @@ export type GenerateUploadUrlResponseSchemaType = z.infer<
   typeof GenerateUploadUrlResponseSchema
 >;
 
-const sharedCommentSchema = z.object({
+const SharedCommentInputSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   chainId: z.number(),
   commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
-export const SignCommentPayloadRequestSchema = z.union([
-  sharedCommentSchema.extend({
-    targetUri: z.string().url(),
-  }),
-  sharedCommentSchema.extend({
-    parentId: HexSchema,
-  }),
+const CommentWithTargetURIInputSchema = SharedCommentInputSchema.extend({
+  targetUri: z.string().url(),
+});
+
+const CommentWithParentIdInputSchema = SharedCommentInputSchema.extend({
+  parentId: HexSchema,
+});
+
+export const CommentPayloadRequestSchema = z.union([
+  CommentWithTargetURIInputSchema,
+  CommentWithParentIdInputSchema,
 ]);
+
+export type CommentPayloadRequestSchemaType = z.input<
+  typeof CommentPayloadRequestSchema
+>;
+
+export const SignCommentPayloadRequestSchema = CommentPayloadRequestSchema;
 
 export type SignCommentPayloadRequestSchemaType = z.input<
   typeof SignCommentPayloadRequestSchema
@@ -67,6 +77,36 @@ export const SignEditCommentPayloadRequestSchema = z.object({
 export type SignEditCommentPayloadRequestSchemaType = z.infer<
   typeof SignEditCommentPayloadRequestSchema
 >;
+
+/**
+ * Post Comment API request payload
+ */
+export const PostCommentPayloadRequestSchema = z.object({
+  comment: CommentPayloadRequestSchema,
+  authorSignature: HexSchema.optional().describe(
+    "Signature of the author, required if the user has not approved our submitter address for post",
+  ),
+  deadline: z.coerce
+    .bigint()
+    .optional()
+    .describe(
+      "Deadline of the comment, required if the user has not approved our submitter address for post",
+    ),
+});
+
+export type PostCommentPayloadRequestSchemaType = z.input<
+  typeof PostCommentPayloadRequestSchema
+>;
+
+/**
+ * Post Comment API response schema
+ */
+export const PostCommentResponseSchema = z.object({
+  txHash: HexSchema,
+  signature: HexSchema,
+  hash: HexSchema,
+  data: CommentDataWithIdSchema,
+});
 
 export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
   try {

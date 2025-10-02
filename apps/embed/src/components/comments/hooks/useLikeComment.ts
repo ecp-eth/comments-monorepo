@@ -3,7 +3,6 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useConnectorClient, useSwitchChain } from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { usePostComment } from "@ecp.eth/sdk/comments/react";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
 import {
   PendingPostCommentOperationSchemaType,
@@ -12,6 +11,7 @@ import {
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitCommentMutationFunction } from "../queries";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 type UseLikeCommentProps = {
   /**
@@ -38,12 +38,13 @@ type UseLikeCommentProps = {
 
 export const useLikeComment = () => {
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postCommentMutation } = usePostComment();
   const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
@@ -78,16 +79,9 @@ export const useLikeComment = () => {
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          async writeContractAsync({
-            signCommentResponse: { signature: appSignature, data: commentData },
-          }) {
-            const { txHash } = await postCommentMutation({
-              appSignature,
-              comment: commentData,
-            });
-
-            return txHash;
-          },
+          readContractAsync,
+          writeContractAsync,
+          signTypedDataAsync,
         });
 
         likeReactionSubmission.start({
@@ -130,8 +124,10 @@ export const useLikeComment = () => {
       client,
       connectedAddress,
       likeReactionSubmission,
-      postCommentMutation,
+      readContractAsync,
+      signTypedDataAsync,
       switchChainAsync,
+      writeContractAsync,
     ],
   );
 };
