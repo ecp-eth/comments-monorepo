@@ -25,7 +25,7 @@
     "db:migrate:up": "pnpm drizzle-kit migrate",
     "worker:fan-out": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/event-fan-out-worker.ts",
     "worker:webhook-event-delivery": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/webhook-event-delivery-worker.ts",
-    "worker:comment-references-refresher": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/comment-references-refresher-worker.ts"
+    "cron:comment-references-refresher": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/comment-references-refresher-worker.ts"
   },
   "dependencies": {
     "@0x/0x-parser": "2.10.3",
@@ -57,6 +57,7 @@
     "is-network-error": "^1.1.0",
     "lru-cache": "^11.0.2",
     "mediabunny": "^1.15.2",
+    "node-cron": "^4.2.1",
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
     "pg": "8.16.0",

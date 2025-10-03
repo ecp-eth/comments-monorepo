@@ -10,6 +10,7 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { type Readable } from "node:stream";
 import readline from "node:readline";
+import cron from "node-cron";
 
 const GRACE_SHUTDOWN_DELAY_MS = 5000;
 const INDEXER_URL =
@@ -33,6 +34,20 @@ const PROCESSES = [
     args: [
       "run",
       "worker:webhook-event-delivery",
+      "--indexer-url",
+      INDEXER_URL,
+    ],
+  },
+];
+const CRON_PROCESSES = [
+  {
+    name: "cron:comment-references-refresher",
+    // every 12 hours, if it goes well we can increase the interval
+    cron: "0 */12 * * *",
+    command: "pnpm",
+    args: [
+      "run",
+      "cron:comment-references-refresher",
       "--indexer-url",
       INDEXER_URL,
     ],
@@ -88,7 +103,7 @@ async function shutdownAll(exitCode = 1) {
   process.exit(exitCode);
 }
 
-function spawnProcess(spec: (typeof PROCESSES)[number]) {
+function spawnProcess(spec: (typeof PROCESSES)[number], killAllOnExit = false) {
   const child = spawn(spec.command, spec.args, {
     env: process.env,
     cwd: process.cwd(),
@@ -108,7 +123,9 @@ function spawnProcess(spec: (typeof PROCESSES)[number]) {
       `[supervisor] ${spec.name} exited with code ${code}, signal ${signal}`,
     );
 
-    shutdownAll(code ?? 1);
+    if (killAllOnExit) {
+      shutdownAll(code ?? 1);
+    }
   });
 
   children.set(spec.name, child);
@@ -133,5 +150,24 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 }
 
 for (const spec of PROCESSES) {
-  spawnProcess(spec);
+  spawnProcess(spec, true);
+}
+
+for (const spec of CRON_PROCESSES) {
+  console.log(`[supervisor] scheduling ${spec.name} cron job`);
+  cron.schedule(spec.cron, () => {
+    const existing = children.get(spec.name);
+    if (
+      existing &&
+      existing.exitCode === null &&
+      existing.signalCode === null
+    ) {
+      console.warn(
+        `[supervisor] skipping ${spec.name} cron job because previous run is still active`,
+      );
+      return;
+    }
+    console.log(`[supervisor] running ${spec.name} cron job`);
+    spawnProcess(spec);
+  });
 }
