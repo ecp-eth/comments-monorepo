@@ -99,6 +99,13 @@ const EnvSchema = z
         },
       ),
 
+    IPFS_RESOLUTION_RETRY_COUNT: z.coerce.number().int().positive().default(5),
+    IPFS_RESOLUTION_RETRY_TIMEOUT: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(500),
+
     // this one is more of an internal flag so we can compile the indexer for docs
     SKIP_DRIZZLE_SCHEMA_DETECTION: z
       .enum(["0", "1"])

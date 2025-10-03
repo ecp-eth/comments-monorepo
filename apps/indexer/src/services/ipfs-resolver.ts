@@ -20,4 +20,6 @@ export const ipfsResolverService = createIPFSResolver({
   cacheMap,
   pinataSDK,
   urlResolver: urlResolverService,
+  retryCount: env.IPFS_RESOLUTION_RETRY_COUNT,
+  retryTimeout: env.IPFS_RESOLUTION_RETRY_TIMEOUT,
 });
