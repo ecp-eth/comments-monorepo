@@ -4,7 +4,7 @@ import { setupGetComment } from "./comments/[commentId]/get";
 import setupGetComments from "./comments/get";
 import setupGetCommentReplies from "./comments/replies/get";
 import setupGetApprovals from "./approvals/get";
-import { OpenAPIHono } from "@hono/zod-openapi";
+import { type OpenAPIHono } from "@hono/zod-openapi";
 import { setupGetAuthor } from "./authors/get";
 import { setupMarkAuthorAsMuted } from "./muted-accounts/post";
 import { setupUnmuteAccount } from "./muted-accounts/delete";

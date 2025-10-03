@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { ponder as Ponder } from "ponder:registry";
+import { type ponder as Ponder } from "ponder:registry";
 import { ZERO_ADDRESS } from "@ecp.eth/sdk";
 import { schema } from "../../schema.ts";
 import { db, eventOutboxService } from "../services/index.ts";

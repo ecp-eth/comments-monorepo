@@ -9,7 +9,7 @@ import {
 } from "vitest";
 import nock from "nock";
 import { CommentModerationClassifier } from "../../src/services/mbd-comment-moderation-classifier";
-import { ICommentClassifierCacheService } from "../../src/services/types";
+import { type ICommentClassifierCacheService } from "../../src/services/types";
 
 const mockClassifierCacheService = {
   getByCommentId: vi.fn(),

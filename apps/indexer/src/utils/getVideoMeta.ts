@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { ReadableStream } from "stream/web";
+import { type ReadableStream } from "stream/web";
 import { Input, StreamSource, MP4, WEBM } from "mediabunny";
 
 const MAX_VIDEO_HEADER_LENGTH = 1024 * 300;

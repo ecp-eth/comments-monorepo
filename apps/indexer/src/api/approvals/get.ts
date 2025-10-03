@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, desc, eq, inArray } from "ponder";

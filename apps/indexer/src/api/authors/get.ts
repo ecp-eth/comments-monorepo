@@ -1,5 +1,5 @@
 import { IndexerAPIAuthorDataSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { GetAuthorParamsSchema } from "../../lib/schemas";
 import { formatAuthor } from "../../lib/response-formatters";
 import { rateLimiter } from "hono-rate-limiter";

@@ -5,13 +5,13 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
 import {
-  ENSByAddressResolver,
-  ENSByNameResolver,
-  ERC20ByTickerResolver,
-  ERC20ByAddressResolver,
-  FarcasterByAddressResolver,
-  FarcasterByNameResolver,
-  URLResolver,
+  type ENSByAddressResolver,
+  type ENSByNameResolver,
+  type ERC20ByTickerResolver,
+  type ERC20ByAddressResolver,
+  type FarcasterByAddressResolver,
+  type FarcasterByNameResolver,
+  type URLResolver,
 } from "../../src/resolvers";
 
 // Mock the cache service

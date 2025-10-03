@@ -50,7 +50,7 @@ await eventOutboxFanOutService
   .catch((e) => {
     console.error("Fan out worker failed", e);
     Sentry.captureException(e);
-    Sentry.flush().then(() => {
+    void Sentry.flush().then(() => {
       process.exit(1);
     });
   });

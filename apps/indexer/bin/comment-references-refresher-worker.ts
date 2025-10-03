@@ -272,7 +272,7 @@ processFailedReferences()
   .catch((error) => {
     console.error("Comment references refresher worker failed", error);
     Sentry.captureException(error);
-    Sentry.flush().then(() => {
+    void Sentry.flush().then(() => {
       process.exit(1);
     });
   });

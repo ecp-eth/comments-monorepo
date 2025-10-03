@@ -1,7 +1,7 @@
 import { z } from "zod";
 import {
-  MetadataArraySchema,
-  MetadataArrayOpSchema,
+  type MetadataArraySchema,
+  type MetadataArrayOpSchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 

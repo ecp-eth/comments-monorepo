@@ -2,7 +2,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { eq } from "ponder";
 import { IndexerAPIChannelOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIErrorResponseSchema,
   GetChannelParamsSchema,

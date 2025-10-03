@@ -1,5 +1,6 @@
 /// <reference types="ponder/virtual" />
 
+/* eslint-disable @typescript-eslint/consistent-type-imports */
 declare module "ponder:internal" {
   const config: typeof import("./ponder.config.ts");
   const schema: typeof import("./ponder.schema.ts");

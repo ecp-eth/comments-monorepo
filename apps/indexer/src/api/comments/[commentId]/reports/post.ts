@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { commentReportsService } from "../../../../services";
 import { APIErrorResponseSchema } from "../../../../lib/schemas";

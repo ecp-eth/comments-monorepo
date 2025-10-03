@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import type { ResolvedERC20Data, ERC20ClientRegistry } from "./erc20.types.ts";
 import { type Hex } from "viem";
-import { ERC20TokensService } from "../services/erc20-tokens-service.ts";
+import { type ERC20TokensService } from "../services/erc20-tokens-service.ts";
 
 export type ERC20ByQueryResolver = DataLoader<string, ResolvedERC20Data[]>;
 

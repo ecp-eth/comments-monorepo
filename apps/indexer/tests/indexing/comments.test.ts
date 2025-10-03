@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import * as Sentry from "@sentry/node";
 import { initializeCommentEventsIndexing } from "../../src/indexing/comments";
-import { Event } from "ponder:registry";
+import { type Event } from "ponder:registry";
 
 // Mock Sentry to avoid real reporting
 vi.mock("@sentry/node", () => ({

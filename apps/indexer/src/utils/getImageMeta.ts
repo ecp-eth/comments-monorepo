@@ -1,5 +1,5 @@
 import { Readable } from "stream";
-import { ReadableStream } from "stream/web";
+import { type ReadableStream } from "stream/web";
 import { imageSize } from "image-size";
 import { z } from "zod";
 

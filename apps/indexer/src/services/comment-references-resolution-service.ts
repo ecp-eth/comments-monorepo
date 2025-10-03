@@ -16,7 +16,7 @@ import type {
   URLResolver,
   FarcasterByNameResolver,
 } from "../resolvers/index.ts";
-import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
+import { type CommentReferencesCacheService } from "./comment-references-cache-service.ts";
 import { type ResolveCommentReferencePosition } from "../lib/resolve-comment-references.ts";
 
 /**
