@@ -284,7 +284,15 @@ export const app = offchainSchema.table(
       }),
     name: text().notNull(),
   },
-  (table) => [index("app_by_owner_id_idx").on(table.ownerId)],
+  (table) => [
+    index("app_by_owner_id_idx").on(table.ownerId),
+    /**
+     * Used by queries WHERE app_id = ? AND created_at > ? for example in notification fan out service
+     * where we don't want to send the notifications for apps that were created after the notification was created
+     * (historical reindexing).
+     */
+    index("app_by_id_created_at_idx").on(table.id, table.createdAt),
+  ],
 );
 
 export type AppSelectType = typeof app.$inferSelect;
@@ -296,6 +304,7 @@ export const appRelations = relations(app, ({ one, many }) => ({
   }),
   appSigningKeys: many(appSigningKeys),
   appWebhooks: many(appWebhook),
+  appNotification: many(appNotification),
 }));
 
 export const appSigningKeys = offchainSchema.table(
@@ -598,4 +607,342 @@ export const eventOutbox = offchainSchema.table(
     index("event_outbox_by_processed_at_idx").on(table.processedAt),
     index("event_outbox_by_created_at_idx").on(table.createdAt),
   ],
+);
+
+const notificationTypeColumnType = text({
+  enum: ["reply", "mention", "reaction", "quote"],
+});
+
+/**
+ * This table is used to store notifications all notifications in the system.
+ * These notifications are then fan out to app clients.
+ */
+export const notificationOutbox = offchainSchema.table(
+  "notification_outbox",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * For fan out services to track processed and uprocessed notifications
+     */
+    processedAt: timestamp({ withTimezone: true }),
+    /**
+     * Unique identifier for the deduplication
+     */
+    notificationUid: text().notNull().unique(),
+    notificationType: notificationTypeColumnType.notNull(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
+    recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
+    parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
+    appSigner: text().notNull().$type<Hex>(),
+  },
+  (table) => [
+    index("nt_by_created_at_unprocessed_idx")
+      .on(table.createdAt)
+      .where(sql`${table.processedAt} IS NULL`),
+  ],
+);
+
+/**
+ * This table is used to store notifications per each app. It is almost the same copy of the notificationOutbox table
+ * but it is used to store notifications per each app.
+ */
+export const appNotification = offchainSchema.table(
+  "app_notification",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    notificationType: notificationTypeColumnType.notNull(),
+    notificationId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => notificationOutbox.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
+    parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
+    appSigner: text().notNull().$type<Hex>(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
+    recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * When the notification was seen by the recipient
+     */
+    seenAt: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    unique("an_dedupe_notifications_uq").on(table.notificationId, table.appId),
+    /**
+     * Recipient address and app are part of all indexes because they are required in list notifications api endpoints.
+     * All indexes end with created_at and id because it is used for ordering and cursor pagination.
+     */
+    index("an_by_app_recipient_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_type_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.notificationType, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.parentId, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_app_signer_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    /**
+     * Composite indexes for multiple conditions, recipient address and app are still required.
+     */
+    index("an_by_app_recipient_app_signer_type_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.notificationType, // = ?, IN (), DISTINCT ON
+      table.parentId, // = ?, IN (), DISTINCT ON
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_app_signer_type_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.notificationType, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_app_signer_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.parentId, // = ?, IN ()
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    index("an_by_app_recipient_type_parent_all_idx").on(
+      table.appId, // = ?
+      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.notificationType, // = ?, IN (), DISTINCT ON
+      table.parentId, // = ?, IN (), DISTINCT ON
+      table.createdAt, // =>,<= ?, ORDER BY
+      table.id, // =>,<= ?, ORDER BY
+    ),
+    /**
+     * Partial indexes for seen_at filters
+     */
+    index("an_by_app_recipient_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_type_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.notificationType, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_type_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.notificationType, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.parentId, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.parentId, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_app_signer_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_app_signer_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_app_signer_type_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.notificationType, // = ?, IN (), DISTINCT ON
+        table.parentId, // = ?, IN (), DISTINCT ON
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_app_signer_type_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.notificationType, // = ?, IN (), DISTINCT ON
+        table.parentId, // = ?, IN (), DISTINCT ON
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_app_signer_type_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.notificationType, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_app_signer_type_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.notificationType, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_app_signer_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.parentId, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_app_signer_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.parentId, // = ?, IN ()
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+    index("an_by_app_recipient_type_parent_seen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.notificationType, // = ?, IN (), DISTINCT ON
+        table.parentId, // = ?, IN (), DISTINCT ON
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_by_app_recipient_type_parent_unseen_idx")
+      .on(
+        table.appId, // = ?
+        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.notificationType, // = ?, IN (), DISTINCT ON
+        table.parentId, // = ?, IN (), DISTINCT ON
+        table.createdAt, // =>,<= ?, ORDER BY
+        table.id, // =>,<= ?, ORDER BY
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+  ],
+);
+
+export const appNotificationRelations = relations(
+  appNotification,
+  ({ one }) => ({
+    notification: one(notificationOutbox, {
+      fields: [appNotification.notificationId],
+      references: [notificationOutbox.id],
+    }),
+    app: one(app, {
+      fields: [appNotification.appId],
+      references: [app.id],
+    }),
+  }),
 );

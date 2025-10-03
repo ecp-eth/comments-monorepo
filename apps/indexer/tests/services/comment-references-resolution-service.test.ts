@@ -5,6 +5,7 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
 import {
+  CAIP373QuotedCommentResolver,
   ENSByAddressResolver,
   ENSByNameResolver,
   ERC20ByTickerResolver,
@@ -25,6 +26,7 @@ const mockResolveCommentReferences = vi.fn();
 
 // Mock resolvers
 const mockResolvers = {
+  caip373QuotedCommentResolver: {} as CAIP373QuotedCommentResolver,
   ensByAddressResolver: {} as ENSByAddressResolver,
   ensByNameResolver: {} as ENSByNameResolver,
   erc20ByAddressResolver: {} as ERC20ByAddressResolver,

@@ -12,9 +12,16 @@ import type {
   ERC20ByAddressResolver,
   URLResolver,
   FarcasterByNameResolver,
+  CAIP373QuotedCommentResolver,
 } from "../../src/resolvers";
-import { Hex } from "viem";
+import { encodeFunctionData, Hex, toHex } from "viem";
+import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
+import { randomBytes } from "crypto";
 
+const caip373QuotedCommentResolver: CAIP373QuotedCommentResolver =
+  new DataLoader(async (keys) =>
+    keys.map(() => null),
+  ) as unknown as CAIP373QuotedCommentResolver;
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
 ) as unknown as ENSByNameResolver;
@@ -39,6 +46,10 @@ const urlResolver: URLResolver = new DataLoader(async (keys) =>
 
 const fetchMock = vi.spyOn(global, "fetch");
 
+const resolveCaip373QuotedComment = vi.spyOn(
+  caip373QuotedCommentResolver,
+  "load",
+);
 const resolveEnsByName = vi.spyOn(ensByNameResolver, "load");
 const resolveEnsByAddress = vi.spyOn(ensByAddressResolver, "load");
 const resolveFarcasterByAddress = vi.spyOn(farcasterByAddressResolver, "load");
@@ -48,6 +59,7 @@ const resolveERC20ByAddress = vi.spyOn(erc20ByAddressResolver, "load");
 const resolveUrl = vi.spyOn(urlResolver, "load");
 
 const options: ResolveCommentReferencesOptions = {
+  caip373QuotedCommentResolver,
   ensByAddressResolver,
   ensByNameResolver,
   farcasterByAddressResolver,
@@ -862,6 +874,113 @@ describe("resolveCommentReferences", () => {
               caip: "eip155:1/erc20:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
             },
           ],
+        },
+      ]);
+    });
+  });
+
+  describe("caip373", () => {
+    function createQuotedCommentCaip(commentId: Hex) {
+      const encodedFunctionCall = encodeFunctionData({
+        abi: CommentManagerABI,
+        functionName: "getComment",
+        args: [commentId],
+      });
+
+      return `eip155:1:${COMMENT_MANAGER_ADDRESS}:call:${encodedFunctionCall}`;
+    }
+    it("resolves caip373 for quoted comment (with prefix)", async () => {
+      const commentId = toHex(randomBytes(32));
+
+      resolveCaip373QuotedComment.mockResolvedValueOnce({
+        commentId,
+        chainId: 1,
+        commentManagerAddress: COMMENT_MANAGER_ADDRESS,
+      });
+
+      const caip = `@${createQuotedCommentCaip(commentId)}`;
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: caip,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "quoted_comment",
+          id: commentId,
+          chainId: 1,
+          position: {
+            start: 0,
+            end: caip.length,
+          },
+        },
+      ]);
+    });
+
+    it("resolves caip373 for quoted comment (without prefix)", async () => {
+      const commentId = toHex(randomBytes(32));
+
+      resolveCaip373QuotedComment.mockResolvedValueOnce({
+        commentId,
+        chainId: 1,
+        commentManagerAddress: COMMENT_MANAGER_ADDRESS,
+      });
+
+      const caip = createQuotedCommentCaip(commentId);
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: caip,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "quoted_comment",
+          id: commentId,
+          chainId: 1,
+          position: {
+            start: 0,
+            end: caip.length,
+          },
+        },
+      ]);
+    });
+
+    it("resolves caip373 for quoted comment with block number", async () => {
+      const commentId = toHex(randomBytes(32));
+
+      resolveCaip373QuotedComment.mockResolvedValueOnce({
+        commentId,
+        chainId: 1,
+        commentManagerAddress: COMMENT_MANAGER_ADDRESS,
+      });
+
+      const caip = createQuotedCommentCaip(commentId) + ":100";
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: caip,
+        },
+        options,
+      );
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "quoted_comment",
+          id: commentId,
+          chainId: 1,
+          position: {
+            start: 0,
+            end: caip.length,
+          },
         },
       ]);
     });
