@@ -173,12 +173,39 @@ describe("url loader", () => {
     });
   });
 
-  it("returns null if response is not ok", async () => {
+  // unauthorized
+  it("returns null if response is 401", async () => {
+    nock("https://example.com").get("/").reply(401);
+
+    const result = await urlResolver.load("https://example.com");
+
+    expect(result).toBeNull();
+  });
+
+  // forbidden
+  it("returns null if response is 403", async () => {
+    nock("https://example.com").get("/").reply(403);
+
+    const result = await urlResolver.load("https://example.com");
+
+    expect(result).toBeNull();
+  });
+
+  // not found
+  it("returns null if response is 404", async () => {
     nock("https://example.com").get("/").reply(404);
 
     const result = await urlResolver.load("https://example.com");
 
     expect(result).toBeNull();
+  });
+
+  it("throws an error if response is not 200, 401, 403, or 404", async () => {
+    nock("https://example.com").get("/").reply(500);
+
+    await expect(async () => {
+      await urlResolver.load("https://example.com");
+    }).rejects.toThrow(expect.any(Error));
   });
 
   describe("webpage", () => {

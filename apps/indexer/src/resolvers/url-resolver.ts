@@ -50,7 +50,17 @@ async function resolveURL(
 
   if (!response.ok) {
     console.warn("Failed to fetch URL", url, response.statusText);
-    return null;
+
+    if (
+      response.status === 401 ||
+      response.status === 403 ||
+      response.status === 404
+    ) {
+      return null;
+    }
+
+    // if http failed, we should throw an error to indicate resolution failed
+    throw new Error(`Failed to fetch URL ${url}: ${response.statusText}`);
   }
 
   // we don't do any sophisticated check of actual content type

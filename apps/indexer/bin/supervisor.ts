@@ -44,7 +44,7 @@ const CRON_PROCESSES = [
     name: "cron:comment-references-refresher",
     // fallback to run it on 3:30 pm on Monday, Wednesday, Friday and Sunday
     // eslint-disable-next-line turbo/no-undeclared-env-vars
-    cron: process.env.CRON_COMMENT_REFERENCES_REFRESHER ?? "30 15 * * 1,3,5,7",
+    cron: process.env.CRON_COMMENT_REFERENCES_REFRESHER ?? "30 16 * * 1,3,5,7",
     command: "pnpm",
     args: [
       "run",
@@ -155,7 +155,9 @@ for (const spec of PROCESSES) {
 }
 
 for (const spec of CRON_PROCESSES) {
-  console.log(`[supervisor] scheduling ${spec.name} cron job`);
+  console.log(
+    `[supervisor] scheduling ${spec.name} cron job to run on "${spec.cron}"`,
+  );
   cron.schedule(spec.cron, () => {
     const existing = children.get(spec.name);
     if (

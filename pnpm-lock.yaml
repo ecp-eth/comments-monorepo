@@ -142,8 +142,8 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pinata:
-        specifier: ^2.4.3
-        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^2.5.0
+        version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -381,8 +381,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pinata:
-        specifier: ^2.4.3
-        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^2.5.0
+        version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -514,8 +514,8 @@ importers:
         specifier: ^0.4.4
         version: 0.4.6(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pinata:
-        specifier: ^2.4.3
-        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^2.5.0
+        version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -728,6 +728,9 @@ importers:
       pg:
         specifier: 8.16.0
         version: 8.16.0
+      pinata:
+        specifier: ^2.5.0
+        version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ponder:
         specifier: 0.12.21
         version: 0.12.21(patch_hash=01c192aa66b97719b56a0aad1ebb7a69911cc744670918eadbb52d26709c42d9)(@opentelemetry/api@1.9.0)(@types/node@22.15.29)(@types/pg@8.15.4)(bufferutil@4.0.9)(hono@4.9.1)(jiti@2.4.2)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.19.4)(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))(yaml@2.8.0)(zod@3.25.76)
@@ -1390,8 +1393,8 @@ importers:
         specifier: ^9.19.0
         version: 9.28.0(jiti@2.4.2)
       pinata:
-        specifier: ^2.4.3
-        version: 2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^2.5.0
+        version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ~19.1.0
         version: 19.1.0
@@ -10167,8 +10170,8 @@ packages:
     resolution: {integrity: sha512-eW/gHNMlxdSP6dmG6uJip6FXN0EQBwm2clYYd8Wul42Cwu/DK8HEftzsapcNdYe2MfLiIwZqsDk2RDEsTE79hA==}
     engines: {node: '>=10'}
 
-  pinata@2.4.3:
-    resolution: {integrity: sha512-06W8Ey9grNqkxYpVO6HuEb4UZ9MK4y10yFJSCkBYvKTfh17uN1QEPi+XDTeKGcYNcRdXh1eyPyItIn4KfenSkg==}
+  pinata@2.5.0:
+    resolution: {integrity: sha512-zjjrEUbEqeAE3gqIOy1K8f4xq3CDDefCgRj6tMqn14gbclSYo014+HQcfcKAAstMUjYNDb1yYQjxmBImW2kxCw==}
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=16.8.0'
@@ -24031,7 +24034,7 @@ snapshots:
 
   pify@5.0.0: {}
 
-  pinata@2.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  pinata@2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     optionalDependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)

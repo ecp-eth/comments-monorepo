@@ -30,6 +30,7 @@ import { urlResolverService } from "../src/services/url-resolver.ts";
 import { parseWorkerCommandOptions, workerCommand } from "./shared.ts";
 import { EventOutboxService } from "../src/services/events/event-outbox-service.ts";
 import { createCommentReferencesUpdatedEvent } from "../src/events/comment/index.ts";
+import { ipfsResolverService } from "../src/services/ipfs-resolver.ts";
 
 initSentry("comment-references-refresher-worker");
 
@@ -95,6 +96,7 @@ const commentReferencesResolutionService =
       farcasterByAddressResolver: farcasterByAddressResolverService,
       farcasterByNameResolver: farcasterByNameResolverService,
       urlResolver: urlResolverService,
+      ipfsResolver: ipfsResolverService,
     },
   });
 const eventOutboxService = new EventOutboxService({

@@ -13,6 +13,7 @@ import {
   type FarcasterByNameResolver,
   type URLResolver,
 } from "../../src/resolvers";
+import { IPFSResolver } from "../../src/resolvers/ipfs-resolver";
 
 // Mock the cache service
 const mockCacheService = {
@@ -32,6 +33,7 @@ const mockResolvers = {
   farcasterByAddressResolver: {} as FarcasterByAddressResolver,
   farcasterByNameResolver: {} as FarcasterByNameResolver,
   urlResolver: {} as URLResolver,
+  ipfsResolver: {} as IPFSResolver,
 };
 
 const service = new CommentReferencesResolutionService({

@@ -87,6 +87,18 @@ const EnvSchema = z
     NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
 
+    // Pinata IPFS configuration
+    PINATA_JWT: z.string().min(1),
+    PINATA_GATEWAY: z
+      .string()
+      .refine(
+        (val) => !val.startsWith("http://") && !val.startsWith("https://"),
+        {
+          message:
+            "Gateway domain must not include protocol (http:// or https://)",
+        },
+      ),
+
     // this one is more of an internal flag so we can compile the indexer for docs
     SKIP_DRIZZLE_SCHEMA_DETECTION: z
       .enum(["0", "1"])

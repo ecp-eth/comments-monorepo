@@ -8,3 +8,5 @@ process.env.DATABASE_URL =
 process.env.JWT_SIWE_NONCE_SECRET = "test";
 process.env.JWT_ACCESS_TOKEN_SECRET = "test";
 process.env.JWT_REFRESH_TOKEN_SECRET = "test";
+process.env.PINATA_JWT = "test";
+process.env.PINATA_GATEWAY = "gateway.pinata.cloud";

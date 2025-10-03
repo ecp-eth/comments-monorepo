@@ -14,6 +14,7 @@ import type {
   FarcasterByNameResolver,
 } from "../../src/resolvers";
 import { type Hex } from "viem";
+import { type IPFSResolver } from "../../src/resolvers/ipfs-resolver";
 
 const ensByNameResolver: ENSByNameResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
@@ -36,6 +37,9 @@ const erc20ByAddressResolver: ERC20ByAddressResolver = new DataLoader(
 const urlResolver: URLResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
 ) as unknown as URLResolver;
+const ipfsResolver: IPFSResolver = new DataLoader(async (keys) =>
+  keys.map(() => null),
+) as unknown as IPFSResolver;
 
 const fetchMock = vi.spyOn(global, "fetch");
 
@@ -45,7 +49,8 @@ const resolveFarcasterByAddress = vi.spyOn(farcasterByAddressResolver, "load");
 const resolveFarcasterByName = vi.spyOn(farcasterByNameResolver, "load");
 const resolveERC20ByTicker = vi.spyOn(erc20ByTickerResolver, "load");
 const resolveERC20ByAddress = vi.spyOn(erc20ByAddressResolver, "load");
-const resolveUrl = vi.spyOn(urlResolver, "load");
+const resolveURL = vi.spyOn(urlResolver, "load");
+const resolveIPFS = vi.spyOn(ipfsResolver, "load");
 
 const options: ResolveCommentReferencesOptions = {
   ensByAddressResolver,
@@ -55,6 +60,7 @@ const options: ResolveCommentReferencesOptions = {
   erc20ByTickerResolver,
   erc20ByAddressResolver,
   urlResolver,
+  ipfsResolver,
 };
 
 describe("resolveCommentReferences", () => {
@@ -64,7 +70,8 @@ describe("resolveCommentReferences", () => {
     resolveFarcasterByAddress.mockReset();
     resolveERC20ByTicker.mockReset();
     resolveERC20ByAddress.mockReset();
-    resolveUrl.mockReset();
+    resolveURL.mockReset();
+    resolveIPFS.mockReset();
     fetchMock.mockReset();
   });
 
@@ -437,8 +444,8 @@ describe("resolveCommentReferences", () => {
     });
   });
 
-  describe("url", () => {
-    it("resolves a url", async () => {
+  describe("http url", () => {
+    it("resolves a http url", async () => {
       const resolvedValue = {
         type: "webpage" as const,
         url: "https://example.com/",
@@ -449,7 +456,7 @@ describe("resolveCommentReferences", () => {
         mediaType: "text/html",
       };
 
-      resolveUrl.mockResolvedValue(resolvedValue);
+      resolveURL.mockResolvedValue(resolvedValue);
 
       const result = await resolveCommentReferences(
         {
@@ -459,7 +466,7 @@ describe("resolveCommentReferences", () => {
         options,
       );
 
-      expect(resolveUrl).toHaveBeenCalledTimes(1);
+      expect(resolveURL).toHaveBeenCalledTimes(1);
       expect(result.status).toBe("success");
       expect(result.references).toEqual([
         {
@@ -483,7 +490,7 @@ describe("resolveCommentReferences", () => {
         mediaType: "text/html",
       };
 
-      resolveUrl.mockResolvedValue(resolvedValue);
+      resolveURL.mockResolvedValue(resolvedValue);
 
       const result = await resolveCommentReferences(
         {
@@ -493,8 +500,8 @@ describe("resolveCommentReferences", () => {
         options,
       );
 
-      expect(resolveUrl).toHaveBeenCalledTimes(1);
-      expect(resolveUrl).toHaveBeenCalledWith(
+      expect(resolveURL).toHaveBeenCalledTimes(1);
+      expect(resolveURL).toHaveBeenCalledWith(
         "http://example.com:8080/?test=true#neheheh",
       );
 
@@ -505,6 +512,84 @@ describe("resolveCommentReferences", () => {
           position: {
             start: 3,
             end: 45,
+          },
+        },
+      ]);
+    });
+  });
+
+  describe("ipfs url", () => {
+    it("resolves a ipfs url", async () => {
+      const resolvedValue = {
+        type: "webpage" as const,
+        url: "https://example.com/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+        mediaType: "text/html",
+      };
+
+      resolveIPFS.mockResolvedValue(resolvedValue);
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content:
+            "👀 ipfs://QmT3ud1DCSLfbTtPntaHCUSPWTwDDapGSUgK55J7Wc3TKp 💻",
+        },
+        options,
+      );
+
+      expect(resolveIPFS).toHaveBeenCalledTimes(1);
+      expect(resolveIPFS).toHaveBeenCalledWith(
+        "ipfs://QmT3ud1DCSLfbTtPntaHCUSPWTwDDapGSUgK55J7Wc3TKp",
+      );
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          ...resolvedValue,
+          position: {
+            start: 3,
+            end: 56,
+          },
+        },
+      ]);
+    });
+
+    it("resolves a ipfs url with resource path", async () => {
+      const resolvedValue = {
+        type: "webpage" as const,
+        url: "https://example.com/",
+        title: "Hello",
+        description: null,
+        opengraph: null,
+        favicon: null,
+        mediaType: "text/html",
+      };
+
+      resolveIPFS.mockResolvedValue(resolvedValue);
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content:
+            "👀 ipfs://QmT3ud1DCSLfbTtPntaHCUSPWTwDDapGSUgK55J7Wc3TKp/path/to/file.png 💻",
+        },
+        options,
+      );
+
+      expect(resolveIPFS).toHaveBeenCalledTimes(1);
+      expect(resolveIPFS).toHaveBeenCalledWith(
+        "ipfs://QmT3ud1DCSLfbTtPntaHCUSPWTwDDapGSUgK55J7Wc3TKp/path/to/file.png",
+      );
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          ...resolvedValue,
+          position: {
+            start: 3,
+            end: 73,
           },
         },
       ]);
@@ -609,7 +694,7 @@ describe("resolveCommentReferences", () => {
 
   describe("status", () => {
     it("resolves to success if all resolutions are successful", async () => {
-      resolveUrl.mockResolvedValueOnce({
+      resolveURL.mockResolvedValueOnce({
         type: "webpage",
         url: "https://example.com/",
         title: "Hello",
@@ -653,7 +738,7 @@ describe("resolveCommentReferences", () => {
     });
 
     it("resolves to partial if some resolutions are successful", async () => {
-      resolveUrl.mockResolvedValueOnce({
+      resolveURL.mockResolvedValueOnce({
         type: "webpage",
         url: "https://example.com/",
         title: "Hello",
@@ -691,7 +776,7 @@ describe("resolveCommentReferences", () => {
     });
 
     it("resolves to failed if all resolutions are failed", async () => {
-      resolveUrl.mockRejectedValueOnce(new Error("Failed to resolve"));
+      resolveURL.mockRejectedValueOnce(new Error("Failed to resolve"));
       resolveEnsByName.mockRejectedValueOnce(new Error("Failed to resolve"));
       resolveERC20ByTicker.mockRejectedValueOnce(
         new Error("Failed to resolve"),
