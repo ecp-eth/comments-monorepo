@@ -42,8 +42,9 @@ const PROCESSES = [
 const CRON_PROCESSES = [
   {
     name: "cron:comment-references-refresher",
-    // run it on 3:30 pm on Monday, Wednesday, Friday and Sunday
-    cron: "30 15 * * 1,3,5,7",
+    // fallback to run it on 3:30 pm on Monday, Wednesday, Friday and Sunday
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    cron: process.env.CRON_COMMENT_REFERENCES_REFRESHER ?? "30 15 * * 1,3,5,7",
     command: "pnpm",
     args: [
       "run",
