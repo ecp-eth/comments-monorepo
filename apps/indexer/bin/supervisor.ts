@@ -42,8 +42,9 @@ const PROCESSES = [
 const CRON_PROCESSES = [
   {
     name: "cron:comment-references-refresher",
-    // every 12 hours, if it goes well we can increase the interval
-    cron: "0 */12 * * *",
+    // fallback to run it on 3:30 pm on Monday, Wednesday, Friday and Sunday
+    // eslint-disable-next-line turbo/no-undeclared-env-vars
+    cron: process.env.CRON_COMMENT_REFERENCES_REFRESHER ?? "30 15 * * 1,3,5,7",
     command: "pnpm",
     args: [
       "run",
@@ -124,7 +125,7 @@ function spawnProcess(spec: (typeof PROCESSES)[number], killAllOnExit = false) {
     );
 
     if (killAllOnExit) {
-      shutdownAll(code ?? 1);
+      void shutdownAll(code ?? 1);
     }
   });
 
@@ -134,18 +135,18 @@ function spawnProcess(spec: (typeof PROCESSES)[number], killAllOnExit = false) {
 
 process.on("uncaughtException", (err) => {
   console.error("[supervisor] uncaught exception", err);
-  shutdownAll(1);
+  void shutdownAll(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("[supervisor] unhandled rejection", reason, promise);
-  shutdownAll(1);
+  void shutdownAll(1);
 });
 
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => {
     console.log(`[supervisor] received ${signal}, shutting down...`);
-    shutdownAll(0);
+    void shutdownAll(0);
   });
 }
 
