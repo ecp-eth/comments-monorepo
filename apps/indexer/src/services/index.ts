@@ -41,6 +41,8 @@ import { NotificationService } from "./notification-service.ts";
 import { AppKeyAuthService } from "./app-key-auth-service.ts";
 import { createAppKeyMiddleware } from "../middleware/app-key.ts";
 import { NotificationOutboxService } from "./notifications/notification-outbox-service.ts";
+import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver.ts";
+import { createCommentByIdResolver } from "../resolvers/comment-by-id-resolver.ts";
 
 export { db };
 
@@ -195,6 +197,7 @@ export const commentReferencesResolutionService =
   new CommentReferencesResolutionService({
     resolveCommentReferences: resolveCommentReferences,
     commentReferencesResolvers: {
+      caip373QuotedCommentResolver: caip373QuotedCommentResolverService,
       ensByAddressResolver: ensByAddressResolverService,
       ensByNameResolver: ensByNameResolverService,
       erc20ByAddressResolver: erc20ByAddressResolverService,
@@ -224,5 +227,9 @@ export const notificationService = new NotificationService({
 });
 
 export const notificationOutboxService = new NotificationOutboxService({
+  db,
+});
+
+export const commentByIdResolverService = createCommentByIdResolver({
   db,
 });

@@ -1,3 +1,4 @@
+export * from "./caip373-quoted-comment-resolver.ts";
 export * from "./ens-by-address-resolver.ts";
 export * from "./ens.types.ts";
 export * from "./ens-by-name-resolver.ts";
