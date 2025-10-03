@@ -35,7 +35,8 @@ function extractResourcePath(ipfsUrl: string) {
 async function waitURLToBeReady(url: string) {
   await runAsync(
     async () => {
-      const response = await fetch(url);
+      const timeoutSignal = AbortSignal.timeout(10000);
+      const response = await fetch(url, { signal: timeoutSignal });
       if (response.ok) {
         return;
       }
@@ -52,7 +53,7 @@ async function waitURLToBeReady(url: string) {
 }
 
 /**
- * Pin a CID to Pinata and return the gateway URL
+ * Pin a CID to Pinata and return whether pinning succeeded
  */
 async function pinCIDToPinata(
   cid: string,
@@ -118,11 +119,6 @@ async function resolveIPFSURL(
     const resURL = pinned
       ? constructGatewayURL(cid, resourcePath, pinataSDK)
       : constructFallbackURL(cid, resourcePath);
-
-    if (!resURL) {
-      console.warn("Failed to pin CID to Pinata:", cid);
-      return null;
-    }
 
     // this is a workaround to wait for pinata pinned url to be ready
     // pinata can falsy return 403 when the url is not pinned yet,

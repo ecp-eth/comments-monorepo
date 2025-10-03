@@ -203,7 +203,7 @@ describe("url loader", () => {
   it("throws an error if response is not 200, 401, 403, or 404", async () => {
     nock("https://example.com").get("/").reply(500);
 
-    expect(async () => {
+    await expect(async () => {
       await urlResolver.load("https://example.com");
     }).rejects.toThrow(expect.any(Error));
   });
