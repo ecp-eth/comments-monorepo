@@ -7,7 +7,7 @@ import {
   APIErrorResponseSchema,
   OpenAPIENSNameOrAddressSchema,
 } from "../../../lib/schemas.ts";
-import { NotificationTypeSchema } from "../../../notifications/schemas/shared.ts";
+import { NotificationTypeSchema } from "../../../notifications/schemas.ts";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
 import {
   NotificationService_InvalidEnsNamesError,

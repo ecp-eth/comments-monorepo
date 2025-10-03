@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { type ponder as Ponder } from "ponder:registry";
+import { type Context, type ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -11,6 +11,7 @@ import {
   mutedAccountsManagementService,
   commentReferencesResolutionService,
   notificationOutboxService,
+  commentByIdResolverService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
@@ -29,10 +30,16 @@ import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 import type { Notifications } from "../notifications/types.ts";
 import {
   createMentionNotification,
+  createQuoteNotification,
   createReactionNotification,
   createReplyNotifications,
 } from "../notifications/index.ts";
 import { resolveCommentParents } from "../lib/resolve-comment-parents.ts";
+import type {
+  NotificationMentionSchemaType,
+  NotificationQuoteSchemaType,
+} from "../notifications/schemas.ts";
+import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -162,31 +169,18 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           chainId: context.chain.id,
         });
 
-      referencesResolutionResult.references.forEach((reference) => {
-        if (reference.type === "ens" || reference.type === "farcaster") {
-          if (
-            reference.address.toLowerCase() === event.args.author.toLowerCase()
-          ) {
-            return;
-          }
+      const notificationsFromReferences =
+        await resolveNotificationsFromReferences({
+          references: referencesResolutionResult.references,
+          comment: {
+            app: event.args.app,
+            author: event.args.author,
+            id: event.args.commentId,
+          },
+          context,
+        });
 
-          notifications.push(
-            createMentionNotification({
-              chainId: context.chain.id,
-              comment: {
-                app: event.args.app,
-                author: event.args.author,
-                id: event.args.commentId,
-              },
-              mentionedUser: {
-                address: reference.address,
-              },
-            }),
-          );
-        }
-
-        // @todo add notification for quoted comments
-      });
+      notifications.push(...notificationsFromReferences);
 
       // We need to check if the comment already has a moderation status
       // this is useful during the reindex process
@@ -455,6 +449,17 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           chainId: context.chain.id,
         });
 
+      const notificationsFromReferences =
+        await resolveNotificationsFromReferences({
+          references: referencesResolutionResult.references,
+          comment: {
+            app: event.args.editedByApp,
+            author: event.args.author,
+            id: event.args.commentId,
+          },
+          context,
+        });
+
       const moderationResult = await commentModerationService.moderateUpdate({
         comment: event.args,
         commentRevision: newCommentRevision,
@@ -492,6 +497,79 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       });
 
       await moderationResult.saveAndNotify();
+
+      await notificationOutboxService.publishNotifications({
+        notifications: notificationsFromReferences,
+        tx,
+      });
     });
   });
+}
+
+async function resolveNotificationsFromReferences({
+  references,
+  comment,
+  context,
+}: {
+  references: IndexerAPICommentReferencesSchemaType;
+  comment: {
+    app: Hex;
+    author: Hex;
+    id: Hex;
+  };
+  context:
+    | Context<"CommentsV1:CommentAdded">
+    | Context<"CommentsV1:CommentEdited">;
+}): Promise<(NotificationMentionSchemaType | NotificationQuoteSchemaType)[]> {
+  const notificationsFromReferencesPromises: Promise<
+    NotificationMentionSchemaType | NotificationQuoteSchemaType | void
+  >[] = [];
+
+  for (const reference of references) {
+    if (reference.type === "ens" || reference.type === "farcaster") {
+      notificationsFromReferencesPromises.push(
+        Promise.resolve(
+          createMentionNotification({
+            chainId: context.chain.id,
+            comment,
+            mentionedUser: {
+              address: reference.address,
+            },
+          }),
+        ),
+      );
+    } else if (reference.type === "quoted_comment") {
+      notificationsFromReferencesPromises.push(
+        commentByIdResolverService
+          .load({
+            chainId: reference.chainId,
+            id: reference.id,
+          })
+          .then((quotedComment) => {
+            if (!quotedComment) {
+              return;
+            }
+
+            return createQuoteNotification({
+              chainId: context.chain.id,
+              comment,
+              quotedComment: {
+                app: quotedComment.app,
+                author: quotedComment.author,
+                id: quotedComment.id,
+              },
+            });
+          }),
+      );
+    }
+  }
+
+  const resolvedNotifications = await Promise.all(
+    notificationsFromReferencesPromises,
+  );
+
+  return resolvedNotifications.filter(
+    (val): val is NotificationMentionSchemaType | NotificationQuoteSchemaType =>
+      !!val,
+  );
 }
