@@ -1,5 +1,5 @@
 import type { DB } from "./db.ts";
-import type { NotificationTypeSchemaType } from "../notifications/schemas/shared.ts";
+import type { NotificationTypeSchemaType } from "../notifications/schemas.ts";
 import { schema } from "../../schema.ts";
 import { and, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import type { ENSByNameResolver } from "../resolvers/index.ts";

@@ -313,6 +313,23 @@ export type IndexerAPICommentReferenceURLVideoSchemaType = z.infer<
   typeof IndexerAPICommentReferenceURLVideoSchema
 >;
 
+/**
+ * Handles caip373 quoted comment
+ *
+ * See https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-373.md
+ * and https://github.com/ecp-eth/ECPIP/discussions/2
+ */
+export const IndexerAPICommentReferenceQuotedCommentSchema = z.object({
+  type: z.literal("quoted_comment"),
+  id: HexSchema,
+  chainId: z.number().int(),
+  position: IndexerAPICommentReferencePositionSchema,
+});
+
+export type IndexerAPICommentReferenceQuotedCommentSchemaType = z.infer<
+  typeof IndexerAPICommentReferenceQuotedCommentSchema
+>;
+
 export const IndexerAPICommentReferenceSchema = z.union([
   IndexerAPICommentReferenceENSSchema,
   IndexerAPICommentReferenceERC20Schema,
@@ -321,6 +338,7 @@ export const IndexerAPICommentReferenceSchema = z.union([
   IndexerAPICommentReferenceURLFileSchema,
   IndexerAPICommentReferenceURLImageSchema,
   IndexerAPICommentReferenceURLVideoSchema,
+  IndexerAPICommentReferenceQuotedCommentSchema,
 ]);
 
 export type IndexerAPICommentReferenceSchemaType = z.infer<
