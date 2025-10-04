@@ -32,7 +32,11 @@ function extractResourcePath(ipfsUrl: string) {
   return "";
 }
 
-async function waitURLToBeReady(url: string) {
+async function waitURLToBeReady(
+  url: string,
+  retryCount: number,
+  retryTimeout: number,
+) {
   await runAsync(
     async () => {
       const timeoutSignal = AbortSignal.timeout(10000);
@@ -43,10 +47,10 @@ async function waitURLToBeReady(url: string) {
       throw new Error("URL is not ready");
     },
     {
-      retries: 3,
+      retries: retryCount,
       backoff: {
         type: "exponential",
-        delay: 300,
+        delay: retryTimeout,
       },
     },
   );
@@ -99,11 +103,19 @@ function constructGatewayURL(
 /**
  * Resolve an IPFS URL by pinning it to Pinata and then resolving metadata
  */
-async function resolveIPFSURL(
-  ipfsUrl: string,
-  pinataSDK: PinataSDK,
-  urlResolver: URLResolver,
-): Promise<ResolvedURL | null> {
+async function resolveIPFSURL({
+  ipfsUrl,
+  pinataSDK,
+  urlResolver,
+  retryCount,
+  retryTimeout,
+}: {
+  ipfsUrl: string;
+  pinataSDK: PinataSDK;
+  urlResolver: URLResolver;
+  retryCount: number;
+  retryTimeout: number;
+}): Promise<ResolvedURL | null> {
   const cid = extractCID(ipfsUrl);
   const resourcePath = extractResourcePath(ipfsUrl);
 
@@ -123,7 +135,7 @@ async function resolveIPFSURL(
     // this is a workaround to wait for pinata pinned url to be ready
     // pinata can falsy return 403 when the url is not pinned yet,
     // which confuses the http url resolver
-    await waitURLToBeReady(resURL);
+    await waitURLToBeReady(resURL, retryCount, retryTimeout);
 
     // Use the existing URL resolver to get metadata from the gateway URL
     const resolvedURL = await urlResolver.load(resURL);
@@ -148,6 +160,8 @@ type IPFSResolverOptions = Omit<
 > & {
   urlResolver: URLResolver;
   pinataSDK: PinataSDK;
+  retryCount: number;
+  retryTimeout: number;
 };
 
 /**
@@ -156,13 +170,21 @@ type IPFSResolverOptions = Omit<
 export function createIPFSResolver({
   urlResolver,
   pinataSDK,
+  retryCount,
+  retryTimeout,
   ...dataLoaderOptions
 }: IPFSResolverOptions): IPFSResolver {
   return new DataLoader<string, ResolvedURL | null>(
     async (ipfsUrls) => {
       return Promise.all(
         ipfsUrls.map((ipfsUrl) =>
-          resolveIPFSURL(ipfsUrl, pinataSDK, urlResolver),
+          resolveIPFSURL({
+            ipfsUrl,
+            pinataSDK,
+            urlResolver,
+            retryCount,
+            retryTimeout,
+          }),
         ),
       );
     },

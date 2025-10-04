@@ -87,7 +87,12 @@ describe("IPFS Resolver", () => {
         },
       },
     } as unknown as PinataSDK;
-    const ipfsResolver = createIPFSResolver({ urlResolver, pinataSDK });
+    const ipfsResolver = createIPFSResolver({
+      urlResolver,
+      pinataSDK,
+      retryCount: 3,
+      retryTimeout: 300,
+    });
     const ipfsUrl = "ipfs://QmTestHash";
     const result = await ipfsResolver.load(ipfsUrl);
 
@@ -133,7 +138,12 @@ describe("IPFS Resolver", () => {
         },
       },
     } as unknown as PinataSDK;
-    const ipfsResolver = createIPFSResolver({ urlResolver, pinataSDK });
+    const ipfsResolver = createIPFSResolver({
+      urlResolver,
+      pinataSDK,
+      retryCount: 3,
+      retryTimeout: 300,
+    });
     const ipfsUrl = "ipfs://QmTestHash/path/to/file.png";
     const result = await ipfsResolver.load(ipfsUrl);
 
@@ -188,6 +198,8 @@ describe("IPFS Resolver", () => {
     const fallbackResolver = createIPFSResolver({
       urlResolver: urlResolver,
       pinataSDK: pinataSDK,
+      retryCount: 3,
+      retryTimeout: 300,
     });
 
     const ipfsUrl = "ipfs://QmFallbackHash";
@@ -247,6 +259,8 @@ describe("IPFS Resolver", () => {
     const ipfsResolver = createIPFSResolver({
       urlResolver: urlResolver,
       pinataSDK: pinataSDK,
+      retryCount: 3,
+      retryTimeout: 300,
     });
 
     const ipfsUrl = "ipfs://QmTestHash/path/to/file.png";
