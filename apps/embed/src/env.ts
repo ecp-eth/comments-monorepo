@@ -18,7 +18,7 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
   }
 }
 
-// Eth submitter schema (same as demo app)
+// Eth submitter schema
 export const SubmitterEnvSchema = z.object({
   SUBMITTER_PRIVATE_KEY: HexSchema,
 });

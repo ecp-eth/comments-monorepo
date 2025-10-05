@@ -24,21 +24,27 @@ export type GenerateUploadUrlResponseSchemaType = z.infer<
   typeof GenerateUploadUrlResponseSchema
 >;
 
-const sharedCommentSchema = z.object({
+const SharedCommentInputSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   chainId: z.number(),
   commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
-export const SignCommentPayloadRequestSchema = z.union([
-  sharedCommentSchema.extend({
-    targetUri: z.string().url(),
-  }),
-  sharedCommentSchema.extend({
-    parentId: HexSchema,
-  }),
+const CommentWithTargetURIInputSchema = SharedCommentInputSchema.extend({
+  targetUri: z.string().url(),
+});
+
+const CommentWithParentIdInputSchema = SharedCommentInputSchema.extend({
+  parentId: HexSchema,
+});
+
+export const CommentPayloadRequestSchema = z.union([
+  CommentWithTargetURIInputSchema,
+  CommentWithParentIdInputSchema,
 ]);
+
+export const SignCommentPayloadRequestSchema = CommentPayloadRequestSchema;
 
 export type SignCommentPayloadRequestSchemaType = z.input<
   typeof SignCommentPayloadRequestSchema
@@ -62,6 +68,23 @@ export const SignEditCommentPayloadRequestSchema = z.object({
   author: HexSchema,
   metadata: z.array(MetadataEntrySchema),
   chainId: z.number(),
+});
+
+/**
+ * Post Comment API request payload
+ */
+export const PostCommentPayloadRequestSchema = z.object({
+  comment: CommentPayloadRequestSchema,
+  authorSignature: HexSchema.optional().describe(
+    "Signature of the author, this is required if the user has not approved our submitter address for post",
+  ),
+});
+
+/**
+ * Post Comment API response schema
+ */
+export const PostCommentResponseServerSchema = z.object({
+  txHash: HexSchema,
 });
 
 export type SignEditCommentPayloadRequestSchemaType = z.infer<
