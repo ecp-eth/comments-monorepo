@@ -13,7 +13,7 @@ import type {
   FarcasterByAddressResolver,
   ERC20ByTickerResolver,
   ERC20ByAddressResolver,
-  URLResolver,
+  HTTPResolver,
   FarcasterByNameResolver,
 } from "../resolvers/index.ts";
 import type { IPFSResolver } from "../resolvers/ipfs-resolver.ts";
@@ -30,7 +30,7 @@ type CommentReferencesResolvers = {
   erc20ByTickerResolver: ERC20ByTickerResolver;
   farcasterByAddressResolver: FarcasterByAddressResolver;
   farcasterByNameResolver: FarcasterByNameResolver;
-  urlResolver: URLResolver;
+  httpResolver: HTTPResolver;
   ipfsResolver: IPFSResolver;
 };
 

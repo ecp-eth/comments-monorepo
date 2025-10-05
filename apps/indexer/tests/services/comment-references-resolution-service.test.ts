@@ -1,6 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { CommentReferencesResolutionService } from "../../src/services/comment-references-resolution-service";
-import { CommentReferencesCacheService } from "../../src/services/comment-references-cache-service";
+import { type CommentReferencesCacheService } from "../../src/services/comment-references-cache-service";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "ponder:schema";
@@ -11,9 +11,9 @@ import {
   type ERC20ByAddressResolver,
   type FarcasterByAddressResolver,
   type FarcasterByNameResolver,
-  type URLResolver,
+  type HTTPResolver,
 } from "../../src/resolvers";
-import { IPFSResolver } from "../../src/resolvers/ipfs-resolver";
+import { type IPFSResolver } from "../../src/resolvers/ipfs-resolver";
 
 // Mock the cache service
 const mockCacheService = {
@@ -32,7 +32,7 @@ const mockResolvers = {
   erc20ByTickerResolver: {} as ERC20ByTickerResolver,
   farcasterByAddressResolver: {} as FarcasterByAddressResolver,
   farcasterByNameResolver: {} as FarcasterByNameResolver,
-  urlResolver: {} as URLResolver,
+  httpResolver: {} as HTTPResolver,
   ipfsResolver: {} as IPFSResolver,
 };
 

@@ -15,15 +15,16 @@ import {
 import type { CommentSelectType } from "../../ponder.schema.ts";
 import type { Hex } from "viem";
 import z from "zod";
-import type {
-  ENSByAddressResolver,
-  ENSByNameResolver,
-  FarcasterByAddressResolver,
-  ERC20ByTickerResolver,
-  ERC20ByAddressResolver,
-  URLResolver,
-  FarcasterByNameResolver,
-  FarcasterName,
+import {
+  type ENSByAddressResolver,
+  type ENSByNameResolver,
+  type FarcasterByAddressResolver,
+  type ERC20ByTickerResolver,
+  type ERC20ByAddressResolver,
+  type HTTPResolver,
+  type FarcasterByNameResolver,
+  type FarcasterName,
+  HTTP_URL_REGEX,
 } from "../resolvers/index.ts";
 import {
   IPFS_URL_REGEX,
@@ -37,7 +38,7 @@ export type ResolveCommentReferencesOptions = {
   farcasterByNameResolver: FarcasterByNameResolver;
   erc20ByTickerResolver: ERC20ByTickerResolver;
   erc20ByAddressResolver: ERC20ByAddressResolver;
-  urlResolver: URLResolver;
+  httpResolver: HTTPResolver;
   ipfsResolver: IPFSResolver;
 };
 
@@ -177,7 +178,7 @@ export async function resolveCommentReferences(
       continue;
     }
 
-    match = restOfContent.match(URL_REGEX);
+    match = restOfContent.match(HTTP_URL_REGEX);
 
     if (match) {
       const position = { start: pos, end: pos + match[0].length };
@@ -252,10 +253,6 @@ const FARCASTER_FNAME_REGEX = /^@?[a-zA-Z0-9.-]+\.fcast\.id/iu;
  * Handles erc20 symbol
  */
 const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/u;
-/**
- * Handles url
- */
-const URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
 /**
  * Handles erc20 caip19 url
  */
@@ -424,9 +421,9 @@ type ResolveURLResultType = z.output<typeof ResolveURLResult>;
 async function resolveURL(
   url: string,
   position: ResolveCommentReferencePosition,
-  { urlResolver }: ResolveCommentReferencesOptions,
+  { httpResolver }: ResolveCommentReferencesOptions,
 ): Promise<ResolveURLResultType> {
-  const result = await urlResolver.load(url);
+  const result = await httpResolver.load(url);
 
   if (result) {
     return (
