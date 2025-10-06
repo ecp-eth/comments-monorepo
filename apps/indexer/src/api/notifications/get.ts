@@ -16,7 +16,7 @@ import {
   isNotNull,
   isNull,
   sql,
-  SQL,
+  type SQL,
 } from "drizzle-orm";
 import { schema } from "../../../schema.ts";
 import { resolveUsersByAddressOrEnsName } from "../../lib/utils.ts";
