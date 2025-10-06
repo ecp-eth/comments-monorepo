@@ -1,6 +1,6 @@
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
-import { publicEnvSchema } from "./publicEnv";
+import { publicEnv, publicEnvSchema } from "./publicEnv";
 
 class InvalidServerEnvVariablesError extends Error {
   constructor(private validationError: z.ZodError) {
@@ -33,17 +33,12 @@ const ServerEnvSchema = z
     SENTRY_AUTH_TOKEN: z.string().optional(),
     PINATA_JWT: z.string().nonempty(),
     COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
-    // Gasless mode configuration
-    GASLESS_ENABLED: z
-      .enum(["1", "0"])
-      .default("0")
-      .transform((val) => val === "1"),
   })
   .merge(publicEnvSchema)
   .merge(SubmitterEnvSchema.partial())
   .refine((data) => {
     // If gasless is enabled, require submitter configuration
-    if (data.GASLESS_ENABLED) {
+    if (publicEnv.NEXT_PUBLIC_GASLESS_ENABLED === true) {
       const submitterResult = SubmitterEnvSchema.safeParse(data);
       if (!submitterResult.success) {
         throw submitterResult.error;

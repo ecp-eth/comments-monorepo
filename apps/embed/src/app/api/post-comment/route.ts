@@ -1,7 +1,7 @@
 import { env } from "@/env";
 import {
   PostCommentPayloadRequestSchema,
-  PostCommentResponseServerSchema,
+  PostCommentResponseSchema,
 } from "@/lib/schemas";
 import { supportedChains } from "@/lib/wagmi";
 import {
@@ -15,7 +15,12 @@ import {
   getChainById,
   JSONResponse,
 } from "@ecp.eth/shared/helpers";
-import { createPublicClient, createWalletClient, http } from "viem";
+import {
+  createPublicClient,
+  createWalletClient,
+  hashTypedData,
+  http,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(req: Request) {
@@ -94,6 +99,7 @@ export async function POST(req: Request) {
     commentData,
     chainId,
   });
+  const hash = hashTypedData(typedCommentData);
 
   const submitterAccount = privateKeyToAccount(env.SUBMITTER_PRIVATE_KEY);
   const submitterWalletClient = createWalletClient({
@@ -112,9 +118,12 @@ export async function POST(req: Request) {
   });
 
   return new JSONResponse(
-    PostCommentResponseServerSchema,
+    PostCommentResponseSchema,
     {
       txHash,
+      signature: appSignature,
+      hash,
+      data: { ...commentData, id: hash },
     },
     {
       jsonReplacer: bigintReplacer,

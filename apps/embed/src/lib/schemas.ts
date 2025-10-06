@@ -44,6 +44,10 @@ export const CommentPayloadRequestSchema = z.union([
   CommentWithParentIdInputSchema,
 ]);
 
+export type CommentPayloadRequestSchemaType = z.input<
+  typeof CommentPayloadRequestSchema
+>;
+
 export const SignCommentPayloadRequestSchema = CommentPayloadRequestSchema;
 
 export type SignCommentPayloadRequestSchemaType = z.input<
@@ -70,6 +74,10 @@ export const SignEditCommentPayloadRequestSchema = z.object({
   chainId: z.number(),
 });
 
+export type SignEditCommentPayloadRequestSchemaType = z.infer<
+  typeof SignEditCommentPayloadRequestSchema
+>;
+
 /**
  * Post Comment API request payload
  */
@@ -80,16 +88,19 @@ export const PostCommentPayloadRequestSchema = z.object({
   ),
 });
 
+export type PostCommentPayloadRequestSchemaType = z.input<
+  typeof PostCommentPayloadRequestSchema
+>;
+
 /**
  * Post Comment API response schema
  */
-export const PostCommentResponseServerSchema = z.object({
+export const PostCommentResponseSchema = z.object({
   txHash: HexSchema,
+  signature: HexSchema,
+  hash: HexSchema,
+  data: CommentDataWithIdSchema,
 });
-
-export type SignEditCommentPayloadRequestSchemaType = z.infer<
-  typeof SignEditCommentPayloadRequestSchema
->;
 
 export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
   try {

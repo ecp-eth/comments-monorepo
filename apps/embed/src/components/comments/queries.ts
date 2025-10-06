@@ -1,13 +1,15 @@
 import {
-  type SignCommentPayloadRequestSchemaType,
+  CommentPayloadRequestSchemaType,
+  PostCommentPayloadRequestSchemaType,
+  PostCommentResponseSchema,
   SignCommentPayloadRequestSchema,
+  SignCommentPayloadRequestSchemaType,
   SignEditCommentPayloadRequestSchema,
   SignEditCommentPayloadRequestSchemaType,
 } from "@/lib/schemas";
 import {
   SignCommentResponseClientSchema,
   SignEditCommentResponseClientSchema,
-  type SignCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -27,6 +29,15 @@ import type {
 } from "@ecp.eth/shared/schemas";
 import { DistributiveOmit } from "@tanstack/react-query";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import {
+  ContractReadFunctions,
+  ContractWriteFunctions,
+  createCommentData,
+  createCommentTypedData,
+  isApproved,
+  postComment,
+} from "@ecp.eth/sdk/comments";
+import { SignTypedDataMutateAsync } from "wagmi/query";
 
 export function createCommentItemsQueryKey(
   viewer: Hex | undefined,
@@ -49,24 +60,27 @@ export class SubmitEditCommentMutationError extends Error {}
 
 type SubmitCommentParams = {
   author: Hex | undefined;
-  commentRequest: DistributiveOmit<
-    SignCommentPayloadRequestSchemaType,
-    "author"
-  >;
+  commentRequest: DistributiveOmit<CommentPayloadRequestSchemaType, "author">;
   references: IndexerAPICommentReferencesSchemaType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  writeContractAsync: (params: {
-    signCommentResponse: SignCommentResponseClientSchemaType;
-    chainId: number;
-  }) => Promise<Hex>;
+  readContractAsync: ContractReadFunctions["getIsApproved"];
+  writeContractAsync: ContractWriteFunctions["postComment"];
+  signTypedDataAsync: SignTypedDataMutateAsync;
 };
+
+type PendingPostCommentOperationSchemaTypeWithoutReferences = Omit<
+  PendingPostCommentOperationSchemaType,
+  "references"
+>;
 
 export async function submitCommentMutationFunction({
   author,
   commentRequest,
   references,
   switchChainAsync,
+  readContractAsync,
   writeContractAsync,
+  signTypedDataAsync,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!author) {
     throw new SubmitCommentMutationError("Wallet not connected.");
@@ -90,20 +104,137 @@ export async function submitCommentMutationFunction({
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
 
-  const commentData = parseResult.data;
+  const commentPayloadRequest = parseResult.data;
 
-  const switchedChain = await switchChainAsync(commentData.chainId);
+  const switchedChain = await switchChainAsync(commentPayloadRequest.chainId);
 
-  if (switchedChain.id !== commentData.chainId) {
+  if (switchedChain.id !== commentPayloadRequest.chainId) {
     throw new SubmitCommentMutationError("Failed to switch chain.");
   }
 
+  const pendingOperation = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
+    ? await postCommentGaslessly({
+        readContractAsync,
+        commentPayloadRequest,
+        signTypedDataAsync,
+      })
+    : {
+        ...(await postCommentNonGaslessly({
+          commentPayloadRequest,
+          writeContractAsync,
+          resolvedAuthor,
+        })),
+        references,
+      };
+
+  return {
+    ...pendingOperation,
+    references,
+  };
+}
+
+async function postCommentGaslessly({
+  commentPayloadRequest,
+  readContractAsync,
+  signTypedDataAsync,
+  resolvedAuthor,
+}: {
+  commentPayloadRequest: CommentPayloadRequestSchemaType;
+  readContractAsync: ContractReadFunctions["getIsApproved"];
+  signTypedDataAsync: SignTypedDataMutateAsync;
+  resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
+}): Promise<PendingPostCommentOperationSchemaTypeWithoutReferences> {
+  const appApproved = await isApproved({
+    author: commentPayloadRequest.author,
+    app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+    readContract: readContractAsync,
+  });
+
+  let authorSignature: Hex | undefined;
+
+  if (!appApproved) {
+    const { content, author, commentType } = commentPayloadRequest;
+    const commentData = createCommentData({
+      content,
+      author,
+      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+      metadata: [],
+      ...("parentId" in commentPayloadRequest
+        ? {
+            parentId: commentPayloadRequest.parentId,
+          }
+        : {
+            targetUri: commentPayloadRequest.targetUri,
+          }),
+      commentType: commentType,
+    });
+
+    const chainId = commentPayloadRequest.chainId;
+    const typedCommentData = createCommentTypedData({
+      commentData,
+      chainId,
+    });
+
+    authorSignature = await signTypedDataAsync(typedCommentData);
+  }
+
+  const response = await fetch("/api/post-comment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      comment: commentPayloadRequest,
+      authorSignature,
+    } satisfies PostCommentPayloadRequestSchemaType),
+  });
+
+  if (!response.ok) {
+    await throwKnownResponseCodeError(response);
+
+    throw new SubmitCommentMutationError(
+      "Failed to obtain signed comment data, please try again.",
+    );
+  }
+
+  const postCommentResult = PostCommentResponseSchema.safeParse(
+    await response.json(),
+  );
+
+  if (!postCommentResult.success) {
+    throw new SubmitCommentMutationError(
+      "Server returned malformed posted comment data, please try again.",
+    );
+  }
+
+  return {
+    txHash: postCommentResult.data.txHash,
+    resolvedAuthor,
+    response: postCommentResult.data,
+    type: authorSignature ? "gasless-preapproved" : "gasless-not-approved",
+    action: "post",
+    state: { status: "pending" },
+    chainId: commentPayloadRequest.chainId,
+  };
+}
+
+async function postCommentNonGaslessly({
+  commentPayloadRequest,
+  writeContractAsync,
+  resolvedAuthor,
+}: {
+  commentPayloadRequest: CommentPayloadRequestSchemaType;
+  resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
+  writeContractAsync: ContractWriteFunctions["postComment"];
+}): Promise<PendingPostCommentOperationSchemaTypeWithoutReferences> {
   const response = await fetch("/api/sign-comment", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(commentData),
+    body: JSON.stringify(
+      commentPayloadRequest satisfies SignCommentPayloadRequestSchemaType,
+    ),
   });
 
   if (!response.ok) {
@@ -125,10 +256,15 @@ export async function submitCommentMutationFunction({
   }
 
   try {
-    const txHash = await writeContractAsync({
-      signCommentResponse: signedCommentResult.data,
-      chainId: commentData.chainId,
+    const { txHash } = await postComment({
+      comment: signedCommentResult.data.data,
+      appSignature: signedCommentResult.data.signature,
+      writeContract: writeContractAsync,
     });
+    // const txHash = await writeContractAsync({
+    //   signCommentResponse: signedCommentResult.data,
+    //   chainId: commentPayloadRequest.chainId,
+    // });
 
     return {
       txHash,
@@ -137,8 +273,7 @@ export async function submitCommentMutationFunction({
       type: "non-gasless",
       action: "post",
       state: { status: "pending" },
-      chainId: commentData.chainId,
-      references,
+      chainId: commentPayloadRequest.chainId,
     };
   } catch (e) {
     if (!(e instanceof Error)) {
