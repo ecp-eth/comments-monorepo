@@ -7,6 +7,10 @@ class InvalidServerEnvVariablesError extends Error {
     super();
   }
 
+  override get message() {
+    return this.toString();
+  }
+
   toString() {
     const message = `
 Invalid environment variables:

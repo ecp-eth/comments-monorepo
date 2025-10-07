@@ -1,12 +1,40 @@
-import { Sparkles } from "lucide-react";
+import { Zap } from "lucide-react";
+import { Tooltip, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import {
+  TooltipArrow,
+  TooltipContent,
+  TooltipPortal,
+} from "@radix-ui/react-tooltip";
+import { useRef } from "react";
 
-export function GaslessIndicator() {
+export function GaslessIndicator({
+  children = <Zap className="h-3 w-3 fill-background stroke-lime-400" />,
+}: {
+  children?: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-accent border border-border px-3 py-2 mb-4">
-      <Sparkles className="h-4 w-4 text-accent-foreground" />
-      <span className="text-sm font-medium text-accent-foreground">
-        Transactions sponsored — post for free!
-      </span>
+    <div
+      ref={ref}
+      className="flex items-center cursor-pointer"
+      aria-label="Gas fee sponsored, any cost occured during the posting is covered by us"
+    >
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>{children}</TooltipTrigger>
+
+          <TooltipPortal container={ref.current}>
+            <TooltipContent side="bottom" sideOffset={5}>
+              <TooltipArrow className="fill-foreground" />
+              <div className="text-xs bg-foreground text-background px-2 py-1 rounded-lg max-w-[200px]">
+                Gas fee sponsored 🥳 any cost occured during the posting is
+                covered by us 🫶
+              </div>
+            </TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }

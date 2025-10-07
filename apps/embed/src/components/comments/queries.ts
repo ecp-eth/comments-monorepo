@@ -1,8 +1,8 @@
 import {
+  CommentPayloadRequestSchema,
   CommentPayloadRequestSchemaType,
   PostCommentPayloadRequestSchemaType,
   PostCommentResponseSchema,
-  SignCommentPayloadRequestSchema,
   SignCommentPayloadRequestSchemaType,
   SignEditCommentPayloadRequestSchema,
   SignEditCommentPayloadRequestSchemaType,
@@ -95,7 +95,7 @@ export async function submitCommentMutationFunction({
     return undefined;
   });
 
-  const parseResult = SignCommentPayloadRequestSchema.safeParse({
+  const parseResult = CommentPayloadRequestSchema.safeParse({
     ...commentRequest,
     author,
   });
@@ -193,7 +193,7 @@ async function postCommentGaslessly({
     await throwKnownResponseCodeError(response);
 
     throw new SubmitCommentMutationError(
-      "Failed to obtain signed comment data, please try again.",
+      "Failed to post comment sponsored, please try again.",
     );
   }
 
