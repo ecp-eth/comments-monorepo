@@ -3,12 +3,12 @@ import { appKeyMiddleware, db } from "../../services/index.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
-  OpenAPIDateStringSchema,
   OpenAPIENSNameOrAddressSchema,
   OpenAPIHexSchema,
 } from "../../lib/schemas.ts";
 import { NotificationTypeSchema } from "../../notifications/schemas.ts";
 import {
+  and,
   asc,
   desc,
   eq,
@@ -39,7 +39,7 @@ export const AppNotificationsCursorInputSchema = z
     },
     z.object({
       id: z.coerce.bigint(),
-      createdAt: z.coerce.date(),
+      us: z.coerce.bigint(),
     }),
   )
   .openapi({
@@ -48,7 +48,7 @@ export const AppNotificationsCursorInputSchema = z
 
 export const AppNotificationsCursorOutputSchema = z
   .object({
-    createdAt: OpenAPIDateStringSchema,
+    us: OpenAPIBigintStringSchema,
     id: OpenAPIBigintStringSchema,
   })
   .transform((val) => {
@@ -57,21 +57,35 @@ export const AppNotificationsCursorOutputSchema = z
 
 export const AppNotificationsGetRequestQuerySchema = z
   .object({
-    app: OpenAPIHexSchema.or(OpenAPIHexSchema.array().min(1).max(20))
-      .optional()
-      .transform((val) => {
-        if (!val) {
-          return [];
+    app: z
+      .preprocess((val) => {
+        if (typeof val === "string") {
+          return val.split(",").map((app) => app.trim());
         }
 
-        if (Array.isArray(val)) {
-          return val;
-        }
-
-        return [val];
-      })
+        return val;
+      }, OpenAPIHexSchema.array().max(20))
+      .default([])
       .openapi({
         description: "Return only notifications created by this app signers",
+        oneOf: [
+          {
+            type: "array",
+            items: {
+              type: "string",
+              description: "an array of app signer public keys in hex format",
+            },
+          },
+          {
+            type: "string",
+            description:
+              "Comma separated list of app signer public keys in hex format",
+          },
+          {
+            type: "string",
+            description: "An app signer public key in hex format",
+          },
+        ],
       }),
     before: AppNotificationsCursorInputSchema.optional().openapi({
       description: "Fetch newer notifications than the cursor",
@@ -79,36 +93,69 @@ export const AppNotificationsGetRequestQuerySchema = z
     after: AppNotificationsCursorInputSchema.optional().openapi({
       description: "Fetch older notifications than the cursor",
     }),
-    limit: z.number().int().min(1).max(100).default(10).openapi({
+    limit: z.coerce.number().int().min(1).max(100).default(10).openapi({
       description: "The number of notifications to return",
     }),
     parentId: OpenAPIHexSchema.optional().openapi({
       description: "Return only notifications for this parent id",
     }),
-    type: NotificationTypeSchema.or(NotificationTypeSchema.array())
-      .optional()
-      .transform((val) => {
-        if (!val) {
-          return [];
+    type: z
+      .preprocess((val) => {
+        if (typeof val === "string") {
+          return val.split(",").map((type) => type.trim());
         }
 
-        if (Array.isArray(val)) {
-          return val;
-        }
-
-        return [val];
-      })
+        return val;
+      }, NotificationTypeSchema.array())
+      .default([])
       .openapi({
         description: "Return only notifications of this type",
+        oneOf: [
+          {
+            type: "array",
+            items: {
+              type: "string",
+              enum: NotificationTypeSchema.options,
+            },
+          },
+          {
+            type: "string",
+            enum: NotificationTypeSchema.options,
+          },
+          {
+            type: "string",
+            description: "Comma separated list of notification types",
+            example: "reply,mention,reaction,quote",
+          },
+        ],
       }),
-    user: OpenAPIENSNameOrAddressSchema.or(
-      OpenAPIENSNameOrAddressSchema.array().min(1).max(20),
-    )
-      .transform((val) => {
-        return Array.isArray(val) ? val : [val];
-      })
+    user: z
+      .preprocess((val) => {
+        if (typeof val === "string") {
+          return val.split(",").map((user) => user.trim());
+        }
+
+        return val;
+      }, OpenAPIENSNameOrAddressSchema.array().min(1).max(20))
       .openapi({
         description: "The user to fetch notifications for",
+        oneOf: [
+          {
+            type: "array",
+            items: {
+              type: "string",
+              description: "an array of ETH addresses or ens names",
+            },
+          },
+          {
+            type: "string",
+            description: "Comma separated list of ETH addresses or ens names",
+          },
+          {
+            type: "string",
+            description: "An ETH address or ens name",
+          },
+        ],
       }),
     seen: z
       .enum(["true", "false", "1", "0"])
@@ -215,65 +262,56 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       }
 
       /**
-       * Conditions used also for unseen count, newest and oldest notification
+       * Conditions used for all queries
        */
-      const sharedConditions: SQL[] = [
+      const sharedConditions: (SQL | undefined)[] = [
         eq(schema.appNotification.appId, app.id),
         inArray(
           sql`lower(${schema.appNotification.recipientAddress})`,
-          sql.join(
-            resolvedUsers.map((user) => sql`lower(${user})`),
-            ", ",
-          ),
+          resolvedUsers.map((user) => sql`lower(${user})`),
         ),
+        parentId ? eq(schema.appNotification.parentId, parentId) : undefined,
+        types.length > 0
+          ? inArray(schema.appNotification.notificationType, types)
+          : undefined,
+        apps.length > 0
+          ? inArray(
+              sql`lower(${schema.appNotification.appSigner})`,
+              apps.map((app) => sql`lower(${app})`),
+            )
+          : undefined,
       ];
       /**
-       * Conditions used only for notifications
+       * Conditions used for cursor queries (oldest, newest)
        */
-      const conditions: SQL[] = sharedConditions.slice();
+      const cursorConditions: (SQL | undefined)[] = sharedConditions.slice();
+      /**
+       * Conditions used for page queries (notifications)
+       */
+      const pageConditions: (SQL | undefined)[] = sharedConditions.slice();
       const orderBy: SQL[] = [];
-      let isReverse = false;
-
-      if (parentId) {
-        sharedConditions.push(eq(schema.appNotification.parentId, parentId));
-      }
 
       if (seen === true) {
-        conditions.push(isNotNull(schema.appNotification.seenAt));
+        const condition = isNotNull(schema.appNotification.seenAt);
+        cursorConditions.push(condition);
+        pageConditions.push(condition);
       } else if (seen === false) {
-        conditions.push(isNull(schema.appNotification.seenAt));
-      }
-
-      if (types.length > 0) {
-        sharedConditions.push(
-          inArray(schema.appNotification.notificationType, types),
-        );
-      }
-
-      if (apps.length > 0) {
-        sharedConditions.push(
-          inArray(
-            sql`lower(${schema.appNotification.appSigner})`,
-            sql.join(
-              apps.map((app) => sql`lower(${app})`),
-              ", ",
-            ),
-          ),
-        );
+        const condition = isNull(schema.appNotification.seenAt);
+        cursorConditions.push(condition);
+        pageConditions.push(condition);
       }
 
       if (after) {
-        conditions.push(
-          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) < (${after.createdAt}, ${after.id})`,
+        pageConditions.push(
+          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) < (to_timestamp(${after.us} / 1e6)::timestamptz, ${after.id})`,
         );
         orderBy.push(
           desc(schema.appNotification.createdAt),
           desc(schema.appNotification.id),
         );
       } else if (before) {
-        isReverse = true;
-        conditions.push(
-          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) > (${before.createdAt}, ${before.id})`,
+        pageConditions.push(
+          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) > (to_timestamp(${before.us} / 1e6)::timestamptz, ${before.id})`,
         );
         orderBy.push(
           asc(schema.appNotification.createdAt),
@@ -288,7 +326,10 @@ export function setupNotificationsGet(app: OpenAPIHono) {
 
       const { rows } = await db.execute<{
         id: string;
-        createdAt: Date;
+        /**
+         * Bigint created_at in microseconds since epoch as string
+         */
+        us: string;
         comment: Record<string, any>;
         unseenCount: string;
         newestNotificationId: string;
@@ -297,46 +338,48 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         WITH 
           unseen_count AS (
             SELECT COUNT(*) as "count" FROM ${schema.appNotification}
-            WHERE ${sql.join(sharedConditions, " AND ")}
+            WHERE ${and(...sharedConditions)}
             AND ${isNull(schema.appNotification.seenAt)}
           ),
           newest_notification AS (
             SELECT id FROM ${schema.appNotification}
-            WHERE ${sql.join(sharedConditions, " AND ")}
-            ORDER BY created_at DESC, id DESC
+            WHERE ${and(...cursorConditions)}
+            ORDER BY ${schema.appNotification.createdAt} DESC, ${schema.appNotification.id} DESC
             LIMIT 1
           ),
           oldest_notification AS (
             SELECT id FROM ${schema.appNotification}
-            WHERE ${sql.join(sharedConditions, " AND ")}
-            ORDER BY created_at ASC, id ASC
+            WHERE ${and(...cursorConditions)}
+            ORDER BY ${schema.appNotification.createdAt} ASC, ${schema.appNotification.id} ASC
             LIMIT 1
           )
         
-        SELECT 
-          an.id,
-          an.created_at as "createdAt",
-          to_jsonb(c) AS comment,
-          (SELECT "count" FROM unseen_count) as "unseenCount",
-          (SELECT id FROM newest_notification) as "newestNotificationId",
-          (SELECT id FROM oldest_notification) as "oldestNotificationId"
-        FROM ${schema.appNotification} an
-        JOIN ${schema.comment} c ON (${schema.appNotification.parentId} = ${schema.comment.id})
-        WHERE ${sql.join(conditions, " AND ")}
-        ORDER BY ${sql.join(orderBy, ", ")}
-        LIMIT ${limit}
+        SELECT * FROM (
+          SELECT 
+            ${schema.appNotification.id},
+            (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as "us", -- epoch in microseconds
+            to_jsonb(${schema.comment}.*) AS comment,
+            (SELECT "count" FROM unseen_count) as "unseenCount",
+            (SELECT id FROM newest_notification) as "newestNotificationId",
+            (SELECT id FROM oldest_notification) as "oldestNotificationId"
+          FROM ${schema.appNotification}
+          JOIN ${schema.comment} ON (${schema.appNotification.entityId} = ${schema.comment.id})
+          WHERE ${and(...pageConditions)}
+          ORDER BY ${sql.join(orderBy, sql`, `)}
+          LIMIT ${limit}
+        ) t
+        ORDER BY t."us" DESC, t."id" DESC
       `);
 
-      const results = isReverse ? rows.toReversed() : rows;
-      const startCursor = results[0];
-      const endCursor = results[results.length - 1];
+      const startCursor = rows[0];
+      const endCursor = rows[rows.length - 1];
       const hasNextPage = endCursor?.id !== endCursor?.oldestNotificationId;
       const hasPreviousPage =
         startCursor?.id !== startCursor?.newestNotificationId;
 
       return c.json(
         formatResponseUsingZodSchema(AppNotificationsGetResponseSchema, {
-          notifications: results.map((row) => ({
+          notifications: rows.map((row) => ({
             cursor: row,
           })),
           pageInfo: {
@@ -346,7 +389,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
             endCursor,
           },
           extra: {
-            unseenCount: rows[0]?.unseenCount ?? "0",
+            unseenCount: rows[0]?.unseenCount ?? 0n,
           },
         }),
         200,
