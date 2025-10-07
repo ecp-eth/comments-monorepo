@@ -16,10 +16,8 @@ import {
 } from "../EmbedConfigProvider";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
-import {
-  submitCommentMutationFunction,
-  submitEditCommentMutationFunction,
-} from "./queries";
+import { submitPostCommentMutationFunction } from "./queries/postComment";
+import { submitEditCommentMutationFunction } from "./queries/editComment";
 import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_COMMENT_LENGTH,
@@ -33,7 +31,6 @@ import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import { useEditComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
@@ -399,9 +396,9 @@ export function CommentForm({
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content, references }) => {
-      const pendingOperation = await submitCommentMutationFunction({
+      const pendingOperation = await submitPostCommentMutationFunction({
         author: author,
-        commentRequest: {
+        postCommentRequest: {
           chainId,
           content,
           ...(parentId ? { parentId } : { targetUri }),
@@ -540,7 +537,8 @@ export function CommentEditForm({
   const { chainId } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
-  const { mutateAsync: editComment } = useEditComment();
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {
@@ -554,14 +552,9 @@ export function CommentEditForm({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ signEditCommentResponse }) {
-          const { txHash } = await editComment({
-            edit: signEditCommentResponse.data,
-            appSignature: signEditCommentResponse.signature,
-          });
-
-          return txHash;
-        },
+        readContractAsync,
+        writeContractAsync,
+        signTypedDataAsync,
       });
 
       try {
@@ -599,11 +592,13 @@ export function CommentEditForm({
       chainId,
       comment,
       commentEdition,
-      editComment,
       onSubmitStartRef,
       queryKey,
+      readContractAsync,
+      signTypedDataAsync,
       switchChainAsync,
       wagmiConfig,
+      writeContractAsync,
     ],
   );
 
