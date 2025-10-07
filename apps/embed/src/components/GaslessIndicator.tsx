@@ -18,7 +18,7 @@ export function GaslessIndicator({
     <div
       ref={ref}
       className="flex items-center cursor-pointer"
-      aria-label="Gas fee sponsored, any cost occured during the posting is covered by us"
+      aria-label="Gas fee sponsored"
     >
       <TooltipProvider>
         <Tooltip>
@@ -28,8 +28,7 @@ export function GaslessIndicator({
             <TooltipContent side="bottom" sideOffset={5}>
               <TooltipArrow className="fill-foreground" />
               <div className="text-xs bg-foreground text-background px-2 py-1 rounded-lg max-w-[200px]">
-                Gas fee sponsored 🥳 any cost occured during the posting is
-                covered by us 🫶
+                Gas fees on us — we cover all costs for your post 🫶
               </div>
             </TooltipContent>
           </TooltipPortal>

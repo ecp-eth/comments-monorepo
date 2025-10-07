@@ -120,10 +120,8 @@ export async function POST(req: Request) {
     commentData,
     chainId,
   });
-  console.log("authorSignature", authorSignature);
-  console.log("typedCommentData", typedCommentData);
+
   const hash = hashTypedData(typedCommentData);
-  console.log("hash", hash);
 
   const submitterAccount = privateKeyToAccount(env.SUBMITTER_PRIVATE_KEY);
   const submitterWalletClient = createWalletClient({
