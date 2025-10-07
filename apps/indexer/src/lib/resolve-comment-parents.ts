@@ -27,7 +27,7 @@ export async function resolveCommentParents(
         WHERE id = ${commentId}
         UNION ALL
         SELECT c.id, c.author, c.app FROM ${schema.comment} c
-        INNER JOIN comment_parents cp ON c."parentId" = cp.id
+        INNER JOIN comment_parents cp ON c."parent_id" = cp.id
       )
 
       SELECT * FROM comment_parents;
