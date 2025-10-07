@@ -6,7 +6,10 @@ import {
   OpenAPIENSNameOrAddressSchema,
   OpenAPIHexSchema,
 } from "../../lib/schemas.ts";
-import { NotificationTypeSchema } from "../../notifications/schemas.ts";
+import {
+  NotificationTypeSchema,
+  type NotificationTypeSchemaType,
+} from "../../notifications/schemas.ts";
 import {
   and,
   asc,
@@ -22,7 +25,17 @@ import { schema } from "../../../schema.ts";
 import { resolveUsersByAddressOrEnsName } from "../../lib/utils.ts";
 import { ensByNameResolverService } from "../../services/ens-by-name-resolver.ts";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { formatResponseUsingZodSchema } from "../../lib/response-formatters.ts";
+import {
+  createUserDataAndFormatSingleCommentResponseResolver,
+  formatAuthor,
+  formatResponseUsingZodSchema,
+  resolveUserData,
+} from "../../lib/response-formatters.ts";
+import { AppNotificationOutputSchema } from "./schemas.ts";
+import { ensByAddressResolverService } from "../../services/ens-by-address-resolver.ts";
+import { farcasterByAddressResolverService } from "../../services/farcaster-by-address-resolver.ts";
+import type { CommentSelectType } from "ponder:schema";
+import type { SnakeCasedProperties } from "type-fest";
 
 export const AppNotificationsCursorInputSchema = z
   .preprocess(
@@ -186,6 +199,7 @@ export const AppNotificationsGetResponseSchema = z.object({
   notifications: z.array(
     z.object({
       cursor: AppNotificationsCursorOutputSchema,
+      notification: AppNotificationOutputSchema,
     }),
   ),
   pageInfo: z.object({
@@ -326,11 +340,23 @@ export function setupNotificationsGet(app: OpenAPIHono) {
 
       const { rows } = await db.execute<{
         id: string;
+        createdAt: Date;
+        notificationType: NotificationTypeSchemaType;
+        seenAt: Date | null;
+        appSigner: Hex;
         /**
          * Bigint created_at in microseconds since epoch as string
          */
         us: string;
-        comment: Record<string, any>;
+        /**
+         * The comment that triggered the notification
+         */
+        comment: JSONComment;
+        /**
+         * The parent of the comment that triggered the notification
+         */
+        parent: JSONComment;
+        recipientAddress: Hex;
         unseenCount: string;
         newestNotificationId: string;
         oldestNotificationId: string;
@@ -354,20 +380,31 @@ export function setupNotificationsGet(app: OpenAPIHono) {
             LIMIT 1
           )
         
-        SELECT * FROM (
+        SELECT 
+          t.*,
+          to_jsonb(c) as comment,
+          to_jsonb(p) as parent
+        FROM (
           SELECT 
             ${schema.appNotification.id},
+            ${schema.appNotification.createdAt} as "createdAt",
+            ${schema.appNotification.notificationType} as "notificationType",
+            ${schema.appNotification.seenAt} as "seenAt",
+            ${schema.appNotification.appSigner} as "appSigner",
+            ${schema.appNotification.recipientAddress} as "recipientAddress",
+            ${schema.appNotification.parentId} as "parentId",
+            ${schema.appNotification.entityId} as "entityId",
             (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as "us", -- epoch in microseconds
-            to_jsonb(${schema.comment}.*) AS comment,
             (SELECT "count" FROM unseen_count) as "unseenCount",
             (SELECT id FROM newest_notification) as "newestNotificationId",
             (SELECT id FROM oldest_notification) as "oldestNotificationId"
           FROM ${schema.appNotification}
-          JOIN ${schema.comment} ON (${schema.appNotification.entityId} = ${schema.comment.id})
           WHERE ${and(...pageConditions)}
           ORDER BY ${sql.join(orderBy, sql`, `)}
           LIMIT ${limit}
         ) t
+        JOIN ${schema.comment} c ON (c.id = t."entityId")
+        JOIN ${schema.comment} p ON (p.id = t."parentId")
         ORDER BY t."us" DESC, t."id" DESC
       `);
 
@@ -377,11 +414,128 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       const hasPreviousPage =
         startCursor?.id !== startCursor?.newestNotificationId;
 
+      const userAddresses = new Set<Hex>(
+        [...resolvedUsers].concat(
+          rows.flatMap((row) => {
+            return [
+              row.comment.author,
+              row.parent.author,
+              row.recipientAddress,
+            ];
+          }),
+        ),
+      );
+
+      const [resolvedUsersEnsData, resolvedUsersFarcasterData] =
+        await Promise.all([
+          ensByAddressResolverService.loadMany([...userAddresses]),
+          farcasterByAddressResolverService.loadMany([...userAddresses]),
+        ]);
+
+      const resolveUserDataAndFormatSingleCommentResponse =
+        createUserDataAndFormatSingleCommentResponseResolver(
+          0,
+          resolvedUsersEnsData,
+          resolvedUsersFarcasterData,
+        );
+
       return c.json(
         formatResponseUsingZodSchema(AppNotificationsGetResponseSchema, {
-          notifications: rows.map((row) => ({
-            cursor: row,
-          })),
+          notifications: rows.map((row) => {
+            const formattedComment =
+              resolveUserDataAndFormatSingleCommentResponse(
+                convertJsonCommentToCommentSelectType(row.comment),
+              );
+
+            switch (row.notificationType) {
+              case "reply":
+                return {
+                  cursor: row,
+                  notification: {
+                    id: row.id,
+                    createdAt: row.createdAt,
+                    type: row.notificationType,
+                    seen: !!row.seenAt,
+                    seenAt: row.seenAt,
+                    app: row.appSigner,
+                    author: formattedComment.author,
+                    comment: formattedComment,
+                    replyingTo: resolveUserDataAndFormatSingleCommentResponse(
+                      convertJsonCommentToCommentSelectType(row.parent),
+                    ),
+                  },
+                };
+              case "mention": {
+                const resolvedUserEnsData = resolveUserData(
+                  resolvedUsersEnsData,
+                  row.recipientAddress,
+                );
+                const resolvedUserFarcasterData = resolveUserData(
+                  resolvedUsersFarcasterData,
+                  row.recipientAddress,
+                );
+
+                return {
+                  cursor: row,
+                  notification: {
+                    id: row.id,
+                    createdAt: row.createdAt,
+                    type: row.notificationType,
+                    seen: !!row.seenAt,
+                    seenAt: row.seenAt,
+                    app: row.appSigner,
+                    author: formattedComment.author,
+                    comment: formattedComment,
+                    mentionedUser: formatAuthor(
+                      row.recipientAddress,
+                      resolvedUserEnsData,
+                      resolvedUserFarcasterData,
+                    ),
+                  },
+                };
+              }
+              case "reaction":
+                return {
+                  cursor: row,
+                  notification: {
+                    id: row.id,
+                    createdAt: row.createdAt,
+                    type: row.notificationType,
+                    seen: !!row.seenAt,
+                    seenAt: row.seenAt,
+                    app: row.appSigner,
+                    author: formattedComment.author,
+                    comment: formattedComment,
+                    reactingTo: resolveUserDataAndFormatSingleCommentResponse(
+                      convertJsonCommentToCommentSelectType(row.parent),
+                    ),
+                  },
+                };
+              case "quote":
+                return {
+                  cursor: row,
+                  notification: {
+                    id: row.id,
+                    createdAt: row.createdAt,
+                    type: row.notificationType,
+                    seen: !!row.seenAt,
+                    seenAt: row.seenAt,
+                    app: row.appSigner,
+                    author: formattedComment.author,
+                    comment: formattedComment,
+                    quotedComment:
+                      resolveUserDataAndFormatSingleCommentResponse(
+                        convertJsonCommentToCommentSelectType(row.parent),
+                      ),
+                  },
+                };
+              default:
+                row.notificationType satisfies never;
+                throw new Error(
+                  `Unknown notification type: ${row.notificationType}`,
+                );
+            }
+          }),
           pageInfo: {
             hasNextPage,
             hasPreviousPage,
@@ -396,4 +550,53 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       );
     },
   );
+}
+
+type JSONComment = SnakeCasedProperties<{
+  [K in keyof CommentSelectType]: CommentSelectType[K] extends Date
+    ? string
+    : CommentSelectType[K] extends Date | null
+      ? string | null
+      : CommentSelectType[K] extends bigint
+        ? string | number
+        : CommentSelectType[K];
+}>;
+
+function convertJsonCommentToCommentSelectType(
+  jsonComment: JSONComment,
+): CommentSelectType {
+  return {
+    id: jsonComment.id,
+    author: jsonComment.author,
+    app: jsonComment.app,
+    createdAt: new Date(jsonComment.created_at),
+    updatedAt: new Date(jsonComment.updated_at),
+    deletedAt: jsonComment.deleted_at ? new Date(jsonComment.deleted_at) : null,
+    channelId: BigInt(jsonComment.channel_id),
+    moderationStatusChangedAt: new Date(
+      jsonComment.moderation_status_changed_at,
+    ),
+    content: jsonComment.content,
+    metadata: jsonComment.metadata,
+    hookMetadata: jsonComment.hook_metadata,
+    targetUri: jsonComment.target_uri,
+    commentType: jsonComment.comment_type,
+    parentId: jsonComment.parent_id,
+    chainId: jsonComment.chain_id,
+    rootCommentId: jsonComment.root_comment_id,
+    txHash: jsonComment.tx_hash,
+    logIndex: jsonComment.log_index,
+    revision: jsonComment.revision,
+    zeroExSwap: jsonComment.zero_ex_swap,
+    references: jsonComment.references,
+    reactionCounts: jsonComment.reaction_counts,
+    moderationClassifierResult: jsonComment.moderation_classifier_result,
+    moderationClassifierScore: jsonComment.moderation_classifier_score,
+    moderationStatus: jsonComment.moderation_status,
+    referencesResolutionStatus: jsonComment.references_resolution_status,
+    referencesResolutionStatusChangedAt:
+      jsonComment.references_resolution_status_changed_at
+        ? new Date(jsonComment.references_resolution_status_changed_at)
+        : null,
+  };
 }

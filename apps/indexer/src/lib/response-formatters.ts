@@ -241,7 +241,7 @@ function formatViewerReactions(
   );
 }
 
-function resolveUserData<
+export function resolveUserData<
   TListItem extends ResolvedENSData | ResolvedFarcasterData,
 >(
   list: (TListItem | Error | null | undefined)[],
