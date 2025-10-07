@@ -39,7 +39,7 @@ import type {
   NotificationMentionSchemaType,
   NotificationQuoteSchemaType,
 } from "../notifications/schemas.ts";
-import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -143,6 +143,8 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           );
         } else {
           const parents = await resolveCommentParents(parentComment.id, tx);
+
+          // @todo do not notify the same person (if author replies to himself)
 
           notifications.push(
             ...createReplyNotifications({
