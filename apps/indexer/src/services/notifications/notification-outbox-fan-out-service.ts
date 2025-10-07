@@ -92,17 +92,18 @@ export class NotificationOutboxFanOutService {
 
             -- 2) Insert the notifications for all app clients
             inserted_notifications AS (
-              INSERT INTO ${schema.appNotification} (notification_id, app_id, notification_type, parent_id, app_signer, author_address, recipient_address)
+              INSERT INTO ${schema.appNotification} (notification_id, app_id, notification_type, parent_id, entity_id, app_signer, author_address, recipient_address)
               SELECT 
                 c.id as notification_id,
                 ${schema.app.id} as app_id,
                 c.notification_type,
                 c.parent_id,
+                c.entity_id,
                 c.app_signer,
                 c.author_address,
                 c.recipient_address
               FROM claimed_notifications c
-              JOIN ${schema.app} ON (${schema.app.id} = c.app_id AND ${schema.app.createdAt} <= c.created_at)
+              JOIN ${schema.app} ON (${schema.app.createdAt} <= c.created_at)
               ON CONFLICT (notification_id, app_id) DO NOTHING
               RETURNING 1
             )
