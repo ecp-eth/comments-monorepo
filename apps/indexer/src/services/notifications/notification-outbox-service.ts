@@ -30,6 +30,11 @@ export class NotificationOutboxService {
       ExtractTablesWithRelations<typeof schema>
     >;
   }): Promise<void> {
+    if (notifications.length === 0) {
+      console.warn("No notifications to publish");
+      return;
+    }
+
     const connection = tx ?? this.db;
 
     await connection
