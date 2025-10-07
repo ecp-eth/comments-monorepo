@@ -21,7 +21,7 @@ export const NotificationBaseSchema = z.object({
    */
   recipientAddress: ETHAddressSchema,
   /**
-   * The id of the parent of the notification (the entity that triggered the notification)
+   * The id of the parent of the notification (the parent of the entity that triggered the notification)
    */
   parentId: z.string().nonempty(),
   /**
