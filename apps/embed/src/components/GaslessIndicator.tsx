@@ -19,16 +19,26 @@ export function GaslessIndicator({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  const handleTouchStart = useCallback(() => {
+  const handleGlobalTouchStart = useCallback((e: TouchEvent) => {
+    // Close only on outside touch
+    if (
+      ref.current &&
+      e.target instanceof Node &&
+      ref.current.contains(e.target)
+    ) {
+      return;
+    }
     setOpen(false);
   }, []);
 
   useEffect(() => {
-    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchstart", handleGlobalTouchStart, {
+      passive: true,
+    });
     return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchstart", handleGlobalTouchStart);
     };
-  }, [handleTouchStart, open]);
+  }, [handleGlobalTouchStart, open]);
 
   return (
     <div

@@ -130,7 +130,7 @@ async function editCommentGaslessly({
       content,
       app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       nonce,
-      metadata: [],
+      metadata: editCommentPayloadRequest.metadata,
     });
 
     const chainId = editCommentPayloadRequest.chainId;
@@ -165,7 +165,7 @@ async function editCommentGaslessly({
     await throwKnownResponseCodeError(response);
 
     throw new SubmitEditCommentMutationError(
-      "Failed to post comment sponsored, please try again.",
+      "Failed to edit comment sponsored, please try again.",
     );
   }
 

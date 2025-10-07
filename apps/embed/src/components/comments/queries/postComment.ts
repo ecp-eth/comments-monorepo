@@ -17,7 +17,7 @@ import {
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { DistributiveOmit } from "@tanstack/react-query";
+import { type DistributiveOmit } from "@ecp.eth/shared/types";
 import {
   bigintReplacer,
   formatContractFunctionExecutionError,
