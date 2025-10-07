@@ -50,7 +50,7 @@ await notificationOutboxFanOutService
   .catch((e) => {
     console.error("Notification outbox fan out worker failed", e);
     Sentry.captureException(e);
-    Sentry.flush().then(() => {
+    void Sentry.flush().then(() => {
       process.exit(1);
     });
   });
