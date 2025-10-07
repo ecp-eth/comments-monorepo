@@ -144,8 +144,6 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         } else {
           const parents = await resolveCommentParents(parentComment.id, tx);
 
-          // @todo do not notify the same person (if author replies to himself)
-
           notifications.push(
             ...createReplyNotifications({
               chainId: context.chain.id,
