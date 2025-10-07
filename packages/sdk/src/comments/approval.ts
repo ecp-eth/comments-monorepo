@@ -15,6 +15,7 @@ import {
   type RemoveApprovalTypedDataSchemaType,
   type AddApprovalTypedDataSchemaType,
 } from "./schemas.js";
+import { getOneDayFromNowInSeconds } from "../core/utils.js";
 
 export type IsApprovedParams = {
   /**
@@ -101,8 +102,7 @@ export async function addApproval(
 
   const { app, expiry, commentsAddress, writeContract } = validatedParams;
 
-  const computedExpiry =
-    expiry ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365); // 1 year from now
+  const computedExpiry = expiry ?? getOneDayFromNowInSeconds() * 365n; // 1 year from now
 
   const txHash = await writeContract({
     address: commentsAddress,
@@ -364,11 +364,11 @@ export async function getAddApprovalHash(
   let computedExpiry = expiry;
 
   if (!computedDeadline) {
-    computedDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+    computedDeadline = getOneDayFromNowInSeconds();
   }
 
   if (!computedExpiry) {
-    computedExpiry = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365); // 1 year from now
+    computedExpiry = getOneDayFromNowInSeconds() * 365n; // 1 year from now
   }
 
   const hash = await params.readContract({
@@ -495,11 +495,8 @@ export function createApprovalTypedData(
   const { author, app, chainId, nonce, deadline, commentsAddress } =
     validatedParams;
 
-  const computedDeadline =
-    deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
-  const computedExpiry = BigInt(
-    Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365,
-  ); // 1 year from now
+  const computedDeadline = deadline ?? getOneDayFromNowInSeconds();
+  const computedExpiry = getOneDayFromNowInSeconds() * 365n; // 1 year from now
 
   return AddApprovalTypedDataSchema.parse({
     domain: {
@@ -575,7 +572,7 @@ export function createRemoveApprovalTypedData(
   let computedDeadline = deadline;
 
   if (!computedDeadline) {
-    computedDeadline = BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24); // 1 day from now
+    computedDeadline = getOneDayFromNowInSeconds();
   }
 
   return RemoveApprovalTypedDataSchema.parse({
