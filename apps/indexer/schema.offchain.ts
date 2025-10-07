@@ -666,7 +666,7 @@ export const notificationOutbox = offchainSchema.table(
 export const appNotification = offchainSchema.table(
   "app_notification",
   {
-    id: uuid().primaryKey().defaultRandom(),
+    id: bigserial({ mode: "bigint" }).primaryKey(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
     notificationType: notificationTypeColumnType.notNull(),
     notificationId: bigint({ mode: "bigint" })
