@@ -28,7 +28,7 @@ import { useAutoBodyMinHeight } from "@/hooks/useAutoBodyMinHeight";
 import { useAccount, useChainId } from "wagmi";
 import { PoweredBy } from "@ecp.eth/shared/components";
 import { CommentItem } from "./CommentItem";
-import { createCommentItemsQueryKey } from "./queries";
+import { createCommentItemsQueryKey } from "./queries/queryKeys";
 import { NoCommentsScreen } from "../NoCommentsScreen";
 import { cn } from "@ecp.eth/shared/helpers";
 import { useSyncViewerCookie } from "@/hooks/useSyncViewerCookie";

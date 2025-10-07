@@ -10,7 +10,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { submitCommentMutationFunction } from "../queries";
+import { submitPostCommentMutationFunction } from "../queries/postComment";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 type UseLikeCommentProps = {
@@ -67,9 +67,9 @@ export const useLikeComment = () => {
         undefined;
 
       try {
-        pendingOperation = await submitCommentMutationFunction({
+        pendingOperation = await submitPostCommentMutationFunction({
           author: connectedAddress,
-          commentRequest: {
+          postCommentRequest: {
             chainId: comment.chainId,
             content: COMMENT_REACTION_LIKE_CONTENT,
             commentType: COMMENT_TYPE_REACTION,

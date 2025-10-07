@@ -3,7 +3,7 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitCommentMutationFunction } from "../queries";
+import { submitPostCommentMutationFunction } from "../queries/postComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { waitForTransactionReceipt } from "@wagmi/core";
@@ -54,9 +54,9 @@ export function useRetryPostComment({
         throw new Error("Only post comments can be retried");
       }
 
-      const pendingOperation = await submitCommentMutationFunction({
+      const pendingOperation = await submitPostCommentMutationFunction({
         author: connectedAddress,
-        commentRequest: {
+        postCommentRequest: {
           chainId: comment.pendingOperation.chainId,
           content: comment.content,
           ...(comment.parentId
