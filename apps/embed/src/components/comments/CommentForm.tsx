@@ -315,13 +315,20 @@ function BaseCommentForm({
         }}
       />
       <div className="flex gap-2 justify-between">
-        {address && <CommentFormAuthor address={address} />}
-        {publicEnv.NEXT_PUBLIC_GASLESS_ENABLED && <GaslessIndicator />}
+        {address && (
+          <>
+            <CommentFormAuthor address={address} />
+            {publicEnv.NEXT_PUBLIC_GASLESS_ENABLED && (
+              <GaslessIndicator enableTooltipOnClick />
+            )}
+          </>
+        )}
         <div className="flex gap-2 items-center ml-auto">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  className="w-8 h-8"
                   aria-label="Add media"
                   variant="outline"
                   size="icon"
