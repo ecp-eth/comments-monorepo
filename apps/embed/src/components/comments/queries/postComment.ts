@@ -1,16 +1,11 @@
 import {
-  CommentPayloadRequestSchema,
-  CommentPayloadRequestSchemaType,
+  PostCommentPayloadInputSchema,
+  PostCommentPayloadInputSchemaType,
   PostCommentPayloadRequestSchemaType,
   PostCommentResponseSchema,
   SignCommentPayloadRequestSchemaType,
-  SignEditCommentPayloadRequestSchema,
-  SignEditCommentPayloadRequestSchemaType,
 } from "@/lib/schemas";
-import {
-  SignCommentResponseClientSchema,
-  SignEditCommentResponseClientSchema,
-} from "@ecp.eth/shared/schemas";
+import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import {
   fetchAuthorData,
@@ -21,12 +16,7 @@ import {
   InvalidCommentError,
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
-import type {
-  Comment,
-  PendingEditCommentOperationSchemaType,
-  PendingPostCommentOperationSchemaType,
-  SignEditCommentResponseClientSchemaType,
-} from "@ecp.eth/shared/schemas";
+import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { DistributiveOmit } from "@tanstack/react-query";
 import {
   bigintReplacer,
@@ -42,28 +32,14 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
 
-export function createCommentItemsQueryKey(
-  viewer: Hex | undefined,
-  chainId: number,
-  targetUriOrCommentIdOrAuthor: string,
-) {
-  return ["CommentItems", viewer, chainId, targetUriOrCommentIdOrAuthor];
-}
+class SubmitPostCommentMutationError extends Error {}
 
-export function createReplyItemsQueryKey(
-  viewer: Hex | undefined,
-  chainId: number,
-  commentId: Hex,
-) {
-  return ["ReplyItems", viewer, chainId, commentId];
-}
-
-export class SubmitCommentMutationError extends Error {}
-export class SubmitEditCommentMutationError extends Error {}
-
-type SubmitCommentParams = {
+type SubmitPostCommentParams = {
   author: Hex | undefined;
-  commentRequest: DistributiveOmit<CommentPayloadRequestSchemaType, "author">;
+  postCommentRequest: DistributiveOmit<
+    PostCommentPayloadInputSchemaType,
+    "author"
+  >;
   references: IndexerAPICommentReferencesSchemaType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   readContractAsync: ContractReadFunctions["getIsApproved"];
@@ -76,17 +52,17 @@ type PendingPostCommentOperationSchemaTypeWithoutReferences = Omit<
   "references"
 >;
 
-export async function submitCommentMutationFunction({
+export async function submitPostCommentMutationFunction({
   author,
-  commentRequest,
+  postCommentRequest,
   references,
   switchChainAsync,
   readContractAsync,
   writeContractAsync,
   signTypedDataAsync,
-}: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
+}: SubmitPostCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!author) {
-    throw new SubmitCommentMutationError("Wallet not connected.");
+    throw new SubmitPostCommentMutationError("Wallet not connected.");
   }
 
   // ignore errors here, we don't want to block the comment submission
@@ -98,8 +74,8 @@ export async function submitCommentMutationFunction({
     return undefined;
   });
 
-  const parseResult = CommentPayloadRequestSchema.safeParse({
-    ...commentRequest,
+  const parseResult = PostCommentPayloadInputSchema.safeParse({
+    ...postCommentRequest,
     author,
   });
 
@@ -112,19 +88,19 @@ export async function submitCommentMutationFunction({
   const switchedChain = await switchChainAsync(commentPayloadRequest.chainId);
 
   if (switchedChain.id !== commentPayloadRequest.chainId) {
-    throw new SubmitCommentMutationError("Failed to switch chain.");
+    throw new SubmitPostCommentMutationError("Failed to switch chain.");
   }
 
   const pendingOperation = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
     ? await postCommentGaslessly({
         readContractAsync,
-        commentPayloadRequest,
+        postCommentPayloadRequest: commentPayloadRequest,
         signTypedDataAsync,
         resolvedAuthor,
       })
     : {
         ...(await postCommentNonGaslessly({
-          commentPayloadRequest,
+          postCommentPayloadRequest: commentPayloadRequest,
           writeContractAsync,
           resolvedAuthor,
         })),
@@ -138,18 +114,18 @@ export async function submitCommentMutationFunction({
 }
 
 async function postCommentGaslessly({
-  commentPayloadRequest,
+  postCommentPayloadRequest,
   readContractAsync,
   signTypedDataAsync,
   resolvedAuthor,
 }: {
-  commentPayloadRequest: CommentPayloadRequestSchemaType;
+  postCommentPayloadRequest: PostCommentPayloadInputSchemaType;
   readContractAsync: ContractReadFunctions["getIsApproved"];
   signTypedDataAsync: SignTypedDataMutateAsync;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
 }): Promise<PendingPostCommentOperationSchemaTypeWithoutReferences> {
   const appApproved = await isApproved({
-    author: commentPayloadRequest.author,
+    author: postCommentPayloadRequest.author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     readContract: readContractAsync,
   });
@@ -158,23 +134,23 @@ async function postCommentGaslessly({
   let deadline: bigint | undefined;
 
   if (!appApproved) {
-    const { content, author, commentType } = commentPayloadRequest;
+    const { content, author, commentType } = postCommentPayloadRequest;
     const commentData = createCommentData({
       content,
       author,
       app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
       metadata: [],
-      ...("parentId" in commentPayloadRequest
+      ...("parentId" in postCommentPayloadRequest
         ? {
-            parentId: commentPayloadRequest.parentId,
+            parentId: postCommentPayloadRequest.parentId,
           }
         : {
-            targetUri: commentPayloadRequest.targetUri,
+            targetUri: postCommentPayloadRequest.targetUri,
           }),
       commentType: commentType,
     });
 
-    const chainId = commentPayloadRequest.chainId;
+    const chainId = postCommentPayloadRequest.chainId;
     const typedCommentData = createCommentTypedData({
       commentData,
       chainId,
@@ -191,7 +167,7 @@ async function postCommentGaslessly({
     },
     body: JSON.stringify(
       {
-        comment: commentPayloadRequest,
+        comment: postCommentPayloadRequest,
         authorSignature,
         deadline,
       } satisfies PostCommentPayloadRequestSchemaType,
@@ -202,7 +178,7 @@ async function postCommentGaslessly({
   if (!response.ok) {
     await throwKnownResponseCodeError(response);
 
-    throw new SubmitCommentMutationError(
+    throw new SubmitPostCommentMutationError(
       "Failed to post comment sponsored, please try again.",
     );
   }
@@ -212,7 +188,7 @@ async function postCommentGaslessly({
   );
 
   if (!postCommentResult.success) {
-    throw new SubmitCommentMutationError(
+    throw new SubmitPostCommentMutationError(
       "Server returned malformed posted comment data, please try again.",
     );
   }
@@ -221,19 +197,19 @@ async function postCommentGaslessly({
     txHash: postCommentResult.data.txHash,
     resolvedAuthor,
     response: postCommentResult.data,
-    type: authorSignature ? "gasless-preapproved" : "gasless-not-approved",
+    type: authorSignature ? "gasless-not-approved" : "gasless-preapproved",
     action: "post",
     state: { status: "pending" },
-    chainId: commentPayloadRequest.chainId,
+    chainId: postCommentPayloadRequest.chainId,
   };
 }
 
 async function postCommentNonGaslessly({
-  commentPayloadRequest,
+  postCommentPayloadRequest,
   writeContractAsync,
   resolvedAuthor,
 }: {
-  commentPayloadRequest: CommentPayloadRequestSchemaType;
+  postCommentPayloadRequest: PostCommentPayloadInputSchemaType;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
   writeContractAsync: ContractWriteFunctions["postComment"];
 }): Promise<PendingPostCommentOperationSchemaTypeWithoutReferences> {
@@ -243,14 +219,14 @@ async function postCommentNonGaslessly({
       "Content-Type": "application/json",
     },
     body: JSON.stringify(
-      commentPayloadRequest satisfies SignCommentPayloadRequestSchemaType,
+      postCommentPayloadRequest satisfies SignCommentPayloadRequestSchemaType,
     ),
   });
 
   if (!response.ok) {
     await throwKnownResponseCodeError(response);
 
-    throw new SubmitCommentMutationError(
+    throw new SubmitPostCommentMutationError(
       "Failed to obtain signed comment data, please try again.",
     );
   }
@@ -260,7 +236,7 @@ async function postCommentNonGaslessly({
   );
 
   if (!signedCommentResult.success) {
-    throw new SubmitCommentMutationError(
+    throw new SubmitPostCommentMutationError(
       "Server returned malformed signed comment data, please try again.",
     );
   }
@@ -271,10 +247,6 @@ async function postCommentNonGaslessly({
       appSignature: signedCommentResult.data.signature,
       writeContract: writeContractAsync,
     });
-    // const txHash = await writeContractAsync({
-    //   signCommentResponse: signedCommentResult.data,
-    //   chainId: commentPayloadRequest.chainId,
-    // });
 
     return {
       txHash,
@@ -283,11 +255,11 @@ async function postCommentNonGaslessly({
       type: "non-gasless",
       action: "post",
       state: { status: "pending" },
-      chainId: commentPayloadRequest.chainId,
+      chainId: postCommentPayloadRequest.chainId,
     };
   } catch (e) {
     if (!(e instanceof Error)) {
-      throw new SubmitCommentMutationError(
+      throw new SubmitPostCommentMutationError(
         "Failed to post comment, please try again.",
       );
     }
@@ -297,110 +269,6 @@ async function postCommentNonGaslessly({
         ? formatContractFunctionExecutionError(e)
         : e.message;
 
-    throw new SubmitCommentMutationError(message);
-  }
-}
-
-type SubmitEditCommentParams = {
-  address: Hex | undefined;
-  comment: Comment;
-  editRequest: Omit<
-    SignEditCommentPayloadRequestSchemaType,
-    "author" | "metadata" | "commentId"
-  >;
-  switchChainAsync: (chainId: number) => Promise<Chain>;
-  writeContractAsync: (params: {
-    signEditCommentResponse: SignEditCommentResponseClientSchemaType;
-    chainId: number;
-  }) => Promise<Hex>;
-};
-
-export async function submitEditCommentMutationFunction({
-  address,
-  comment,
-  editRequest,
-  switchChainAsync,
-  writeContractAsync,
-}: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaType> {
-  if (!address) {
-    throw new SubmitEditCommentMutationError("Wallet not connected.");
-  }
-
-  const parseResult = SignEditCommentPayloadRequestSchema.safeParse({
-    author: address,
-    commentId: comment.id,
-    content: editRequest.content,
-    metadata: comment.metadata,
-    chainId: editRequest.chainId,
-  });
-
-  if (!parseResult.success) {
-    throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
-  }
-
-  const commentData = parseResult.data;
-
-  const switchedChain = await switchChainAsync(editRequest.chainId);
-
-  if (switchedChain.id !== editRequest.chainId) {
-    throw new SubmitEditCommentMutationError("Failed to switch chain.");
-  }
-
-  const response = await fetch("/api/sign-edit-comment", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(commentData),
-  });
-
-  if (!response.ok) {
-    await throwKnownResponseCodeError(response);
-
-    throw new SubmitEditCommentMutationError(
-      "Failed to obtain signed comment data, please try again.",
-    );
-  }
-
-  const signedCommentResult = SignEditCommentResponseClientSchema.safeParse(
-    await response.json(),
-  );
-
-  if (!signedCommentResult.success) {
-    throw new SubmitEditCommentMutationError(
-      "Server returned malformed signed comment data, please try again.",
-    );
-  }
-
-  try {
-    const txHash = await writeContractAsync({
-      signEditCommentResponse: signedCommentResult.data,
-      chainId: editRequest.chainId,
-    });
-
-    return {
-      txHash,
-      response: signedCommentResult.data,
-      type: "non-gasless",
-      action: "edit",
-      state: { status: "pending" },
-      chainId: editRequest.chainId,
-    };
-  } catch (e) {
-    if (e instanceof ContractFunctionExecutionError) {
-      if (e.shortMessage.includes("User rejected the request.")) {
-        throw new SubmitEditCommentMutationError(
-          "Could not edit the comment because the transaction was rejected.",
-        );
-      }
-
-      throw new SubmitEditCommentMutationError(e.details);
-    }
-
-    console.error(e);
-
-    throw new SubmitEditCommentMutationError(
-      "Failed to edit comment, please try again.",
-    );
+    throw new SubmitPostCommentMutationError(message);
   }
 }

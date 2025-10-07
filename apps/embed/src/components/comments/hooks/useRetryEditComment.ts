@@ -3,11 +3,11 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitEditCommentMutationFunction } from "../queries";
+import { submitEditCommentMutationFunction } from "../queries/editComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { useEditComment as useEditCommentSdk } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 export type OnRetryEditCommentParams = {
   comment: Comment;
@@ -35,7 +35,9 @@ export function useRetryEditComment({
   const wagmiConfig = useConfig();
   const commentRetryEdition = useCommentRetryEdition();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: editComment } = useEditCommentSdk();
+
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   return useCallback<OnRetryEditComment>(
     async (params) => {
@@ -63,14 +65,9 @@ export function useRetryEditComment({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ signEditCommentResponse }) {
-          const { txHash } = await editComment({
-            edit: signEditCommentResponse.data,
-            appSignature: signEditCommentResponse.signature,
-          });
-
-          return txHash;
-        },
+        readContractAsync,
+        writeContractAsync,
+        signTypedDataAsync,
       });
 
       try {
@@ -106,8 +103,10 @@ export function useRetryEditComment({
     },
     [
       connectedAddress,
+      readContractAsync,
+      writeContractAsync,
+      signTypedDataAsync,
       switchChainAsync,
-      editComment,
       commentRetryEdition,
       wagmiConfig,
     ],
