@@ -26,3 +26,24 @@ export function getAppSignerAddress(
       ? undefined
       : app;
 }
+
+export function guardAPIDeadline(deadline: bigint | undefined) {
+  if (deadline != null) {
+    if (deadline < BigInt(Date.now()) / 1000n) {
+      return Response.json(
+        { error: "Deadline is in the past" },
+        { status: 400 },
+      );
+    }
+
+    if (deadline > BigInt(Date.now() + 24 * 60 * 60 * 1000) / 1000n) {
+      return Response.json(
+        {
+          error:
+            "Deadline is too far in the future, please provide a deadline within 24 hours",
+        },
+        { status: 400 },
+      );
+    }
+  }
+}

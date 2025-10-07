@@ -1,15 +1,16 @@
 import { env } from "@/env";
 import {
-  PostCommentPayloadRequestSchema,
-  PostCommentResponseSchema,
+  EditCommentPayloadRequestSchema,
+  EditCommentResponseSchema,
 } from "@/lib/schemas";
 import { guardAPIDeadline } from "@/lib/utils";
 import { supportedChains } from "@/lib/wagmi";
 import {
-  createCommentData,
-  createCommentTypedData,
+  createEditCommentData,
+  createEditCommentTypedData,
+  editCommentWithSig,
+  getNonce,
   isApproved,
-  postCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import {
   bigintReplacer,
@@ -25,7 +26,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 
 export async function POST(req: Request) {
-  const parseResult = PostCommentPayloadRequestSchema.safeParse(
+  const parseResult = EditCommentPayloadRequestSchema.safeParse(
     await req.json(),
   );
 
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
 
   const passedCommentData = parseResult.data;
   const {
-    comment: { content, author, chainId, commentType },
+    comment: { commentId, content, author, chainId },
     authorSignature,
     deadline,
   } = passedCommentData;
@@ -84,26 +85,28 @@ export async function POST(req: Request) {
     );
   }
 
-  const commentData = createCommentData({
-    content,
+  const nonce = await getNonce({
     author,
     app: appAccount.address,
-    commentType,
-    deadline,
-
-    ...("parentId" in passedCommentData.comment
-      ? {
-          parentId: passedCommentData.comment.parentId,
-        }
-      : {
-          targetUri: passedCommentData.comment.targetUri,
-        }),
+    readContract: publicClient.readContract,
   });
 
-  const typedCommentData = createCommentTypedData({
-    commentData,
+  const editCommentData = createEditCommentData({
+    commentId,
+    content,
+    app: appAccount.address,
+    nonce,
+    deadline,
+    metadata: [],
+  });
+
+  const typedEditCommentData = createEditCommentTypedData({
+    author,
+    edit: editCommentData,
     chainId,
   });
+
+  const hash = hashTypedData(typedEditCommentData);
 
   const submitterAccount = privateKeyToAccount(env.SUBMITTER_PRIVATE_KEY);
   const submitterWalletClient = createWalletClient({
@@ -112,23 +115,22 @@ export async function POST(req: Request) {
     transport: http(),
   });
 
-  const hash = hashTypedData(typedCommentData);
-  const appSignature = await appAccount.signTypedData(typedCommentData);
+  const appSignature = await appAccount.signTypedData(typedEditCommentData);
 
-  const { txHash } = await postCommentWithSig({
+  const { txHash } = await editCommentWithSig({
     appSignature,
     authorSignature,
-    comment: typedCommentData.message,
+    edit: typedEditCommentData.message,
     writeContract: submitterWalletClient.writeContract,
   });
 
   return new JSONResponse(
-    PostCommentResponseSchema,
+    EditCommentResponseSchema,
     {
       txHash,
       signature: appSignature,
       hash,
-      data: { ...commentData, id: hash },
+      data: editCommentData,
     },
     {
       jsonReplacer: bigintReplacer,
