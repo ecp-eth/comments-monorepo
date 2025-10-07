@@ -84,8 +84,14 @@ export type SignEditCommentPayloadRequestSchemaType = z.infer<
 export const PostCommentPayloadRequestSchema = z.object({
   comment: CommentPayloadRequestSchema,
   authorSignature: HexSchema.optional().describe(
-    "Signature of the author, this is required if the user has not approved our submitter address for post",
+    "Signature of the author, required if the user has not approved our submitter address for post",
   ),
+  deadline: z.coerce
+    .bigint()
+    .optional()
+    .describe(
+      "Deadline of the comment, required if the user has not approved our submitter address for post",
+    ),
 });
 
 export type PostCommentPayloadRequestSchemaType = z.input<

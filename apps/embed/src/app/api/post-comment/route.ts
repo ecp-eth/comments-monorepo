@@ -38,7 +38,27 @@ export async function POST(req: Request) {
   const {
     comment: { content, author, chainId, commentType },
     authorSignature,
+    deadline,
   } = passedCommentData;
+
+  if (deadline) {
+    if (deadline < BigInt(Date.now())) {
+      return Response.json(
+        { error: "Deadline is in the past" },
+        { status: 400 },
+      );
+    }
+
+    if (deadline > BigInt(Date.now() + 24 * 60 * 60 * 1000)) {
+      return Response.json(
+        {
+          error:
+            "Deadline is too far in the future, please provide a deadline within 24 hours",
+        },
+        { status: 400 },
+      );
+    }
+  }
 
   if (!env.SUBMITTER_PRIVATE_KEY) {
     return Response.json(
@@ -85,6 +105,7 @@ export async function POST(req: Request) {
     author,
     app: appAccount.address,
     commentType,
+    deadline,
 
     ...("parentId" in passedCommentData.comment
       ? {
@@ -99,7 +120,10 @@ export async function POST(req: Request) {
     commentData,
     chainId,
   });
+  console.log("authorSignature", authorSignature);
+  console.log("typedCommentData", typedCommentData);
   const hash = hashTypedData(typedCommentData);
+  console.log("hash", hash);
 
   const submitterAccount = privateKeyToAccount(env.SUBMITTER_PRIVATE_KEY);
   const submitterWalletClient = createWalletClient({

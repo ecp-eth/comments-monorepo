@@ -28,7 +28,10 @@ import type {
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { DistributiveOmit } from "@tanstack/react-query";
-import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import {
+  bigintReplacer,
+  formatContractFunctionExecutionError,
+} from "@ecp.eth/shared/helpers";
 import {
   ContractReadFunctions,
   ContractWriteFunctions,
@@ -117,6 +120,7 @@ export async function submitCommentMutationFunction({
         readContractAsync,
         commentPayloadRequest,
         signTypedDataAsync,
+        resolvedAuthor,
       })
     : {
         ...(await postCommentNonGaslessly({
@@ -151,6 +155,7 @@ async function postCommentGaslessly({
   });
 
   let authorSignature: Hex | undefined;
+  let deadline: bigint | undefined;
 
   if (!appApproved) {
     const { content, author, commentType } = commentPayloadRequest;
@@ -175,6 +180,7 @@ async function postCommentGaslessly({
       chainId,
     });
 
+    deadline = commentData.deadline;
     authorSignature = await signTypedDataAsync(typedCommentData);
   }
 
@@ -183,10 +189,14 @@ async function postCommentGaslessly({
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      comment: commentPayloadRequest,
-      authorSignature,
-    } satisfies PostCommentPayloadRequestSchemaType),
+    body: JSON.stringify(
+      {
+        comment: commentPayloadRequest,
+        authorSignature,
+        deadline,
+      } satisfies PostCommentPayloadRequestSchemaType,
+      bigintReplacer,
+    ),
   });
 
   if (!response.ok) {
