@@ -1,5 +1,5 @@
 CREATE TABLE "ecp_indexer_schema"."app_notification" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" bigserial PRIMARY KEY NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"notification_type" text NOT NULL,
 	"notification_id" bigint NOT NULL,
@@ -55,6 +55,7 @@ CREATE INDEX "an_by_app_recipient_type_parent_seen_idx" ON "ecp_indexer_schema".
 CREATE INDEX "an_by_app_recipient_type_parent_unseen_idx" ON "ecp_indexer_schema"."app_notification" USING btree ("app_id",lower("recipient_address"),"notification_type","parent_id","created_at","id") WHERE "ecp_indexer_schema"."app_notification"."seen_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "nt_by_created_at_unprocessed_idx" ON "ecp_indexer_schema"."notification_outbox" USING btree ("created_at") WHERE "ecp_indexer_schema"."notification_outbox"."processed_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "app_by_id_created_at_idx" ON "ecp_indexer_schema"."app" USING btree ("id","created_at");
+
 
 CREATE OR REPLACE FUNCTION ecp_indexer_schema.notify_new_notifications_in_outbox() RETURNS trigger
 LANGUAGE plpgsql AS $$
