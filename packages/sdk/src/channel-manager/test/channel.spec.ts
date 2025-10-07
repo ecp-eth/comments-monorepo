@@ -29,7 +29,8 @@ import type { Hex } from "../../core/schemas.js";
 import type { CommentData, MetadataEntry } from "../../comments/types.js";
 import { AuthorAuthMethod } from "../../comments/types.js";
 import { NATIVE_ASSET_ADDRESS } from "../../constants.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
+import { deployContractsForTests } from "../../../scripts/test-helpers.js";
+import { ANVIL_PORT_FOR_TESTS } from "../../../scripts/constants.js";
 
 describe("channel", () => {
   let channelManagerAddress: Hex;
@@ -41,7 +42,7 @@ describe("channel", () => {
       channelManagerAddress,
       flatFeeHookAddress,
       legacyTakeChannelFeeHookAddress,
-    } = deployContracts());
+    } = deployContractsForTests());
   });
 
   // Test account setup
@@ -56,14 +57,14 @@ describe("channel", () => {
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
     pollingInterval: 500,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: account2,
     pollingInterval: 500,
   }).extend(publicActions);

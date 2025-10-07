@@ -41,13 +41,14 @@ import {
   MetadataTypeValues,
 } from "../metadata.js";
 import type { MetadataEntry } from "../types.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
+import { deployContractsForTests } from "../../../scripts/test-helpers.js";
+import { ANVIL_PORT_FOR_TESTS } from "../../../scripts/constants.js";
 
 describe("comment", () => {
   let commentsAddress: Hex;
 
   beforeAll(() => {
-    ({ commentsAddress } = deployContracts());
+    ({ commentsAddress } = deployContractsForTests());
   });
 
   // Test account setup
@@ -66,21 +67,21 @@ describe("comment", () => {
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
     pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: appAccount,
     pollingInterval: 500,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: thirdPartyAccount,
     pollingInterval: 500,
   }).extend(publicActions);
@@ -220,7 +221,8 @@ describe("comment", () => {
           comment: createCommentData({
             app: appAccount.address,
             author: account.address,
-            content: "Test comment content",
+            content:
+              "Test comment content different from the one in the signature",
             metadata: [],
             targetUri: "https://example.com",
           }),
@@ -311,7 +313,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: "Test comment content for deleteComment",
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -497,7 +499,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: "Test editComment",
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -605,7 +607,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: "Test editCommentWithSig",
         metadata: [],
         targetUri: "https://example.com",
       });
