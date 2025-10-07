@@ -35,17 +35,21 @@ export function createReplyNotifications({
   reply,
   parents,
 }: CreateReplyNotificationParams): NotificationReplySchemaType[] {
-  return parents.map((parent) => {
-    return NotificationReplySchema.parse({
-      uid: `reply:${chainId}:${parent.id}:${reply.id}`,
-      type: "reply",
-      recipientAddress: parent.author,
-      appSigner: reply.app,
-      authorAddress: reply.author,
-      parentId: parent.id,
-      entityId: reply.id,
-    } satisfies NotificationReplySchemaInput);
-  });
+  return parents
+    .filter(
+      (parent) => parent.author.toLowerCase() !== reply.author.toLowerCase(),
+    )
+    .map((parent) => {
+      return NotificationReplySchema.parse({
+        uid: `reply:${chainId}:${parent.id}:${reply.id}`,
+        type: "reply",
+        recipientAddress: parent.author,
+        appSigner: reply.app,
+        authorAddress: reply.author,
+        parentId: parent.id,
+        entityId: reply.id,
+      } satisfies NotificationReplySchemaInput);
+    });
 }
 
 type CreateMentionNotificationParams = {
