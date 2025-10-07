@@ -25,7 +25,7 @@ export type HTTPResolver = DataLoader<string, ResolvedHTTP | null>;
 export const HTTP_URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
 
 // these status codes that are considered as permanently not resolvable
-const STATUS_CODES_NOT_RESOLVABLE = [401, 403, 404];
+const STATUS_CODES_NOT_RESOLVABLE = [401, 403, 404, 410];
 
 function normalizeContentType(contentType: string | null): string | null {
   if (!contentType) {
