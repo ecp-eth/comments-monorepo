@@ -43,7 +43,14 @@ export async function POST(req: Request) {
     deadline,
   } = passedCommentData;
 
-  guardAPIDeadline(deadline);
+  try {
+    guardAPIDeadline(deadline);
+  } catch (error) {
+    return Response.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 400 },
+    );
+  }
 
   if (!env.SUBMITTER_PRIVATE_KEY) {
     return Response.json(
@@ -79,7 +86,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error:
-          "Author has not approved submitter address for post, provide author signature to post the comment",
+          "Author has not approved submitter address for edit, provide author signature to edit the comment",
       },
       { status: 400 },
     );
