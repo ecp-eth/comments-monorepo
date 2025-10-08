@@ -2,6 +2,7 @@ import { createCAIP373QuotedCommentResolver } from "../resolvers/caip373-quoted-
 import { LRUCache } from "lru-cache";
 import type { CAIP373QuotedCommentResolverResult } from "../resolvers/caip373-quoted-comment-resolver.ts";
 import config from "../../ponder.config.ts";
+import { commentByIdResolverService } from "./comment-by-id-resolver.ts";
 
 const cacheMap = new LRUCache<
   string,
@@ -16,4 +17,5 @@ export const caip373QuotedCommentResolverService =
   createCAIP373QuotedCommentResolver({
     chains: config.chains,
     cacheMap,
+    commentByIdResolver: commentByIdResolverService,
   });

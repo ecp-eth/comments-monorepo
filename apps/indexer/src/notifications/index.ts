@@ -132,7 +132,7 @@ export function createQuoteNotification({
     type: "quote",
     appSigner: quotedComment.app,
     authorAddress: quotedComment.author,
-    recipientAddress: comment.author,
+    recipientAddress: quotedComment.author,
     parentId: comment.id,
     entityId: quotedComment.id,
   } satisfies NotificationQuoteSchemaInput);

@@ -1,9 +1,12 @@
 import * as Sentry from "@sentry/node";
 import { CommentManagerABI } from "@ecp.eth/sdk";
-import { isZeroHex, type Hex } from "@ecp.eth/sdk/core";
+import { type Hex } from "@ecp.eth/sdk/core";
 import DataLoader from "dataloader";
-import type config from "../../ponder.config.ts";
 import { decodeFunctionData } from "viem";
+import type config from "../../ponder.config.ts";
+import { sql } from "drizzle-orm";
+import { isSameHex } from "@ecp.eth/shared/helpers";
+import type { CommentByIdResolver } from "./comment-by-id-resolver.ts";
 
 export type CAIP373QuotedCommentResolverKey = {
   functionCallData: Hex;
@@ -24,6 +27,7 @@ export type CAIP373QuotedCommentResolver = DataLoader<
 
 export type CAIP373QuotedCommentResolverOptions = {
   chains: typeof config.chains;
+  commentByIdResolver: CommentByIdResolver;
 } & Omit<
   DataLoader.Options<
     CAIP373QuotedCommentResolverKey,
@@ -35,6 +39,7 @@ export type CAIP373QuotedCommentResolverOptions = {
 
 export function createCAIP373QuotedCommentResolver({
   chains,
+  commentByIdResolver,
   ...options
 }: CAIP373QuotedCommentResolverOptions): CAIP373QuotedCommentResolver {
   return new DataLoader<
@@ -43,22 +48,28 @@ export function createCAIP373QuotedCommentResolver({
     string
   >(
     async (keys) => {
-      const commentIdsToResolveByChainId: Record<
-        number,
-        { commentId: Hex; result: null | CAIP373QuotedCommentResolverResult }[]
+      const resultPointers: Record<
+        string,
+        {
+          commentId: Hex;
+          chainId: number;
+          commentManagerAddress: Hex;
+          result: null | CAIP373QuotedCommentResolverResult;
+        }
       > = {};
-      const resultPointersForKeys: ({
-        commentId: Hex;
+      const keysToResults: {
         result: null | CAIP373QuotedCommentResolverResult;
-      } | null)[] = keys.map((key) => {
+      }[] = [];
+
+      for (const key of keys) {
         const chain = chains[key.chainId.toString()];
 
         if (
           !chain ||
-          chain.channelManagerAddress.toLowerCase() !==
-            key.commentManagerAddress.toLowerCase()
+          !isSameHex(chain.commentManagerAddress, key.commentManagerAddress)
         ) {
-          return null;
+          keysToResults.push({ result: null });
+          continue;
         }
 
         const commentId = getCommentIdFromFunctionCallData(
@@ -66,68 +77,56 @@ export function createCAIP373QuotedCommentResolver({
         );
 
         if (!commentId) {
-          return null;
+          keysToResults.push({ result: null });
+          continue;
         }
 
-        const toResolve = commentIdsToResolveByChainId[key.chainId] ?? [];
+        const lowerCaseCommentId = commentId.toLowerCase();
 
-        const resultPointer = {
-          commentId,
+        resultPointers[`${lowerCaseCommentId}-${key.chainId}`] = {
+          commentId: lowerCaseCommentId as Hex,
+          chainId: key.chainId,
+          commentManagerAddress: chain.commentManagerAddress,
           result: null,
         };
 
-        toResolve.push(resultPointer);
-
-        commentIdsToResolveByChainId[key.chainId] = toResolve;
-
-        return resultPointer;
-      });
-      const promises: Promise<void>[] = [];
-
-      for (const [chainId, commentIdsToResolve] of Object.entries(
-        commentIdsToResolveByChainId,
-      )) {
-        const chain = chains[chainId];
-
-        if (!chain) {
-          throw new Error(`Chain ${chainId} not found`);
-        }
-
-        const resultPromise = chain.publicClient
-          .multicall({
-            contracts: commentIdsToResolve.map(({ commentId }) => {
-              return {
-                address: chain.commentManagerAddress,
-                abi: CommentManagerABI,
-                functionName: "getComment",
-                args: [commentId],
-              } as const;
-            }),
-          })
-          .then((results) => {
-            return results.forEach((result, index) => {
-              if (result.status === "failure") {
-                return;
-              }
-
-              if (isZeroHex(result.result.author)) {
-                return;
-              }
-
-              commentIdsToResolve[index]!.result = {
-                chainId: Number(chainId),
-                commentId: commentIdsToResolve[index]!.commentId,
-                commentManagerAddress: chain.commentManagerAddress,
-              };
-            });
-          });
-
-        promises.push(resultPromise);
+        keysToResults.push(
+          resultPointers[`${lowerCaseCommentId}-${key.chainId}`]!,
+        );
       }
 
-      return resultPointersForKeys.map(
-        (resultPointer) => resultPointer?.result ?? null,
+      const resultPointerTuples = Object.entries(resultPointers).map(
+        ([, value]) => sql`(${value.commentId}, ${value.chainId})`,
       );
+
+      if (resultPointerTuples.length > 0) {
+        const comments = await commentByIdResolver.loadMany(
+          Object.entries(resultPointers).map(([, value]) => ({
+            id: value.commentId,
+            chainId: value.chainId,
+          })),
+        );
+
+        for (const comment of comments) {
+          if (comment instanceof Error || !comment) {
+            continue;
+          }
+
+          const resultPointer =
+            resultPointers[`${comment.id}-${comment.chainId}`];
+
+          if (resultPointer) {
+            // this updates the pointer so it is immediately available in keysToResults as well
+            resultPointer.result = {
+              commentId: comment.id,
+              chainId: comment.chainId,
+              commentManagerAddress: resultPointer.commentManagerAddress,
+            };
+          }
+        }
+      }
+
+      return keysToResults.map((key) => key.result);
     },
     {
       ...options,
