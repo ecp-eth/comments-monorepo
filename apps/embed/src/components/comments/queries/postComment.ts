@@ -84,7 +84,6 @@ export async function submitPostCommentMutationFunction({
   }
 
   const commentPayloadRequest = parseResult.data;
-
   const switchedChain = await switchChainAsync(commentPayloadRequest.chainId);
 
   if (switchedChain.id !== commentPayloadRequest.chainId) {
@@ -139,7 +138,7 @@ async function postCommentGaslessly({
       content,
       author,
       app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-      metadata: [],
+      commentType: commentType,
       ...("parentId" in postCommentPayloadRequest
         ? {
             parentId: postCommentPayloadRequest.parentId,
@@ -147,7 +146,6 @@ async function postCommentGaslessly({
         : {
             targetUri: postCommentPayloadRequest.targetUri,
           }),
-      commentType: commentType,
     });
 
     const chainId = postCommentPayloadRequest.chainId;
