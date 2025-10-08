@@ -6,10 +6,7 @@ import {
   OpenAPIENSNameOrAddressSchema,
   OpenAPIHexSchema,
 } from "../../lib/schemas.ts";
-import {
-  NotificationTypeSchema,
-  type NotificationTypeSchemaType,
-} from "../../notifications/schemas.ts";
+import { type NotificationTypeSchemaType } from "../../notifications/schemas.ts";
 import {
   and,
   asc,
@@ -31,7 +28,12 @@ import {
   formatResponseUsingZodSchema,
   resolveUserData,
 } from "../../lib/response-formatters.ts";
-import { AppNotificationOutputSchema } from "./schemas.ts";
+import {
+  AppNotificationGetRequestQueryAppSchema,
+  AppNotificationGetRequestQuerySeenSchema,
+  AppNotificationGetRequestQueryTypeSchema,
+  AppNotificationOutputSchema,
+} from "./schemas.ts";
 import { ensByAddressResolverService } from "../../services/ens-by-address-resolver.ts";
 import { farcasterByAddressResolverService } from "../../services/farcaster-by-address-resolver.ts";
 import type { CommentSelectType } from "ponder:schema";
@@ -70,36 +72,7 @@ export const AppNotificationsCursorOutputSchema = z
 
 export const AppNotificationsGetRequestQuerySchema = z
   .object({
-    app: z
-      .preprocess((val) => {
-        if (typeof val === "string") {
-          return val.split(",").map((app) => app.trim());
-        }
-
-        return val;
-      }, OpenAPIHexSchema.array().max(20))
-      .default([])
-      .openapi({
-        description: "Return only notifications created by this app signers",
-        oneOf: [
-          {
-            type: "array",
-            items: {
-              type: "string",
-              description: "an array of app signer public keys in hex format",
-            },
-          },
-          {
-            type: "string",
-            description:
-              "Comma separated list of app signer public keys in hex format",
-          },
-          {
-            type: "string",
-            description: "An app signer public key in hex format",
-          },
-        ],
-      }),
+    app: AppNotificationGetRequestQueryAppSchema,
     before: AppNotificationsCursorInputSchema.optional().openapi({
       description: "Fetch newer notifications than the cursor",
     }),
@@ -112,79 +85,9 @@ export const AppNotificationsGetRequestQuerySchema = z
     parentId: OpenAPIHexSchema.optional().openapi({
       description: "Return only notifications for this parent id",
     }),
-    type: z
-      .preprocess((val) => {
-        if (typeof val === "string") {
-          return val.split(",").map((type) => type.trim());
-        }
-
-        return val;
-      }, NotificationTypeSchema.array())
-      .default([])
-      .openapi({
-        description: "Return only notifications of this type",
-        oneOf: [
-          {
-            type: "array",
-            items: {
-              type: "string",
-              enum: NotificationTypeSchema.options,
-            },
-          },
-          {
-            type: "string",
-            enum: NotificationTypeSchema.options,
-          },
-          {
-            type: "string",
-            description: "Comma separated list of notification types",
-            example: "reply,mention,reaction,quote",
-          },
-        ],
-      }),
-    user: z
-      .preprocess((val) => {
-        if (typeof val === "string") {
-          return val.split(",").map((user) => user.trim());
-        }
-
-        return val;
-      }, OpenAPIENSNameOrAddressSchema.array().min(1).max(20))
-      .openapi({
-        description: "The user to fetch notifications for",
-        oneOf: [
-          {
-            type: "array",
-            items: {
-              type: "string",
-              description: "an array of ETH addresses or ens names",
-            },
-          },
-          {
-            type: "string",
-            description: "Comma separated list of ETH addresses or ens names",
-          },
-          {
-            type: "string",
-            description: "An ETH address or ens name",
-          },
-        ],
-      }),
-    seen: z
-      .enum(["true", "false", "1", "0"])
-      .transform((val) => {
-        if (val === "true" || val === "1") {
-          return true;
-        }
-
-        return false;
-      })
-      .optional()
-      .openapi({
-        description:
-          "Whether to include only seen or unseen notifications, if omitted or empty all notifications will be included",
-        enum: ["true", "false", "1", "0"],
-      }),
+    type: AppNotificationGetRequestQueryTypeSchema,
+    user: OpenAPIENSNameOrAddressSchema,
+    seen: AppNotificationGetRequestQuerySeenSchema,
   })
   .superRefine((data, ctx) => {
     if (data.before && data.after) {
@@ -261,18 +164,18 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         limit,
         parentId,
         type: types,
-        user: users,
+        user,
         seen,
       } = c.req.valid("query");
       const app = c.get("app");
 
       const resolvedUsers: Hex[] = await resolveUsersByAddressOrEnsName(
-        users,
+        [user],
         ensByNameResolverService,
       );
 
       if (resolvedUsers.length === 0) {
-        return c.json({ message: "Invalid ENS names" }, 400);
+        return c.json({ message: "Invalid ENS name" }, 400);
       }
 
       /**
@@ -281,8 +184,8 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       const sharedConditions: (SQL | undefined)[] = [
         eq(schema.appNotification.appId, app.id),
         inArray(
-          sql`lower(${schema.appNotification.recipientAddress})`,
-          resolvedUsers.map((user) => sql`lower(${user})`),
+          sql`${schema.appNotification.recipientAddress}`,
+          resolvedUsers.map((user) => sql`${user.toLowerCase()}`),
         ),
         parentId ? eq(schema.appNotification.parentId, parentId) : undefined,
         types.length > 0
@@ -290,8 +193,8 @@ export function setupNotificationsGet(app: OpenAPIHono) {
           : undefined,
         apps.length > 0
           ? inArray(
-              sql`lower(${schema.appNotification.appSigner})`,
-              apps.map((app) => sql`lower(${app})`),
+              sql`${schema.appNotification.appSigner}`,
+              apps.map((app) => sql`lower(${app.toLowerCase()})`),
             )
           : undefined,
       ];

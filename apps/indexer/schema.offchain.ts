@@ -714,28 +714,28 @@ export const appNotification = offchainSchema.table(
      */
     index("an_by_app_recipient_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
     index("an_by_app_recipient_type_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
       table.notificationType, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
     index("an_by_app_recipient_parent_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
       table.parentId, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
     index("an_by_app_recipient_app_signer_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
-      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
+      table.appSigner, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
@@ -744,8 +744,8 @@ export const appNotification = offchainSchema.table(
      */
     index("an_by_app_recipient_app_signer_type_parent_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
-      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
+      table.appSigner, // = ?, IN ()
       table.notificationType, // = ?, IN (), DISTINCT ON
       table.parentId, // = ?, IN (), DISTINCT ON
       table.createdAt, // =>,<= ?, ORDER BY
@@ -753,23 +753,23 @@ export const appNotification = offchainSchema.table(
     ),
     index("an_by_app_recipient_app_signer_type_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
-      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
+      table.appSigner, // = ?, IN ()
       table.notificationType, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
     index("an_by_app_recipient_app_signer_parent_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
-      sql`lower(${table.appSigner})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
+      table.appSigner, // = ?, IN ()
       table.parentId, // = ?, IN ()
       table.createdAt, // =>,<= ?, ORDER BY
       table.id, // =>,<= ?, ORDER BY
     ),
     index("an_by_app_recipient_type_parent_all_idx").on(
       table.appId, // = ?
-      sql`lower(${table.recipientAddress})`, // = ?, IN ()
+      table.recipientAddress, // = ?, IN ()
       table.notificationType, // = ?, IN (), DISTINCT ON
       table.parentId, // = ?, IN (), DISTINCT ON
       table.createdAt, // =>,<= ?, ORDER BY
@@ -781,7 +781,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
       )
@@ -789,7 +789,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
       )
@@ -797,7 +797,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_type_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.notificationType, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -806,7 +806,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_type_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.notificationType, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -815,7 +815,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_parent_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.parentId, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -824,7 +824,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_parent_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.parentId, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -833,8 +833,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
       )
@@ -842,8 +842,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
       )
@@ -851,8 +851,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_type_parent_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.notificationType, // = ?, IN (), DISTINCT ON
         table.parentId, // = ?, IN (), DISTINCT ON
         table.createdAt, // =>,<= ?, ORDER BY
@@ -862,8 +862,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_type_parent_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.notificationType, // = ?, IN (), DISTINCT ON
         table.parentId, // = ?, IN (), DISTINCT ON
         table.createdAt, // =>,<= ?, ORDER BY
@@ -873,8 +873,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_type_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.notificationType, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -883,8 +883,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_type_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.notificationType, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -893,8 +893,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_parent_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.parentId, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -903,8 +903,8 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_app_signer_parent_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
-        sql`lower(${table.appSigner})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
+        table.appSigner, // = ?, IN ()
         table.parentId, // = ?, IN ()
         table.createdAt, // =>,<= ?, ORDER BY
         table.id, // =>,<= ?, ORDER BY
@@ -913,7 +913,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_type_parent_seen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.notificationType, // = ?, IN (), DISTINCT ON
         table.parentId, // = ?, IN (), DISTINCT ON
         table.createdAt, // =>,<= ?, ORDER BY
@@ -923,7 +923,7 @@ export const appNotification = offchainSchema.table(
     index("an_by_app_recipient_type_parent_unseen_idx")
       .on(
         table.appId, // = ?
-        sql`lower(${table.recipientAddress})`, // = ?, IN ()
+        table.recipientAddress, // = ?, IN ()
         table.notificationType, // = ?, IN (), DISTINCT ON
         table.parentId, // = ?, IN (), DISTINCT ON
         table.createdAt, // =>,<= ?, ORDER BY
