@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
   const passedCommentData = parseResult.data;
   const {
-    comment: { commentId, content, author, chainId },
+    comment: { commentId, content, author, chainId, metadata },
     authorSignature,
     deadline,
   } = passedCommentData;
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
     app: appAccount.address,
     nonce,
     deadline,
-    metadata: [],
+    metadata,
   });
 
   const typedEditCommentData = createEditCommentTypedData({
