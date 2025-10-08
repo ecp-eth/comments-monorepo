@@ -43,7 +43,10 @@ import type {
   WaitableWriteContractHelperResult,
   WriteContractHelperResult,
 } from "../core/types.js";
-import { createWaitableWriteContractHelper } from "../core/utils.js";
+import {
+  createWaitableWriteContractHelper,
+  getOneDayFromNowInSeconds,
+} from "../core/utils.js";
 import type { MetadataEntry } from "./types.js";
 
 export type PostCommentParams = {
@@ -585,7 +588,7 @@ export function createCommentData({
     author,
     app,
     channelId,
-    deadline: deadline ?? BigInt(Date.now() + 24 * 60 * 60 * 1000),
+    deadline: deadline ?? getOneDayFromNowInSeconds(),
     ...parentIdOrTargetUri,
   };
 }
@@ -653,8 +656,7 @@ export function createDeleteCommentTypedData(
       commentId,
       author,
       app,
-      deadline:
-        deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24), // 1 day from now
+      deadline: deadline ?? getOneDayFromNowInSeconds(),
     },
   });
 }
@@ -758,8 +760,7 @@ export function createEditCommentData(
     metadata,
     app: params.app,
     nonce: params.nonce,
-    deadline:
-      params.deadline ?? BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24),
+    deadline: params.deadline ?? getOneDayFromNowInSeconds(),
   };
 }
 

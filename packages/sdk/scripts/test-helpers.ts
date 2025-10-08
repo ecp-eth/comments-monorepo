@@ -5,7 +5,7 @@ import type { Hex } from "viem";
 
 const cwd = path.resolve(import.meta.dirname, "../../protocol");
 
-export function deployContracts(): {
+export function deployContractsForTests(): {
   commentsAddress: Hex;
   channelManagerAddress: Hex;
   noopHookAddress: Hex;

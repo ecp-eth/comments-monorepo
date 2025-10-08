@@ -217,3 +217,11 @@ export function runAsync<T>(
 
   return execute();
 }
+
+/**
+ * Get the number of seconds to one day from now
+ * @returns one day from now in seconds in bigint
+ */
+export function getOneDayFromNowInSeconds(): bigint {
+  return BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24);
+}

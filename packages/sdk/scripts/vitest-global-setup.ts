@@ -1,5 +1,6 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import path from "node:path";
+import { ANVIL_PORT_FOR_TESTS } from "./constants";
 
 let nodeProcess: ChildProcess;
 
@@ -12,7 +13,17 @@ export async function setup() {
   console.log("📡 Starting Anvil node...");
   nodeProcess = spawn(
     "pnpm",
-    ["rivet", "anvil", "--host", "0.0.0.0", "--block-time", "0.5"],
+    [
+      "rivet",
+      "anvil",
+      "--host",
+      "0.0.0.0",
+      "--block-time",
+      "0.5",
+      // let's use a different port for sdk testing so we don't conflict with the main anvil node
+      "--port",
+      ANVIL_PORT_FOR_TESTS.toString(),
+    ],
     {
       cwd,
       env: process.env,
@@ -32,7 +43,7 @@ export async function setup() {
 
       nodeProcess.stdout?.on("data", (data) => {
         const output = data.toString();
-        if (output.includes("Listening on 0.0.0.0:8545")) {
+        if (output.includes(`Listening on 0.0.0.0:${ANVIL_PORT_FOR_TESTS}`)) {
           console.log("✅ Anvil node started");
           resolve(true);
         }
@@ -86,7 +97,7 @@ async function verifyAnvilConnection() {
 
   while (retries < maxRetries) {
     try {
-      const response = await fetch("http://localhost:8545", {
+      const response = await fetch(`http://localhost:${ANVIL_PORT_FOR_TESTS}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

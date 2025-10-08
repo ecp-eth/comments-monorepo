@@ -24,13 +24,14 @@ import type {
   AddApprovalTypedDataSchemaType,
   RemoveApprovalTypedDataSchemaType,
 } from "../schemas.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
+import { deployContractsForTests } from "../../../scripts/test-helpers.js";
+import { ANVIL_PORT_FOR_TESTS } from "../../../scripts/constants.js";
 
 describe("approval", () => {
   let commentsAddress: Hex;
 
   beforeAll(() => {
-    ({ commentsAddress } = deployContracts());
+    ({ commentsAddress } = deployContractsForTests());
   });
 
   // Test account setup
@@ -45,14 +46,14 @@ describe("approval", () => {
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
     pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: app,
     pollingInterval: 500,
   }).extend(publicActions);

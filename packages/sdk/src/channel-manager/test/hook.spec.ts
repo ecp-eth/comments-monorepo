@@ -16,15 +16,16 @@ import {
 } from "../hook.js";
 import { createChannel } from "../channel.js";
 import { ChannelManagerABI } from "../../abis.js";
-import { deployContracts } from "../../../scripts/test-helpers.js";
+import { deployContractsForTests } from "../../../scripts/test-helpers.js";
 import type { Hex } from "../../core/schemas.js";
+import { ANVIL_PORT_FOR_TESTS } from "../../../scripts/constants.js";
 
 describe("hook", () => {
   let channelManagerAddress: Hex;
   let noopHookAddress: Hex;
 
   beforeAll(() => {
-    ({ channelManagerAddress, noopHookAddress } = deployContracts());
+    ({ channelManagerAddress, noopHookAddress } = deployContractsForTests());
   });
 
   // Test account setup
@@ -39,14 +40,14 @@ describe("hook", () => {
   // Create wallet client
   const client = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
     pollingInterval: 500,
   }).extend(publicActions);
 
   const client2 = createWalletClient({
     chain: anvil,
-    transport: http("http://localhost:8545"),
+    transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: account2,
     pollingInterval: 500,
   }).extend(publicActions);
