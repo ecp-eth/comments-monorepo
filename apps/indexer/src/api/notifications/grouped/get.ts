@@ -281,7 +281,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                   sql`notification_type > ${after.notificationType}`,
                   and(
                     sql`notification_type = ${after.notificationType}`,
-                    sql`parent_id < to_timestamp(${after.us} / 1e6)::timestamptz`,
+                    sql`parent_id < ${after.parentId}`,
                   ),
                 ),
               ),
@@ -302,7 +302,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                   sql`notification_type < ${before.notificationType}`,
                   and(
                     sql`notification_type = ${before.notificationType}`,
-                    sql`parent_id > to_timestamp(${before.us} / 1e6)::timestamptz`,
+                    sql`parent_id > ${before.parentId}`,
                   ),
                 ),
               ),
