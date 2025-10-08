@@ -31,7 +31,7 @@ import {
   CommentGaslessProvider,
   CommentGaslessProviderContextType,
 } from "./CommentGaslessProvider";
-import { useApprovalStatus } from "@/hooks/useApprovalStatus";
+import { useApprovalStatus } from "@ecp.eth/shared/hooks/useApprovalStatus";
 import { chain } from "@/lib/clientWagmi";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
@@ -62,7 +62,10 @@ export function CommentSectionGasless({
   );
 
   const revokeApproval = useRevokeApproval();
-  const approvalStatus = useApprovalStatus();
+  const approvalStatus = useApprovalStatus(
+    publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+    chain,
+  );
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
@@ -122,7 +125,7 @@ export function CommentSectionGasless({
     },
   });
 
-  const { setRequestApprovalOnConnect } = useConnectedAction(() => {
+  const { request: requestApprovalOnConnect } = useConnectedAction(() => {
     approveGaslessTransactionsMutation.mutate();
   });
 
@@ -278,7 +281,7 @@ export function CommentSectionGasless({
                   onClick={async () => {
                     if (!viewer) {
                       await connectAccount();
-                      setRequestApprovalOnConnect(true);
+                      requestApprovalOnConnect();
                       return;
                     }
 

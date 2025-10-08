@@ -51,7 +51,8 @@ import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
-import { GaslessIndicator } from "../GaslessIndicator";
+import { GaslessIndicator } from "./GaslessIndicator";
+import { ApprovalSwitch } from "./ApprovalSwitch";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -117,6 +118,7 @@ function BaseCommentForm({
 }: BaseCommentFormProps) {
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
+
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitRef = useFreshRef(onSubmit);
@@ -311,7 +313,7 @@ function BaseCommentForm({
           onCancel?.();
         }}
       />
-      <div className="flex gap-2 justify-between">
+      <div className="flex gap-2 justify-between text-xs">
         {address && (
           <>
             <CommentFormAuthor address={address} />
@@ -321,6 +323,7 @@ function BaseCommentForm({
           </>
         )}
         <div className="flex gap-2 items-center ml-auto">
+          <ApprovalSwitch />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -336,7 +339,7 @@ function BaseCommentForm({
                   <ImageIcon className="stroke-foreground" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom">
                 <p>Add media</p>
               </TooltipContent>
             </Tooltip>

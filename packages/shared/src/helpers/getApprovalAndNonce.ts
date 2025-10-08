@@ -1,9 +1,7 @@
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { Address, Chain, PublicClient, Transport } from "viem";
-import { chain } from "@/lib/clientWagmi";
-import { publicEnv } from "@/publicEnv";
 
-export async function getApprovalStatusAndNonce<
+export async function getApprovalAndNonce<
   TTransport extends Transport,
   TChain extends Chain,
   TPublicClient extends PublicClient<TTransport, TChain> = PublicClient<
@@ -13,6 +11,8 @@ export async function getApprovalStatusAndNonce<
 >(
   publicClient: TPublicClient,
   connectedAddress: Address,
+  appSignerAddress: Address,
+  chain: Chain,
 ): Promise<[{ result: boolean }, { result: bigint }]> {
   return (
     chain.contracts &&
@@ -24,19 +24,13 @@ export async function getApprovalStatusAndNonce<
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
               functionName: "isApproved",
-              args: [
-                connectedAddress,
-                publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-              ],
+              args: [connectedAddress, appSignerAddress],
             },
             {
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
               functionName: "getNonce",
-              args: [
-                connectedAddress,
-                publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-              ],
+              args: [connectedAddress, appSignerAddress],
             },
           ],
         })
@@ -46,19 +40,13 @@ export async function getApprovalStatusAndNonce<
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
               functionName: "isApproved",
-              args: [
-                connectedAddress,
-                publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-              ],
+              args: [connectedAddress, appSignerAddress],
             }),
             publicClient.readContract({
               address: COMMENT_MANAGER_ADDRESS,
               abi: CommentManagerABI,
               functionName: "getNonce",
-              args: [
-                connectedAddress,
-                publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-              ],
+              args: [connectedAddress, appSignerAddress],
             }),
           ])
         ).map((result) => ({ result }))
