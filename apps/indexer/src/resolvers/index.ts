@@ -10,4 +10,4 @@ export * from "./farcaster-by-address-resolver.ts";
 export * from "./farcaster-by-name-resolver.ts";
 export * from "./farcaster.types.ts";
 export * from "./farcaster.utils.ts";
-export * from "./url-resolver.ts";
+export * from "./http-resolver.ts";

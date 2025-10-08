@@ -1,10 +1,10 @@
 import * as Sentry from "@sentry/node";
 import type { PinataSDK } from "pinata";
 import DataLoader from "dataloader";
-import type { URLResolver, ResolvedURL } from "./url-resolver.ts";
+import type { HTTPResolver, ResolvedHTTP } from "./http-resolver.ts";
 import { runAsync } from "@ecp.eth/sdk/core";
 
-export type IPFSResolver = DataLoader<string, ResolvedURL | null>;
+export type IPFSResolver = DataLoader<string, ResolvedHTTP | null>;
 
 /**
  * IPFS protocol URL pattern
@@ -106,16 +106,16 @@ function constructGatewayURL(
 async function resolveIPFSURL({
   ipfsUrl,
   pinataSDK,
-  urlResolver,
+  httpResolver,
   retryCount,
   retryTimeout,
 }: {
   ipfsUrl: string;
   pinataSDK: PinataSDK;
-  urlResolver: URLResolver;
+  httpResolver: HTTPResolver;
   retryCount: number;
   retryTimeout: number;
-}): Promise<ResolvedURL | null> {
+}): Promise<ResolvedHTTP | null> {
   const cid = extractCID(ipfsUrl);
   const resourcePath = extractResourcePath(ipfsUrl);
 
@@ -138,7 +138,7 @@ async function resolveIPFSURL({
     await waitURLToBeReady(resURL, retryCount, retryTimeout);
 
     // Use the existing URL resolver to get metadata from the gateway URL
-    const resolvedURL = await urlResolver.load(resURL);
+    const resolvedURL = await httpResolver.load(resURL);
 
     if (!resolvedURL) {
       console.warn("Failed to resolve metadata for IPFS content:", resURL);
@@ -155,10 +155,10 @@ async function resolveIPFSURL({
 }
 
 type IPFSResolverOptions = Omit<
-  DataLoader.Options<string, ResolvedURL | null>,
+  DataLoader.Options<string, ResolvedHTTP | null>,
   "batchLoadFn"
 > & {
-  urlResolver: URLResolver;
+  httpResolver: HTTPResolver;
   pinataSDK: PinataSDK;
   retryCount: number;
   retryTimeout: number;
@@ -168,20 +168,20 @@ type IPFSResolverOptions = Omit<
  * Create an IPFS resolver that pins CIDs to Pinata and resolves metadata
  */
 export function createIPFSResolver({
-  urlResolver,
+  httpResolver,
   pinataSDK,
   retryCount,
   retryTimeout,
   ...dataLoaderOptions
 }: IPFSResolverOptions): IPFSResolver {
-  return new DataLoader<string, ResolvedURL | null>(
+  return new DataLoader<string, ResolvedHTTP | null>(
     async (ipfsUrls) => {
       return Promise.all(
         ipfsUrls.map((ipfsUrl) =>
           resolveIPFSURL({
             ipfsUrl,
             pinataSDK,
-            urlResolver,
+            httpResolver,
             retryCount,
             retryTimeout,
           }),

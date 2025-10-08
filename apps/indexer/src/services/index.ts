@@ -16,7 +16,7 @@ import { erc20ByAddressResolverService } from "./erc20-by-address-resolver.ts";
 import { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
 import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
 import { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
-import { urlResolverService } from "./url-resolver.ts";
+import { httpResolverService } from "./http-resolver.ts";
 import { ipfsResolverService } from "./ipfs-resolver.ts";
 import { NoopAdminBotService } from "./admin-noop-bot-service.ts";
 import { AdminTelegramBotService } from "./admin-telegram-bot-service/index.ts";
@@ -198,7 +198,7 @@ export const commentReferencesResolutionService =
       erc20ByTickerResolver: erc20ByTickerResolverService,
       farcasterByAddressResolver: farcasterByAddressResolverService,
       farcasterByNameResolver: farcasterByNameResolverService,
-      urlResolver: urlResolverService,
+      httpResolver: httpResolverService,
       ipfsResolver: ipfsResolverService,
     },
     commentReferencesCacheService: commentReferencesCacheService,

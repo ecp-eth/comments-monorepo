@@ -11,13 +11,21 @@ import z from "zod";
 import { getImageMeta } from "../utils/getImageMeta.ts";
 import { getVideoMeta } from "../utils/getVideoMeta.ts";
 
-export type ResolvedURL =
+export type ResolvedHTTP =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLVideoSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLFileSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLWebPageSchemaType, "position">;
 
-export type URLResolver = DataLoader<string, ResolvedURL | null>;
+export type HTTPResolver = DataLoader<string, ResolvedHTTP | null>;
+
+/**
+ * Regex to match http/https url
+ */
+export const HTTP_URL_REGEX = /^https?:\/\/[^\s<>[\]{}|\\^]+/u;
+
+// these status codes that are considered as permanently not resolvable
+const STATUS_CODES_NOT_RESOLVABLE = [401, 403, 404, 410];
 
 function normalizeContentType(contentType: string | null): string | null {
   if (!contentType) {
@@ -30,10 +38,10 @@ function normalizeContentType(contentType: string | null): string | null {
   return normalizedType || null;
 }
 
-async function resolveURL(
+async function resolveHTTP(
   url: string,
   timeout: number,
-): Promise<ResolvedURL | null> {
+): Promise<ResolvedHTTP | null> {
   const abortController = new AbortController();
   const response = await fetch(url, {
     signal: AbortSignal.any([
@@ -51,11 +59,7 @@ async function resolveURL(
   if (!response.ok) {
     console.warn("Failed to fetch URL", url, response.statusText);
 
-    if (
-      response.status === 401 ||
-      response.status === 403 ||
-      response.status === 404
-    ) {
+    if (STATUS_CODES_NOT_RESOLVABLE.includes(response.status)) {
       return null;
     }
 
@@ -195,12 +199,12 @@ async function resolveWebPage(
     opengraph,
     title,
     description,
-    favicon: favicon ? resolveFaviconUrl(favicon, response.url) : null,
+    favicon: favicon ? resolveFaviconURL(favicon, response.url) : null,
     mediaType: "text/html",
   };
 }
 
-function resolveFaviconUrl(href: string, pageUrl: string): string {
+function resolveFaviconURL(href: string, pageUrl: string): string {
   if (URL.canParse(href)) {
     return href;
   }
@@ -208,8 +212,8 @@ function resolveFaviconUrl(href: string, pageUrl: string): string {
   return new URL(href, pageUrl).toString();
 }
 
-type URLResolverOptions = Omit<
-  DataLoader.Options<string, ResolvedURL | null>,
+type HTTPResolverOptions = Omit<
+  DataLoader.Options<string, ResolvedHTTP | null>,
   "batchLoadFn"
 > & {
   /**
@@ -218,13 +222,13 @@ type URLResolverOptions = Omit<
   timeout?: number;
 };
 
-export function createURLResolver({
+export function createHTTPResolver({
   timeout = 5000,
   ...dataLoaderOptions
-}: URLResolverOptions = {}): URLResolver {
-  return new DataLoader<string, ResolvedURL | null>(
+}: HTTPResolverOptions = {}): HTTPResolver {
+  return new DataLoader<string, ResolvedHTTP | null>(
     async (urls) => {
-      return Promise.all(urls.map((url) => resolveURL(url, timeout)));
+      return Promise.all(urls.map((url) => resolveHTTP(url, timeout)));
     },
     {
       maxBatchSize: 5,

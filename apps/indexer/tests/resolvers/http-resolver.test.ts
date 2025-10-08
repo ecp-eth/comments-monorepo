@@ -2,13 +2,13 @@ import { describe, it, expect, beforeEach } from "vitest";
 import nock from "nock";
 import fs from "fs";
 import path from "path";
-import { createURLResolver } from "../../src/resolvers/url-resolver";
+import { createHTTPResolver } from "../../src/resolvers/http-resolver";
 import { Readable } from "stream";
 
 nock.disableNetConnect();
 
 describe("url loader", () => {
-  const urlResolver = createURLResolver();
+  const httpResolver = createHTTPResolver();
   const jpgBuffer = fs.readFileSync(
     path.join(__dirname, "fixtures", "example-image.jpg"),
   );
@@ -21,7 +21,7 @@ describe("url loader", () => {
 
   beforeEach(() => {
     nock.cleanAll();
-    urlResolver.clearAll();
+    httpResolver.clearAll();
   });
 
   it("resolves image url", async () => {
@@ -30,7 +30,7 @@ describe("url loader", () => {
       "content-length": jpgBuffer.length.toString(),
     });
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toEqual({
       type: "image",
@@ -52,7 +52,7 @@ describe("url loader", () => {
         "content-length": jpgBuffer.length.toString(),
       });
 
-    const result = await urlResolver.load(
+    const result = await httpResolver.load(
       "https://example.com/example-image.jpg",
     );
 
@@ -76,7 +76,7 @@ describe("url loader", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const result = await urlResolver.load(
+    const result = await httpResolver.load(
       "https://example.com/example-image.png",
     );
 
@@ -100,7 +100,7 @@ describe("url loader", () => {
         "content-length": svgBuffer.length.toString(),
       });
 
-    const result = await urlResolver.load(
+    const result = await httpResolver.load(
       "https://example.com/example-image.svg",
     );
 
@@ -120,7 +120,7 @@ describe("url loader", () => {
       "content-type": "video/mp4",
     });
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toEqual({
       type: "video",
@@ -134,7 +134,7 @@ describe("url loader", () => {
       "content-type": "application/pdf",
     });
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toEqual({
       type: "file",
@@ -146,7 +146,7 @@ describe("url loader", () => {
   it("treats any other url as file", async () => {
     nock("https://example.com").get("/").reply(200, "");
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toEqual({
       type: "file",
@@ -164,7 +164,7 @@ describe("url loader", () => {
       .get("/redirected")
       .reply(200, "");
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toEqual({
       type: "file",
@@ -177,7 +177,7 @@ describe("url loader", () => {
   it("returns null if response is 401", async () => {
     nock("https://example.com").get("/").reply(401);
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toBeNull();
   });
@@ -186,7 +186,7 @@ describe("url loader", () => {
   it("returns null if response is 403", async () => {
     nock("https://example.com").get("/").reply(403);
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toBeNull();
   });
@@ -195,7 +195,16 @@ describe("url loader", () => {
   it("returns null if response is 404", async () => {
     nock("https://example.com").get("/").reply(404);
 
-    const result = await urlResolver.load("https://example.com");
+    const result = await httpResolver.load("https://example.com");
+
+    expect(result).toBeNull();
+  });
+
+  // permanently gone
+  it("returns null if response is 410", async () => {
+    nock("https://example.com").get("/").reply(410);
+
+    const result = await httpResolver.load("https://example.com");
 
     expect(result).toBeNull();
   });
@@ -204,7 +213,7 @@ describe("url loader", () => {
     nock("https://example.com").get("/").reply(500);
 
     await expect(async () => {
-      await urlResolver.load("https://example.com");
+      await httpResolver.load("https://example.com");
     }).rejects.toThrow(expect.any(Error));
   });
 
@@ -216,7 +225,7 @@ describe("url loader", () => {
           "content-type": "text/html",
         });
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -247,7 +256,7 @@ describe("url loader", () => {
           },
         );
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -284,7 +293,7 @@ describe("url loader", () => {
           },
         );
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -321,7 +330,7 @@ describe("url loader", () => {
           },
         );
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -350,7 +359,7 @@ describe("url loader", () => {
           },
         );
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -374,7 +383,7 @@ describe("url loader", () => {
           },
         );
 
-      const result = await urlResolver.load("https://example.com");
+      const result = await httpResolver.load("https://example.com");
 
       expect(result).toEqual({
         type: "webpage",
@@ -389,7 +398,7 @@ describe("url loader", () => {
   });
 
   it("respects timeout", async () => {
-    const resolver = createURLResolver({ timeout: 200 });
+    const resolver = createHTTPResolver({ timeout: 200 });
 
     nock("https://example.com").get("/").delay(300).reply(200, "");
 

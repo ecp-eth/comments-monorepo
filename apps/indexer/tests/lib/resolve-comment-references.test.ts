@@ -10,7 +10,7 @@ import type {
   ERC20ByTickerResolver,
   FarcasterByAddressResolver,
   ERC20ByAddressResolver,
-  URLResolver,
+  HTTPResolver,
   FarcasterByNameResolver,
 } from "../../src/resolvers";
 import { type Hex } from "viem";
@@ -34,9 +34,9 @@ const erc20ByTickerResolver: ERC20ByTickerResolver = new DataLoader(
 const erc20ByAddressResolver: ERC20ByAddressResolver = new DataLoader(
   async (keys) => keys.map(() => null),
 ) as unknown as ERC20ByAddressResolver;
-const urlResolver: URLResolver = new DataLoader(async (keys) =>
+const httpResolver: HTTPResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
-) as unknown as URLResolver;
+) as unknown as HTTPResolver;
 const ipfsResolver: IPFSResolver = new DataLoader(async (keys) =>
   keys.map(() => null),
 ) as unknown as IPFSResolver;
@@ -49,7 +49,7 @@ const resolveFarcasterByAddress = vi.spyOn(farcasterByAddressResolver, "load");
 const resolveFarcasterByName = vi.spyOn(farcasterByNameResolver, "load");
 const resolveERC20ByTicker = vi.spyOn(erc20ByTickerResolver, "load");
 const resolveERC20ByAddress = vi.spyOn(erc20ByAddressResolver, "load");
-const resolveURL = vi.spyOn(urlResolver, "load");
+const resolveURL = vi.spyOn(httpResolver, "load");
 const resolveIPFS = vi.spyOn(ipfsResolver, "load");
 
 const options: ResolveCommentReferencesOptions = {
@@ -59,7 +59,7 @@ const options: ResolveCommentReferencesOptions = {
   farcasterByNameResolver,
   erc20ByTickerResolver,
   erc20ByAddressResolver,
-  urlResolver,
+  httpResolver,
   ipfsResolver,
 };
 

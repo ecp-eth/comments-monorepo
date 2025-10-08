@@ -4,11 +4,8 @@ import {
   createIPFSResolver,
   IPFS_URL_REGEX,
 } from "../../src/resolvers/ipfs-resolver.ts";
-import {
-  createURLResolver,
-  URLResolver,
-} from "../../src/resolvers/url-resolver.ts";
-import { PinataSDK } from "pinata";
+import { createHTTPResolver } from "../../src/resolvers/http-resolver.ts";
+import { type PinataSDK } from "pinata";
 import nock from "nock";
 import path from "path";
 
@@ -75,8 +72,8 @@ describe("IPFS Resolver", () => {
         "content-type": "image/png",
         "content-length": pngBuffer.length.toString(),
       });
-    const urlResolver = createURLResolver();
-    vi.spyOn(urlResolver, "load");
+    const httpResolver = createHTTPResolver();
+    vi.spyOn(httpResolver, "load");
     const pinataSDK = {
       config: {
         pinataGateway: "https://test-gateway.pinata.cloud",
@@ -88,7 +85,7 @@ describe("IPFS Resolver", () => {
       },
     } as unknown as PinataSDK;
     const ipfsResolver = createIPFSResolver({
-      urlResolver,
+      httpResolver,
       pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
@@ -107,7 +104,7 @@ describe("IPFS Resolver", () => {
     expect(result.url).toBe(
       "https://test-gateway.pinata.cloud/ipfs/QmTestHash",
     );
-    expect(urlResolver.load).toHaveBeenCalledWith(
+    expect(httpResolver.load).toHaveBeenCalledWith(
       "https://test-gateway.pinata.cloud/ipfs/QmTestHash",
     );
     expect(result.mediaType).toBe("image/png");
@@ -126,8 +123,8 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const urlResolver = createURLResolver();
-    vi.spyOn(urlResolver, "load");
+    const httpResolver = createHTTPResolver();
+    vi.spyOn(httpResolver, "load");
     const pinataSDK = {
       config: {
         pinataGateway: "https://test-gateway.pinata.cloud",
@@ -139,7 +136,7 @@ describe("IPFS Resolver", () => {
       },
     } as unknown as PinataSDK;
     const ipfsResolver = createIPFSResolver({
-      urlResolver,
+      httpResolver,
       pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
@@ -155,7 +152,7 @@ describe("IPFS Resolver", () => {
       expect.fail("Result is not an image");
     }
 
-    expect(urlResolver.load).toHaveBeenCalledWith(
+    expect(httpResolver.load).toHaveBeenCalledWith(
       "https://test-gateway.pinata.cloud/ipfs/QmTestHash/path/to/file.png",
     );
     expect(result.url).toBe(
@@ -178,8 +175,8 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const urlResolver = createURLResolver();
-    vi.spyOn(urlResolver, "load");
+    const httpResolver = createHTTPResolver();
+    vi.spyOn(httpResolver, "load");
 
     // Mock Pinata SDK to fail
     const pinataSDK = {
@@ -196,7 +193,7 @@ describe("IPFS Resolver", () => {
     } as unknown as PinataSDK;
 
     const fallbackResolver = createIPFSResolver({
-      urlResolver: urlResolver,
+      httpResolver,
       pinataSDK: pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
@@ -214,7 +211,7 @@ describe("IPFS Resolver", () => {
     }
 
     // Verify that the URL resolver was called with the ipfs.io fallback URL
-    expect(urlResolver.load).toHaveBeenCalledWith(
+    expect(httpResolver.load).toHaveBeenCalledWith(
       "https://ipfs.io/ipfs/QmFallbackHash",
     );
 
@@ -241,8 +238,8 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const urlResolver = createURLResolver();
-    vi.spyOn(urlResolver, "load");
+    const httpResolver = createHTTPResolver();
+    vi.spyOn(httpResolver, "load");
 
     // Mock Pinata SDK to fail
     const pinataSDK = {
@@ -257,7 +254,7 @@ describe("IPFS Resolver", () => {
     } as unknown as PinataSDK;
 
     const ipfsResolver = createIPFSResolver({
-      urlResolver: urlResolver,
+      httpResolver,
       pinataSDK: pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
@@ -275,7 +272,7 @@ describe("IPFS Resolver", () => {
     }
 
     // Verify that the URL resolver was called with the ipfs.io fallback URL
-    expect(urlResolver.load).toHaveBeenCalledWith(
+    expect(httpResolver.load).toHaveBeenCalledWith(
       "https://test-gateway.pinata.cloud/ipfs/QmTestHash/path/to/file.png",
     );
 
