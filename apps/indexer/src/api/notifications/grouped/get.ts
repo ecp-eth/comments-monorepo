@@ -14,25 +14,35 @@ import {
 import {
   NotificationTypeSchema,
   type NotificationTypeSchemaType,
-} from "../../../notifications/schemas";
+} from "../../../notifications/schemas.ts";
 import {
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
-  OpenAPIHexSchema,
   OpenAPIENSNameOrAddressSchema,
-  OpenAPIDateStringSchema,
-} from "../../../lib/schemas";
-import { appManager, db, siweMiddleware } from "../../../services";
-import { AppManagerAppNotFoundError } from "../../../services/app-manager-service";
+} from "../../../lib/schemas.ts";
+import { db, appKeyMiddleware } from "../../../services/index.ts";
+import { AppManagerAppNotFoundError } from "../../../services/app-manager-service.ts";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { schema } from "../../../../schema";
+import { schema } from "../../../../schema.ts";
 import { resolveUsersByAddressOrEnsName } from "../../../lib/utils";
-import { ensByNameResolverService } from "../../../services/ens-by-name-resolver";
-import { formatResponseUsingZodSchema } from "../../../lib/response-formatters";
-
-export const AppNotificationsGroupedGetRequestParamsSchema = z.object({
-  appId: z.string().uuid(),
-});
+import { ensByNameResolverService } from "../../../services/ens-by-name-resolver.ts";
+import {
+  createUserDataAndFormatSingleCommentResponseResolver,
+  formatResponseUsingZodSchema,
+} from "../../../lib/response-formatters.ts";
+import {
+  AppNotificationGetRequestQueryAppSchema,
+  AppNotificationGetRequestQuerySeenSchema,
+  AppNotificationGetRequestQueryTypeSchema,
+} from "../schemas.ts";
+import { AppNotificationsCursorOutputSchema } from "../get.ts";
+import type { SnakeCasedProperties } from "type-fest";
+import type { NotificationOutboxSelectType } from "../../../../schema.offchain.ts";
+import type { JSONCommentSelectType } from "../types.ts";
+import { IndexerAPICommentOutputSchema } from "@ecp.eth/sdk/indexer";
+import { ensByAddressResolverService } from "../../../services/ens-by-address-resolver.ts";
+import { farcasterByAddressResolverService } from "../../../services/farcaster-by-address-resolver.ts";
+import { convertJsonCommentToCommentSelectType } from "../utils.ts";
 
 export const AppNotificationsGroupedCursorInputSchema = z
   .preprocess(
@@ -42,21 +52,13 @@ export const AppNotificationsGroupedCursorInputSchema = z
           return val;
         }
 
-        const [createdAt, notificationType, parentId] = JSON.parse(
-          Buffer.from(val, "base64url").toString("ascii"),
-        );
-
-        return {
-          createdAt,
-          notificationType,
-          parentId,
-        };
+        return JSON.parse(Buffer.from(val, "base64url").toString("ascii"));
       } catch {
         return val;
       }
     },
     z.object({
-      createdAt: z.coerce.date(),
+      us: z.coerce.bigint(),
       notificationType: NotificationTypeSchema,
       parentId: z.string().nonempty(),
     }),
@@ -67,83 +69,29 @@ export const AppNotificationsGroupedCursorInputSchema = z
 
 export const AppNotificationsGroupedCursorOutputSchema = z
   .object({
-    createdAt: OpenAPIDateStringSchema,
+    us: OpenAPIBigintStringSchema,
     notificationType: NotificationTypeSchema,
     parentId: z.string().nonempty(),
   })
   .transform((val) =>
-    Buffer.from(
-      JSON.stringify([val.createdAt, val.notificationType, val.parentId]),
-    ).toString("base64url"),
+    Buffer.from(JSON.stringify(JSON.stringify(val))).toString("base64url"),
   );
 
 export const AppNotificationsGroupedGetRequestQuerySchema = z
   .object({
-    app: OpenAPIHexSchema.or(OpenAPIHexSchema.array().min(1).max(20))
-      .optional()
-      .transform((val) => {
-        if (!val) {
-          return [];
-        }
-
-        if (Array.isArray(val)) {
-          return val;
-        }
-
-        return [val];
-      })
-      .openapi({
-        description: "Return only notifications created by this app signers",
-      }),
+    app: AppNotificationGetRequestQueryAppSchema,
     before: AppNotificationsGroupedCursorInputSchema.optional().openapi({
       description: "Fetch newer notifications than the cursor",
     }),
     after: AppNotificationsGroupedCursorInputSchema.optional().openapi({
       description: "Fetch older notifications than the cursor",
     }),
-    limit: z.number().int().min(1).max(100).default(10).openapi({
+    limit: z.coerce.number().int().min(1).max(100).default(10).openapi({
       description: "The number of notifications to return",
     }),
-    type: NotificationTypeSchema.or(NotificationTypeSchema.array())
-      .optional()
-      .transform((val) => {
-        if (!val) {
-          return [];
-        }
-
-        if (Array.isArray(val)) {
-          return val;
-        }
-
-        return [val];
-      })
-      .openapi({
-        description: "Return only notifications of this type",
-      }),
-    user: OpenAPIENSNameOrAddressSchema.or(
-      OpenAPIENSNameOrAddressSchema.array().min(1).max(20),
-    )
-      .transform((val) => {
-        return Array.isArray(val) ? val : [val];
-      })
-      .openapi({
-        description: "The user to fetch notifications for",
-      }),
-    seen: z
-      .enum(["true", "false", "1", "0"])
-      .transform((val) => {
-        if (val === "true" || val === "1") {
-          return true;
-        }
-
-        return false;
-      })
-      .optional()
-      .openapi({
-        description:
-          "Whether to include only seen or unseen notifications, if omitted or empty all notifications will be included",
-        enum: ["true", "false", "1", "0"],
-      }),
+    type: AppNotificationGetRequestQueryTypeSchema,
+    user: OpenAPIENSNameOrAddressSchema,
+    seen: AppNotificationGetRequestQuerySeenSchema,
   })
   .superRefine((data, ctx) => {
     if (data.before && data.after) {
@@ -157,13 +105,13 @@ export const AppNotificationsGroupedGetRequestQuerySchema = z
 export const AppNotificationsGroupedGetResponseSchema = z.object({
   notifications: z.array(
     z.object({
-      cursor: AppNotificationsGroupedCursorInputSchema,
+      cursor: AppNotificationsGroupedCursorOutputSchema,
       groupedBy: z
         .object({
           notificationType: NotificationTypeSchema,
           parent: z.object({
             type: z.literal("comment"),
-            comment: z.record(z.any()),
+            comment: IndexerAPICommentOutputSchema,
           }),
         })
         .openapi({
@@ -178,14 +126,12 @@ export const AppNotificationsGroupedGetResponseSchema = z.object({
           hasPreviousPage: z.boolean().openapi({
             description: "Whether there are newer notifications",
           }),
-          startCursor:
-            AppNotificationsGroupedCursorInputSchema.optional().openapi({
-              description: "The cursor to the first notification",
-            }),
-          endCursor:
-            AppNotificationsGroupedCursorInputSchema.optional().openapi({
-              description: "The cursor to the last notification",
-            }),
+          startCursor: AppNotificationsCursorOutputSchema.optional().openapi({
+            description: "The cursor to the first notification",
+          }),
+          endCursor: AppNotificationsCursorOutputSchema.optional().openapi({
+            description: "The cursor to the last notification",
+          }),
         }),
         extra: z.object({
           unseenCount: OpenAPIBigintStringSchema.openapi({
@@ -202,10 +148,10 @@ export const AppNotificationsGroupedGetResponseSchema = z.object({
     hasPreviousPage: z.boolean().openapi({
       description: "Whether there are newer notifications",
     }),
-    startCursor: AppNotificationsGroupedCursorInputSchema.optional().openapi({
+    startCursor: AppNotificationsGroupedCursorOutputSchema.optional().openapi({
       description: "The cursor to the first notification",
     }),
-    endCursor: AppNotificationsGroupedCursorInputSchema.optional().openapi({
+    endCursor: AppNotificationsGroupedCursorOutputSchema.optional().openapi({
       description: "The cursor to the last notification",
     }),
   }),
@@ -220,11 +166,10 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
   app.openapi(
     {
       method: "get",
-      path: "/api/apps/{appId}/notifications/grouped",
-      middleware: siweMiddleware,
+      path: "/api/notifications/grouped",
+      middleware: appKeyMiddleware,
       description: "Get notifications grouped by type",
       request: {
-        params: AppNotificationsGroupedGetRequestParamsSchema,
         query: AppNotificationsGroupedGetRequestQuerySchema,
       },
       responses: {
@@ -271,7 +216,6 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { appId } = c.req.valid("param");
       const {
         app: apps,
         before,
@@ -279,37 +223,30 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
         limit,
         seen,
         type: types,
-        user: users,
+        user,
       } = c.req.valid("query");
 
       try {
-        const { app } = await appManager.getApp({
-          id: appId,
-          ownerId: c.get("user").id,
-        });
-
+        const app = c.get("app");
         const groupedNotificationsLimit = 5;
         const sharedConditions: (SQL | undefined)[] = [
           eq(schema.appNotification.appId, app.id),
         ];
-        const pageConditions: (SQL | undefined)[] = sharedConditions.slice();
+        const pageConditions: (SQL | undefined)[] = [];
         const orderBy: SQL[] = [];
         const resolvedUsers: Hex[] = await resolveUsersByAddressOrEnsName(
-          users,
+          [user],
           ensByNameResolverService,
         );
 
         if (resolvedUsers.length === 0) {
-          return c.json({ message: "Invalid ENS names" }, 400);
+          return c.json({ message: "Invalid ENS name" }, 400);
         }
 
         sharedConditions.push(
           inArray(
-            sql`lower(${schema.appNotification.recipientAddress})`,
-            sql.join(
-              resolvedUsers.map((user) => sql`lower(${user})`),
-              ", ",
-            ),
+            sql`${schema.appNotification.recipientAddress}`,
+            resolvedUsers.map((user) => user.toLowerCase()),
           ),
         );
 
@@ -324,11 +261,8 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
         if (apps.length > 0) {
           sharedConditions.push(
             inArray(
-              sql`lower(${schema.appNotification.appSigner})`,
-              sql.join(
-                apps.map((app) => sql`lower(${app})`),
-                ", ",
-              ),
+              sql`${schema.appNotification.appSigner}`,
+              apps.map((app) => app.toLowerCase()),
             ),
           );
         }
@@ -342,136 +276,160 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
         if (after) {
           pageConditions.push(
             or(
-              sql`notification_type > ${after.notificationType}`,
+              sql`created_at < to_timestamp(${after.us} / 1e6)::timestamptz`,
               and(
-                sql`notification_type = ${after.notificationType}`,
+                sql`created_at = to_timestamp(${after.us} / 1e6)::timestamptz`,
                 or(
-                  sql`parent_id > ${after.parentId}`,
+                  sql`notification_type > ${after.notificationType}`,
                   and(
-                    sql`parent_id = ${after.parentId}`,
-                    sql`created_at < ${after.createdAt}`,
+                    sql`notification_type = ${after.notificationType}`,
+                    sql`parent_id < to_timestamp(${after.us} / 1e6)::timestamptz`,
                   ),
                 ),
               ),
             ),
-            sql`(notification_type, parent_id, created_at) < (${after.notificationType}, ${after.parentId}, ${after.createdAt})`,
           );
           orderBy.push(
+            desc(sql`created_at`),
             asc(sql`notification_type`),
             asc(sql`parent_id`),
-            desc(sql`created_at`),
           );
         } else if (before) {
           pageConditions.push(
             or(
-              sql`notification_type < ${before.notificationType}`,
+              sql`created_at > to_timestamp(${before.us} / 1e6)::timestamptz`,
               and(
-                sql`notification_type = ${before.notificationType}`,
+                sql`created_at = to_timestamp(${before.us} / 1e6)::timestamptz`,
                 or(
-                  sql`parent_id < ${before.parentId}`,
+                  sql`notification_type < ${before.notificationType}`,
                   and(
-                    sql`parent_id = ${before.parentId}`,
-                    sql`created_at > ${before.createdAt}`,
+                    sql`notification_type = ${before.notificationType}`,
+                    sql`parent_id > to_timestamp(${before.us} / 1e6)::timestamptz`,
                   ),
                 ),
               ),
             ),
           );
           orderBy.push(
+            desc(sql`created_at`),
             desc(sql`notification_type`),
             desc(sql`parent_id`),
-            desc(sql`created_at`),
           );
         } else {
           orderBy.push(
+            desc(sql`created_at`),
             asc(sql`notification_type`),
             asc(sql`parent_id`),
-            desc(sql`created_at`),
           );
         }
 
         const { rows } = await db.execute<{
           notification_type: NotificationTypeSchemaType;
           parent_id: string;
-          created_at: Date;
+          /**
+           * Bigint created_at in microseconds since epoch as string
+           */
+          us: string;
           /**
            * Bigint as string
            */
           group_unseen_count: string;
-          comment: Record<string, any>;
-          notification: Record<string, any>;
+          comment: JSONCommentSelectType;
+          app_notification: {
+            id: string;
+            us: string;
+          };
+          notification: JSONNotificationOutboxSelectType;
           /**
            * Bigint as string
            */
           total_unseen_count: string;
+          newest_group: {
+            notification_type: NotificationTypeSchemaType;
+            parent_id: string;
+            us: string | number;
+          } | null;
+          oldest_group: {
+            notification_type: NotificationTypeSchemaType;
+            parent_id: string;
+            us: string | number;
+          } | null;
         }>(
           sql`
             WITH 
               newest_group AS (
-                SELECT notification_type, parent_id, created_at FROM ${schema.appNotification}
-                WHERE ${sql.join(sharedConditions, " AND ")}
-                ORDER BY notification_type ASC, parent_id ASC, created_at DESC
+                SELECT 
+                  notification_type, 
+                  parent_id, 
+                  (extract(epoch from created_at) * 1e6)::bigint as us -- epoch in microseconds
+                FROM ${schema.appNotification}
+                WHERE ${and(...sharedConditions)}
+                ORDER BY created_at DESC, notification_type ASC, parent_id ASC
                 LIMIT 1
               ),
               oldest_group AS (
-                SELECT notification_type, parent_id, created_at FROM ${schema.appNotification}
-                WHERE ${sql.join(sharedConditions, " AND ")}
-                ORDER BY notification_type DESC, parent_id DESC, created_at DESC
+                SELECT 
+                  notification_type, 
+                  parent_id, 
+                  (extract(epoch from created_at) * 1e6)::bigint as us -- epoch in microseconds
+                FROM ${schema.appNotification}
+                WHERE ${and(...sharedConditions)}
+                ORDER BY created_at ASC, notification_type DESC, parent_id DESC
                 LIMIT 1
               ),
               groups AS (
-                SELECT * FROM (
-                  SELECT 
-                    DISTINCT ON (notification_type, parent_id) 
-                    notification_type, 
-                    parent_id, 
-                    created_at,
-                    to_jsonb(${schema.comment}) AS comment
-                  FROM ${schema.appNotification}
-                  JOIN ${schema.comment} ON (${schema.appNotification.parentId} = ${schema.comment.id})
-                  WHERE ${sql.join([...sharedConditions, ...pageConditions], " AND ")}
-                  ORDER BY ${sql.join(orderBy, ", ")}
-                  LIMIT ${limit}
-                ) t 
-                ORDER BY t.created_at DESC, t.notification_type ASC, t.parent_id ASC
+                SELECT 
+                  COUNT(*) as group_unseen_count,
+                  ${schema.appNotification.notificationType},
+                  ${schema.appNotification.parentId}, 
+                  MAX(${schema.appNotification.createdAt}) as created_at
+                FROM ${schema.appNotification}
+                WHERE ${and(...sharedConditions, ...pageConditions)}
+                GROUP BY ${schema.appNotification.notificationType}, ${schema.appNotification.parentId}
+                ORDER BY ${sql.join(orderBy, sql`, `)}
+                LIMIT ${limit}
               ),
               total_unseen_groups_count AS (
-                SELECT 
-                  COUNT(DISTINCT notification_type, parent_id) as total_unseen_count
-                FROM ${schema.appNotification}
-                WHERE ${sql.join(sharedConditions, " AND ")}
+                SELECT COUNT(*) as total_unseen_count FROM (
+                  SELECT 
+                    DISTINCT notification_type, parent_id
+                  FROM ${schema.appNotification}
+                  WHERE ${and(...sharedConditions)}
+                )
               )
             
             SELECT 
               g.notification_type,
               g.parent_id,
-              g.created_at,
+              (extract(epoch from g.created_at) * 1e6)::bigint as us, -- epoch in microseconds
               g.group_unseen_count,
-              g.comment,
+              to_jsonb(t) AS "app_notification",
               to_jsonb(n) AS "notification",
               (SELECT total_unseen_count FROM total_unseen_groups_count) as total_unseen_count,
-              to_jsonb(SELECT * FROM newest_group) AS "newest_group",
-              to_jsonb(SELECT * FROM oldest_group) AS "oldest_group"
+              to_jsonb(ng) AS "newest_group",
+              to_jsonb(og) AS "oldest_group",
+              to_jsonb(c) AS "comment"
             FROM groups g
+            JOIN ${schema.comment} c ON (c.id = g.parent_id)
+            JOIN LATERAL (SELECT * FROM newest_group) ng ON (true)
+            JOIN LATERAL (SELECT * FROM oldest_group) og ON (true)
             JOIN LATERAL (
-              SELECT * FROM ${schema.appNotification}
+              SELECT
+                ${schema.appNotification.id},
+                (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as us, -- epoch in microseconds
+                ${schema.appNotification.notificationId}
+              FROM ${schema.appNotification}
               WHERE 
                 ${and(
-                  eq(schema.appNotification.appId, appId),
+                  eq(schema.appNotification.appId, app.id),
                   inArray(
-                    sql`lower(${schema.appNotification.recipientAddress})`,
-                    sql.join(
-                      resolvedUsers.map((user) => sql`lower(${user})`),
-                      ", ",
-                    ),
+                    schema.appNotification.recipientAddress,
+                    resolvedUsers.map((user) => user.toLowerCase() as Hex),
                   ),
                   apps.length > 0
                     ? inArray(
-                        sql`lower(${schema.appNotification.appSigner})`,
-                        sql.join(
-                          apps.map((app) => sql`lower(${app})`),
-                          ", ",
-                        ),
+                        schema.appNotification.appSigner,
+                        apps.map((app) => app.toLowerCase() as Hex),
                       )
                     : undefined,
                   eq(
@@ -486,99 +444,140 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                     ? isNull(schema.appNotification.seenAt)
                     : undefined,
                 )}
-              ORDER BY created_at DESC
+              ORDER BY ${schema.appNotification.createdAt} DESC
               LIMIT ${groupedNotificationsLimit + 1} -- +1 to if the are more notification (next page)
             ) t ON true
             JOIN ${schema.notificationOutbox} n ON (t.notification_id = n.id)
+            ORDER BY us DESC, notification_type ASC, parent_id ASC
             `,
         );
 
-        // group notification sorted by created_at by their group_id
-        const groupedNotifications = rows.reduce(
-          (acc, curr) => {
-            const groupId = `${curr.notification_type}:${curr.parent_id}`;
+        type Group = {
+          us: string;
+          notificationType: NotificationTypeSchemaType;
+          parentId: string;
+          comment: JSONCommentSelectType;
+          newestGroup: {
+            notification_type: NotificationTypeSchemaType;
+            parent_id: string;
+            us: string | number;
+          } | null;
+          oldestGroup: {
+            notification_type: NotificationTypeSchemaType;
+            parent_id: string;
+            us: string | number;
+          } | null;
+          notifications: {
+            notifications: Record<string, any>[];
+            pageInfo: {
+              hasNextPage: boolean;
+              hasPreviousPage: boolean;
+              startCursor:
+                | z.input<typeof AppNotificationsCursorOutputSchema>
+                | undefined;
+              endCursor:
+                | z.input<typeof AppNotificationsCursorOutputSchema>
+                | undefined;
+            };
+            extra: {
+              unseenCount: string;
+            };
+          };
+        };
 
-            if (!acc[groupId]) {
-              acc[groupId] = {
-                createdAt: curr.created_at,
-                notificationType: curr.notification_type,
-                parentId: curr.parent_id,
-                comment: curr.comment,
-                notifications: {
-                  notifications: [],
-                  pageInfo: {
-                    hasNextPage: false,
-                    hasPreviousPage: false,
-                    startCursor: null,
-                    endCursor: null,
-                  },
-                  extra: {
-                    unseenCount: curr.group_unseen_count,
-                  },
-                },
-              };
+        const userAddresses = new Set<Hex>();
+        const groups: Group[] = [];
+        let currentGroup: Group | null = null;
+
+        for (const row of rows) {
+          userAddresses.add(row.comment.author);
+
+          if (
+            !currentGroup ||
+            currentGroup.us !== row.us ||
+            currentGroup.notificationType !== row.notification_type ||
+            currentGroup.parentId !== row.parent_id
+          ) {
+            if (currentGroup) {
+              groups.push(currentGroup);
             }
 
-            acc[groupId]!.notifications.notifications.push(curr.notification);
-
-            return acc;
-          },
-          {} as Record<
-            string, // group_id
-            {
-              createdAt: Date;
-              notificationType: NotificationTypeSchemaType;
-              parentId: string;
-              comment: Record<string, any>;
+            currentGroup = {
+              us: row.us,
+              notificationType: row.notification_type,
+              parentId: row.parent_id,
+              comment: row.comment,
+              newestGroup: row.newest_group,
+              oldestGroup: row.oldest_group,
               notifications: {
-                notifications: Record<string, any>[];
+                notifications: [],
                 pageInfo: {
-                  hasNextPage: boolean;
-                  hasPreviousPage: boolean;
-                  startCursor: string | null;
-                  endCursor: string | null;
-                };
-                extra: {
-                  unseenCount: string;
-                };
-              };
-            }
-          >,
-        );
-
-        const sortedGroups = Object.values(groupedNotifications)
-          .toSorted((a, b) => {
-            return b.createdAt.getTime() - a.createdAt.getTime();
-          })
-          .map((group) => {
-            const sortedNotifications =
-              group.notifications.notifications.toSorted((a, b) => {
-                return b.createdAt.getTime() - a.createdAt.getTime();
-              });
-
-            return {
-              ...group,
-              notifications: {
-                ...group.notifications,
-                notifications: sortedNotifications.slice(
-                  0,
-                  groupedNotificationsLimit,
-                ),
-                pageInfo: {
-                  hasNextPage:
-                    group.notifications.notifications.length >
-                    groupedNotificationsLimit,
+                  hasNextPage: false,
                   hasPreviousPage: false,
-                  startCursor: sortedNotifications[0],
-                  endCursor:
-                    sortedNotifications[sortedNotifications.length - 1],
+                  startCursor: undefined,
+                  endCursor: undefined,
+                },
+                extra: {
+                  unseenCount: row.group_unseen_count,
                 },
               },
             };
-          });
+          }
 
-        const hasNextPage = sortedGroups.length > limit;
-        const groups = sortedGroups.slice(0, limit);
+          const cursor: z.input<typeof AppNotificationsCursorOutputSchema> = {
+            id: row.app_notification.id,
+            us: row.app_notification.us,
+          };
+
+          if (
+            currentGroup.notifications.notifications.length <
+            groupedNotificationsLimit
+          ) {
+            currentGroup.notifications.notifications.push(row.notification);
+          } else {
+            currentGroup.notifications.pageInfo.hasNextPage = true;
+          }
+
+          if (!currentGroup.notifications.pageInfo.startCursor) {
+            currentGroup.notifications.pageInfo.startCursor = cursor;
+          }
+
+          currentGroup.notifications.pageInfo.endCursor = cursor;
+        }
+
+        if (currentGroup) {
+          groups.push(currentGroup);
+        }
+
+        const [resolvedUsersEnsData, resolvedUsersFarcasterData] =
+          await Promise.all([
+            ensByAddressResolverService.loadMany([...userAddresses]),
+            farcasterByAddressResolverService.loadMany([...userAddresses]),
+          ]);
+
+        const resolveUserDataAndFormatSingleCommentResponse =
+          createUserDataAndFormatSingleCommentResponseResolver(
+            0,
+            resolvedUsersEnsData,
+            resolvedUsersFarcasterData,
+          );
+
+        const firstGroup = groups[0];
+        const lastGroup = groups[groups.length - 1];
+        const hasNextPage =
+          lastGroup && lastGroup.oldestGroup
+            ? BigInt(lastGroup.oldestGroup.us) !== BigInt(lastGroup.us) ||
+              lastGroup.oldestGroup.notification_type !==
+                lastGroup.notificationType ||
+              lastGroup.oldestGroup.parent_id !== lastGroup.parentId
+            : false;
+        const hasPreviousPage =
+          firstGroup && firstGroup.newestGroup
+            ? BigInt(firstGroup.newestGroup.us) !== BigInt(firstGroup.us) ||
+              firstGroup.newestGroup.notification_type !==
+                firstGroup.notificationType ||
+              firstGroup.newestGroup.parent_id !== firstGroup.parentId
+            : false;
 
         return c.json(
           formatResponseUsingZodSchema(
@@ -591,17 +590,19 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                     notificationType: group.notificationType,
                     parent: {
                       type: "comment" as const,
-                      comment: group.comment,
+                      comment: resolveUserDataAndFormatSingleCommentResponse(
+                        convertJsonCommentToCommentSelectType(group.comment),
+                      ),
                     },
                   },
                   notifications: group.notifications,
                 };
               }),
               pageInfo: {
-                hasPreviousPage: false,
+                hasPreviousPage,
                 hasNextPage,
                 startCursor: groups[0],
-                endCursor: groups[sortedGroups.length - 1],
+                endCursor: groups[groups.length - 1],
               },
               extra: {
                 unseenCount: rows[0]?.total_unseen_count ?? "0",
@@ -620,3 +621,13 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
     },
   );
 }
+
+type JSONNotificationOutboxSelectType = SnakeCasedProperties<{
+  [K in keyof NotificationOutboxSelectType]: NotificationOutboxSelectType[K] extends Date
+    ? string
+    : NotificationOutboxSelectType[K] extends Date | null
+      ? string | null
+      : NotificationOutboxSelectType[K] extends bigint
+        ? string | number
+        : NotificationOutboxSelectType[K];
+}>;

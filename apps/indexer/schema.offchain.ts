@@ -659,6 +659,9 @@ export const notificationOutbox = offchainSchema.table(
   ],
 );
 
+export type NotificationOutboxSelectType =
+  typeof notificationOutbox.$inferSelect;
+
 /**
  * This table is used to store notifications per each app. It is almost the same copy of the notificationOutbox table
  * but it is used to store notifications per each app.
