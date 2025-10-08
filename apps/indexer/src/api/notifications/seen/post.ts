@@ -33,16 +33,7 @@ export const NotificationsMarkAsSeenRequestBodySchema = z.object({
     description:
       "The date of the last seen notification, only unseen notifications created after this date will be marked as seen. If omitted all notifications will be marked as seen",
   }),
-  users: OpenAPIENSNameOrAddressSchema.or(
-    OpenAPIENSNameOrAddressSchema.array().min(1).max(20),
-  )
-    .transform((value) => {
-      return Array.isArray(value) ? value : [value];
-    })
-    .openapi({
-      description:
-        "The recipients whose notifications should be marked as seen, must contain at least one user",
-    }),
+  user: OpenAPIENSNameOrAddressSchema,
 });
 
 export const NotificationsMarkAsSeenResponseSchema = z.object({
@@ -103,7 +94,7 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { type, lastSeenNotificationDate, users } = c.req.valid("json");
+      const { type, lastSeenNotificationDate, user } = c.req.valid("json");
 
       try {
         const app = c.get("app");
@@ -112,7 +103,7 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
           appId: app.id,
           types: type,
           lastSeenNotificationDate,
-          users,
+          users: [user],
         });
 
         return c.json(

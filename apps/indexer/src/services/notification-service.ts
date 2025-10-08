@@ -1,13 +1,14 @@
 import type { DB } from "./db.ts";
 import type { NotificationTypeSchemaType } from "../notifications/schemas.ts";
 import { schema } from "../../schema.ts";
-import { and, eq, gt, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, lte } from "drizzle-orm";
 import type { ENSByNameResolver } from "../resolvers/index.ts";
 import type {
   ENSNameSchemaType,
   ETHAddressSchemaType,
 } from "../lib/schemas.ts";
 import { resolveUsersByAddressOrEnsName } from "../lib/utils.ts";
+import type { Hex } from "viem";
 
 type NotificationServiceOptions = {
   db: DB;
@@ -62,18 +63,15 @@ export class NotificationService {
         and(
           eq(schema.appNotification.appId, appId),
           inArray(
-            sql`lower(${schema.appNotification.recipientAddress})`,
-            sql.join(
-              resolvedUsers.map((user) => sql`lower(${user})`),
-              ", ",
-            ),
+            schema.appNotification.recipientAddress,
+            resolvedUsers.map((user) => user.toLowerCase() as Hex),
           ),
           isNull(schema.appNotification.seenAt),
           ...(types && types.length > 0
             ? [inArray(schema.appNotification.notificationType, types)]
             : []),
           ...(lastSeenNotificationDate
-            ? [gt(schema.appNotification.createdAt, lastSeenNotificationDate)]
+            ? [lte(schema.appNotification.createdAt, lastSeenNotificationDate)]
             : []),
         ),
       )
