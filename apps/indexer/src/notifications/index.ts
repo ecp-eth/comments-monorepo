@@ -13,6 +13,7 @@ import {
   type NotificationReplySchemaType,
   NotificationQuoteSchema,
 } from "./schemas";
+import { isSameHex } from "@ecp.eth/shared/helpers";
 
 type CreateReplyNotificationParams = {
   chainId: number;
@@ -36,9 +37,7 @@ export function createReplyNotifications({
   parents,
 }: CreateReplyNotificationParams): NotificationReplySchemaType[] {
   return parents
-    .filter(
-      (parent) => parent.author.toLowerCase() !== reply.author.toLowerCase(),
-    )
+    .filter((parent) => !isSameHex(parent.author, reply.author))
     .map((parent) => {
       return NotificationReplySchema.parse({
         uid: `reply:${chainId}:${parent.id}:${reply.id}`,
