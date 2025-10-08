@@ -14,6 +14,7 @@ import {
   commentByIdResolverService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
+import { isSameHex } from "@ecp.eth/shared/helpers";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { env } from "../env.ts";
@@ -130,17 +131,19 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             .where(eq(schema.comment.id, parentId))
             .execute();
 
-          notifications.push(
-            createReactionNotification({
-              chainId: context.chain.id,
-              parent: parentComment,
-              reaction: {
-                app: event.args.app,
-                author: event.args.author,
-                id: event.args.commentId,
-              },
-            }),
-          );
+          if (!isSameHex(parentComment.author, event.args.author)) {
+            notifications.push(
+              createReactionNotification({
+                chainId: context.chain.id,
+                parent: parentComment,
+                reaction: {
+                  app: event.args.app,
+                  author: event.args.author,
+                  id: event.args.commentId,
+                },
+              }),
+            );
+          }
         } else {
           const parents = await resolveCommentParents(parentComment.id, tx);
 
@@ -527,6 +530,10 @@ async function resolveNotificationsFromReferences({
 
   for (const reference of references) {
     if (reference.type === "ens" || reference.type === "farcaster") {
+      if (isSameHex(reference.address, comment.author)) {
+        continue;
+      }
+
       notificationsFromReferencesPromises.push(
         Promise.resolve(
           createMentionNotification({
@@ -546,7 +553,10 @@ async function resolveNotificationsFromReferences({
             id: reference.id,
           })
           .then((quotedComment) => {
-            if (!quotedComment) {
+            if (
+              !quotedComment ||
+              isSameHex(quotedComment.author, comment.author)
+            ) {
               return;
             }
 
