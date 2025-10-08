@@ -131,9 +131,9 @@ export function createQuoteNotification({
     uid: `quote:${chainId}:${quotedComment.id}:${comment.id}`,
     type: "quote",
     appSigner: quotedComment.app,
-    authorAddress: quotedComment.author,
+    authorAddress: comment.author,
     recipientAddress: quotedComment.author,
-    parentId: comment.id,
-    entityId: quotedComment.id,
+    parentId: quotedComment.id,
+    entityId: comment.id,
   } satisfies NotificationQuoteSchemaInput);
 }
