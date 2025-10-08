@@ -35,10 +35,13 @@ export function createCommentByIdResolver({
       const comments = await db.query.comment.findMany({
         where(fields, operators) {
           return operators.sql`
-          (${fields.id}, ${fields.chainId}) IN (${operators.sql`
-            ${keys.map((key) => operators.sql`(${key.id}, ${key.chainId})`).join(", ")}
-          `})
-        `;
+            (${fields.id}, ${fields.chainId}) IN (
+              ${operators.sql.join(
+                keys.map((key) => operators.sql`(${key.id}, ${key.chainId})`),
+                operators.sql`, `,
+              )}
+            )
+          `;
         },
       });
 

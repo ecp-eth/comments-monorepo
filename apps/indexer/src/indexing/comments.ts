@@ -11,7 +11,6 @@ import {
   mutedAccountsManagementService,
   commentReferencesResolutionService,
   notificationOutboxService,
-  commentByIdResolverService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { isSameHex } from "@ecp.eth/shared/helpers";
@@ -41,6 +40,7 @@ import type {
   NotificationQuoteSchemaType,
 } from "../notifications/schemas.ts";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {

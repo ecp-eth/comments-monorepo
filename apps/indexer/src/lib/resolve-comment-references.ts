@@ -4,6 +4,7 @@ import {
   type IndexerAPICommentReferenceERC20SchemaType,
   type IndexerAPICommentReferenceFarcasterSchemaType,
   type IndexerAPICommentReferenceSchemaType,
+  type IndexerAPICommentReferenceQuotedCommentSchemaType,
   IndexerAPICommentReferenceENSSchema,
   IndexerAPICommentReferenceFarcasterSchema,
   IndexerAPICommentReferenceERC20Schema,
@@ -11,7 +12,6 @@ import {
   IndexerAPICommentReferenceURLImageSchema,
   IndexerAPICommentReferenceURLVideoSchema,
   IndexerAPICommentReferenceURLWebPageSchema,
-  IndexerAPICommentReferenceQuotedCommentSchemaType,
   IndexerAPICommentReferenceQuotedCommentSchema,
 } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "../../ponder.schema.ts";
@@ -298,7 +298,7 @@ const ERC_20_CAIP_19_REGEX =
  * and https://github.com/ecp-eth/ECPIP/discussions/2
  */
 const CAIP_373_REGEX =
-  /^(?:@)?eip155:([0-9]+):(0x[a-fA-F0-9]{40}):call:(0x[a-fA-F0-9]+)(:[0-9]+)?$/;
+  /^(?:@)?eip155:([0-9]+):(0x[a-fA-F0-9]{40}):call:(0x[a-fA-F0-9]+)(:[0-9]+)?/;
 
 async function resolveEthAddress(
   address: Hex,
