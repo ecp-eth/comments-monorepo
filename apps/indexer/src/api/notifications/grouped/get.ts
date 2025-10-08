@@ -73,9 +73,7 @@ export const AppNotificationsGroupedCursorOutputSchema = z
     notificationType: NotificationTypeSchema,
     parentId: z.string().nonempty(),
   })
-  .transform((val) =>
-    Buffer.from(JSON.stringify(JSON.stringify(val))).toString("base64url"),
-  );
+  .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
 export const AppNotificationsGroupedGetRequestQuerySchema = z
   .object({
