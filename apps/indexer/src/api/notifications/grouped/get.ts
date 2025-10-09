@@ -321,7 +321,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             ),
           );
           orderBy.push(
-            desc(sql`created_at`),
+            asc(sql`created_at`),
             desc(sql`notification_type`),
             desc(sql`parent_id`),
           );
@@ -374,7 +374,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               page_groups AS (
                 SELECT * FROM per_group_latest pgl
                 WHERE ${pageConditions.length > 0 ? and(...pageConditions) : sql`true`}
-                ORDER BY pgl.created_at DESC, pgl.notification_type ASC, pgl.parent_id ASC, pgl.id DESC
+                ORDER BY ${orderBy.join(", ")}
                 LIMIT ${limit}
               ),
               per_group_unseen_counts AS (
