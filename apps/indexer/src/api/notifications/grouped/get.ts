@@ -242,6 +242,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
           eq(schema.appNotification.appId, app.id),
         ];
         const pageConditions: (SQL | undefined)[] = [];
+        const seenConditions: (SQL | undefined)[] = [];
         const orderBy: SQL[] = [];
         const resolvedUsers: Hex[] = await resolveUsersByAddressOrEnsName(
           [user],
@@ -261,9 +262,9 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
 
         if (seen != null) {
           if (seen) {
-            pageConditions.push(isNotNull(schema.appNotification.seenAt));
+            seenConditions.push(isNotNull(schema.appNotification.seenAt));
           } else {
-            pageConditions.push(isNull(schema.appNotification.seenAt));
+            seenConditions.push(isNull(schema.appNotification.seenAt));
           }
         }
 
@@ -341,7 +342,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                   parent_id, 
                   (extract(epoch from created_at) * 1e6)::bigint::text as us -- epoch in microseconds
                 FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions)}
+                WHERE ${and(...sharedConditions, ...seenConditions)}
                 ORDER BY created_at DESC, notification_type ASC, parent_id ASC
                 LIMIT 1
               ),
@@ -351,28 +352,50 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                   parent_id, 
                   (extract(epoch from created_at) * 1e6)::bigint::text as us -- epoch in microseconds
                 FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions)}
+                WHERE ${and(...sharedConditions, ...seenConditions)}
                 ORDER BY created_at ASC, notification_type DESC, parent_id DESC
                 LIMIT 1
               ),
-              groups AS (
+              per_group_latest AS (
                 SELECT 
-                  COUNT(*) as group_unseen_count,
+                  DISTINCT ON (${schema.appNotification.notificationType}, ${schema.appNotification.parentId})
                   ${schema.appNotification.notificationType},
-                  ${schema.appNotification.parentId}, 
-                  MAX(${schema.appNotification.createdAt}) as created_at
+                  ${schema.appNotification.parentId},
+                  ${schema.appNotification.createdAt},
+                  ${schema.appNotification.id}
                 FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions, ...pageConditions)}
-                GROUP BY ${schema.appNotification.notificationType}, ${schema.appNotification.parentId}
-                ORDER BY ${sql.join(orderBy, sql`, `)}
+                WHERE ${and(...sharedConditions, ...seenConditions)}
+                ORDER BY 
+                  ${schema.appNotification.notificationType} ASC, 
+                  ${schema.appNotification.parentId} ASC, 
+                  ${schema.appNotification.createdAt} DESC, 
+                  ${schema.appNotification.id} DESC
+              ),
+              page_groups AS (
+                SELECT * FROM per_group_latest pgl
+                WHERE ${pageConditions.length > 0 ? and(...pageConditions) : sql`true`}
+                ORDER BY pgl.created_at DESC, pgl.notification_type ASC, pgl.parent_id ASC, pgl.id DESC
                 LIMIT ${limit}
+              ),
+              per_group_unseen_counts AS (
+                SELECT
+                  ${schema.appNotification.notificationType},
+                  ${schema.appNotification.parentId},
+                  COUNT(*) as group_unseen_count
+                FROM ${schema.appNotification}
+                JOIN page_groups pg ON (
+                  pg.notification_type = ${schema.appNotification.notificationType} AND
+                  pg.parent_id = ${schema.appNotification.parentId}
+                )
+                WHERE ${and(...sharedConditions, isNull(schema.appNotification.seenAt))}
+                GROUP BY ${schema.appNotification.notificationType}, ${schema.appNotification.parentId}
               ),
               total_unseen_groups_count AS (
                 SELECT COUNT(*) as total_unseen_count FROM (
-                  SELECT 
-                    DISTINCT notification_type, parent_id
+                  SELECT
+                    DISTINCT ON (notification_type, parent_id) notification_type, parent_id
                   FROM ${schema.appNotification}
-                  WHERE ${and(...sharedConditions)}
+                  WHERE ${and(...sharedConditions, isNull(schema.appNotification.seenAt))}
                 )
               )
             
@@ -380,14 +403,15 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               g.notification_type,
               g.parent_id,
               (extract(epoch from g.created_at) * 1e6)::bigint::text as us, -- epoch in microseconds
-              g.group_unseen_count,
+              pguc.group_unseen_count,
               to_jsonb(t) AS "app_notification",
               (SELECT total_unseen_count FROM total_unseen_groups_count) as total_unseen_count,
               to_jsonb(ng) AS "newest_group",
               to_jsonb(og) AS "oldest_group",
               to_jsonb(p) AS "parent",
               to_jsonb(c) AS "comment"
-            FROM groups g
+            FROM page_groups g
+            JOIN per_group_unseen_counts pguc ON (pguc.notification_type = g.notification_type AND pguc.parent_id = g.parent_id)
             JOIN ${schema.comment} p ON (p.id = g.parent_id)
             JOIN LATERAL (SELECT * FROM newest_group) ng ON (true)
             JOIN LATERAL (SELECT * FROM oldest_group) og ON (true)
@@ -398,34 +422,19 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               FROM ${schema.appNotification}
               WHERE 
                 ${and(
-                  eq(schema.appNotification.appId, app.id),
-                  inArray(
-                    schema.appNotification.recipientAddress,
-                    resolvedUsers.map((user) => user.toLowerCase() as Hex),
-                  ),
-                  apps.length > 0
-                    ? inArray(
-                        schema.appNotification.appSigner,
-                        apps.map((app) => app.toLowerCase() as Hex),
-                      )
-                    : undefined,
+                  ...sharedConditions,
+                  ...seenConditions,
                   eq(
                     schema.appNotification.notificationType,
                     sql`g.notification_type`,
                   ),
                   eq(schema.appNotification.parentId, sql`g.parent_id`),
-                  seen === true
-                    ? isNotNull(schema.appNotification.seenAt)
-                    : undefined,
-                  seen === false
-                    ? isNull(schema.appNotification.seenAt)
-                    : undefined,
                 )}
-              ORDER BY ${schema.appNotification.createdAt} DESC
+              ORDER BY ${schema.appNotification.createdAt} DESC, ${schema.appNotification.id} DESC
               LIMIT ${GROUPED_NOTIFICATIONS_LIMIT + 1} -- +1 to if the are more notification (next page)
             ) t ON true
             JOIN ${schema.comment} c ON (c.id = t.entity_id)
-            ORDER BY us DESC, notification_type ASC, parent_id ASC
+            ORDER BY g.created_at DESC, g.notification_type ASC, g.parent_id ASC
             `,
         );
 
