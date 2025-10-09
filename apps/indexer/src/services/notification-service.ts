@@ -1,7 +1,7 @@
 import type { DB } from "./db.ts";
 import type { NotificationTypeSchemaType } from "../notifications/schemas.ts";
 import { schema } from "../../schema.ts";
-import { and, eq, inArray, isNull, lte } from "drizzle-orm";
+import { and, eq, inArray, isNull, gt } from "drizzle-orm";
 import type { ENSByNameResolver } from "../resolvers/index.ts";
 import type {
   ENSNameSchemaType,
@@ -71,7 +71,7 @@ export class NotificationService {
             ? [inArray(schema.appNotification.notificationType, types)]
             : []),
           ...(lastSeenNotificationDate
-            ? [lte(schema.appNotification.createdAt, lastSeenNotificationDate)]
+            ? [gt(schema.appNotification.createdAt, lastSeenNotificationDate)]
             : []),
         ),
       )
