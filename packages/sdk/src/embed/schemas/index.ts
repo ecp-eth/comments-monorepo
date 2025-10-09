@@ -214,6 +214,16 @@ export const EmbedConfigSchema = z.object({
   app: z
     .union([HexSchema, z.literal("embed"), z.literal("all")])
     .default("embed"),
+
+  gasSponsorship: z
+    .union([
+      // this option is needed for when we want to support custom channel id
+      z.literal("gas-not-sponsored"),
+      z.literal("gas-sponsored-dual-auth"),
+      z.literal("gas-sponsored-auth-everytime"),
+      z.literal("gas-sponsored-preauth"),
+    ])
+    .default("gas-not-sponsored"),
 });
 
 /**

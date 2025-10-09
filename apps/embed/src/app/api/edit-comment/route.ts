@@ -101,12 +101,14 @@ export async function POST(req: Request) {
       chainId,
     });
 
-    guardAuthorSignature({
-      publicClient,
-      authorSignature,
-      signTypedDataParams: typedEditCommentData,
-      authorAddress: author,
-    });
+    if (authorSignature) {
+      await guardAuthorSignature({
+        publicClient,
+        authorSignature,
+        signTypedDataParams: typedEditCommentData,
+        authorAddress: author,
+      });
+    }
 
     const hash = hashTypedData(typedEditCommentData);
 
@@ -147,7 +149,7 @@ export async function POST(req: Request) {
 
     return Response.json(
       { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 400 },
+      { status: 500 },
     );
   }
 }

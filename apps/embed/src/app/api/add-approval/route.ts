@@ -47,7 +47,7 @@ export async function POST(
       transport: privateTransport,
     });
 
-    guardAuthorSignature({
+    await guardAuthorSignature({
       publicClient,
       authorSignature,
       signTypedDataParams,
