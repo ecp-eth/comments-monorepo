@@ -100,12 +100,14 @@ export async function POST(req: Request) {
       chainId,
     });
 
-    guardAuthorSignature({
-      publicClient,
-      authorSignature,
-      signTypedDataParams: typedCommentData,
-      authorAddress: author,
-    });
+    if (authorSignature) {
+      await guardAuthorSignature({
+        publicClient,
+        authorSignature,
+        signTypedDataParams: typedCommentData,
+        authorAddress: author,
+      });
+    }
 
     const submitterAccount = privateKeyToAccount(submitterPrivateKey);
     const submitterWalletClient = createWalletClient({

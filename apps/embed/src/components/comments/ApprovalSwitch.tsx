@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -33,6 +33,14 @@ export function ApprovalSwitch() {
     publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     chain,
   );
+
+  useEffect(() => {
+    if (!approvalStatus.data) {
+      return;
+    }
+
+    setApprovedOnBehalf(approvalStatus.data.approved);
+  }, [approvalStatus.data]);
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
@@ -93,7 +101,9 @@ export function ApprovalSwitch() {
   });
   const handleOnBehalfApprovalChange = useCallback(
     async (newValue: boolean) => {
-      await approveGaslessTransactionsMutation.mutateAsync();
+      if (newValue) {
+        await approveGaslessTransactionsMutation.mutateAsync();
+      }
       setApprovedOnBehalf(newValue);
     },
     [approveGaslessTransactionsMutation],
@@ -112,6 +122,7 @@ export function ApprovalSwitch() {
               id="approve-on-behalf"
               checked={approvedOnBehalf}
               onCheckedChange={handleOnBehalfApprovalChange}
+              disabled={approvalStatus.isPending}
             />
             <label htmlFor="approve-on-behalf">One-click Posting</label>
           </div>

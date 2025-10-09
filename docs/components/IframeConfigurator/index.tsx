@@ -39,6 +39,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { ChevronsDown, Info } from "lucide-react";
+import { env } from "process";
 
 const formSchema = z.object({
   mode: z.enum(["post", "author", "replies"]),
@@ -84,6 +85,10 @@ export default function IframeConfigurator() {
   const autoHeightAdjustment = useWatch({
     control: form.control,
     name: "autoHeightAdjustment",
+  });
+  const gasSponsorship = useWatch({
+    control: form.control,
+    name: "config.gasSponsorship",
   });
 
   const [debouncedConfig] = useDebounce(config, 500);
@@ -349,6 +354,50 @@ export default function IframeConfigurator() {
                   )}
                 />
               )}
+
+              <FormItem>
+                <FormLabel>Gas Sponsorship</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={(value) => {
+                      if (
+                        value === "gas-not-sponsored" ||
+                        value === "gas-sponsored-dual-auth" ||
+                        value === "gas-sponsored-auth-everytime" ||
+                        value === "gas-sponsored-preauth"
+                      ) {
+                        form.setValue("config.gasSponsorship", value);
+                      }
+                      throw new Error("Invalid gas sponsorship mode");
+                    }}
+                    value={gasSponsorship}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Please select" />
+                    </SelectTrigger>
+                    <SelectContent id="gas-sponsorship-mode-select">
+                      <SelectItem value="gas-not-sponsored">
+                        No gas sponsorship
+                      </SelectItem>
+                      <SelectItem
+                        value="gas-sponsored-dual-auth"
+                        defaultChecked
+                      >
+                        Gas sponsored, users choose either pre-approve or sign
+                        every transaction
+                      </SelectItem>
+                      <SelectItem value="gas-sponsored-auth-everytime">
+                        Gas sponsored, users need to sign every transaction
+                      </SelectItem>
+                      <SelectItem value="gas-sponsored-preauth">
+                        Gas sponsored, users pre-approve once for all future
+                        transactions
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
 
               <FormField
                 control={form.control}
