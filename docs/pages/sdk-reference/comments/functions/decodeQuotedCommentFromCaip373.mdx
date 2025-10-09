@@ -1,0 +1,32 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [comments](/sdk-reference/comments/index.mdx) / decodeQuotedCommentFromCaip373
+
+# Function: decodeQuotedCommentFromCaip373()
+
+```ts
+function decodeQuotedCommentFromCaip373(caip373): DecodedQuotedCommentFromCaip373Result;
+```
+
+Defined in: [packages/sdk/src/comments/caip373.ts:88](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/comments/caip373.ts#L88)
+
+Parses a CAIP-373 quoted comment.
+
+This function does not validate if the comment really exists.
+
+See https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-373.md
+and https://github.com/ecp-eth/ECPIP/discussions/2
+
+## Parameters
+
+### caip373
+
+`string`
+
+## Returns
+
+[`DecodedQuotedCommentFromCaip373Result`](/sdk-reference/comments/type-aliases/DecodedQuotedCommentFromCaip373Result.mdx)
+
+The parsed quoted comment from the CAIP-373
