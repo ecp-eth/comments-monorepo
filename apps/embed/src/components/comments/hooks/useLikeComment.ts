@@ -12,6 +12,7 @@ import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostCommentMutationFunction } from "../queries/postComment";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 type UseLikeCommentProps = {
   /**
@@ -45,6 +46,7 @@ export const useLikeComment = () => {
   const { data: client } = useConnectorClient();
   const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
+  const embedConfig = useEmbedConfig();
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
@@ -82,6 +84,7 @@ export const useLikeComment = () => {
           readContractAsync,
           writeContractAsync,
           signTypedDataAsync,
+          gasSponsorship: embedConfig.gasSponsorship,
         });
 
         likeReactionSubmission.start({
