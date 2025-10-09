@@ -314,14 +314,7 @@ function BaseCommentForm({
         }}
       />
       <div className="flex gap-2 justify-between text-xs">
-        {address && (
-          <>
-            <CommentFormAuthor address={address} />
-            {publicEnv.NEXT_PUBLIC_GASLESS_ENABLED && (
-              <GaslessIndicator enableTooltipOnClick />
-            )}
-          </>
-        )}
+        {address && <CommentFormAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
           <ApprovalSwitch />
           <TooltipProvider>
