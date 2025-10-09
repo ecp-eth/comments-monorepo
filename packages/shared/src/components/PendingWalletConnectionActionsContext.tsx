@@ -67,23 +67,34 @@ const PendingWalletConnectionActionsContext =
 
 export const PendingWalletConnectionActionsProvider = ({
   children,
+  globalActionAfterWalletConnected,
 }: {
   children: React.ReactNode;
+  /**
+   * Specify a global action to be executed after wallet is connected and before executing non-global actions
+   */
+  globalActionAfterWalletConnected?: () => Promise<void> | void;
 }) => {
   const actionsRef = useRef<PendingWalletConnectionAction[]>([]);
   const handlersRef = useRef<PendingWalletConnectionActionHandlerRecord>({});
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
 
-  const triggerActions = useCallback(() => {
-    // interestingly when useAccount is able to return the address, useConnectorClient still need to takes a bit of time.
-    // without checking it the like/unlike hooks in embed will failed as they rely on the client to be available
+  const triggerActions = useCallback(async () => {
+    // interestingly when useAccount is able to return the address, useConnectorClient still needs to take a bit of time.
+    // without checking `client` the like/unlike hooks in embed will failed as they rely on the client to be available
     if (!connectedAddress || !client) {
       return;
     }
 
+    let globalActionExecuted = false;
+
     const actions = actionsRef.current;
     const handlers = handlersRef.current;
+
+    // clear the actions and handlers to double execution caused by concurrent triggerActions calls
+    actionsRef.current = [];
+    handlersRef.current = {};
 
     for (let len = actions.length; len > 0; len--) {
       const action = actions[len - 1];
@@ -95,15 +106,21 @@ export const PendingWalletConnectionActionsProvider = ({
       if (!handler) {
         continue;
       }
+
+      if (globalActionExecuted) {
+        await globalActionAfterWalletConnected?.();
+        globalActionExecuted = true;
+      }
+
       // Remove the action from the array if handler is found.
       actions.splice(len - 1, 1);
 
-      handler[action.type]();
+      await handler[action.type]();
     }
-  }, [client, connectedAddress]);
+  }, [client, connectedAddress, globalActionAfterWalletConnected]);
 
   useEffect(() => {
-    triggerActions();
+    void triggerActions();
   }, [triggerActions]);
 
   const value = useMemo(() => {
@@ -149,9 +166,9 @@ export const useConsumePendingWalletConnectionActions = ({
   onPrepareReplyAction,
 }: {
   commentId: Hex;
-  onLikeAction: (commentId: Hex) => void;
-  onUnlikeAction: (commentId: Hex) => void;
-  onPrepareReplyAction: (commentId: Hex) => void;
+  onLikeAction: (commentId: Hex) => Promise<void> | void;
+  onUnlikeAction: (commentId: Hex) => Promise<void> | void;
+  onPrepareReplyAction: (commentId: Hex) => Promise<void> | void;
 }) => {
   const onLikeActionRef = useFreshRef(onLikeAction);
   const onUnlikeActionRef = useFreshRef(onUnlikeAction);
@@ -161,14 +178,14 @@ export const useConsumePendingWalletConnectionActions = ({
 
   useEffect(() => {
     addHandler(commentId, {
-      like: () => {
-        onLikeActionRef.current(commentId);
+      like: async () => {
+        await onLikeActionRef.current(commentId);
       },
-      unlike: () => {
-        onUnlikeActionRef.current(commentId);
+      unlike: async () => {
+        await onUnlikeActionRef.current(commentId);
       },
-      prepareReply: () => {
-        onPrepareReplyActionRef.current(commentId);
+      prepareReply: async () => {
+        await onPrepareReplyActionRef.current(commentId);
       },
     });
 

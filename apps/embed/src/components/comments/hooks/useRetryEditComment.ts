@@ -8,6 +8,7 @@ import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryEditCommentParams = {
   comment: Comment;
@@ -35,9 +36,9 @@ export function useRetryEditComment({
   const wagmiConfig = useConfig();
   const commentRetryEdition = useCommentRetryEdition();
   const { switchChainAsync } = useSwitchChain();
-
   const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
+  const embedConfig = useEmbedConfig();
 
   return useCallback<OnRetryEditComment>(
     async (params) => {
@@ -68,6 +69,7 @@ export function useRetryEditComment({
         readContractAsync,
         writeContractAsync,
         signTypedDataAsync,
+        gasSponsorship: embedConfig.gasSponsorship,
       });
 
       try {

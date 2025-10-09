@@ -968,7 +968,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/addApproval</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -998,13 +998,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createCommentData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createCommentTypedData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1016,19 +1016,19 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createDeleteCommentTypedData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createEditCommentData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createEditCommentTypedData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1058,13 +1058,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createRemoveApprovalTypedData</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/createReportCommentTypedData</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1172,13 +1172,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/getComment</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/getCommentId</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1196,7 +1196,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/getDeleteCommentHash</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1208,13 +1208,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/getEditCommentHash</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/getNonce</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1226,7 +1226,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/functions/isApproved</loc>
-    <lastmod>2025-05-19T15:00:00.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1760,13 +1760,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/AddApprovalParams</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/AddApprovalResult</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1796,7 +1796,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/BaseEditCommentDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1868,31 +1868,31 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateCommentTypedDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateDeleteCommentTypedDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateEditCommentTypedDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateRemoveApprovalTypedDataParams</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateRemoveApprovalTypedDataResult</loc>
-    <lastmod>2025-06-19T20:30:07.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1904,7 +1904,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/CreateReportCommentTypedDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1916,13 +1916,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/DeleteCommentParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/DeleteCommentResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1934,13 +1934,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/DeleteCommentWithSigParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/DeleteCommentWithSigResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1952,25 +1952,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentDataParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentDataParamsWithMetadataEntries</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -1982,13 +1982,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentWithSigParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/EditCommentWithSigResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2018,19 +2018,19 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetCommentIdParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetCommentParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetCommentResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2048,7 +2048,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetDeleteCommentHashParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2060,13 +2060,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetEditCommentHashParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/GetNonceParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2084,7 +2084,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/IsApprovedParams</loc>
-    <lastmod>2025-05-19T15:00:00.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2150,25 +2150,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/PostCommentParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/PostCommentResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/PostCommentWithSigParams</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/type-aliases/PostCommentWithSigResult</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2276,7 +2276,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/deleteComment</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2288,7 +2288,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/deleteCommentWithSig</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2312,7 +2312,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/editComment</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2330,7 +2330,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/editCommentWithSig</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2390,13 +2390,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/postComment</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/postCommentWithSig</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2438,7 +2438,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core</loc>
-    <lastmod>2025-07-14T08:11:57.000Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2450,7 +2450,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core/functions/getOneDayFromNowInSeconds</loc>
-    <lastmod>2025-10-07T21:30:43.378Z</lastmod>
+    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

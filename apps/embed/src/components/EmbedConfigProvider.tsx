@@ -1,5 +1,6 @@
 "use client";
 
+import { publicEnv } from "@/publicEnv";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import {
   EmbedConfigSchema,
@@ -68,5 +69,17 @@ export function useEmbedConfig<
     | EmbedConfigProviderByAuthorConfig
     | EmbedConfigProviderByRepliesConfig,
 >() {
-  return useContext(configContext) as TConfig;
+  const ctx = useContext(configContext) as TConfig;
+  // create a new object with its prototype points to the real context, it is quicker this way
+  return Object.create(ctx, {
+    gasSponsorship: {
+      get() {
+        if (!publicEnv.NEXT_PUBLIC_GASLESS_ENABLED) {
+          return "gas-not-sponsored";
+        }
+        return ctx.gasSponsorship;
+      },
+      enumerable: true,
+    },
+  });
 }

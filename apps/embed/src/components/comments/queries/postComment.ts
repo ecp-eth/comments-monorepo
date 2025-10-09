@@ -31,6 +31,8 @@ import {
   postComment,
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
+import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
+import { addApproval } from "./addApproval";
 
 class SubmitPostCommentMutationError extends Error {}
 
@@ -42,9 +44,12 @@ type SubmitPostCommentParams = {
   >;
   references: IndexerAPICommentReferencesSchemaType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  readContractAsync: ContractReadFunctions["getIsApproved"];
+  readContractAsync:
+    | ContractReadFunctions["getIsApproved"]
+    | ContractReadFunctions["getNonce"];
   writeContractAsync: ContractWriteFunctions["postComment"];
   signTypedDataAsync: SignTypedDataMutateAsync;
+  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
 
 type PendingPostCommentOperationSchemaTypeWithoutReferences = Omit<
@@ -60,6 +65,7 @@ export async function submitPostCommentMutationFunction({
   readContractAsync,
   writeContractAsync,
   signTypedDataAsync,
+  gasSponsorship,
 }: SubmitPostCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   if (!author) {
     throw new SubmitPostCommentMutationError("Wallet not connected.");
@@ -90,21 +96,23 @@ export async function submitPostCommentMutationFunction({
     throw new SubmitPostCommentMutationError("Failed to switch chain.");
   }
 
-  const pendingOperation = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
-    ? await postCommentGaslessly({
-        readContractAsync,
-        postCommentPayloadRequest: commentPayloadRequest,
-        signTypedDataAsync,
-        resolvedAuthor,
-      })
-    : {
-        ...(await postCommentNonGaslessly({
+  const pendingOperation =
+    gasSponsorship === "gas-not-sponsored"
+      ? {
+          ...(await postCommentNonGaslessly({
+            postCommentPayloadRequest: commentPayloadRequest,
+            writeContractAsync,
+            resolvedAuthor,
+          })),
+          references,
+        }
+      : await postCommentGaslessly({
+          readContractAsync,
           postCommentPayloadRequest: commentPayloadRequest,
-          writeContractAsync,
+          signTypedDataAsync,
           resolvedAuthor,
-        })),
-        references,
-      };
+          gasSponsorship,
+        });
 
   return {
     ...pendingOperation,
@@ -117,17 +125,30 @@ async function postCommentGaslessly({
   readContractAsync,
   signTypedDataAsync,
   resolvedAuthor,
+  gasSponsorship,
 }: {
   postCommentPayloadRequest: PostCommentPayloadInputSchemaType;
-  readContractAsync: ContractReadFunctions["getIsApproved"];
+  readContractAsync:
+    | ContractReadFunctions["getIsApproved"]
+    | ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
+  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 }): Promise<PendingPostCommentOperationSchemaTypeWithoutReferences> {
   const appApproved = await isApproved({
     author: postCommentPayloadRequest.author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    readContract: readContractAsync,
+    readContract: readContractAsync as ContractReadFunctions["getIsApproved"],
   });
+
+  if (gasSponsorship === "gas-sponsored-preauth" && !appApproved) {
+    await addApproval({
+      author: postCommentPayloadRequest.author,
+      chainId: postCommentPayloadRequest.chainId,
+      readContractAsync: readContractAsync as ContractReadFunctions["getNonce"],
+      signTypedDataAsync,
+    });
+  }
 
   let authorSignature: Hex | undefined;
   let deadline: bigint | undefined;

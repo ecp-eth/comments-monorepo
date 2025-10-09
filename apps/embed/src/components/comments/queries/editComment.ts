@@ -29,6 +29,8 @@ import {
   isApproved,
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
+import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
+import { addApproval } from "./addApproval";
 
 class SubmitEditCommentMutationError extends Error {}
 
@@ -46,6 +48,7 @@ type SubmitEditCommentParams = {
     | ContractReadFunctions["getIsApproved"]
     | ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
+  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
 
 export async function submitEditCommentMutationFunction({
@@ -56,6 +59,7 @@ export async function submitEditCommentMutationFunction({
   writeContractAsync,
   readContractAsync,
   signTypedDataAsync,
+  gasSponsorship,
 }: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaType> {
   if (!address) {
     throw new SubmitEditCommentMutationError("Wallet not connected.");
@@ -81,17 +85,19 @@ export async function submitEditCommentMutationFunction({
     throw new SubmitEditCommentMutationError("Failed to switch chain.");
   }
 
-  const pendingOperation = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
-    ? await editCommentGaslessly({
-        readContractAsync,
-        editCommentPayloadRequest,
-        signTypedDataAsync,
-      })
-    : await editCommentNonGaslessly({
-        editCommentPayloadRequest,
-        writeContractAsync,
-        editRequest,
-      });
+  const pendingOperation =
+    gasSponsorship === "gas-not-sponsored"
+      ? await editCommentNonGaslessly({
+          editCommentPayloadRequest,
+          writeContractAsync,
+          editRequest,
+        })
+      : await editCommentGaslessly({
+          readContractAsync,
+          editCommentPayloadRequest,
+          signTypedDataAsync,
+          gasSponsorship,
+        });
 
   return {
     ...pendingOperation,
@@ -102,18 +108,29 @@ async function editCommentGaslessly({
   editCommentPayloadRequest,
   readContractAsync,
   signTypedDataAsync,
+  gasSponsorship,
 }: {
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
   readContractAsync:
     | ContractReadFunctions["getIsApproved"]
     | ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
+  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 }): Promise<PendingEditCommentOperationSchemaType> {
   const appApproved = await isApproved({
     author: editCommentPayloadRequest.author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     readContract: readContractAsync as ContractReadFunctions["getIsApproved"],
   });
+
+  if (gasSponsorship === "gas-sponsored-preauth" && !appApproved) {
+    await addApproval({
+      author: editCommentPayloadRequest.author,
+      chainId: editCommentPayloadRequest.chainId,
+      readContractAsync: readContractAsync as ContractReadFunctions["getNonce"],
+      signTypedDataAsync,
+    });
+  }
 
   let authorSignature: Hex | undefined;
   let deadline: bigint | undefined;
@@ -143,8 +160,6 @@ async function editCommentGaslessly({
     deadline = editCommentData.deadline;
     authorSignature = await signTypedDataAsync(typedCommentData);
   }
-
-  console.log("new deadline", deadline);
 
   const response = await fetch("/api/edit-comment", {
     method: "POST",

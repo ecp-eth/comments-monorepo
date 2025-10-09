@@ -52,7 +52,6 @@ import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { GaslessIndicator } from "./GaslessIndicator";
-import { ApprovalSwitch } from "./ApprovalSwitch";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -316,7 +315,6 @@ function BaseCommentForm({
       <div className="flex gap-2 justify-between text-xs">
         {address && <CommentFormAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
-          <ApprovalSwitch />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -384,8 +382,8 @@ export function CommentForm({
   const wagmiConfig = useConfig();
   const commentSubmission = useCommentSubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { targetUri, chainId } =
-    useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const embedConfig = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const { targetUri, chainId } = embedConfig;
   const onSubmitStartRef = useFreshRef(onSubmitStart);
   const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
@@ -406,6 +404,7 @@ export function CommentForm({
         readContractAsync,
         signTypedDataAsync,
         writeContractAsync: writeContractAsync,
+        gasSponsorship: embedConfig.gasSponsorship,
       });
 
       try {
@@ -442,6 +441,7 @@ export function CommentForm({
     [
       chainId,
       commentSubmission,
+      embedConfig,
       onSubmitStartRef,
       parentId,
       queryKey,
@@ -458,6 +458,7 @@ export function CommentForm({
 }
 
 function CommentFormAuthor({ address }: { address: Hex }) {
+  const embedConfig = useEmbedConfig();
   const { openAccountModal } = useAccountModal();
   const { openChainModal } = useChainModal();
   const queryResult = useQuery({
@@ -473,7 +474,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
   return (
     <div
       className="flex flex-row gap-2 items-center overflow-hidden"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${publicEnv.NEXT_PUBLIC_GASLESS_ENABLED ? " for free" : ""}`}
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${embedConfig.gasSponsorship === "gas-not-sponsored" ? "" : " for free"}`}
     >
       <CommentAuthorAvatar author={queryResult.data ?? { address }} />
       <div className="flex-grow text-xs text-muted-foreground truncate">
@@ -530,7 +531,8 @@ export function CommentEditForm({
   const wagmiConfig = useConfig();
   const commentEdition = useCommentEdition();
   const { switchChainAsync } = useSwitchChain();
-  const { chainId } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const embedConfig = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const { chainId } = embedConfig;
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
   const { readContractAsync, writeContractAsync, signTypedDataAsync } =
@@ -551,6 +553,7 @@ export function CommentEditForm({
         readContractAsync,
         writeContractAsync,
         signTypedDataAsync,
+        gasSponsorship: embedConfig.gasSponsorship,
       });
 
       try {
@@ -588,6 +591,7 @@ export function CommentEditForm({
       chainId,
       comment,
       commentEdition,
+      embedConfig,
       onSubmitStartRef,
       queryKey,
       readContractAsync,
