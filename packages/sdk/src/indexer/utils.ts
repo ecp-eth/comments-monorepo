@@ -1,6 +1,7 @@
 import { stringToHex } from "viem";
 import type { Hex } from "../core/schemas.js";
 import { ResponseError } from "./errors.js";
+import { z } from "zod";
 
 /**
  * Get the cursor for a comment
@@ -52,6 +53,10 @@ export function isRetryableHttpResponse(response: Response): boolean {
  * @returns True if the error should be retried, false otherwise
  */
 export function indexerApiRetryCondition(error: unknown): boolean {
+  if (error instanceof z.ZodError) {
+    return false;
+  }
+
   if (!(error instanceof ResponseError)) {
     return true;
   }
