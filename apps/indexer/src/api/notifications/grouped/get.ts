@@ -28,16 +28,19 @@ import { resolveUsersByAddressOrEnsName } from "../../../lib/utils";
 import { ensByNameResolverService } from "../../../services/ens-by-name-resolver.ts";
 import {
   createUserDataAndFormatSingleCommentResponseResolver,
+  formatAuthor,
   formatResponseUsingZodSchema,
+  resolveUserData,
 } from "../../../lib/response-formatters.ts";
 import {
   AppNotificationGetRequestQueryAppSchema,
   AppNotificationGetRequestQuerySeenSchema,
   AppNotificationGetRequestQueryTypeSchema,
+  AppNotificationOutputSchema,
 } from "../schemas.ts";
 import { AppNotificationsCursorOutputSchema } from "../get.ts";
 import type { SnakeCasedProperties } from "type-fest";
-import type { NotificationOutboxSelectType } from "../../../../schema.offchain.ts";
+import type { AppNotificationSelectType } from "../../../../schema.offchain.ts";
 import type { JSONCommentSelectType } from "../types.ts";
 import { IndexerAPICommentOutputSchema } from "@ecp.eth/sdk/indexer";
 import { ensByAddressResolverService } from "../../../services/ens-by-address-resolver.ts";
@@ -116,7 +119,12 @@ export const AppNotificationsGroupedGetResponseSchema = z.object({
           description: "Condition used to group notifications",
         }),
       notifications: z.object({
-        notifications: z.array(z.any()),
+        notifications: z.array(
+          z.object({
+            cursor: AppNotificationsCursorOutputSchema,
+            notification: AppNotificationOutputSchema,
+          }),
+        ),
         pageInfo: z.object({
           hasNextPage: z.boolean().openapi({
             description: "Whether there are older notifications",
@@ -332,12 +340,11 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
            * Bigint as string
            */
           group_unseen_count: string;
+          parent: JSONCommentSelectType;
           comment: JSONCommentSelectType;
-          app_notification: {
-            id: string;
+          app_notification: JSONAppNotificationSelectType & {
             us: string;
           };
-          notification: JSONNotificationOutboxSelectType;
           /**
            * Bigint as string
            */
@@ -402,20 +409,19 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               (extract(epoch from g.created_at) * 1e6)::bigint as us, -- epoch in microseconds
               g.group_unseen_count,
               to_jsonb(t) AS "app_notification",
-              to_jsonb(n) AS "notification",
               (SELECT total_unseen_count FROM total_unseen_groups_count) as total_unseen_count,
               to_jsonb(ng) AS "newest_group",
               to_jsonb(og) AS "oldest_group",
+              to_jsonb(p) AS "parent",
               to_jsonb(c) AS "comment"
             FROM groups g
-            JOIN ${schema.comment} c ON (c.id = g.parent_id)
+            JOIN ${schema.comment} p ON (p.id = g.parent_id)
             JOIN LATERAL (SELECT * FROM newest_group) ng ON (true)
             JOIN LATERAL (SELECT * FROM oldest_group) og ON (true)
             JOIN LATERAL (
               SELECT
-                ${schema.appNotification.id},
-                (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as us, -- epoch in microseconds
-                ${schema.appNotification.notificationId}
+                ${schema.appNotification}.*,
+                (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as us -- epoch in microseconds
               FROM ${schema.appNotification}
               WHERE 
                 ${and(
@@ -445,7 +451,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               ORDER BY ${schema.appNotification.createdAt} DESC
               LIMIT ${groupedNotificationsLimit + 1} -- +1 to if the are more notification (next page)
             ) t ON true
-            JOIN ${schema.notificationOutbox} n ON (t.notification_id = n.id)
+            JOIN ${schema.comment} c ON (c.id = t.entity_id)
             ORDER BY us DESC, notification_type ASC, parent_id ASC
             `,
         );
@@ -454,7 +460,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
           us: string;
           notificationType: NotificationTypeSchemaType;
           parentId: string;
-          comment: JSONCommentSelectType;
+          parent: JSONCommentSelectType;
           newestGroup: {
             notification_type: NotificationTypeSchemaType;
             parent_id: string;
@@ -466,7 +472,10 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             us: string | number;
           } | null;
           notifications: {
-            notifications: Record<string, any>[];
+            notifications: (JSONAppNotificationSelectType & {
+              us: string;
+              comment: JSONCommentSelectType;
+            })[];
             pageInfo: {
               hasNextPage: boolean;
               hasPreviousPage: boolean;
@@ -488,7 +497,9 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
         let currentGroup: Group | null = null;
 
         for (const row of rows) {
+          userAddresses.add(row.parent.author);
           userAddresses.add(row.comment.author);
+          userAddresses.add(row.app_notification.recipient_address);
 
           if (
             !currentGroup ||
@@ -504,7 +515,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               us: row.us,
               notificationType: row.notification_type,
               parentId: row.parent_id,
-              comment: row.comment,
+              parent: row.parent,
               newestGroup: row.newest_group,
               oldestGroup: row.oldest_group,
               notifications: {
@@ -523,7 +534,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
           }
 
           const cursor: z.input<typeof AppNotificationsCursorOutputSchema> = {
-            id: row.app_notification.id,
+            id: row.app_notification.id.toString(),
             us: row.app_notification.us,
           };
 
@@ -531,7 +542,10 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             currentGroup.notifications.notifications.length <
             groupedNotificationsLimit
           ) {
-            currentGroup.notifications.notifications.push(row.notification);
+            currentGroup.notifications.notifications.push({
+              ...row.app_notification,
+              comment: row.comment,
+            });
           } else {
             currentGroup.notifications.pageInfo.hasNextPage = true;
           }
@@ -582,18 +596,123 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             AppNotificationsGroupedGetResponseSchema,
             {
               notifications: groups.map((group) => {
+                const formattedParentComment =
+                  resolveUserDataAndFormatSingleCommentResponse(
+                    convertJsonCommentToCommentSelectType(group.parent),
+                  );
+
                 return {
                   cursor: group,
                   groupedBy: {
                     notificationType: group.notificationType,
                     parent: {
                       type: "comment" as const,
-                      comment: resolveUserDataAndFormatSingleCommentResponse(
-                        convertJsonCommentToCommentSelectType(group.comment),
-                      ),
+                      comment: formattedParentComment,
                     },
                   },
-                  notifications: group.notifications,
+                  notifications: {
+                    ...group.notifications,
+                    notifications: group.notifications.notifications.map(
+                      (notification) => {
+                        const formattedComment =
+                          resolveUserDataAndFormatSingleCommentResponse(
+                            convertJsonCommentToCommentSelectType(
+                              notification.comment,
+                            ),
+                          );
+                        const cursor = {
+                          id: notification.id.toString(),
+                          us: notification.us,
+                        };
+
+                        switch (notification.notification_type) {
+                          case "mention": {
+                            const resolvedUserEnsData = resolveUserData(
+                              resolvedUsersEnsData,
+                              notification.recipient_address,
+                            );
+                            const resolvedUserFarcasterData = resolveUserData(
+                              resolvedUsersFarcasterData,
+                              notification.recipient_address,
+                            );
+
+                            return {
+                              cursor,
+                              notification: {
+                                id: notification.id.toString(),
+                                type: notification.notification_type,
+                                author: formattedComment.author,
+                                createdAt: notification.created_at,
+                                seen: !!notification.seen_at,
+                                seenAt: notification.seen_at,
+                                app: notification.app_signer,
+                                comment: formattedComment,
+                                mentionedUser: formatAuthor(
+                                  notification.recipient_address,
+                                  resolvedUserEnsData,
+                                  resolvedUserFarcasterData,
+                                ),
+                              },
+                            };
+                          }
+                          case "quote": {
+                            return {
+                              cursor,
+                              notification: {
+                                id: notification.id.toString(),
+                                type: notification.notification_type,
+                                author: formattedComment.author,
+                                createdAt: notification.created_at,
+                                seen: !!notification.seen_at,
+                                seenAt: notification.seen_at,
+                                app: notification.app_signer,
+                                comment: formattedComment,
+                                quotedComment: formattedParentComment,
+                              },
+                            };
+                          }
+                          case "reaction": {
+                            return {
+                              cursor,
+                              notification: {
+                                id: notification.id.toString(),
+                                type: notification.notification_type,
+                                author: formattedComment.author,
+                                createdAt: notification.created_at,
+                                seen: !!notification.seen_at,
+                                seenAt: notification.seen_at,
+                                app: notification.app_signer,
+                                comment: formattedComment,
+                                reactingTo: formattedParentComment,
+                              },
+                            };
+                          }
+                          case "reply": {
+                            return {
+                              cursor,
+                              notification: {
+                                id: notification.id.toString(),
+                                type: notification.notification_type,
+                                author: formattedComment.author,
+                                createdAt: notification.created_at,
+                                seen: !!notification.seen_at,
+                                seenAt: notification.seen_at,
+                                app: notification.app_signer,
+                                comment: formattedComment,
+                                replyingTo: formattedParentComment,
+                              },
+                            };
+                          }
+                          default: {
+                            notification.notification_type satisfies never;
+                            throw new Error(
+                              `Unknown notification type: ${notification.notification_type}`,
+                            );
+                          }
+                        }
+                      },
+                    ),
+                  },
                 };
               }),
               pageInfo: {
@@ -620,12 +739,12 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
   );
 }
 
-type JSONNotificationOutboxSelectType = SnakeCasedProperties<{
-  [K in keyof NotificationOutboxSelectType]: NotificationOutboxSelectType[K] extends Date
+type JSONAppNotificationSelectType = SnakeCasedProperties<{
+  [K in keyof AppNotificationSelectType]: AppNotificationSelectType[K] extends Date
     ? string
-    : NotificationOutboxSelectType[K] extends Date | null
+    : AppNotificationSelectType[K] extends Date | null
       ? string | null
-      : NotificationOutboxSelectType[K] extends bigint
-        ? string | number
-        : NotificationOutboxSelectType[K];
+      : AppNotificationSelectType[K] extends bigint
+        ? string | number | bigint
+        : AppNotificationSelectType[K];
 }>;

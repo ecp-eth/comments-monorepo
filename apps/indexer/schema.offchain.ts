@@ -936,6 +936,8 @@ export const appNotification = offchainSchema.table(
   ],
 );
 
+export type AppNotificationSelectType = typeof appNotification.$inferSelect;
+
 export const appNotificationRelations = relations(
   appNotification,
   ({ one }) => ({
