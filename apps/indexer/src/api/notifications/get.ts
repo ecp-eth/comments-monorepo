@@ -129,6 +129,11 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       responses: {
         200: {
           description: "The notifications",
+          content: {
+            "application/json": {
+              schema: AppNotificationsGetResponseSchema,
+            },
+          },
         },
         400: {
           description: "Bad request",
@@ -194,7 +199,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         apps.length > 0
           ? inArray(
               sql`${schema.appNotification.appSigner}`,
-              apps.map((app) => sql`lower(${app.toLowerCase()})`),
+              apps.map((app) => sql`${app.toLowerCase()}`),
             )
           : undefined,
       ];

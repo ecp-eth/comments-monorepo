@@ -76,7 +76,9 @@ export class NotificationService {
             schema.appNotification.recipientAddress,
             resolvedUsers.map((user) => user.toLowerCase() as Hex),
           ),
-          ...(apps ? [inArray(schema.appNotification.appSigner, apps)] : []),
+          ...(apps && apps.length > 0
+            ? [inArray(schema.appNotification.appSigner, apps)]
+            : []),
           isNull(schema.appNotification.seenAt),
           ...(types && types.length > 0
             ? [inArray(schema.appNotification.notificationType, types)]

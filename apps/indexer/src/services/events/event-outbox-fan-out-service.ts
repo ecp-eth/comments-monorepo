@@ -74,12 +74,13 @@ export class EventOutboxFanOutService {
       this.deferred?.resolve();
     });
 
-    while (!signal.aborted) {
-      /**
-       * Select events from event outbox and mark them as locked for update. Then fan out the events to webhooks that are subscribed to the event.
-       */
-      const { rows } = await this.db.transaction(async (tx) => {
-        return tx.execute(sql`
+    try {
+      while (!signal.aborted) {
+        /**
+         * Select events from event outbox and mark them as locked for update. Then fan out the events to webhooks that are subscribed to the event.
+         */
+        const { rows } = await this.db.transaction(async (tx) => {
+          return tx.execute(sql`
           WITH
             -- 1) Claim a batch of events to be fanned out
             claimed_events AS (
@@ -129,20 +130,25 @@ export class EventOutboxFanOutService {
           WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events)
           RETURNING *;
         `);
-      });
+        });
 
-      // if no rows were returned we essentially processed all the events
-      // otherwise we want to drain the queue completely
-      if (rows.length === 0) {
-        await this.waitForNewEvents();
-        // reset the deferred so it will be again created by the waitForNewEvents method
-        // and resolved either by notification or interval
-        this.deferred = undefined;
-        this.shouldProcessBatch = false;
+        // if no rows were returned we essentially processed all the events
+        // otherwise we want to drain the queue completely
+        if (rows.length === 0) {
+          await this.waitForNewEvents();
+          // reset the deferred so it will be again created by the waitForNewEvents method
+          // and resolved either by notification or interval
+          this.deferred = undefined;
+          this.shouldProcessBatch = false;
+        }
       }
-    }
 
-    cleanup();
+      cleanup();
+    } catch (error) {
+      cleanup();
+
+      throw error;
+    }
   }
 
   private async waitForNewEvents(): Promise<void> {
