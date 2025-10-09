@@ -6,6 +6,7 @@ import {
 import {
   APIErrorResponseSchema,
   OpenAPIENSNameOrAddressSchema,
+  OpenAPIHexSchema,
 } from "../../../lib/schemas.ts";
 import { NotificationTypeSchema } from "../../../notifications/schemas.ts";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
@@ -34,6 +35,10 @@ export const NotificationsMarkAsSeenRequestBodySchema = z.object({
       "The date of the last seen notification, only unseen notifications created after this date will be marked as seen. If omitted all notifications will be marked as seen",
   }),
   user: OpenAPIENSNameOrAddressSchema,
+  app: OpenAPIHexSchema.or(OpenAPIHexSchema.array()).optional().openapi({
+    description:
+      "The app signers to mark notifications as seen for, if omitted all notifications will be marked as seen",
+  }),
 });
 
 export const NotificationsMarkAsSeenResponseSchema = z.object({
@@ -94,7 +99,12 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
       },
     },
     async (c) => {
-      const { type, lastSeenNotificationDate, user } = c.req.valid("json");
+      const {
+        type,
+        lastSeenNotificationDate,
+        user,
+        app: appSigner,
+      } = c.req.valid("json");
 
       try {
         const app = c.get("app");
@@ -104,6 +114,7 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
           types: type,
           lastSeenNotificationDate,
           users: [user],
+          appSigner,
         });
 
         return c.json(
