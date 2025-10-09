@@ -35,11 +35,15 @@ export class NotificationService {
      */
     types?: NotificationTypeSchemaType[];
     /**
+     * Mark notifications as seen by app signer(s), if omitted all notifications will be marked as seen
+     */
+    appSigner?: Hex | Hex[];
+    /**
      * The date of the last seen notification, only unseen notifications created after this date will be marked as seen. If omitted all notifications will be marked as seen
      */
     lastSeenNotificationDate?: Date;
   }): Promise<{ count: number }> {
-    const { appId, users, types, lastSeenNotificationDate } = params;
+    const { appId, users, types, lastSeenNotificationDate, appSigner } = params;
 
     if (users.length === 0) {
       throw new NotificationService_UsersRequiredError();
@@ -54,6 +58,12 @@ export class NotificationService {
       throw new NotificationService_InvalidEnsNamesError();
     }
 
+    const apps = appSigner
+      ? Array.isArray(appSigner)
+        ? appSigner
+        : [appSigner]
+      : undefined;
+
     const result = await this.db
       .update(schema.appNotification)
       .set({
@@ -66,6 +76,7 @@ export class NotificationService {
             schema.appNotification.recipientAddress,
             resolvedUsers.map((user) => user.toLowerCase() as Hex),
           ),
+          ...(apps ? [inArray(schema.appNotification.appSigner, apps)] : []),
           isNull(schema.appNotification.seenAt),
           ...(types && types.length > 0
             ? [inArray(schema.appNotification.notificationType, types)]
