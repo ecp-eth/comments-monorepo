@@ -596,7 +596,7 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
     };
 
     if (
-      currentGroup.notifications.notifications.length <=
+      currentGroup.notifications.notifications.length <
       GROUPED_NOTIFICATIONS_LIMIT
     ) {
       currentGroup.notifications.notifications.push({
