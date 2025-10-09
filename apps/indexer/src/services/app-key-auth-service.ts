@@ -17,7 +17,10 @@ export class AppKeyAuthService implements IAppKeyAuthService {
   }> {
     const appSigningKey = await this.options.db.query.appSigningKeys.findFirst({
       where(fields, operators) {
-        return operators.eq(fields.secret, appKey);
+        return operators.and(
+          operators.eq(fields.secret, appKey),
+          operators.isNull(fields.revokedAt),
+        );
       },
       with: {
         app: true,

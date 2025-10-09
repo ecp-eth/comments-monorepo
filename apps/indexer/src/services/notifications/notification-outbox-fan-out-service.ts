@@ -74,12 +74,13 @@ export class NotificationOutboxFanOutService {
       this.deferred?.resolve();
     });
 
-    while (!signal.aborted) {
-      /**
-       * Select notifications from notification outbox and mark them as locked for update. Then fan out the notifications to app clients.
-       */
-      const { rows } = await this.db.transaction(async (tx) => {
-        return tx.execute(sql`
+    try {
+      while (!signal.aborted) {
+        /**
+         * Select notifications from notification outbox and mark them as locked for update. Then fan out the notifications to app clients.
+         */
+        const { rows } = await this.db.transaction(async (tx) => {
+          return tx.execute(sql`
           WITH
             -- 1) Claim a batch of notifications to be fanned out
             claimed_notifications AS (
@@ -115,20 +116,25 @@ export class NotificationOutboxFanOutService {
           WHERE ${schema.notificationOutbox.id} IN (SELECT id FROM claimed_notifications)
           RETURNING *;
         `);
-      });
+        });
 
-      // if no rows were returned we essentially processed all the events
-      // otherwise we want to drain the queue completely
-      if (rows.length === 0) {
-        await this.waitForNewEvents();
-        // reset the deferred so it will be again created by the waitForNewEvents method
-        // and resolved either by notification or interval
-        this.deferred = undefined;
-        this.shouldProcessBatch = false;
+        // if no rows were returned we essentially processed all the events
+        // otherwise we want to drain the queue completely
+        if (rows.length === 0) {
+          await this.waitForNewEvents();
+          // reset the deferred so it will be again created by the waitForNewEvents method
+          // and resolved either by notification or interval
+          this.deferred = undefined;
+          this.shouldProcessBatch = false;
+        }
       }
-    }
 
-    cleanup();
+      cleanup();
+    } catch (error) {
+      cleanup();
+
+      throw error;
+    }
   }
 
   private async waitForNewEvents(): Promise<void> {

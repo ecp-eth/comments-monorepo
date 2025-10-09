@@ -130,7 +130,7 @@ export function createQuoteNotification({
   return NotificationQuoteSchema.parse({
     uid: `quote:${chainId}:${quotedComment.id}:${comment.id}`,
     type: "quote",
-    appSigner: quotedComment.app,
+    appSigner: comment.app,
     authorAddress: comment.author,
     recipientAddress: quotedComment.author,
     parentId: quotedComment.id,
