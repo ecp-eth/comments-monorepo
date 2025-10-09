@@ -367,6 +367,7 @@ export default function IframeConfigurator() {
                         value === "gas-sponsored-preauth"
                       ) {
                         form.setValue("config.gasSponsorship", value);
+                        return;
                       }
                       throw new Error("Invalid gas sponsorship mode");
                     }}

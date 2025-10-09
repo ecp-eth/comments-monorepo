@@ -47,6 +47,15 @@ export async function POST(
       transport: privateTransport,
     });
 
+    // Sanity check typed-data domain vs selected chain
+    if (signTypedDataParams.domain.chainId !== chain.id) {
+      return new JSONResponse(
+        BadRequestResponseSchema,
+        { signTypedDataParams: ["Incorrect chainId in typed-data domain"] },
+        { status: 400 },
+      );
+    }
+
     await guardAuthorSignature({
       publicClient,
       authorSignature,
