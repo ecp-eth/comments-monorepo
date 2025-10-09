@@ -713,3 +713,143 @@ export const IndexerAPIReportsListPendingOutputSchema =
 export type IndexerAPIReportsListPendingOutputSchemaType = z.infer<
   typeof IndexerAPIReportsListPendingOutputSchema
 >;
+
+export const IndexerAPINotificationBaseSchema = z.object({
+  id: z.coerce.bigint(),
+  createdAt: z.coerce.date(),
+  seen: z.boolean(),
+  seenAt: z.coerce.date().nullable(),
+  app: HexSchema,
+  author: IndexerAPIAuthorDataSchema,
+  comment: IndexerAPICommentSchema,
+});
+
+export const IndexerAPINotificationReplySchema =
+  IndexerAPINotificationBaseSchema.extend({
+    type: z.literal("reply"),
+    replyingTo: IndexerAPICommentSchema,
+  });
+
+export type IndexerAPINotificationReplySchemaType = z.infer<
+  typeof IndexerAPINotificationReplySchema
+>;
+
+export const IndexerAPINotificationMentionSchema =
+  IndexerAPINotificationBaseSchema.extend({
+    type: z.literal("mention"),
+    mentionedUser: IndexerAPIAuthorDataSchema,
+  });
+
+export type IndexerAPINotificationMentionSchemaType = z.infer<
+  typeof IndexerAPINotificationMentionSchema
+>;
+
+export const IndexerAPINotificationReactionSchema =
+  IndexerAPINotificationBaseSchema.extend({
+    type: z.literal("reaction"),
+    reactingTo: IndexerAPICommentSchema,
+  });
+
+export type IndexerAPINotificationReactionSchemaType = z.infer<
+  typeof IndexerAPINotificationReactionSchema
+>;
+
+export const IndexerAPINotificationQuoteSchema =
+  IndexerAPINotificationBaseSchema.extend({
+    type: z.literal("quote"),
+    quotedComment: IndexerAPICommentSchema,
+  });
+
+export type IndexerAPINotificationQuoteSchemaType = z.infer<
+  typeof IndexerAPINotificationQuoteSchema
+>;
+
+/**
+ * The notification schema
+ */
+export const IndexerAPINotificationSchema = z.discriminatedUnion("type", [
+  IndexerAPINotificationReplySchema,
+  IndexerAPINotificationMentionSchema,
+  IndexerAPINotificationReactionSchema,
+  IndexerAPINotificationQuoteSchema,
+]);
+
+export type IndexerAPINotificationSchemaType = z.infer<
+  typeof IndexerAPINotificationSchema
+>;
+
+export const IndexerAPINotificationTypeSchema = z.enum([
+  "reply",
+  "mention",
+  "reaction",
+  "quote",
+]);
+
+export type IndexerAPINotificationTypeSchemaType = z.infer<
+  typeof IndexerAPINotificationTypeSchema
+>;
+
+/**
+ * The list notifications schema returned by fetchNotifications()
+ */
+export const IndexerAPIListNotificationsSchema = z.object({
+  notifications: z.array(
+    z.object({
+      cursor: z.string(),
+      notification: IndexerAPINotificationSchema,
+    }),
+  ),
+  pageInfo: z.object({
+    hasNextPage: z.boolean(),
+    hasPreviousPage: z.boolean(),
+    startCursor: z.string().optional(),
+    endCursor: z.string().optional(),
+  }),
+  extra: z.object({
+    unseenCount: z.coerce.bigint(),
+  }),
+});
+
+export type IndexerAPIListNotificationsSchemaType = z.infer<
+  typeof IndexerAPIListNotificationsSchema
+>;
+
+/**
+ * The list grouped notifications schema returned by fetchGroupedNotifications()
+ */
+export const IndexerAPIListGroupedNotificationsSchema = z.object({
+  notifications: z.array(
+    z.object({
+      cursor: z.string(),
+      groupedBy: z.object({
+        notificationType: IndexerAPINotificationTypeSchema,
+        parent: z.object({
+          type: z.literal("comment"),
+          comment: IndexerAPICommentSchema,
+        }),
+      }),
+      notifications: IndexerAPIListNotificationsSchema,
+    }),
+  ),
+  pageInfo: z.object({
+    hasNextPage: z.boolean(),
+    hasPreviousPage: z.boolean(),
+    startCursor: z.string().optional(),
+    endCursor: z.string().optional(),
+  }),
+  extra: z.object({
+    unseenCount: z.coerce.bigint(),
+  }),
+});
+
+export type IndexerAPIListGroupedNotificationsSchemaType = z.infer<
+  typeof IndexerAPIListGroupedNotificationsSchema
+>;
+
+export const IndexerAPIMarkNotificationsAsSeenSchema = z.object({
+  count: z.number().int().nonnegative(),
+});
+
+export type IndexerAPIMarkNotificationsAsSeenSchemaType = z.infer<
+  typeof IndexerAPIMarkNotificationsAsSeenSchema
+>;

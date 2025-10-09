@@ -1,0 +1,203 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchNotificationsOptions
+
+# Type Alias: FetchNotificationsOptions
+
+```ts
+type FetchNotificationsOptions = {
+  after?: string;
+  apiUrl?: string;
+  app?:   | Hex
+     | Hex[];
+  appSecretKey: string;
+  before?: string;
+  limit?: number;
+  parentId?: Hex;
+  retries?: number;
+  seen?: boolean;
+  signal?: AbortSignal;
+  type?:   | IndexerAPINotificationTypeSchemaType
+     | IndexerAPINotificationTypeSchemaType[];
+  user: Hex | string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1199](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1199)
+
+The options for `fetchNotifications()`
+
+## Properties
+
+### after?
+
+```ts
+optional after: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1232](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1232)
+
+After cursor to fetch notifications from (older notifications)
+
+***
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1205](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1205)
+
+URL on which /api/notifications endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### app?
+
+```ts
+optional app: 
+  | Hex
+  | Hex[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1218](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1218)
+
+The app signers to fetch notifications for
+
+***
+
+### appSecretKey
+
+```ts
+appSecretKey: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1210](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1210)
+
+App secret key to authenticate the request.
+Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+
+***
+
+### before?
+
+```ts
+optional before: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1228](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1228)
+
+Before cursor to fetch notifications from (newer notifications)
+
+***
+
+### limit?
+
+```ts
+optional limit: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1248](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1248)
+
+The number of notifications to fetch
+
+#### Default
+
+```ts
+10
+```
+
+***
+
+### parentId?
+
+```ts
+optional parentId: Hex;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1236](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1236)
+
+Fetch notifications for a specific parent id
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1254](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1254)
+
+Number of times to retry the request in case of failure (non‑parsing/network errors).
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### seen?
+
+```ts
+optional seen: boolean;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1242)
+
+Whether to fetch only seen or unseen notifications
+
+#### Default
+
+```ts
+undefined - fetches all notifications
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1258](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1258)
+
+The signal to abort the request
+
+***
+
+### type?
+
+```ts
+optional type: 
+  | IndexerAPINotificationTypeSchemaType
+  | IndexerAPINotificationTypeSchemaType[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1222)
+
+The types of notifications to fetch
+
+***
+
+### user
+
+```ts
+user: Hex | string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1214)
+
+The user to fetch notifications for, either ETH address or ENS name
