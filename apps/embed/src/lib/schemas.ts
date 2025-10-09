@@ -5,6 +5,7 @@ import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { MAX_COMMENT_LENGTH } from "./constants";
 import { decompressFromURI } from "lz-ts";
 import {
+  AddApprovalTypedDataSchema,
   EditCommentDataSchema,
   MetadataEntrySchema,
 } from "@ecp.eth/sdk/comments";
@@ -149,6 +150,26 @@ export const EditCommentResponseSchema = z.object({
   signature: HexSchema,
   hash: HexSchema,
   data: EditCommentDataSchema,
+});
+
+/**
+ * Request body schema for API that gaslessly adding approval
+ */
+export const AddApprovalStatusRequestBodySchema = z.object({
+  signTypedDataParams: AddApprovalTypedDataSchema,
+  authorSignature: HexSchema,
+  authorAddress: HexSchema,
+  chainId: z.number(),
+});
+
+export type AddApprovalStatusRequestBodySchemaType = z.infer<
+  typeof AddApprovalStatusRequestBodySchema
+>;
+/**
+ * Response schema for API that gaslessly approving gasless transactions
+ */
+export const AddApprovalResponseSchema = z.object({
+  txHash: HexSchema,
 });
 
 /**

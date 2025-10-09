@@ -8,8 +8,9 @@ import {
 } from "@/lib/schemas";
 import { resolveSubmitterAccount } from "@/lib/submitter";
 import { chain, privateTransport } from "@/lib/serverWagmi";
-import { getApprovalStatusAndNonce } from "@/lib/contract";
+import { getApprovalAndNonce } from "@ecp.eth/shared/helpers/getApprovalAndNonce";
 import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
+import { publicEnv } from "@/publicEnv";
 
 export async function POST(
   req: Request,
@@ -57,11 +58,15 @@ export async function POST(
   // double check to avoid wasting gas on incorrect or unnecessary request
   // Check approval on chain and get nonce (multicall3 if available,
   // otherwise read contracts)
-  const [{ result: isApproved }, { result: nonce }] =
-    await getApprovalStatusAndNonce<typeof privateTransport, typeof chain>(
-      publicClient,
-      authorAddress,
-    );
+  const [{ result: isApproved }, { result: nonce }] = await getApprovalAndNonce<
+    typeof privateTransport,
+    typeof chain
+  >(
+    publicClient,
+    authorAddress,
+    publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+    chain,
+  );
 
   if (isApproved) {
     return new JSONResponse(

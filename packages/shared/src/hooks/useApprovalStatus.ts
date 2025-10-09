@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAccount, usePublicClient } from "wagmi";
-import { getApprovalStatusAndNonce } from "@/lib/contract";
+import { getApprovalAndNonce } from "../helpers/getApprovalAndNonce";
+import { Address, Chain } from "viem";
 
-export function useApprovalStatus() {
+export function useApprovalStatus(appSignerAddress: Address, chain: Chain) {
   const { address: connectedAddress } = useAccount();
   const publicClient = usePublicClient();
   return useQuery({
@@ -19,7 +20,12 @@ export function useApprovalStatus() {
 
       // Check approval on chain and get nonce (multicall3 if available, otherwise read contracts)
       const [{ result: isApproved }, { result: nonce }] =
-        await getApprovalStatusAndNonce(publicClient, connectedAddress);
+        await getApprovalAndNonce(
+          publicClient,
+          connectedAddress,
+          appSignerAddress,
+          chain,
+        );
       return {
         approved: isApproved,
         nonce,

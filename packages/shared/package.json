@@ -43,6 +43,11 @@
       "import": "./dist/esm/helpers.js",
       "default": "./dist/cjs/helpers.cjs"
     },
+    "./helpers/*": {
+      "types": "./dist/esm/helpers/*.d.ts",
+      "import": "./dist/esm/helpers/*.js",
+      "default": "./dist/cjs/helpers/*.cjs"
+    },
     "./hooks": {
       "types": "./dist/esm/hooks/index.d.ts",
       "import": "./dist/esm/hooks/index.js",

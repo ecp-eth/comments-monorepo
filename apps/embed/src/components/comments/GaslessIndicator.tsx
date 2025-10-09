@@ -1,5 +1,5 @@
 import { Zap } from "lucide-react";
-import { Tooltip, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import {
   TooltipArrow,
   TooltipContent,

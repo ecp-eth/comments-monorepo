@@ -37,6 +37,7 @@ const ServerEnvSchema = z
     SENTRY_AUTH_TOKEN: z.string().optional(),
     PINATA_JWT: z.string().nonempty(),
     COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
+    PRIVATE_RPC_URL: z.string().url().optional(),
   })
   .merge(publicEnvSchema)
   .merge(SubmitterEnvSchema.partial())
@@ -46,6 +47,9 @@ const ServerEnvSchema = z
       const submitterResult = SubmitterEnvSchema.safeParse(data);
       if (!submitterResult.success) {
         throw submitterResult.error;
+      }
+      if (!data.PRIVATE_RPC_URL) {
+        throw new Error("PRIVATE_RPC_URL is required when gasless is enabled");
       }
     }
     return true;
