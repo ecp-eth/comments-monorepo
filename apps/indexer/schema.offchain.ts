@@ -1,4 +1,4 @@
-import { sql, relations } from "drizzle-orm";
+import { sql, relations, desc, asc } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -715,222 +715,83 @@ export const appNotification = offchainSchema.table(
      * Recipient address and app are part of all indexes because they are required in list notifications api endpoints.
      * All indexes end with created_at and id because it is used for ordering and cursor pagination.
      */
-    index("an_by_app_recipient_all_idx").on(
+    index("an_list_all_idx").on(
       table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
+      table.recipientAddress, // = ?
+      desc(table.createdAt),
+      desc(table.id),
     ),
-    index("an_by_app_recipient_type_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.notificationType, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    index("an_by_app_recipient_parent_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.parentId, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    index("an_by_app_recipient_app_signer_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.appSigner, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    /**
-     * Composite indexes for multiple conditions, recipient address and app are still required.
-     */
-    index("an_by_app_recipient_app_signer_type_parent_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.appSigner, // = ?, IN ()
-      table.notificationType, // = ?, IN (), DISTINCT ON
-      table.parentId, // = ?, IN (), DISTINCT ON
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    index("an_by_app_recipient_app_signer_type_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.appSigner, // = ?, IN ()
-      table.notificationType, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    index("an_by_app_recipient_app_signer_parent_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.appSigner, // = ?, IN ()
-      table.parentId, // = ?, IN ()
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    index("an_by_app_recipient_type_parent_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?, IN ()
-      table.notificationType, // = ?, IN (), DISTINCT ON
-      table.parentId, // = ?, IN (), DISTINCT ON
-      table.createdAt, // =>,<= ?, ORDER BY
-      table.id, // =>,<= ?, ORDER BY
-    ),
-    /**
-     * Partial indexes for seen_at filters
-     */
-    index("an_by_app_recipient_seen_idx")
+    index("an_list_seen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        desc(table.createdAt),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_unseen_idx")
+    index("an_list_unseen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        desc(table.createdAt),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_type_seen_idx")
+
+    index("an_grouped_idx").on(
+      table.appId, // = ?
+      table.recipientAddress, // = ?
+      desc(table.createdAt),
+      asc(table.notificationType),
+      asc(table.parentId),
+      desc(table.id),
+    ),
+    index("an_grouped_seen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.notificationType, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        desc(table.createdAt),
+        asc(table.notificationType),
+        asc(table.parentId),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_type_unseen_idx")
+    index("an_grouped_unseen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.notificationType, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        desc(table.createdAt),
+        asc(table.notificationType),
+        asc(table.parentId),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_parent_seen_idx")
+    index("an_grouped_latest_idx").on(
+      table.appId, // = ?
+      table.recipientAddress, // = ?
+      asc(table.notificationType),
+      asc(table.parentId),
+      desc(table.createdAt),
+      desc(table.id),
+    ),
+    index("an_grouped_latest_seen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.parentId, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        asc(table.notificationType),
+        asc(table.parentId),
+        desc(table.createdAt),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_parent_unseen_idx")
+    index("an_grouped_latest_unseen_idx")
       .on(
         table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.parentId, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_app_signer_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_app_signer_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_app_signer_type_parent_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.notificationType, // = ?, IN (), DISTINCT ON
-        table.parentId, // = ?, IN (), DISTINCT ON
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_app_signer_type_parent_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.notificationType, // = ?, IN (), DISTINCT ON
-        table.parentId, // = ?, IN (), DISTINCT ON
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_app_signer_type_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.notificationType, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_app_signer_type_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.notificationType, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_app_signer_parent_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.parentId, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_app_signer_parent_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.appSigner, // = ?, IN ()
-        table.parentId, // = ?, IN ()
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_by_app_recipient_type_parent_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.notificationType, // = ?, IN (), DISTINCT ON
-        table.parentId, // = ?, IN (), DISTINCT ON
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_by_app_recipient_type_parent_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?, IN ()
-        table.notificationType, // = ?, IN (), DISTINCT ON
-        table.parentId, // = ?, IN (), DISTINCT ON
-        table.createdAt, // =>,<= ?, ORDER BY
-        table.id, // =>,<= ?, ORDER BY
+        table.recipientAddress, // = ?
+        asc(table.notificationType),
+        asc(table.parentId),
+        desc(table.createdAt),
+        desc(table.id),
       )
       .where(sql`${table.seenAt} IS NULL`),
   ],
