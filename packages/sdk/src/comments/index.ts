@@ -11,3 +11,4 @@ export * from "./metadata.js";
 export * from "./types.js";
 export * from "./schemas.js";
 export * from "./eip712.js";
+export * from "./caip373.js";
