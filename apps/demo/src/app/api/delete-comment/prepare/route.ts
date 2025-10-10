@@ -58,7 +58,7 @@ export async function POST(
 
   const signature = await account.signTypedData(typedDeleteCommentData);
 
-  if (submitIfApproved) {
+  if (submitIfApproved && env.NEXT_PUBLIC_ENABLE_PREAPPROVED_GASLESS) {
     const submitterAccount = await resolveSubmitterAccount();
     const walletClient = createWalletClient({
       account: submitterAccount,
