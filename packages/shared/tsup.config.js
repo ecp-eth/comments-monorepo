@@ -29,7 +29,10 @@ const entry = files
 
 export default defineConfig({
   entry,
-  splitting: false,
+  // split should not be set to false, when it is false it will generate
+  // a single chunk file with all the dependencies, which will cause react
+  // context to be duplicated
+  splitting: true,
   dts: true,
   clean: true,
   sourcemap: false,
