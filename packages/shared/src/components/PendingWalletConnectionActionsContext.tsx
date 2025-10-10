@@ -67,13 +67,8 @@ const PendingWalletConnectionActionsContext =
 
 export const PendingWalletConnectionActionsProvider = ({
   children,
-  globalActionAfterWalletConnected,
 }: {
   children: React.ReactNode;
-  /**
-   * Specify a global action to be executed after wallet is connected and before executing non-global actions
-   */
-  globalActionAfterWalletConnected?: () => Promise<void> | void;
 }) => {
   const actionsRef = useRef<PendingWalletConnectionAction[]>([]);
   const handlersRef = useRef<PendingWalletConnectionActionHandlerRecord>({});
@@ -87,14 +82,11 @@ export const PendingWalletConnectionActionsProvider = ({
       return;
     }
 
-    let globalActionExecuted = false;
-
     const actions = actionsRef.current;
     const handlers = handlersRef.current;
 
-    // clear the actions and handlers to double execution caused by concurrent triggerActions calls
+    // clear the actions to avoid double execution caused by concurrent triggerActions calls
     actionsRef.current = [];
-    handlersRef.current = {};
 
     for (let len = actions.length; len > 0; len--) {
       const action = actions[len - 1];
@@ -107,17 +99,12 @@ export const PendingWalletConnectionActionsProvider = ({
         continue;
       }
 
-      if (globalActionExecuted) {
-        await globalActionAfterWalletConnected?.();
-        globalActionExecuted = true;
-      }
-
       // Remove the action from the array if handler is found.
       actions.splice(len - 1, 1);
 
       await handler[action.type]();
     }
-  }, [client, connectedAddress, globalActionAfterWalletConnected]);
+  }, [client, connectedAddress]);
 
   useEffect(() => {
     void triggerActions();

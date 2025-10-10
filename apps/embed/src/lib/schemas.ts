@@ -184,3 +184,55 @@ export const EmbedConfigFromSearchParamsSchema = z.preprocess((value) => {
     console.warn("failed to parse config", err);
   }
 }, EmbedConfigSchema.default({}));
+
+/**
+ * Delete Comment payload schema for both gasless and non-gasless
+ */
+export const DeleteCommentPayloadInputSchema = z.object({
+  commentId: HexSchema,
+  author: HexSchema,
+  chainId: z.number(),
+});
+
+export type DeleteCommentPayloadInputSchemaType = z.input<
+  typeof DeleteCommentPayloadInputSchema
+>;
+
+/**
+ * Payload schema for deleting comment gaslessly
+ */
+export const DeleteCommentPayloadRequestSchema = z.object({
+  comment: DeleteCommentPayloadInputSchema,
+  authorSignature: HexSchema.optional().describe(
+    "Signature of the author, required if the user has not approved our submitter address",
+  ),
+  deadline: z.coerce
+    .bigint()
+    .optional()
+    .describe(
+      "Deadline of the request, required if the user has not approved our submitter address",
+    ),
+});
+
+export type DeleteCommentPayloadRequestSchemaType = z.input<
+  typeof DeleteCommentPayloadRequestSchema
+>;
+
+/**
+ * Delete Comment API response schema
+ */
+export const DeleteCommentResponseSchema = z.object({
+  txHash: HexSchema,
+  signature: HexSchema,
+  hash: HexSchema,
+  data: z.object({
+    commentId: HexSchema,
+    author: HexSchema,
+    app: HexSchema,
+    deadline: z.coerce.bigint(),
+  }),
+});
+
+export type DeleteCommentResponseSchemaType = z.infer<
+  typeof DeleteCommentResponseSchema
+>;

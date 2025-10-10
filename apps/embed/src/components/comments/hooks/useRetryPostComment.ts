@@ -115,6 +115,7 @@ export function useRetryPostComment({
       readContractAsync,
       writeContractAsync,
       signTypedDataAsync,
+      embedConfig.gasSponsorship,
       switchChainAsync,
       commentRetrySubmission,
       wagmiConfig,
