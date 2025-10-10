@@ -49,7 +49,9 @@ export default function Home() {
             <TabsTrigger value="gasless">
               Gas Sponsored Transactions
             </TabsTrigger>
-            <TabsTrigger value="approvals">Approvals</TabsTrigger>
+            {publicEnv.NEXT_PUBLIC_ENABLE_PREAPPROVED_GASLESS && (
+              <TabsTrigger value="approvals">Approvals</TabsTrigger>
+            )}
             {publicEnv.NEXT_PUBLIC_ENABLE_SWAPPING && (
               <TabsTrigger value="swap">Swap with comment</TabsTrigger>
             )}
