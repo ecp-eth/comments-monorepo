@@ -13,7 +13,6 @@ import { supportedChains } from "@/lib/wagmi";
 import {
   createCommentData,
   createCommentTypedData,
-  isApproved,
   postCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import {
@@ -62,23 +61,6 @@ export async function POST(req: Request) {
       transport: privateTransport,
     });
     const appAccount = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
-
-    const hasApproved = await isApproved({
-      author,
-      app: appAccount.address,
-      readContract: publicClient.readContract,
-    });
-
-    if (!hasApproved && !authorSignature) {
-      return Response.json(
-        {
-          error:
-            "Author has not approved submitter address for post, provide author signature to post the comment",
-        },
-        { status: 400 },
-      );
-    }
-
     const commentData = createCommentData({
       content,
       author,
@@ -100,14 +82,12 @@ export async function POST(req: Request) {
       chainId,
     });
 
-    if (authorSignature) {
-      await guardAuthorSignature({
-        publicClient,
-        authorSignature,
-        signTypedDataParams: typedCommentData,
-        authorAddress: author,
-      });
-    }
+    await guardAuthorSignature({
+      publicClient,
+      authorSignature,
+      signTypedDataParams: typedCommentData,
+      authorAddress: author,
+    });
 
     const submitterAccount = privateKeyToAccount(submitterPrivateKey);
     const submitterWalletClient = createWalletClient({

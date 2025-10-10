@@ -75,7 +75,7 @@ export const SignCommentResponseServerSchema = z.object({
  */
 export const PostCommentPayloadRequestSchema = z.object({
   comment: PostCommentPayloadInputSchema,
-  authorSignature: HexSchema.optional().describe(
+  authorSignature: HexSchema.describe(
     "Signature of the author, required if the user has not approved our submitter address",
   ),
   deadline: z.coerce
@@ -130,7 +130,7 @@ export type SignEditCommentPayloadRequestSchemaType = z.infer<
  */
 export const EditCommentPayloadRequestSchema = z.object({
   comment: EditCommentPayloadInputSchema,
-  authorSignature: HexSchema.optional().describe(
+  authorSignature: HexSchema.describe(
     "Signature of the author, required if the user has not approved our submitter address",
   ),
   deadline: z.coerce
@@ -203,7 +203,7 @@ export type DeleteCommentPayloadInputSchemaType = z.input<
  */
 export const DeleteCommentPayloadRequestSchema = z.object({
   comment: DeleteCommentPayloadInputSchema,
-  authorSignature: HexSchema.optional().describe(
+  authorSignature: HexSchema.describe(
     "Signature of the author, required if the user has not approved our submitter address",
   ),
   deadline: z.coerce

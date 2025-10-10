@@ -17,15 +17,12 @@ import {
   formatContractFunctionExecutionError,
 } from "@ecp.eth/shared/helpers";
 import {
-  ContractReadFunctions,
   ContractWriteFunctions,
   createDeleteCommentTypedData,
-  isApproved,
   deleteComment,
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
-import { addApproval } from "./addApproval";
 
 class SubmitDeleteCommentMutationError extends Error {}
 
@@ -36,19 +33,15 @@ type SubmitDeleteCommentParams = {
     "author"
   >;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  readContractAsync:
-    | ContractReadFunctions["getIsApproved"]
-    | ContractReadFunctions["getNonce"];
   writeContractAsync: ContractWriteFunctions["deleteComment"];
   signTypedDataAsync: SignTypedDataMutateAsync;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
 
-export async function submitDeleteCommentMutationFunction({
+export async function submitDeleteComment({
   author,
   deleteCommentRequest,
   switchChainAsync,
-  readContractAsync,
   writeContractAsync,
   signTypedDataAsync,
   gasSponsorship,
@@ -75,68 +68,47 @@ export async function submitDeleteCommentMutationFunction({
     throw new SubmitDeleteCommentMutationError("Failed to switch chain.");
   }
 
-  const pendingOperation =
-    gasSponsorship === "gas-not-sponsored"
-      ? await deleteCommentNonGaslessly({
-          deleteCommentPayloadRequest: deleteCommentPayloadRequest,
-          writeContractAsync,
-        })
-      : await deleteCommentGaslessly({
-          readContractAsync,
-          deleteCommentPayloadRequest: deleteCommentPayloadRequest,
-          signTypedDataAsync,
-          gasSponsorship,
-        });
-
-  return pendingOperation;
+  switch (gasSponsorship) {
+    case "not-gasless":
+      return await deleteCommentWithoutGasless({
+        deleteCommentPayloadRequest: deleteCommentPayloadRequest,
+        writeContractAsync,
+      });
+    case "gasless-not-preapproved":
+      return await deleteCommentWithGaslessAndAuthorSig({
+        deleteCommentPayloadRequest: deleteCommentPayloadRequest,
+        signTypedDataAsync,
+      });
+    case "gasless-preapproved":
+      throw new SubmitDeleteCommentMutationError(
+        "gasless-preapproved not supported",
+      );
+    default:
+      gasSponsorship satisfies never;
+      throw new SubmitDeleteCommentMutationError("Invalid gas sponsorship");
+  }
 }
 
-async function deleteCommentGaslessly({
+async function deleteCommentWithGaslessAndAuthorSig({
   deleteCommentPayloadRequest,
-  readContractAsync,
   signTypedDataAsync,
-  gasSponsorship,
 }: {
   deleteCommentPayloadRequest: DeleteCommentPayloadInputSchemaType;
-  readContractAsync:
-    | ContractReadFunctions["getIsApproved"]
-    | ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
-  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 }): Promise<PendingDeleteCommentOperationSchemaType> {
-  const appApproved = await isApproved({
-    author: deleteCommentPayloadRequest.author,
+  const { commentId, author } = deleteCommentPayloadRequest;
+  const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hour from now
+
+  const chainId = deleteCommentPayloadRequest.chainId;
+  const typedDeleteData = createDeleteCommentTypedData({
+    commentId,
+    author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    readContract: readContractAsync as ContractReadFunctions["getIsApproved"],
+    deadline,
+    chainId,
   });
 
-  if (gasSponsorship === "gas-sponsored-preauth" && !appApproved) {
-    await addApproval({
-      author: deleteCommentPayloadRequest.author,
-      chainId: deleteCommentPayloadRequest.chainId,
-      readContractAsync: readContractAsync as ContractReadFunctions["getNonce"],
-      signTypedDataAsync,
-    });
-  }
-
-  let authorSignature: Hex | undefined;
-  let deadline: bigint | undefined;
-
-  if (!appApproved) {
-    const { commentId, author } = deleteCommentPayloadRequest;
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hour from now
-
-    const chainId = deleteCommentPayloadRequest.chainId;
-    const typedDeleteData = createDeleteCommentTypedData({
-      commentId,
-      author,
-      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-      deadline,
-      chainId,
-    });
-
-    authorSignature = await signTypedDataAsync(typedDeleteData);
-  }
+  const authorSignature = await signTypedDataAsync(typedDeleteData);
 
   const response = await fetch("/api/delete-comment", {
     method: "POST",
@@ -181,7 +153,7 @@ async function deleteCommentGaslessly({
   };
 }
 
-async function deleteCommentNonGaslessly({
+async function deleteCommentWithoutGasless({
   deleteCommentPayloadRequest,
   writeContractAsync,
 }: {

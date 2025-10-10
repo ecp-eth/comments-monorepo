@@ -15,7 +15,6 @@ import {
   createEditCommentTypedData,
   editCommentWithSig,
   getNonce,
-  isApproved,
 } from "@ecp.eth/sdk/comments";
 import {
   bigintReplacer,
@@ -63,29 +62,11 @@ export async function POST(req: Request) {
       transport: privateTransport,
     });
     const appAccount = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
-
-    const hasApproved = await isApproved({
-      author,
-      app: appAccount.address,
-      readContract: publicClient.readContract,
-    });
-
-    if (!hasApproved && !authorSignature) {
-      return Response.json(
-        {
-          error:
-            "Author has not approved submitter address for edit, provide author signature to edit the comment",
-        },
-        { status: 400 },
-      );
-    }
-
     const nonce = await getNonce({
       author,
       app: appAccount.address,
       readContract: publicClient.readContract,
     });
-
     const editCommentData = createEditCommentData({
       commentId,
       content,
@@ -94,33 +75,27 @@ export async function POST(req: Request) {
       deadline,
       metadata,
     });
-
     const typedEditCommentData = createEditCommentTypedData({
       author,
       edit: editCommentData,
       chainId,
     });
 
-    if (authorSignature) {
-      await guardAuthorSignature({
-        publicClient,
-        authorSignature,
-        signTypedDataParams: typedEditCommentData,
-        authorAddress: author,
-      });
-    }
+    await guardAuthorSignature({
+      publicClient,
+      authorSignature,
+      signTypedDataParams: typedEditCommentData,
+      authorAddress: author,
+    });
 
     const hash = hashTypedData(typedEditCommentData);
-
     const submitterAccount = privateKeyToAccount(submitterPrivateKey);
     const submitterWalletClient = createWalletClient({
       account: submitterAccount,
       chain: selectedChain,
       transport: privateTransport,
     });
-
     const appSignature = await appAccount.signTypedData(typedEditCommentData);
-
     const { txHash } = await editCommentWithSig({
       appSignature,
       authorSignature,

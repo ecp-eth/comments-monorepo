@@ -360,15 +360,15 @@ export default function IframeConfigurator() {
                       <Select
                         onValueChange={(value) => {
                           if (
-                            value === "gas-not-sponsored" ||
-                            value === "gas-sponsored-auth-everytime" ||
-                            value === "gas-sponsored-preauth"
+                            value === "not-gasless" ||
+                            value === "gasless-not-preapproved" ||
+                            value === "gasless-preapproved"
                           ) {
                             field.onChange(value);
                             return;
                           }
                           // fallback to default
-                          field.onChange("gas-sponsored-auth-everytime");
+                          field.onChange("gasless-not-preapproved");
                         }}
                         {...field}
                         value={field.value}
@@ -379,18 +379,20 @@ export default function IframeConfigurator() {
                           />
                         </SelectTrigger>
                         <SelectContent id="gas-sponsorship-mode-select">
-                          <SelectItem value="gas-not-sponsored">
+                          <SelectItem value="not-gasless">
                             Users pay their own gas fees
                           </SelectItem>
-                          <SelectItem value="gas-sponsored-auth-everytime">
+                          <SelectItem value="gasless-not-preapproved">
                             Gas sponsored, users sign each transaction
                           </SelectItem>
-                          <SelectItem
-                            value="gas-sponsored-preauth"
-                            defaultChecked
-                          >
-                            Gas sponsored, users pre-approve all transactions
-                          </SelectItem>
+                          {publicEnv.VITE_ECP_ENABLE_PREAPPROVED_GASLESS && (
+                            <SelectItem
+                              value="gasless-preapproved"
+                              defaultChecked
+                            >
+                              Gas sponsored, users pre-approve all transactions
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>

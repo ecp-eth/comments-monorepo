@@ -7,7 +7,7 @@ import { useReactionRemoval } from "@ecp.eth/shared/hooks";
 import { type Comment } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { submitDeleteCommentMutationFunction } from "../queries/deleteComment";
+import { submitDeleteComment } from "../queries/deleteComment";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
@@ -31,12 +31,12 @@ type UseUnlikeCommentProps = {
 };
 
 export const useUnlikeComment = () => {
-  const { address: connectedAddress } = useAccount();
+  const { address: viewer } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
   const { data: client } = useConnectorClient();
   const config = useEmbedConfig();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+  const { writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
 
   return useCallback(
@@ -45,7 +45,7 @@ export const useUnlikeComment = () => {
         throw new Error("No client");
       }
 
-      if (!connectedAddress) {
+      if (!viewer) {
         throw new Error("Wallet not connected");
       }
 
@@ -75,8 +75,8 @@ export const useUnlikeComment = () => {
         onBeforeStart?.();
 
         const commentId = reaction.id;
-        const { txHash } = await submitDeleteCommentMutationFunction({
-          author,
+        const { txHash } = await submitDeleteComment({
+          author: viewer,
           deleteCommentRequest: {
             commentId: commentId,
             chainId: config.chainId,
@@ -85,7 +85,6 @@ export const useUnlikeComment = () => {
             const result = await switchChainAsync({ chainId });
             return result;
           },
-          readContractAsync,
           writeContractAsync,
           signTypedDataAsync,
           gasSponsorship: config.gasSponsorship,
@@ -112,6 +111,15 @@ export const useUnlikeComment = () => {
         throw e;
       }
     },
-    [client, connectedAddress, likeReactionRemoval, switchChainAsync],
+    [
+      client,
+      config.chainId,
+      config.gasSponsorship,
+      viewer,
+      likeReactionRemoval,
+      signTypedDataAsync,
+      switchChainAsync,
+      writeContractAsync,
+    ],
   );
 };

@@ -12,7 +12,6 @@ import {
 import { supportedChains } from "@/lib/wagmi";
 import {
   createDeleteCommentTypedData,
-  isApproved,
   deleteCommentWithSig,
 } from "@ecp.eth/sdk/comments";
 import {
@@ -61,23 +60,6 @@ export async function POST(req: Request) {
       transport: privateTransport,
     });
     const appAccount = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
-
-    const hasApproved = await isApproved({
-      author,
-      app: appAccount.address,
-      readContract: publicClient.readContract,
-    });
-
-    if (!hasApproved && !authorSignature) {
-      return Response.json(
-        {
-          error:
-            "Author has not approved submitter address for delete, provide author signature to delete the comment",
-        },
-        { status: 400 },
-      );
-    }
-
     const typedDeleteData = createDeleteCommentTypedData({
       commentId,
       author,
@@ -86,14 +68,12 @@ export async function POST(req: Request) {
       chainId,
     });
 
-    if (authorSignature) {
-      await guardAuthorSignature({
-        publicClient,
-        authorSignature,
-        signTypedDataParams: typedDeleteData,
-        authorAddress: author,
-      });
-    }
+    await guardAuthorSignature({
+      publicClient,
+      authorSignature,
+      signTypedDataParams: typedDeleteData,
+      authorAddress: author,
+    });
 
     const submitterAccount = privateKeyToAccount(submitterPrivateKey);
     const submitterWalletClient = createWalletClient({
@@ -101,10 +81,8 @@ export async function POST(req: Request) {
       chain: selectedChain,
       transport: privateTransport,
     });
-
     const hash = hashTypedData(typedDeleteData);
     const appSignature = await appAccount.signTypedData(typedDeleteData);
-
     const { txHash } = await deleteCommentWithSig({
       commentId,
       app: appAccount.address,

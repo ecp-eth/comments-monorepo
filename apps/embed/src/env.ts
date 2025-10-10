@@ -43,7 +43,7 @@ const ServerEnvSchema = z
   .merge(SubmitterEnvSchema.partial())
   .refine((data) => {
     // If gasless is enabled, require submitter configuration
-    if (publicEnv.NEXT_PUBLIC_GASLESS_ENABLED === true) {
+    if (publicEnv.NEXT_PUBLIC_ENABLE_GASLESS === true) {
       const submitterResult = SubmitterEnvSchema.safeParse(data);
       if (!submitterResult.success) {
         throw submitterResult.error;

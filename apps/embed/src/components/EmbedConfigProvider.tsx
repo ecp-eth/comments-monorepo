@@ -74,8 +74,8 @@ export function useEmbedConfig<
   return Object.create(ctx, {
     gasSponsorship: {
       get() {
-        if (!publicEnv.NEXT_PUBLIC_GASLESS_ENABLED) {
-          return "gas-not-sponsored";
+        if (!publicEnv.NEXT_PUBLIC_ENABLE_GASLESS) {
+          return "not-gasless";
         }
         return ctx.gasSponsorship;
       },
