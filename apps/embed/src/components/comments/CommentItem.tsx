@@ -20,7 +20,7 @@ import { useRetryPostComment } from "./hooks/useRetryPostComment";
 import {
   createReplyItemsQueryKey,
   createCommentItemsQueryKey,
-} from "./queries";
+} from "./queries/queryKeys";
 import {
   useEmbedConfig,
   type EmbedConfigProviderByTargetURIConfig,

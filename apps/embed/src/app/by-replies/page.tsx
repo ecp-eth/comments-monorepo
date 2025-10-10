@@ -8,13 +8,13 @@ import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "../providers";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
-import { env } from "@/env";
 import { CommentSectionReplies } from "@/components/comments/CommentSectionReplies";
 import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
 import { cookies } from "next/headers";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { getAppSignerAddress } from "@/lib/utils";
+import { publicEnv } from "@/publicEnv";
 
 const SearchParamsSchema = z.object({
   commentId: HexSchema,
@@ -58,7 +58,7 @@ export default async function EmbedCommentsByRepliesPage({
     const fetchCommentRepliesParams: FetchCommentRepliesOptions = {
       chainId: config.chainId,
       app: getAppSignerAddress(config.app),
-      apiUrl: env.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
+      apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
       commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
       mode: "flat",

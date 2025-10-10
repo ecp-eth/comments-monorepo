@@ -75,15 +75,18 @@ export const PendingWalletConnectionActionsProvider = ({
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
 
-  const triggerActions = useCallback(() => {
-    // interestingly when useAccount is able to return the address, useConnectorClient still need to takes a bit of time.
-    // without checking it the like/unlike hooks in embed will failed as they rely on the client to be available
+  const triggerActions = useCallback(async () => {
+    // interestingly when useAccount is able to return the address, useConnectorClient still needs to take a bit of time.
+    // without checking `client` the like/unlike hooks in embed will failed as they rely on the client to be available
     if (!connectedAddress || !client) {
       return;
     }
 
     const actions = actionsRef.current;
     const handlers = handlersRef.current;
+
+    // clear the actions to avoid double execution caused by concurrent triggerActions calls
+    actionsRef.current = [];
 
     for (let len = actions.length; len > 0; len--) {
       const action = actions[len - 1];
@@ -95,15 +98,16 @@ export const PendingWalletConnectionActionsProvider = ({
       if (!handler) {
         continue;
       }
+
       // Remove the action from the array if handler is found.
       actions.splice(len - 1, 1);
 
-      handler[action.type]();
+      await handler[action.type]();
     }
   }, [client, connectedAddress]);
 
   useEffect(() => {
-    triggerActions();
+    void triggerActions();
   }, [triggerActions]);
 
   const value = useMemo(() => {
@@ -149,9 +153,9 @@ export const useConsumePendingWalletConnectionActions = ({
   onPrepareReplyAction,
 }: {
   commentId: Hex;
-  onLikeAction: (commentId: Hex) => void;
-  onUnlikeAction: (commentId: Hex) => void;
-  onPrepareReplyAction: (commentId: Hex) => void;
+  onLikeAction: (commentId: Hex) => Promise<void> | void;
+  onUnlikeAction: (commentId: Hex) => Promise<void> | void;
+  onPrepareReplyAction: (commentId: Hex) => Promise<void> | void;
 }) => {
   const onLikeActionRef = useFreshRef(onLikeAction);
   const onUnlikeActionRef = useFreshRef(onUnlikeAction);
@@ -161,14 +165,14 @@ export const useConsumePendingWalletConnectionActions = ({
 
   useEffect(() => {
     addHandler(commentId, {
-      like: () => {
-        onLikeActionRef.current(commentId);
+      like: async () => {
+        await onLikeActionRef.current(commentId);
       },
-      unlike: () => {
-        onUnlikeActionRef.current(commentId);
+      unlike: async () => {
+        await onUnlikeActionRef.current(commentId);
       },
-      prepareReply: () => {
-        onPrepareReplyActionRef.current(commentId);
+      prepareReply: async () => {
+        await onPrepareReplyActionRef.current(commentId);
       },
     });
 
@@ -205,7 +209,12 @@ export const useConnectBeforeAction = () => {
     ) => {
       return async (...args: TParams) => {
         if (!connectedAddress) {
-          await connectAccount();
+          // we shouldn't await here, the promise might not resolve due to
+          // the containing component being unmounted, causing the action
+          // to be lost
+          // instead the action should be added immediately to queue to be
+          // executed whenever `useConsumePendingWalletConnectionActions` is consumed
+          void connectAccount();
         }
 
         const action = await getAction(...args);

@@ -77,6 +77,7 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
     },
   },
   restrictMaximumContainerWidth: true,
+  gasSponsorship: "gasless-not-preapproved",
 };
 
 export const COLOR_FIELDS = [

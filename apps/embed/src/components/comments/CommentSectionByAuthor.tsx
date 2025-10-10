@@ -23,7 +23,7 @@ import {
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import { useAccount, useChainId } from "wagmi";
-import { createCommentItemsQueryKey } from "./queries";
+import { createCommentItemsQueryKey } from "./queries/queryKeys";
 import {
   useIsAccountStatusResolved,
   useNewCommentsChecker,
