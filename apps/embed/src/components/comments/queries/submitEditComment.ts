@@ -26,11 +26,9 @@ import {
   createEditCommentTypedData,
   editComment,
   getNonce,
-  isApproved,
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
-import { addApproval } from "./addApproval";
 
 class SubmitEditCommentMutationError extends Error {}
 
@@ -44,14 +42,12 @@ type SubmitEditCommentParams = {
   editRequest: EditCommentRequestType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: ContractWriteFunctions["editComment"];
-  readContractAsync:
-    | ContractReadFunctions["getIsApproved"]
-    | ContractReadFunctions["getNonce"];
+  readContractAsync: ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
 
-export async function submitEditCommentMutationFunction({
+export async function submitEditComment({
   address,
   comment,
   editRequest,
@@ -85,81 +81,61 @@ export async function submitEditCommentMutationFunction({
     throw new SubmitEditCommentMutationError("Failed to switch chain.");
   }
 
-  const pendingOperation =
-    gasSponsorship === "gas-not-sponsored"
-      ? await editCommentNonGaslessly({
-          editCommentPayloadRequest,
-          writeContractAsync,
-          editRequest,
-        })
-      : await editCommentGaslessly({
-          readContractAsync,
-          editCommentPayloadRequest,
-          signTypedDataAsync,
-          gasSponsorship,
-        });
-
-  return {
-    ...pendingOperation,
-  };
+  switch (gasSponsorship) {
+    case "not-gasless":
+      return await editCommentWithoutGasless({
+        editCommentPayloadRequest,
+        writeContractAsync,
+        editRequest,
+      });
+    case "gasless-not-preapproved":
+      return await editCommentWithGaslessAndAuthorSig({
+        editCommentPayloadRequest,
+        readContractAsync,
+        signTypedDataAsync,
+      });
+    case "gasless-preapproved":
+      throw new SubmitEditCommentMutationError(
+        "gasless-preapproved not supported",
+      );
+    default:
+      gasSponsorship satisfies never;
+      throw new SubmitEditCommentMutationError("Invalid gas sponsorship");
+  }
 }
 
-async function editCommentGaslessly({
+async function editCommentWithGaslessAndAuthorSig({
   editCommentPayloadRequest,
   readContractAsync,
   signTypedDataAsync,
-  gasSponsorship,
 }: {
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
-  readContractAsync:
-    | ContractReadFunctions["getIsApproved"]
-    | ContractReadFunctions["getNonce"];
+  readContractAsync: ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
-  gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 }): Promise<PendingEditCommentOperationSchemaType> {
-  const appApproved = await isApproved({
-    author: editCommentPayloadRequest.author,
+  const { commentId, content, author } = editCommentPayloadRequest;
+  const nonce = await getNonce({
+    author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    readContract: readContractAsync as ContractReadFunctions["getIsApproved"],
+    readContract: readContractAsync as ContractReadFunctions["getNonce"],
+  });
+  const editCommentData = createEditCommentData({
+    commentId,
+    content,
+    app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+    nonce,
+    metadata: editCommentPayloadRequest.metadata,
   });
 
-  if (gasSponsorship === "gas-sponsored-preauth" && !appApproved) {
-    await addApproval({
-      author: editCommentPayloadRequest.author,
-      chainId: editCommentPayloadRequest.chainId,
-      readContractAsync: readContractAsync as ContractReadFunctions["getNonce"],
-      signTypedDataAsync,
-    });
-  }
+  const chainId = editCommentPayloadRequest.chainId;
+  const typedCommentData = createEditCommentTypedData({
+    author,
+    edit: editCommentData,
+    chainId,
+  });
 
-  let authorSignature: Hex | undefined;
-  let deadline: bigint | undefined;
-
-  if (!appApproved) {
-    const { commentId, content, author } = editCommentPayloadRequest;
-    const nonce = await getNonce({
-      author,
-      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-      readContract: readContractAsync as ContractReadFunctions["getNonce"],
-    });
-    const editCommentData = createEditCommentData({
-      commentId,
-      content,
-      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-      nonce,
-      metadata: editCommentPayloadRequest.metadata,
-    });
-
-    const chainId = editCommentPayloadRequest.chainId;
-    const typedCommentData = createEditCommentTypedData({
-      author,
-      edit: editCommentData,
-      chainId,
-    });
-
-    deadline = editCommentData.deadline;
-    authorSignature = await signTypedDataAsync(typedCommentData);
-  }
+  const deadline = editCommentData.deadline;
+  const authorSignature = await signTypedDataAsync(typedCommentData);
 
   const response = await fetch("/api/edit-comment", {
     method: "POST",
@@ -204,7 +180,7 @@ async function editCommentGaslessly({
   };
 }
 
-async function editCommentNonGaslessly({
+async function editCommentWithoutGasless({
   editCommentPayloadRequest,
   writeContractAsync,
   editRequest,

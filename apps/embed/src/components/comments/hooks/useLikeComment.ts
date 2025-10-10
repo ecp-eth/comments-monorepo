@@ -10,7 +10,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { submitPostCommentMutationFunction } from "../queries/postComment";
+import { submitPostComment } from "../queries/submitPostComment";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
@@ -44,7 +44,7 @@ export const useLikeComment = () => {
   );
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+  const { writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
 
@@ -69,23 +69,24 @@ export const useLikeComment = () => {
         undefined;
 
       try {
-        pendingOperation = await submitPostCommentMutationFunction({
-          author: connectedAddress,
-          postCommentRequest: {
-            chainId: comment.chainId,
-            content: COMMENT_REACTION_LIKE_CONTENT,
-            commentType: COMMENT_TYPE_REACTION,
-            parentId: comment.id,
-          },
+        pendingOperation = {
+          ...(await submitPostComment({
+            author: connectedAddress,
+            postCommentRequest: {
+              chainId: comment.chainId,
+              content: COMMENT_REACTION_LIKE_CONTENT,
+              commentType: COMMENT_TYPE_REACTION,
+              parentId: comment.id,
+            },
+            switchChainAsync(chainId) {
+              return switchChainAsync({ chainId });
+            },
+            writeContractAsync,
+            signTypedDataAsync,
+            gasSponsorship: embedConfig.gasSponsorship,
+          })),
           references: [],
-          switchChainAsync(chainId) {
-            return switchChainAsync({ chainId });
-          },
-          readContractAsync,
-          writeContractAsync,
-          signTypedDataAsync,
-          gasSponsorship: embedConfig.gasSponsorship,
-        });
+        };
 
         likeReactionSubmission.start({
           ...params,
@@ -128,7 +129,6 @@ export const useLikeComment = () => {
       connectedAddress,
       embedConfig.gasSponsorship,
       likeReactionSubmission,
-      readContractAsync,
       signTypedDataAsync,
       switchChainAsync,
       writeContractAsync,

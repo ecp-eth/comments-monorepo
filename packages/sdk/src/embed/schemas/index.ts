@@ -218,11 +218,11 @@ export const EmbedConfigSchema = z.object({
   gasSponsorship: z
     .union([
       // this option is needed for when we want to support custom channel id
-      z.literal("gas-not-sponsored"),
-      z.literal("gas-sponsored-auth-everytime"),
-      z.literal("gas-sponsored-preauth"),
+      z.literal("not-gasless"),
+      z.literal("gasless-not-preapproved"),
+      z.literal("gasless-preapproved"),
     ])
-    .default("gas-sponsored-preauth"),
+    .default("gasless-not-preapproved"),
 });
 
 /**

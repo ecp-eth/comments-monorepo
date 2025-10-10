@@ -29,6 +29,10 @@ export const publicEnvSchema = z.object({
       z.string().url().safeParse(val).success ? val : undefined,
     )
     .optional(),
+  VITE_ECP_ENABLE_PREAPPROVED_GASLESS: z
+    .enum(["1", "0"])
+    .default("0")
+    .transform((val) => val === "1"),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -37,4 +41,6 @@ export const publicEnv = publicEnvSchema.parse({
     .VITE_ECP_ETH_EMBED_BY_AUTHOR_URL,
   VITE_ECP_ETH_EMBED_BY_REPLIES_URL: import.meta.env
     .VITE_ECP_ETH_EMBED_BY_REPLIES_URL,
+  VITE_ECP_ENABLE_PREAPPROVED_GASLESS: import.meta.env
+    .VITE_ECP_ENABLE_PREAPPROVED_GASLESS,
 });

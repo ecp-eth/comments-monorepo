@@ -6,7 +6,7 @@ import { useCommentDeletion } from "@ecp.eth/shared/hooks";
 import type { QueryKey } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../../EmbedConfigProvider";
-import { submitDeleteCommentMutationFunction } from "../queries/deleteComment";
+import { submitDeleteComment } from "../queries/deleteComment";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 type OnCommentDeleteParams = {
@@ -19,10 +19,10 @@ type OnCommentDelete = (params: OnCommentDeleteParams) => Promise<void>;
 export function useDeleteComment(): OnCommentDelete {
   const commentDeletion = useCommentDeletion();
   const { data: client } = useConnectorClient();
-  const { address: author } = useAccount();
+  const { address: viewer } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const config = useEmbedConfig();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+  const { writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
 
   return useCallback(
@@ -32,12 +32,12 @@ export function useDeleteComment(): OnCommentDelete {
           throw new Error("No client");
         }
 
-        if (!author) {
+        if (!viewer) {
           throw new Error("Wallet not connected");
         }
 
-        const pendingOperation = await submitDeleteCommentMutationFunction({
-          author,
+        const pendingOperation = await submitDeleteComment({
+          author: viewer,
           deleteCommentRequest: {
             commentId: params.commentId,
             chainId: config.chainId,
@@ -46,7 +46,6 @@ export function useDeleteComment(): OnCommentDelete {
             const result = await switchChainAsync({ chainId });
             return result;
           },
-          readContractAsync,
           writeContractAsync,
           signTypedDataAsync,
           gasSponsorship: config.gasSponsorship,
@@ -81,10 +80,9 @@ export function useDeleteComment(): OnCommentDelete {
     },
     [
       client,
-      author,
+      viewer,
       config.chainId,
       config.gasSponsorship,
-      readContractAsync,
       writeContractAsync,
       signTypedDataAsync,
       commentDeletion,

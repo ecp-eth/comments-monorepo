@@ -3,7 +3,7 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitPostCommentMutationFunction } from "../queries/postComment";
+import { submitPostComment } from "../queries/submitPostComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { waitForTransactionReceipt } from "@wagmi/core";
@@ -36,7 +36,7 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+  const { writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
 
@@ -56,28 +56,30 @@ export function useRetryPostComment({
         throw new Error("Only post comments can be retried");
       }
 
-      const pendingOperation = await submitPostCommentMutationFunction({
-        author: connectedAddress,
-        postCommentRequest: {
-          chainId: comment.pendingOperation.chainId,
-          content: comment.content,
-          ...(comment.parentId
-            ? {
-                parentId: comment.parentId,
-              }
-            : {
-                targetUri: comment.targetUri,
-              }),
-        },
+      const pendingOperation = {
+        ...(await submitPostComment({
+          author: connectedAddress,
+          postCommentRequest: {
+            chainId: comment.pendingOperation.chainId,
+            content: comment.content,
+            ...(comment.parentId
+              ? {
+                  parentId: comment.parentId,
+                }
+              : {
+                  targetUri: comment.targetUri,
+                }),
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+
+          writeContractAsync,
+          signTypedDataAsync,
+          gasSponsorship: embedConfig.gasSponsorship,
+        })),
         references: comment.references,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        readContractAsync,
-        writeContractAsync,
-        signTypedDataAsync,
-        gasSponsorship: embedConfig.gasSponsorship,
-      });
+      };
 
       try {
         commentRetrySubmission.start({
@@ -112,7 +114,6 @@ export function useRetryPostComment({
     },
     [
       connectedAddress,
-      readContractAsync,
       writeContractAsync,
       signTypedDataAsync,
       embedConfig.gasSponsorship,

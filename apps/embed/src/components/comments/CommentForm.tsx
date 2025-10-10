@@ -16,8 +16,8 @@ import {
 } from "../EmbedConfigProvider";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
-import { submitPostCommentMutationFunction } from "./queries/postComment";
-import { submitEditCommentMutationFunction } from "./queries/editComment";
+import { submitPostComment } from "./queries/submitPostComment";
+import { submitEditComment } from "./queries/submitEditComment";
 import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_COMMENT_LENGTH,
@@ -263,7 +263,7 @@ function BaseCommentForm({
 
   const isSubmitting = submitMutation.isPending;
 
-  const ButtonWrapper = publicEnv.NEXT_PUBLIC_GASLESS_ENABLED
+  const ButtonWrapper = publicEnv.NEXT_PUBLIC_ENABLE_GASLESS
     ? GaslessIndicator
     : React.Fragment;
 
@@ -385,27 +385,28 @@ export function CommentForm({
   const embedConfig = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const { targetUri, chainId } = embedConfig;
   const onSubmitStartRef = useFreshRef(onSubmitStart);
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+  const { writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content, references }) => {
-      const pendingOperation = await submitPostCommentMutationFunction({
-        author: author,
-        postCommentRequest: {
-          chainId,
-          content,
-          ...(parentId ? { parentId } : { targetUri }),
-        },
+      const pendingOperation = {
+        ...(await submitPostComment({
+          author: author,
+          postCommentRequest: {
+            chainId,
+            content,
+            ...(parentId ? { parentId } : { targetUri }),
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          signTypedDataAsync,
+          writeContractAsync: writeContractAsync,
+          gasSponsorship: embedConfig.gasSponsorship,
+        })),
         references,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        readContractAsync,
-        signTypedDataAsync,
-        writeContractAsync: writeContractAsync,
-        gasSponsorship: embedConfig.gasSponsorship,
-      });
+      };
 
       try {
         commentSubmission.start({
@@ -445,7 +446,6 @@ export function CommentForm({
       onSubmitStartRef,
       parentId,
       queryKey,
-      readContractAsync,
       signTypedDataAsync,
       switchChainAsync,
       targetUri,
@@ -474,7 +474,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
   return (
     <div
       className="flex flex-row gap-2 items-center overflow-hidden"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${embedConfig.gasSponsorship === "gas-not-sponsored" ? "" : " for free"}`}
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${embedConfig.gasSponsorship === "not-gasless" ? "" : " for free"}`}
     >
       <CommentAuthorAvatar author={queryResult.data ?? { address }} />
       <div className="flex-grow text-xs text-muted-foreground truncate">
@@ -540,7 +540,7 @@ export function CommentEditForm({
 
   const submitCommentMutation = useCallback<OnSubmitFunction>(
     async ({ author, content }) => {
-      const pendingOperation = await submitEditCommentMutationFunction({
+      const pendingOperation = await submitEditComment({
         address: author,
         comment,
         editRequest: {
