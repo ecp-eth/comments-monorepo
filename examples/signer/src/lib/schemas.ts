@@ -37,6 +37,7 @@ const sharedCommentSchema = z.object({
   metadata: MetadataArraySchema,
   chainId: AllowedChainIdSchema.default(env.DEFAULT_CHAIN_ID),
   commentType: CommentTypeSchema.optional(),
+  channelId: z.coerce.bigint().optional(),
 });
 
 // Request schema for standard signing
