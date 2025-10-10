@@ -70,7 +70,8 @@ export function useEmbedConfig<
     | EmbedConfigProviderByRepliesConfig,
 >() {
   const ctx = useContext(configContext) as TConfig;
-  // create a new object with its prototype points to the real context, it is quicker this way
+  // create a new object with its prototype points to the real context
+  // performance wise it is quicker this way, avoid spreading overhead
   return Object.create(ctx, {
     gasSponsorship: {
       get() {
