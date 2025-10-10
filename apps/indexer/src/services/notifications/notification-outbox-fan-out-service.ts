@@ -86,7 +86,7 @@ export class NotificationOutboxFanOutService {
             claimed_notifications AS (
               SELECT * FROM ${schema.notificationOutbox}
               WHERE ${schema.notificationOutbox.processedAt} IS NULL
-              ORDER BY ${schema.notificationOutbox.createdAt} ASC
+              ORDER BY ${schema.notificationOutbox.id} ASC
               LIMIT 100
               FOR UPDATE SKIP LOCKED
             ),
@@ -107,10 +107,19 @@ export class NotificationOutboxFanOutService {
               FROM claimed_notifications c
               JOIN ${schema.app} ON (${schema.app.createdAt} <= c.created_at)
               ON CONFLICT (notification_id, app_id) DO NOTHING
+              RETURNING *
+            ),
+
+            -- 3) Insert the heads of the notification groups
+            inserted_heads AS (
+              INSERT INTO ${schema.appRecipientNotificationGroups} (app_id, recipient_address, notification_type, parent_id, app_notification_id, seen_status, app_signer)
+              SELECT i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.id, 'unseen' as seen_status, i.app_signer
+              FROM inserted_notifications i
+              ON CONFLICT (app_id, recipient_address, seen_status, notification_type, parent_id, app_signer) DO UPDATE SET app_notification_id = EXCLUDED.app_notification_id
               RETURNING 1
             )
 
-          -- 3) Mark the events as processed
+          -- 4) Mark the events as processed
           UPDATE ${schema.notificationOutbox}
           SET processed_at = NOW()
           WHERE ${schema.notificationOutbox.id} IN (SELECT id FROM claimed_notifications)

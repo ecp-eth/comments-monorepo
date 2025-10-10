@@ -12,9 +12,11 @@ import {
   asc,
   desc,
   eq,
+  gt,
   inArray,
   isNotNull,
   isNull,
+  lt,
   sql,
   type SQL,
 } from "drizzle-orm";
@@ -54,7 +56,6 @@ export const AppNotificationsCursorInputSchema = z
     },
     z.object({
       id: z.coerce.bigint(),
-      us: z.coerce.bigint(),
     }),
   )
   .openapi({
@@ -63,7 +64,6 @@ export const AppNotificationsCursorInputSchema = z
 
 export const AppNotificationsCursorOutputSchema = z
   .object({
-    us: OpenAPIBigintStringSchema,
     id: OpenAPIBigintStringSchema,
   })
   .transform((val) => {
@@ -174,12 +174,12 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       } = c.req.valid("query");
       const app = c.get("app");
 
-      const resolvedUsers: Hex[] = await resolveUsersByAddressOrEnsName(
+      const [resolvedUser] = await resolveUsersByAddressOrEnsName(
         [user],
         ensByNameResolverService,
       );
 
-      if (resolvedUsers.length === 0) {
+      if (!resolvedUser) {
         return c.json({ message: "Invalid ENS name" }, 400);
       }
 
@@ -188,9 +188,9 @@ export function setupNotificationsGet(app: OpenAPIHono) {
        */
       const sharedConditions: (SQL | undefined)[] = [
         eq(schema.appNotification.appId, app.id),
-        inArray(
-          sql`${schema.appNotification.recipientAddress}`,
-          resolvedUsers.map((user) => user.toLowerCase()),
+        eq(
+          schema.appNotification.recipientAddress,
+          resolvedUser.toLowerCase() as Hex,
         ),
         parentId ? eq(schema.appNotification.parentId, parentId) : undefined,
         types.length > 0
@@ -198,8 +198,8 @@ export function setupNotificationsGet(app: OpenAPIHono) {
           : undefined,
         apps.length > 0
           ? inArray(
-              sql`${schema.appNotification.appSigner}`,
-              apps.map((app) => app.toLowerCase()),
+              schema.appNotification.appSigner,
+              apps.map((app) => app.toLowerCase() as Hex),
             )
           : undefined,
       ];
@@ -224,26 +224,13 @@ export function setupNotificationsGet(app: OpenAPIHono) {
       }
 
       if (after) {
-        pageConditions.push(
-          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) < (to_timestamp(${after.us} / 1e6)::timestamptz, ${after.id})`,
-        );
-        orderBy.push(
-          desc(schema.appNotification.createdAt),
-          desc(schema.appNotification.id),
-        );
+        pageConditions.push(lt(schema.appNotification.id, after.id));
+        orderBy.push(desc(schema.appNotification.id));
       } else if (before) {
-        pageConditions.push(
-          sql`(${schema.appNotification.createdAt}, ${schema.appNotification.id}) > (to_timestamp(${before.us} / 1e6)::timestamptz, ${before.id})`,
-        );
-        orderBy.push(
-          asc(schema.appNotification.createdAt),
-          asc(schema.appNotification.id),
-        );
+        pageConditions.push(gt(schema.appNotification.id, before.id));
+        orderBy.push(asc(schema.appNotification.id));
       } else {
-        orderBy.push(
-          desc(schema.appNotification.createdAt),
-          desc(schema.appNotification.id),
-        );
+        orderBy.push(desc(schema.appNotification.id));
       }
 
       const { rows } = await db.execute<{
@@ -252,10 +239,6 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         notificationType: NotificationTypeSchemaType;
         seenAt: Date | null;
         appSigner: Hex;
-        /**
-         * Bigint created_at in microseconds since epoch as string
-         */
-        us: string;
         /**
          * The comment that triggered the notification
          */
@@ -278,13 +261,13 @@ export function setupNotificationsGet(app: OpenAPIHono) {
           newest_notification AS (
             SELECT id FROM ${schema.appNotification}
             WHERE ${and(...cursorConditions)}
-            ORDER BY ${schema.appNotification.createdAt} DESC, ${schema.appNotification.id} DESC
+            ORDER BY ${schema.appNotification.id} DESC
             LIMIT 1
           ),
           oldest_notification AS (
             SELECT id FROM ${schema.appNotification}
             WHERE ${and(...cursorConditions)}
-            ORDER BY ${schema.appNotification.createdAt} ASC, ${schema.appNotification.id} ASC
+            ORDER BY ${schema.appNotification.id} ASC
             LIMIT 1
           )
         
@@ -302,7 +285,6 @@ export function setupNotificationsGet(app: OpenAPIHono) {
             ${schema.appNotification.recipientAddress} as "recipientAddress",
             ${schema.appNotification.parentId} as "parentId",
             ${schema.appNotification.entityId} as "entityId",
-            (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint as "us", -- epoch in microseconds
             (SELECT "count" FROM unseen_count) as "unseenCount",
             (SELECT id FROM newest_notification) as "newestNotificationId",
             (SELECT id FROM oldest_notification) as "oldestNotificationId"
@@ -313,7 +295,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         ) t
         JOIN ${schema.comment} c ON (c.id = t."entityId")
         JOIN ${schema.comment} p ON (p.id = t."parentId")
-        ORDER BY t."us" DESC, t."id" DESC
+        ORDER BY t."id" DESC
       `);
 
       const startCursor = rows[0];
@@ -323,7 +305,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         startCursor?.id !== startCursor?.newestNotificationId;
 
       const userAddresses = new Set<Hex>(
-        [...resolvedUsers].concat(
+        [resolvedUser].concat(
           rows.flatMap((row) => {
             return [
               row.comment.author,

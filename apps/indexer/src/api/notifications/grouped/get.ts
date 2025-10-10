@@ -4,12 +4,12 @@ import {
   asc,
   desc,
   eq,
+  gt,
   inArray,
   isNotNull,
   isNull,
-  or,
+  lt,
   sql,
-  type SQL,
 } from "drizzle-orm";
 import {
   NotificationTypeSchema,
@@ -65,9 +65,7 @@ export const AppNotificationsGroupedCursorInputSchema = z
       }
     },
     z.object({
-      us: z.coerce.bigint(),
-      notificationType: NotificationTypeSchema,
-      parentId: z.string().nonempty(),
+      id: z.coerce.bigint(),
     }),
   )
   .openapi({
@@ -76,9 +74,7 @@ export const AppNotificationsGroupedCursorInputSchema = z
 
 export const AppNotificationsGroupedCursorOutputSchema = z
   .object({
-    us: OpenAPIBigintStringSchema,
-    notificationType: NotificationTypeSchema,
-    parentId: z.string().nonempty(),
+    id: OpenAPIBigintStringSchema,
   })
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
 
@@ -238,203 +234,208 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
 
       try {
         const app = c.get("app");
-        const sharedConditions: (SQL | undefined)[] = [
-          eq(schema.appNotification.appId, app.id),
-        ];
-        const pageConditions: (SQL | undefined)[] = [];
-        const seenConditions: (SQL | undefined)[] = [];
-        const orderBy: SQL[] = [];
-        const resolvedUsers: Hex[] = await resolveUsersByAddressOrEnsName(
+        const [resolvedUser] = await resolveUsersByAddressOrEnsName(
           [user],
           ensByNameResolverService,
         );
 
-        if (resolvedUsers.length === 0) {
+        if (!resolvedUser) {
           return c.json({ message: "Invalid ENS name" }, 400);
         }
 
-        sharedConditions.push(
-          inArray(
-            sql`${schema.appNotification.recipientAddress}`,
-            resolvedUsers.map((user) => user.toLowerCase()),
-          ),
-        );
-
-        if (seen != null) {
-          if (seen) {
-            seenConditions.push(isNotNull(schema.appNotification.seenAt));
-          } else {
-            seenConditions.push(isNull(schema.appNotification.seenAt));
-          }
-        }
-
-        if (apps.length > 0) {
-          sharedConditions.push(
-            inArray(
-              sql`${schema.appNotification.appSigner}`,
-              apps.map((app) => app.toLowerCase()),
-            ),
-          );
-        }
-
-        if (types.length > 0) {
-          sharedConditions.push(
-            inArray(schema.appNotification.notificationType, types),
-          );
-        }
-
-        if (after) {
-          pageConditions.push(
-            or(
-              sql`created_at < to_timestamp(${after.us} / 1e6)::timestamptz`,
-              and(
-                sql`created_at = to_timestamp(${after.us} / 1e6)::timestamptz`,
-                or(
-                  sql`notification_type > ${after.notificationType}`,
-                  and(
-                    sql`notification_type = ${after.notificationType}`,
-                    sql`parent_id < ${after.parentId}`,
-                  ),
-                ),
-              ),
-            ),
-          );
-          orderBy.push(
-            desc(sql`created_at`),
-            asc(sql`notification_type`),
-            asc(sql`parent_id`),
-          );
-        } else if (before) {
-          pageConditions.push(
-            or(
-              sql`created_at > to_timestamp(${before.us} / 1e6)::timestamptz`,
-              and(
-                sql`created_at = to_timestamp(${before.us} / 1e6)::timestamptz`,
-                or(
-                  sql`notification_type < ${before.notificationType}`,
-                  and(
-                    sql`notification_type = ${before.notificationType}`,
-                    sql`parent_id > ${before.parentId}`,
-                  ),
-                ),
-              ),
-            ),
-          );
-          orderBy.push(
-            asc(sql`created_at`),
-            desc(sql`notification_type`),
-            desc(sql`parent_id`),
-          );
-        } else {
-          orderBy.push(
-            desc(sql`created_at`),
-            asc(sql`notification_type`),
-            asc(sql`parent_id`),
-          );
-        }
+        const lowercasedResolvedUser = resolvedUser.toLowerCase() as Hex;
+        const lowercasedApps = apps.map((app) => app.toLowerCase() as Hex);
 
         const { rows } = await db.execute<DBRow>(
           sql`
             WITH 
-              newest_group AS (
-                SELECT 
-                  notification_type, 
-                  parent_id, 
-                  (extract(epoch from created_at) * 1e6)::bigint::text as us -- epoch in microseconds
-                FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions, ...seenConditions)}
-                ORDER BY created_at DESC, notification_type ASC, parent_id ASC
-                LIMIT 1
-              ),
-              oldest_group AS (
-                SELECT 
-                  notification_type, 
-                  parent_id, 
-                  (extract(epoch from created_at) * 1e6)::bigint::text as us -- epoch in microseconds
-                FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions, ...seenConditions)}
-                ORDER BY created_at ASC, notification_type DESC, parent_id DESC
-                LIMIT 1
-              ),
               per_group_latest AS (
                 SELECT 
-                  DISTINCT ON (${schema.appNotification.notificationType}, ${schema.appNotification.parentId})
-                  ${schema.appNotification.notificationType},
-                  ${schema.appNotification.parentId},
-                  ${schema.appNotification.createdAt},
-                  ${schema.appNotification.id}
-                FROM ${schema.appNotification}
-                WHERE ${and(...sharedConditions, ...seenConditions)}
+                  DISTINCT ON (${schema.appRecipientNotificationGroups.notificationType}, ${schema.appRecipientNotificationGroups.parentId})
+                  ${schema.appRecipientNotificationGroups.notificationType},
+                  ${schema.appRecipientNotificationGroups.parentId},
+                  ${schema.appRecipientNotificationGroups.appNotificationId}
+                FROM ${schema.appRecipientNotificationGroups}
+                WHERE ${and(
+                  eq(schema.appRecipientNotificationGroups.appId, app.id),
+                  eq(
+                    schema.appRecipientNotificationGroups.recipientAddress,
+                    lowercasedResolvedUser,
+                  ),
+                  types.length > 0
+                    ? inArray(
+                        schema.appRecipientNotificationGroups.notificationType,
+                        types,
+                      )
+                    : undefined,
+                  apps.length > 0
+                    ? inArray(
+                        schema.appRecipientNotificationGroups.appSigner,
+                        lowercasedApps,
+                      )
+                    : undefined,
+                  seen === true
+                    ? eq(
+                        schema.appRecipientNotificationGroups.seenStatus,
+                        "seen",
+                      )
+                    : undefined,
+                  seen === false
+                    ? eq(
+                        schema.appRecipientNotificationGroups.seenStatus,
+                        "unseen",
+                      )
+                    : undefined,
+                  before
+                    ? gt(
+                        schema.appRecipientNotificationGroups.appNotificationId,
+                        before.id,
+                      )
+                    : undefined,
+                  after
+                    ? lt(
+                        schema.appRecipientNotificationGroups.appNotificationId,
+                        after.id,
+                      )
+                    : undefined,
+                )}
                 ORDER BY 
-                  ${schema.appNotification.notificationType} ASC, 
-                  ${schema.appNotification.parentId} ASC, 
-                  ${schema.appNotification.createdAt} DESC, 
-                  ${schema.appNotification.id} DESC
+                  ${before ? sql`${schema.appRecipientNotificationGroups.notificationType} ASC, ${schema.appRecipientNotificationGroups.parentId} ASC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC` : sql``}
+                  ${!before ? sql`${schema.appRecipientNotificationGroups.notificationType} DESC, ${schema.appRecipientNotificationGroups.parentId} DESC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC` : sql``}
               ),
+              previous_group AS (
+                SELECT ${schema.appRecipientNotificationGroups.appNotificationId}::text as "id" FROM ${schema.appRecipientNotificationGroups}
+                WHERE ${and(
+                  eq(schema.appRecipientNotificationGroups.appId, app.id),
+                  eq(
+                    schema.appRecipientNotificationGroups.recipientAddress,
+                    lowercasedResolvedUser,
+                  ),
+                  types.length > 0
+                    ? inArray(
+                        schema.appRecipientNotificationGroups.notificationType,
+                        types,
+                      )
+                    : undefined,
+                  apps.length > 0
+                    ? inArray(
+                        schema.appRecipientNotificationGroups.appSigner,
+                        lowercasedApps,
+                      )
+                    : undefined,
+                  seen === true
+                    ? eq(
+                        schema.appRecipientNotificationGroups.seenStatus,
+                        "seen",
+                      )
+                    : undefined,
+                  seen === false
+                    ? eq(
+                        schema.appRecipientNotificationGroups.seenStatus,
+                        "unseen",
+                      )
+                    : undefined,
+                )}
+                ORDER BY 
+                  ${before ? asc(schema.appRecipientNotificationGroups.appNotificationId) : desc(schema.appRecipientNotificationGroups.appNotificationId)}
+                LIMIT 1
+              ),
+              -- per_group_latest is already prefiltered by cursor so we want just to limit them and sort them by id
               page_groups AS (
                 SELECT * FROM per_group_latest pgl
-                WHERE ${pageConditions.length > 0 ? and(...pageConditions) : sql`true`}
-                ORDER BY ${orderBy.join(", ")}
-                LIMIT ${limit}
+                ORDER BY ${before ? sql`app_notification_id ASC` : sql`app_notification_id DESC`}
+                LIMIT ${limit + 1} -- +1 to if the are more notification (next page or previous, depends on used cursor)
               ),
               per_group_unseen_counts AS (
                 SELECT
-                  ${schema.appNotification.notificationType},
-                  ${schema.appNotification.parentId},
+                  an.notification_type,
+                  an.parent_id,
                   COUNT(*) as group_unseen_count
-                FROM ${schema.appNotification}
-                JOIN page_groups pg ON (
-                  pg.notification_type = ${schema.appNotification.notificationType} AND
-                  pg.parent_id = ${schema.appNotification.parentId}
+                FROM page_groups pg 
+                JOIN ${schema.appNotification} an ON (
+                  ${and(
+                    eq(sql`pg.notification_type`, sql`an.notification_type`),
+                    eq(sql`pg.parent_id`, sql`an.parent_id`),
+                    eq(sql`an.app_id`, app.id),
+                    eq(sql`an.recipient_address`, lowercasedResolvedUser),
+                    apps.length > 0
+                      ? inArray(sql`an.app_signer`, lowercasedApps)
+                      : undefined,
+                    sql`an.seen_at IS NULL`,
+                  )}
                 )
-                WHERE ${and(...sharedConditions, isNull(schema.appNotification.seenAt))}
-                GROUP BY ${schema.appNotification.notificationType}, ${schema.appNotification.parentId}
+                GROUP BY an.notification_type, an.parent_id
               ),
               total_unseen_groups_count AS (
                 SELECT COUNT(*) as total_unseen_count FROM (
                   SELECT
                     DISTINCT ON (notification_type, parent_id) notification_type, parent_id
-                  FROM ${schema.appNotification}
-                  WHERE ${and(...sharedConditions, isNull(schema.appNotification.seenAt))}
+                  FROM ${schema.appRecipientNotificationGroups}
+                  WHERE ${and(
+                    eq(schema.appRecipientNotificationGroups.appId, app.id),
+                    eq(
+                      schema.appRecipientNotificationGroups.recipientAddress,
+                      lowercasedResolvedUser,
+                    ),
+                    eq(
+                      schema.appRecipientNotificationGroups.seenStatus,
+                      "unseen",
+                    ),
+                    apps.length > 0
+                      ? inArray(
+                          schema.appRecipientNotificationGroups.appSigner,
+                          lowercasedApps,
+                        )
+                      : undefined,
+                  )}
                 )
               )
             
             SELECT 
-              g.notification_type,
-              g.parent_id,
-              (extract(epoch from g.created_at) * 1e6)::bigint::text as us, -- epoch in microseconds
-              pguc.group_unseen_count,
-              to_jsonb(t) AS "app_notification",
-              (SELECT total_unseen_count FROM total_unseen_groups_count) as total_unseen_count,
-              to_jsonb(ng) AS "newest_group",
-              to_jsonb(og) AS "oldest_group",
-              to_jsonb(p) AS "parent",
-              to_jsonb(c) AS "comment"
+              g.app_notification_id as "id",
+              g.notification_type as "notificationType",
+              g.parent_id as "parentId",
+              pguc.group_unseen_count as "groupUnseenCount",
+              to_jsonb(t) as "appNotification",
+              (SELECT total_unseen_count FROM total_unseen_groups_count) as "totalUnseenGroupsCount",
+              to_jsonb(pg) as "previousGroup",
+              to_jsonb(p) as "parent",
+              to_jsonb(c) as "comment"
             FROM page_groups g
             JOIN per_group_unseen_counts pguc ON (pguc.notification_type = g.notification_type AND pguc.parent_id = g.parent_id)
             JOIN ${schema.comment} p ON (p.id = g.parent_id)
-            JOIN LATERAL (SELECT * FROM newest_group) ng ON (true)
-            JOIN LATERAL (SELECT * FROM oldest_group) og ON (true)
+            JOIN LATERAL (SELECT * FROM previous_group) pg ON (true)
             JOIN LATERAL (
               SELECT
-                ${schema.appNotification}.*,
-                (extract(epoch from ${schema.appNotification.createdAt}) * 1e6)::bigint::text as us -- epoch in microseconds
+                ${schema.appNotification}.*
               FROM ${schema.appNotification}
               WHERE 
                 ${and(
-                  ...sharedConditions,
-                  ...seenConditions,
+                  eq(schema.appNotification.appId, app.id),
+                  eq(
+                    schema.appNotification.recipientAddress,
+                    lowercasedResolvedUser,
+                  ),
                   eq(
                     schema.appNotification.notificationType,
                     sql`g.notification_type`,
                   ),
                   eq(schema.appNotification.parentId, sql`g.parent_id`),
+                  apps.length > 0
+                    ? inArray(schema.appNotification.appSigner, lowercasedApps)
+                    : undefined,
+                  seen === true
+                    ? isNotNull(schema.appNotification.seenAt)
+                    : undefined,
+                  seen === false
+                    ? isNull(schema.appNotification.seenAt)
+                    : undefined,
                 )}
-              ORDER BY ${schema.appNotification.createdAt} DESC, ${schema.appNotification.id} DESC
+              ORDER BY ${schema.appNotification.id} DESC
               LIMIT ${GROUPED_NOTIFICATIONS_LIMIT + 1} -- +1 to if the are more notification (next page)
             ) t ON true
             JOIN ${schema.comment} c ON (c.id = t.entity_id)
-            ORDER BY g.created_at DESC, g.notification_type ASC, g.parent_id ASC
+            ORDER BY g.app_notification_id DESC
             `,
         );
 
@@ -442,11 +443,13 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
           await resolveGroupedNotificationsFromRows(rows);
 
         return c.json(
-          formatGroupedNotificationsToResponse(
+          formatGroupedNotificationsToResponse({
             groups,
             resolvedUsersEnsData,
             resolvedUsersFarcasterData,
-          ),
+            limit,
+            isBeforeCursorUsed: !!before,
+          }),
           200,
         );
       } catch (error) {
@@ -460,63 +463,37 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
   );
 }
 
+type GroupHead = {
+  id: string;
+};
+
 type DBRow = {
-  notification_type: NotificationTypeSchemaType;
-  parent_id: string;
-  /**
-   * Bigint created_at in microseconds since epoch as string
-   */
-  us: string;
+  id: string;
+  notificationType: NotificationTypeSchemaType;
+  parentId: string;
   /**
    * Bigint as string
    */
-  group_unseen_count: string;
+  groupUnseenCount: string;
   parent: JSONCommentSelectType;
   comment: JSONCommentSelectType;
-  app_notification: JSONAppNotificationSelectType & {
-    /**
-     * Bigint created_at in microseconds since epoch as string
-     */
-    us: string;
-  };
+  appNotification: JSONAppNotificationSelectType;
   /**
    * Bigint as string
    */
-  total_unseen_count: string;
-  newest_group: {
-    notification_type: NotificationTypeSchemaType;
-    parent_id: string;
-    us: string;
-  } | null;
-  oldest_group: {
-    notification_type: NotificationTypeSchemaType;
-    parent_id: string;
-    us: string;
-  } | null;
+  totalUnseenGroupsCount: string;
+  previousGroup: GroupHead | null;
 };
 
 type Group = {
-  /**
-   * Bigint created_at in microseconds since epoch as string
-   */
-  us: string;
+  id: string;
   notificationType: NotificationTypeSchemaType;
   parentId: string;
   parent: JSONCommentSelectType;
-  totalUnseenCount: string;
-  newestGroup: {
-    notification_type: NotificationTypeSchemaType;
-    parent_id: string;
-    us: string;
-  } | null;
-  oldestGroup: {
-    notification_type: NotificationTypeSchemaType;
-    parent_id: string;
-    us: string;
-  } | null;
+  totalUnseenGroupsCount: string;
+  previousGroup: GroupHead | null;
   notifications: {
     notifications: (JSONAppNotificationSelectType & {
-      us: string;
       comment: JSONCommentSelectType;
     })[];
     pageInfo: {
@@ -555,26 +532,25 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
   for (const row of rows) {
     userAddresses.add(row.parent.author);
     userAddresses.add(row.comment.author);
-    userAddresses.add(row.app_notification.recipient_address);
+    userAddresses.add(row.appNotification.recipient_address);
 
     if (
       !currentGroup ||
-      currentGroup.us !== row.us ||
-      currentGroup.notificationType !== row.notification_type ||
-      currentGroup.parentId !== row.parent_id
+      currentGroup.id !== row.id ||
+      currentGroup.notificationType !== row.notificationType ||
+      currentGroup.parentId !== row.parentId
     ) {
       if (currentGroup) {
         groups.push(currentGroup);
       }
 
       currentGroup = {
-        us: row.us,
-        notificationType: row.notification_type,
-        parentId: row.parent_id,
+        id: row.id,
+        notificationType: row.notificationType,
+        parentId: row.parentId,
         parent: row.parent,
-        newestGroup: row.newest_group,
-        oldestGroup: row.oldest_group,
-        totalUnseenCount: row.total_unseen_count,
+        previousGroup: row.previousGroup,
+        totalUnseenGroupsCount: row.totalUnseenGroupsCount,
         notifications: {
           notifications: [],
           pageInfo: {
@@ -584,15 +560,14 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
             endCursor: undefined,
           },
           extra: {
-            unseenCount: row.group_unseen_count,
+            unseenCount: row.groupUnseenCount,
           },
         },
       };
     }
 
     const cursor: z.input<typeof AppNotificationsCursorOutputSchema> = {
-      id: row.app_notification.id.toString(),
-      us: row.app_notification.us,
+      id: row.appNotification.id.toString(),
     };
 
     if (
@@ -600,7 +575,7 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
       GROUPED_NOTIFICATIONS_LIMIT
     ) {
       currentGroup.notifications.notifications.push({
-        ...row.app_notification,
+        ...row.appNotification,
         comment: row.comment,
       });
     } else {
@@ -636,11 +611,19 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
   };
 }
 
-function formatGroupedNotificationsToResponse(
-  groups: Group[],
-  resolvedUsersEnsData: ResolvedENSData[],
-  resolvedUsersFarcasterData: ResolvedFarcasterData[],
-) {
+function formatGroupedNotificationsToResponse({
+  groups,
+  resolvedUsersEnsData,
+  resolvedUsersFarcasterData,
+  limit,
+  isBeforeCursorUsed,
+}: {
+  groups: Group[];
+  resolvedUsersEnsData: ResolvedENSData[];
+  resolvedUsersFarcasterData: ResolvedFarcasterData[];
+  limit: number;
+  isBeforeCursorUsed: boolean;
+}) {
   const resolveUserDataAndFormatSingleCommentResponse =
     createUserDataAndFormatSingleCommentResponseResolver(
       0,
@@ -648,22 +631,27 @@ function formatGroupedNotificationsToResponse(
       resolvedUsersFarcasterData,
     );
 
+  let hasNextPage = false;
+  let hasPreviousPage = false;
+
+  if (isBeforeCursorUsed) {
+    hasNextPage = groups[0]?.id !== groups[0]?.previousGroup?.id;
+
+    if (groups.length > limit) {
+      groups.shift();
+      hasPreviousPage = true;
+    }
+  } else {
+    hasPreviousPage = groups[0]?.id !== groups[0]?.previousGroup?.id;
+
+    if (groups.length > limit) {
+      groups.pop();
+      hasNextPage = true;
+    }
+  }
+
   const firstGroup = groups[0];
   const lastGroup = groups[groups.length - 1];
-  const hasNextPage =
-    lastGroup && lastGroup.oldestGroup
-      ? BigInt(lastGroup.oldestGroup.us) !== BigInt(lastGroup.us) ||
-        lastGroup.oldestGroup.notification_type !==
-          lastGroup.notificationType ||
-        lastGroup.oldestGroup.parent_id !== lastGroup.parentId
-      : false;
-  const hasPreviousPage =
-    firstGroup && firstGroup.newestGroup
-      ? BigInt(firstGroup.newestGroup.us) !== BigInt(firstGroup.us) ||
-        firstGroup.newestGroup.notification_type !==
-          firstGroup.notificationType ||
-        firstGroup.newestGroup.parent_id !== firstGroup.parentId
-      : false;
 
   return formatResponseUsingZodSchema(
     AppNotificationsGroupedGetResponseSchema,
@@ -693,7 +681,6 @@ function formatGroupedNotificationsToResponse(
                   );
                 const cursor = {
                   id: notification.id.toString(),
-                  us: notification.us,
                 };
 
                 switch (notification.notification_type) {
@@ -789,11 +776,11 @@ function formatGroupedNotificationsToResponse(
       pageInfo: {
         hasPreviousPage,
         hasNextPage,
-        startCursor: groups[0],
-        endCursor: groups[groups.length - 1],
+        startCursor: firstGroup,
+        endCursor: lastGroup,
       },
       extra: {
-        unseenCount: groups[0]?.totalUnseenCount ?? "0",
+        unseenCount: groups[0]?.totalUnseenGroupsCount ?? "0",
       },
     },
   );

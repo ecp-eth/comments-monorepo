@@ -653,8 +653,8 @@ export const notificationOutbox = offchainSchema.table(
     appSigner: text().notNull().$type<Hex>(),
   },
   (table) => [
-    index("nt_by_created_at_unprocessed_idx")
-      .on(table.createdAt)
+    index("nt_by_id_unprocessed_idx")
+      .on(table.id)
       .where(sql`${table.processedAt} IS NULL`),
   ],
 );
@@ -670,7 +670,7 @@ export const appNotification = offchainSchema.table(
   "app_notification",
   {
     id: bigserial({ mode: "bigint" }).primaryKey(),
-    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
     notificationType: notificationTypeColumnType.notNull(),
     notificationId: bigint({ mode: "bigint" })
       .notNull()
@@ -716,81 +716,39 @@ export const appNotification = offchainSchema.table(
      * All indexes end with created_at and id because it is used for ordering and cursor pagination.
      */
     index("an_list_all_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?
-      desc(table.createdAt),
+      table.appId,
+      table.recipientAddress,
       desc(table.id),
     ),
     index("an_list_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        desc(table.createdAt),
-        desc(table.id),
-      )
+      .on(table.appId, table.recipientAddress, desc(table.id))
       .where(sql`${table.seenAt} IS NOT NULL`),
     index("an_list_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        desc(table.createdAt),
-        desc(table.id),
-      )
+      .on(table.appId, table.recipientAddress, desc(table.id))
       .where(sql`${table.seenAt} IS NULL`),
 
     index("an_grouped_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?
-      desc(table.createdAt),
-      asc(table.notificationType),
-      asc(table.parentId),
+      table.appId,
+      table.recipientAddress,
+      desc(table.notificationType),
+      desc(table.parentId),
       desc(table.id),
     ),
     index("an_grouped_seen_idx")
       .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        desc(table.createdAt),
-        asc(table.notificationType),
-        asc(table.parentId),
+        table.appId,
+        table.recipientAddress,
+        desc(table.notificationType),
+        desc(table.parentId),
         desc(table.id),
       )
       .where(sql`${table.seenAt} IS NOT NULL`),
     index("an_grouped_unseen_idx")
       .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        desc(table.createdAt),
-        asc(table.notificationType),
-        asc(table.parentId),
-        desc(table.id),
-      )
-      .where(sql`${table.seenAt} IS NULL`),
-    index("an_grouped_latest_idx").on(
-      table.appId, // = ?
-      table.recipientAddress, // = ?
-      asc(table.notificationType),
-      asc(table.parentId),
-      desc(table.createdAt),
-      desc(table.id),
-    ),
-    index("an_grouped_latest_seen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        asc(table.notificationType),
-        asc(table.parentId),
-        desc(table.createdAt),
-        desc(table.id),
-      )
-      .where(sql`${table.seenAt} IS NOT NULL`),
-    index("an_grouped_latest_unseen_idx")
-      .on(
-        table.appId, // = ?
-        table.recipientAddress, // = ?
-        asc(table.notificationType),
-        asc(table.parentId),
-        desc(table.createdAt),
+        table.appId,
+        table.recipientAddress,
+        desc(table.notificationType),
+        desc(table.parentId),
         desc(table.id),
       )
       .where(sql`${table.seenAt} IS NULL`),
@@ -811,4 +769,61 @@ export const appNotificationRelations = relations(
       references: [app.id],
     }),
   }),
+);
+
+/**
+ * This table is used to store the heads of the notification groups for each recipient and app.
+ *
+ * It supports groups by app signer
+ */
+export const appRecipientNotificationGroups = offchainSchema.table(
+  "app_recipient_notification_groups",
+  {
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    recipientAddress: text().notNull().$type<Hex>(),
+    seenStatus: text({ enum: ["seen", "unseen"] }).notNull(),
+    notificationType: notificationTypeColumnType.notNull(),
+    parentId: text().notNull(),
+    appSigner: text().notNull().$type<Hex>(),
+    appNotificationId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => appNotification.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => [
+    primaryKey({
+      columns: [
+        table.appId,
+        table.recipientAddress,
+        table.seenStatus,
+        table.notificationType,
+        table.parentId,
+        table.appSigner,
+      ],
+    }),
+
+    index("apng_all_idx").on(
+      table.appId,
+      table.recipientAddress,
+      desc(table.notificationType),
+      desc(table.parentId),
+      desc(table.appNotificationId),
+    ),
+
+    index("apng_seen_status_idx").on(
+      table.appId,
+      table.recipientAddress,
+      table.seenStatus,
+      desc(table.notificationType),
+      desc(table.parentId),
+      desc(table.appNotificationId),
+    ),
+  ],
 );
