@@ -1,28 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useRef } from "react";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useAccount, useConfig, useSwitchChain } from "wagmi";
+import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
-import {
-  useCommentEdition,
-  useCommentSubmission,
-  useConnectAccount,
-  useFreshRef,
-} from "@ecp.eth/shared/hooks";
+import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
   EmbedConfigProviderByTargetURIConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
-import { submitPostComment } from "./queries/submitPostComment";
-import { submitEditComment } from "./queries/submitEditComment";
+
 import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_COMMENT_LENGTH,
   MAX_UPLOAD_FILE_SIZE,
-  TX_RECEIPT_TIMEOUT,
 } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
@@ -50,8 +42,9 @@ import {
 import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { GaslessIndicator } from "./GaslessIndicator";
+import { usePostComment } from "./hooks/usePostComment";
+import { useEditComment } from "./hooks/useEditComment";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -117,7 +110,6 @@ function BaseCommentForm({
 }: BaseCommentFormProps) {
   const { address } = useAccount();
   const connectAccount = useConnectAccount();
-
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitRef = useFreshRef(onSubmit);
@@ -319,6 +311,7 @@ function BaseCommentForm({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  // to match the size of the submit button
                   className="w-8 h-8"
                   aria-label="Add media"
                   variant="outline"
@@ -379,82 +372,25 @@ export function CommentForm({
   queryKey,
   ...props
 }: CommentFormProps) {
-  const wagmiConfig = useConfig();
-  const commentSubmission = useCommentSubmission();
-  const { switchChainAsync } = useSwitchChain();
-  const embedConfig = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
-  const { targetUri, chainId } = embedConfig;
+  const { targetUri } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
-  const { writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
+  const submitCommentMutation = usePostComment();
 
-  const submitCommentMutation = useCallback<OnSubmitFunction>(
-    async ({ author, content, references }) => {
-      const pendingOperation = {
-        ...(await submitPostComment({
-          author: author,
-          postCommentRequest: {
-            chainId,
-            content,
-            ...(parentId ? { parentId } : { targetUri }),
-          },
-          switchChainAsync(chainId) {
-            return switchChainAsync({ chainId });
-          },
-          signTypedDataAsync,
-          writeContractAsync: writeContractAsync,
-          gasSponsorship: embedConfig.gasSponsorship,
-        })),
-        references,
-      };
-
-      try {
-        commentSubmission.start({
+  return (
+    <BaseCommentForm
+      {...props}
+      onSubmit={({ author, content, references }) =>
+        submitCommentMutation({
           queryKey,
-          pendingOperation,
-        });
-
-        onSubmitStartRef.current?.();
-
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
-          timeout: TX_RECEIPT_TIMEOUT,
-        });
-
-        if (receipt.status !== "success") {
-          throw new Error("Transaction reverted");
-        }
-
-        commentSubmission.success({
-          queryKey,
-          pendingOperation,
-        });
-      } catch (e) {
-        commentSubmission.error({
-          commentId: pendingOperation.response.data.id,
-          queryKey,
-          error: e instanceof Error ? e : new Error(String(e)),
-        });
-
-        throw e;
+          onSubmitStart: onSubmitStartRef.current,
+          author,
+          content,
+          references,
+          targetUriOrParentId: parentId ? { parentId } : { targetUri },
+        })
       }
-    },
-    [
-      chainId,
-      commentSubmission,
-      embedConfig,
-      onSubmitStartRef,
-      parentId,
-      queryKey,
-      signTypedDataAsync,
-      switchChainAsync,
-      targetUri,
-      wagmiConfig,
-      writeContractAsync,
-    ],
+    />
   );
-
-  return <BaseCommentForm {...props} onSubmit={submitCommentMutation} />;
 }
 
 function CommentFormAuthor({ address }: { address: Hex }) {
@@ -528,79 +464,8 @@ export function CommentEditForm({
   queryKey,
   ...props
 }: CommentEditFormProps) {
-  const wagmiConfig = useConfig();
-  const commentEdition = useCommentEdition();
-  const { switchChainAsync } = useSwitchChain();
-  const embedConfig = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
-  const { chainId } = embedConfig;
   const onSubmitStartRef = useFreshRef(onSubmitStart);
-
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
-
-  const submitCommentMutation = useCallback<OnSubmitFunction>(
-    async ({ author, content }) => {
-      const pendingOperation = await submitEditComment({
-        address: author,
-        comment,
-        editRequest: {
-          chainId,
-          content,
-        },
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        readContractAsync,
-        writeContractAsync,
-        signTypedDataAsync,
-        gasSponsorship: embedConfig.gasSponsorship,
-      });
-
-      try {
-        commentEdition.start({
-          queryKey,
-          pendingOperation,
-        });
-
-        onSubmitStartRef.current?.();
-
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
-          timeout: TX_RECEIPT_TIMEOUT,
-        });
-
-        if (receipt.status !== "success") {
-          throw new Error("Transaction reverted");
-        }
-
-        commentEdition.success({
-          queryKey,
-          pendingOperation,
-        });
-      } catch (e) {
-        commentEdition.error({
-          commentId: pendingOperation.response.data.commentId,
-          queryKey,
-          error: e instanceof Error ? e : new Error(String(e)),
-        });
-
-        throw e;
-      }
-    },
-    [
-      chainId,
-      comment,
-      commentEdition,
-      embedConfig,
-      onSubmitStartRef,
-      queryKey,
-      readContractAsync,
-      signTypedDataAsync,
-      switchChainAsync,
-      wagmiConfig,
-      writeContractAsync,
-    ],
-  );
+  const submitCommentMutation = useEditComment();
 
   return (
     <BaseCommentForm
@@ -609,7 +474,16 @@ export function CommentEditForm({
         content: comment.content,
         references: comment.references,
       }}
-      onSubmit={submitCommentMutation}
+      onSubmit={({ author, content, references }) =>
+        submitCommentMutation({
+          queryKey,
+          onSubmitStart: onSubmitStartRef.current,
+          author,
+          content,
+          references,
+          comment,
+        })
+      }
       submitIdleLabel="Update"
       submitPendingLabel="Updating..."
     />
