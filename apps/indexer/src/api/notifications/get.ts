@@ -190,7 +190,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         eq(schema.appNotification.appId, app.id),
         inArray(
           sql`${schema.appNotification.recipientAddress}`,
-          resolvedUsers.map((user) => sql`${user.toLowerCase()}`),
+          resolvedUsers.map((user) => user.toLowerCase()),
         ),
         parentId ? eq(schema.appNotification.parentId, parentId) : undefined,
         types.length > 0
@@ -199,7 +199,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         apps.length > 0
           ? inArray(
               sql`${schema.appNotification.appSigner}`,
-              apps.map((app) => sql`${app.toLowerCase()}`),
+              apps.map((app) => app.toLowerCase()),
             )
           : undefined,
       ];
