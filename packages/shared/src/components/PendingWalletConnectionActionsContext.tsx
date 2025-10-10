@@ -209,7 +209,12 @@ export const useConnectBeforeAction = () => {
     ) => {
       return async (...args: TParams) => {
         if (!connectedAddress) {
-          await connectAccount();
+          // we shouldn't await here, the promise might not resolve due to
+          // the containing component being unmounted, causing the action
+          // to be lost
+          // instead the action should be added immediately to queue to be
+          // executed whenever `useConsumePendingWalletConnectionActions` is consumed
+          void connectAccount();
         }
 
         const action = await getAction(...args);
