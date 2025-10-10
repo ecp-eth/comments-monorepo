@@ -222,7 +222,7 @@ export const EmbedConfigSchema = z.object({
       z.literal("gas-sponsored-auth-everytime"),
       z.literal("gas-sponsored-preauth"),
     ])
-    .default("gas-not-sponsored"),
+    .default("gas-sponsored-preauth"),
 });
 
 /**

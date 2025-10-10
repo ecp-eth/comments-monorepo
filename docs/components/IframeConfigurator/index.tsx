@@ -85,10 +85,6 @@ export default function IframeConfigurator() {
     control: form.control,
     name: "autoHeightAdjustment",
   });
-  const gasSponsorship = useWatch({
-    control: form.control,
-    name: "config.gasSponsorship",
-  });
 
   const [debouncedConfig] = useDebounce(config, 500);
   const getEmbedUri = React.useCallback(() => {
@@ -354,45 +350,54 @@ export default function IframeConfigurator() {
                 />
               )}
 
-              <FormItem>
-                <FormLabel>Gas Sponsorship</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={(value) => {
-                      if (
-                        value === "gas-not-sponsored" ||
-                        value === "gas-sponsored-auth-everytime" ||
-                        value === "gas-sponsored-preauth"
-                      ) {
-                        form.setValue("config.gasSponsorship", value);
-                        return;
-                      }
-                      // fallback to default
-                      form.setValue(
-                        "config.gasSponsorship",
-                        "gas-sponsored-auth-everytime",
-                      );
-                    }}
-                    value={gasSponsorship}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Please select" />
-                    </SelectTrigger>
-                    <SelectContent id="gas-sponsorship-mode-select">
-                      <SelectItem value="gas-not-sponsored">
-                        Users pay their own gas fees
-                      </SelectItem>
-                      <SelectItem value="gas-sponsored-auth-everytime">
-                        Gas sponsored, users sign each transaction
-                      </SelectItem>
-                      <SelectItem value="gas-sponsored-preauth" defaultChecked>
-                        Gas sponsored, users pre-approve all transactions
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <FormField
+                control={form.control}
+                name="config.gasSponsorship"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gas Sponsorship</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          if (
+                            value === "gas-not-sponsored" ||
+                            value === "gas-sponsored-auth-everytime" ||
+                            value === "gas-sponsored-preauth"
+                          ) {
+                            field.onChange(value);
+                            return;
+                          }
+                          // fallback to default
+                          field.onChange("gas-sponsored-auth-everytime");
+                        }}
+                        {...field}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={`Please select ${field.value}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent id="gas-sponsorship-mode-select">
+                          <SelectItem value="gas-not-sponsored">
+                            Users pay their own gas fees
+                          </SelectItem>
+                          <SelectItem value="gas-sponsored-auth-everytime">
+                            Gas sponsored, users sign each transaction
+                          </SelectItem>
+                          <SelectItem
+                            value="gas-sponsored-preauth"
+                            defaultChecked
+                          >
+                            Gas sponsored, users pre-approve all transactions
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

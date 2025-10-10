@@ -108,6 +108,7 @@ export function useRetryEditComment({
       readContractAsync,
       writeContractAsync,
       signTypedDataAsync,
+      embedConfig.gasSponsorship,
       switchChainAsync,
       commentRetryEdition,
       wagmiConfig,

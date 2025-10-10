@@ -126,6 +126,7 @@ export const useLikeComment = () => {
     [
       client,
       connectedAddress,
+      embedConfig.gasSponsorship,
       likeReactionSubmission,
       readContractAsync,
       signTypedDataAsync,
