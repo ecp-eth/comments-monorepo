@@ -38,6 +38,11 @@ import { resolveCommentReferences } from "../lib/resolve-comment-references.ts";
 import { CommentReferencesResolutionService } from "./comment-references-resolution-service.ts";
 import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
 import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-service.ts";
+import { NotificationService } from "./notification-service.ts";
+import { AppKeyAuthService } from "./app-key-auth-service.ts";
+import { createAppKeyMiddleware } from "../middleware/app-key.ts";
+import { NotificationOutboxService } from "./notifications/notification-outbox-service.ts";
+import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver.ts";
 
 export { db };
 
@@ -192,6 +197,7 @@ export const commentReferencesResolutionService =
   new CommentReferencesResolutionService({
     resolveCommentReferences: resolveCommentReferences,
     commentReferencesResolvers: {
+      caip373QuotedCommentResolver: caip373QuotedCommentResolverService,
       ensByAddressResolver: ensByAddressResolverService,
       ensByNameResolver: ensByNameResolverService,
       erc20ByAddressResolver: erc20ByAddressResolverService,
@@ -205,5 +211,22 @@ export const commentReferencesResolutionService =
   });
 
 export const appWebhookDeliveryManager = new AppWebhookDeliveryManager({
+  db,
+});
+
+export const appKeyAuthService = new AppKeyAuthService({
+  db,
+});
+
+export const appKeyMiddleware = createAppKeyMiddleware({
+  appKeyService: appKeyAuthService,
+});
+
+export const notificationService = new NotificationService({
+  db,
+  ensByNameResolver: ensByNameResolverService,
+});
+
+export const notificationOutboxService = new NotificationOutboxService({
   db,
 });

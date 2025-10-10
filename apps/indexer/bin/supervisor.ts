@@ -24,9 +24,14 @@ const PROCESSES = [
     args: ["start"],
   },
   {
-    name: "worker:fan-out",
+    name: "worker:event-fan-out",
     command: "pnpm",
-    args: ["run", "worker:fan-out", "--indexer-url", INDEXER_URL],
+    args: ["run", "worker:event-fan-out", "--indexer-url", INDEXER_URL],
+  },
+  {
+    name: "worker:notification-fan-out",
+    command: "pnpm",
+    args: ["run", "worker:notification-fan-out", "--indexer-url", INDEXER_URL],
   },
   {
     name: "worker:webhook-event-delivery",

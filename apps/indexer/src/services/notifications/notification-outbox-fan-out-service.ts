@@ -3,35 +3,35 @@ import Deferred from "promise-deferred";
 import { schema } from "../../../schema.ts";
 import type { DB } from "../db.ts";
 
-type EventOutboxFanOutService_FanOutEventsParams = {
+type NotificationOutboxFanOutService_FanOutNotificationsParams = {
   signal: AbortSignal;
 };
 
-type EventOutboxFanOutServiceOptions = {
+type NotificationOutboxFanOutServiceOptions = {
   db: DB;
   /**
-   * Polling interval in milliseconds for checking for new events.
-   * This works as fallback to LISTEN/NOTIFY if there are no new events.
+   * Polling interval in milliseconds for checking for new notifications.
+   * This works as fallback to LISTEN/NOTIFY if there are no new notifications.
    *
    * @default 30_000
    */
   pollInterval?: number;
 };
 
-export class EventOutboxFanOutService {
+export class NotificationOutboxFanOutService {
   private readonly db: DB;
   private readonly pollInterval: number;
   private shouldProcessBatch: boolean;
   private deferred: Deferred.Deferred<void> | undefined;
 
-  constructor(options: EventOutboxFanOutServiceOptions) {
+  constructor(options: NotificationOutboxFanOutServiceOptions) {
     this.db = options.db;
     this.pollInterval = options.pollInterval ?? 30_000;
     this.shouldProcessBatch = false;
   }
 
-  async fanOutEvents(
-    params: EventOutboxFanOutService_FanOutEventsParams,
+  async fanOutNotifications(
+    params: NotificationOutboxFanOutService_FanOutNotificationsParams,
   ): Promise<void> {
     const { signal } = params;
 
@@ -42,7 +42,7 @@ export class EventOutboxFanOutService {
     }
 
     const processBatchListener = () => {
-      // if there is a deferred, resolve it (we are already waiting for new events)
+      // if there is a deferred, resolve it (we are already waiting for new notifications)
       if (this.deferred) {
         this.deferred.resolve();
       } else {
@@ -53,7 +53,7 @@ export class EventOutboxFanOutService {
     };
 
     // start listening for new events using notifications
-    await notificationPgClient.query("LISTEN event_outbox_events");
+    await notificationPgClient.query("LISTEN notification_events");
     notificationPgClient.on("notification", processBatchListener);
 
     // fallback to polling if there were no notifications for {this.interval} seconds
@@ -70,64 +70,59 @@ export class EventOutboxFanOutService {
     };
 
     signal.addEventListener("abort", () => {
-      // if the loop is waiting for new events, resolve the deferred so the abort signal is picked up
+      // if the loop is waiting for new notifications, resolve the deferred so the abort signal is picked up
       this.deferred?.resolve();
     });
 
     try {
       while (!signal.aborted) {
         /**
-         * Select events from event outbox and mark them as locked for update. Then fan out the events to webhooks that are subscribed to the event.
+         * Select notifications from notification outbox and mark them as locked for update. Then fan out the notifications to app clients.
          */
         const { rows } = await this.db.transaction(async (tx) => {
           return tx.execute(sql`
           WITH
-            -- 1) Claim a batch of events to be fanned out
-            claimed_events AS (
-              SELECT * FROM ${schema.eventOutbox}
-              WHERE ${schema.eventOutbox.processedAt} IS NULL
-              ORDER BY ${schema.eventOutbox.id} ASC
+            -- 1) Claim a batch of notifications to be fanned out
+            claimed_notifications AS (
+              SELECT * FROM ${schema.notificationOutbox}
+              WHERE ${schema.notificationOutbox.processedAt} IS NULL
+              ORDER BY ${schema.notificationOutbox.id} ASC
               LIMIT 100
               FOR UPDATE SKIP LOCKED
             ),
 
-            -- 2) Insert the events for subscribers which are interested in the event
-            inserted_events AS (
-              INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id, app_id, owner_id, retry_number)
-              SELECT ${schema.appWebhook.id}, e.id, ${schema.appWebhook.appId}, ${schema.appWebhook.ownerId}, 0 as retry_number
-              FROM claimed_events e
-              JOIN ${schema.appWebhook} ON (
-                ${schema.appWebhook.paused} = FALSE
-                AND 
-                (
-                  ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
-                  OR ${schema.appWebhook.eventFilter} = '{}'
-                )
-                AND
-                (
-                  e.event_type != 'test'
-                  OR
-                  (
-                    ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
-                    AND
-                    ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
-                  )
-                )
-                AND
-                -- prevents from sending the events that the webhook has not been subscribed to previously
-                -- on reindex. For example if the webhook was updated to subscribe to more events than previously
-                -- then on reindex it would send the past events to the webhook. This guarantees that the webhook will pick only 
-                -- newer events.
-                e.id > GREATEST(${schema.appWebhook.eventOutboxPosition}, (${schema.appWebhook.eventActivations}->>(e.event_type))::bigint)
-              )
-              ON CONFLICT (app_webhook_id, event_id, retry_number) DO NOTHING
+            -- 2) Insert the notifications for all app clients
+            inserted_notifications AS (
+              INSERT INTO ${schema.appNotification} (notification_id, app_id, notification_type, parent_id, entity_id, app_signer, author_address, recipient_address, created_at)
+              SELECT 
+                c.id as notification_id,
+                ${schema.app.id} as app_id,
+                c.notification_type,
+                c.parent_id,
+                c.entity_id,
+                c.app_signer,
+                c.author_address,
+                c.recipient_address,
+                c.created_at
+              FROM claimed_notifications c
+              JOIN ${schema.app} ON (${schema.app.createdAt} <= c.created_at)
+              ON CONFLICT (notification_id, app_id) DO NOTHING
+              RETURNING *
+            ),
+
+            -- 3) Insert the heads of the notification groups
+            inserted_heads AS (
+              INSERT INTO ${schema.appRecipientNotificationGroups} (app_id, recipient_address, notification_type, parent_id, app_notification_id, seen_status, app_signer)
+              SELECT i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.id, 'unseen' as seen_status, i.app_signer
+              FROM inserted_notifications i
+              ON CONFLICT (app_id, recipient_address, seen_status, notification_type, parent_id, app_signer) DO UPDATE SET app_notification_id = EXCLUDED.app_notification_id
               RETURNING 1
             )
 
-          -- 3) Mark the events as processed
-          UPDATE ${schema.eventOutbox}
+          -- 4) Mark the events as processed
+          UPDATE ${schema.notificationOutbox}
           SET processed_at = NOW()
-          WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events)
+          WHERE ${schema.notificationOutbox.id} IN (SELECT id FROM claimed_notifications)
           RETURNING *;
         `);
         });

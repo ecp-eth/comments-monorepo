@@ -27,6 +27,7 @@ import { erc20ByTickerResolverService } from "../src/services/erc20-by-ticker-re
 import { farcasterByAddressResolverService } from "../src/services/farcaster-by-address-resolver.ts";
 import { farcasterByNameResolverService } from "../src/services/farcaster-by-name-resolver.ts";
 import { httpResolverService } from "../src/services/http-resolver.ts";
+import { caip373QuotedCommentResolverService } from "../src/services/caip373-quoted-comment-resolver.ts";
 import { parseWorkerCommandOptions, workerCommand } from "./shared.ts";
 import { EventOutboxService } from "../src/services/events/event-outbox-service.ts";
 import { createCommentReferencesUpdatedEvent } from "../src/events/comment/index.ts";
@@ -89,6 +90,7 @@ const commentReferencesResolutionService =
     commentReferencesCacheService,
     resolveCommentReferences,
     commentReferencesResolvers: {
+      caip373QuotedCommentResolver: caip373QuotedCommentResolverService,
       ensByAddressResolver: ensByAddressResolverService,
       ensByNameResolver: ensByNameResolverService,
       erc20ByAddressResolver: erc20ByAddressResolverService,

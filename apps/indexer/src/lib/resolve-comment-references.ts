@@ -4,6 +4,7 @@ import {
   type IndexerAPICommentReferenceERC20SchemaType,
   type IndexerAPICommentReferenceFarcasterSchemaType,
   type IndexerAPICommentReferenceSchemaType,
+  type IndexerAPICommentReferenceQuotedCommentSchemaType,
   IndexerAPICommentReferenceENSSchema,
   IndexerAPICommentReferenceFarcasterSchema,
   IndexerAPICommentReferenceERC20Schema,
@@ -11,6 +12,7 @@ import {
   IndexerAPICommentReferenceURLImageSchema,
   IndexerAPICommentReferenceURLVideoSchema,
   IndexerAPICommentReferenceURLWebPageSchema,
+  IndexerAPICommentReferenceQuotedCommentSchema,
 } from "@ecp.eth/sdk/indexer";
 import type { CommentSelectType } from "../../ponder.schema.ts";
 import type { Hex } from "viem";
@@ -25,6 +27,7 @@ import {
   type FarcasterByNameResolver,
   type FarcasterName,
   HTTP_URL_REGEX,
+  type CAIP373QuotedCommentResolver,
 } from "../resolvers/index.ts";
 import {
   IPFS_URL_REGEX,
@@ -32,6 +35,7 @@ import {
 } from "../resolvers/ipfs-resolver.ts";
 
 export type ResolveCommentReferencesOptions = {
+  caip373QuotedCommentResolver: CAIP373QuotedCommentResolver;
   ensByAddressResolver: ENSByAddressResolver;
   ensByNameResolver: ENSByNameResolver;
   farcasterByAddressResolver: FarcasterByAddressResolver;
@@ -166,6 +170,34 @@ export async function resolveCommentReferences(
       continue;
     }
 
+    match = restOfContent.match(CAIP_373_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      const commentManagerAddress = match[2] as Hex;
+      const chainId = Number(match[1]);
+      const functionCallData = match[3] as Hex;
+
+      promises.push(
+        resolveCaip373(
+          {
+            functionCallData,
+            commentManagerAddress,
+            chainId,
+          },
+          position,
+          {
+            caip373QuotedCommentResolver: options.caip373QuotedCommentResolver,
+          },
+        ),
+      );
+
+      allResolvedPositions.push(position);
+      pos += match[0].length;
+
+      continue;
+    }
+
     match = restOfContent.match(IPFS_URL_REGEX);
 
     if (match) {
@@ -236,11 +268,11 @@ export type ResolveCommentReferencePosition = {
 /**
  * Can be any entity on a chain so make sure you resolve it properly
  */
-const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/u;
+const ETH_ADDRESS_REGEX = /^@?0x[a-fA-F0-9]{40}/;
 /**
  * This one is an address that should probably point only to erc20 token
  */
-const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/u;
+const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/;
 /**
  * Handles ens name or ens name mention
  */
@@ -252,12 +284,21 @@ const FARCASTER_FNAME_REGEX = /^@?[a-zA-Z0-9.-]+\.fcast\.id/iu;
 /**
  * Handles erc20 symbol
  */
-const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/u;
+const ERC20_TOKEN_TICKER_REGEX = /^\$[a-zA-Z0-9.-]+/;
 /**
  * Handles erc20 caip19 url
  */
 const ERC_20_CAIP_19_REGEX =
-  /^(?:\$|@)?eip155:([0-9]+)\/erc20:(0x[a-fA-F0-9]{40})/u;
+  /^(?:\$|@)?eip155:([0-9]+)\/erc20:(0x[a-fA-F0-9]{40})/;
+
+/**
+ * Handles caip373 quoted comment
+ *
+ * See https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-373.md
+ * and https://github.com/ecp-eth/ECPIP/discussions/2
+ */
+const CAIP_373_REGEX =
+  /^(?:@)?eip155:([0-9]+):(0x[a-fA-F0-9]{40}):call:(0x[a-fA-F0-9]+)(:[0-9]+)?/;
 
 async function resolveEthAddress(
   address: Hex,
@@ -450,6 +491,44 @@ async function resolveIPFS(
         ...result,
         position,
       } satisfies ResolveURLResultType).data ?? null
+    );
+  }
+
+  return null;
+}
+
+async function resolveCaip373(
+  {
+    functionCallData,
+    commentManagerAddress,
+    chainId,
+  }: {
+    functionCallData: Hex;
+    commentManagerAddress: Hex;
+    chainId: number;
+  },
+  position: ResolveCommentReferencePosition,
+  {
+    caip373QuotedCommentResolver,
+  }: {
+    caip373QuotedCommentResolver: CAIP373QuotedCommentResolver;
+  },
+): Promise<IndexerAPICommentReferenceQuotedCommentSchemaType | null> {
+  const result = await caip373QuotedCommentResolver.load({
+    functionCallData,
+    commentManagerAddress,
+    chainId,
+  });
+
+  if (result) {
+    return (
+      IndexerAPICommentReferenceQuotedCommentSchema.safeParse({
+        type: "quoted_comment",
+        id: result.commentId,
+        chainId,
+        position,
+      } satisfies IndexerAPICommentReferenceQuotedCommentSchemaType).data ??
+      null
     );
   }
 
