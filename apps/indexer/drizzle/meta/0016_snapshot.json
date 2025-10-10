@@ -1,5 +1,5 @@
 {
-  "id": "42468766-cbf0-475a-8ceb-ff400d061296",
+  "id": "60ef34bf-0a45-4438-8a59-c245ae7ddd2e",
   "prevId": "c3488c6d-a113-4a11-a130-35a46cd4beeb",
   "version": "7",
   "dialect": "postgresql",
@@ -184,8 +184,7 @@
           "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         },
         "notification_type": {
           "name": "notification_type",
@@ -259,12 +258,6 @@
               "nulls": "last"
             },
             {
-              "expression": "\"created_at\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
               "expression": "\"id\" desc",
               "asc": true,
               "isExpression": true,
@@ -289,12 +282,6 @@
               "expression": "recipient_address",
               "isExpression": false,
               "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"created_at\" desc",
-              "asc": true,
-              "isExpression": true,
               "nulls": "last"
             },
             {
@@ -326,12 +313,6 @@
               "nulls": "last"
             },
             {
-              "expression": "\"created_at\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
               "expression": "\"id\" desc",
               "asc": true,
               "isExpression": true,
@@ -360,19 +341,13 @@
               "nulls": "last"
             },
             {
-              "expression": "\"created_at\" desc",
+              "expression": "\"notification_type\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
             },
             {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
+              "expression": "\"parent_id\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -405,19 +380,13 @@
               "nulls": "last"
             },
             {
-              "expression": "\"created_at\" desc",
+              "expression": "\"notification_type\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
             },
             {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
+              "expression": "\"parent_id\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -451,156 +420,13 @@
               "nulls": "last"
             },
             {
-              "expression": "\"created_at\" desc",
+              "expression": "\"notification_type\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
             },
             {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"id\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "where": "\"ecp_indexer_schema\".\"app_notification\".\"seen_at\" IS NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "an_grouped_latest_idx": {
-          "name": "an_grouped_latest_idx",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "recipient_address",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"created_at\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"id\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "an_grouped_latest_seen_idx": {
-          "name": "an_grouped_latest_seen_idx",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "recipient_address",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"created_at\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"id\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "where": "\"ecp_indexer_schema\".\"app_notification\".\"seen_at\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "an_grouped_latest_unseen_idx": {
-          "name": "an_grouped_latest_unseen_idx",
-          "columns": [
-            {
-              "expression": "app_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "recipient_address",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"notification_type\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" asc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"created_at\" desc",
+              "expression": "\"parent_id\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -660,6 +486,187 @@
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "ecp_indexer_schema.app_recipient_notification_groups": {
+      "name": "app_recipient_notification_groups",
+      "schema": "ecp_indexer_schema",
+      "columns": {
+        "app_id": {
+          "name": "app_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recipient_address": {
+          "name": "recipient_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seen_status": {
+          "name": "seen_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notification_type": {
+          "name": "notification_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_signer": {
+          "name": "app_signer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "app_notification_id": {
+          "name": "app_notification_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "apng_all_idx": {
+          "name": "apng_all_idx",
+          "columns": [
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "recipient_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"notification_type\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"parent_id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"app_notification_id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "apng_seen_status_idx": {
+          "name": "apng_seen_status_idx",
+          "columns": [
+            {
+              "expression": "app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "recipient_address",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "seen_status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"notification_type\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"parent_id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"app_notification_id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "app_recipient_notification_groups_app_id_app_id_fk": {
+          "name": "app_recipient_notification_groups_app_id_app_id_fk",
+          "tableFrom": "app_recipient_notification_groups",
+          "tableTo": "app",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsFrom": [
+            "app_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "app_recipient_notification_groups_app_notification_id_app_notification_id_fk": {
+          "name": "app_recipient_notification_groups_app_notification_id_app_notification_id_fk",
+          "tableFrom": "app_recipient_notification_groups",
+          "tableTo": "app_notification",
+          "schemaTo": "ecp_indexer_schema",
+          "columnsFrom": [
+            "app_notification_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "app_recipient_notification_groups_app_id_recipient_address_seen_status_notification_type_parent_id_app_signer_pk": {
+          "name": "app_recipient_notification_groups_app_id_recipient_address_seen_status_notification_type_parent_id_app_signer_pk",
+          "columns": [
+            "app_id",
+            "recipient_address",
+            "seen_status",
+            "notification_type",
+            "parent_id",
+            "app_signer"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -2177,11 +2184,11 @@
         }
       },
       "indexes": {
-        "nt_by_created_at_unprocessed_idx": {
-          "name": "nt_by_created_at_unprocessed_idx",
+        "nt_by_id_unprocessed_idx": {
+          "name": "nt_by_id_unprocessed_idx",
           "columns": [
             {
-              "expression": "created_at",
+              "expression": "id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
