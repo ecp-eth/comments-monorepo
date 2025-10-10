@@ -73,6 +73,7 @@ export async function POST(
       metadata,
       author,
       app: app.address,
+      channelId,
       ...("parentId" in passedCommentData
         ? {
             parentId: passedCommentData.parentId,
@@ -81,7 +82,6 @@ export async function POST(
             targetUri: passedCommentData.targetUri,
           }),
       commentType,
-      ...(channelId !== undefined ? { channelId } : {}),
     });
 
     const typedCommentData = createCommentTypedData({
