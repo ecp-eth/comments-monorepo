@@ -205,6 +205,7 @@ export function EditorComposer({
           },
           txHash,
           type: "non-gasless",
+          references,
         };
 
         commentEdition.start({

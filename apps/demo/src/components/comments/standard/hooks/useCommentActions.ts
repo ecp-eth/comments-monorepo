@@ -274,24 +274,27 @@ export function useCommentActions({
     async (params) => {
       const { comment, edit, address } = params;
 
-      const pendingOperation = await submitEditCommentMutationFunction({
-        address,
-        editRequest: edit,
-        comment,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        async writeContractAsync({
-          signEditCommentResponse: { signature: appSignature, data },
-        }) {
-          const { txHash } = await editCommentMutation({
-            appSignature,
-            edit: data,
-          });
+      const pendingOperation = {
+        ...(await submitEditCommentMutationFunction({
+          address,
+          editRequest: edit,
+          comment,
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          async writeContractAsync({
+            signEditCommentResponse: { signature: appSignature, data },
+          }) {
+            const { txHash } = await editCommentMutation({
+              appSignature,
+              edit: data,
+            });
 
-          return txHash;
-        },
-      });
+            return txHash;
+          },
+        })),
+        references: edit.references,
+      };
 
       commentEdition.start({
         ...params,
@@ -343,24 +346,27 @@ export function useCommentActions({
         throw new Error("Only edit comments can be retried");
       }
 
-      const pendingOperation = await submitEditCommentMutationFunction({
-        address: connectedAddress,
-        editRequest: comment.pendingOperation.response.data,
-        comment,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        async writeContractAsync({
-          signEditCommentResponse: { signature: appSignature, data },
-        }) {
-          const { txHash } = await editCommentMutation({
-            appSignature,
-            edit: data,
-          });
+      const pendingOperation = {
+        ...(await submitEditCommentMutationFunction({
+          address: connectedAddress,
+          editRequest: comment.pendingOperation.response.data,
+          comment,
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          async writeContractAsync({
+            signEditCommentResponse: { signature: appSignature, data },
+          }) {
+            const { txHash } = await editCommentMutation({
+              appSignature,
+              edit: data,
+            });
 
-          return txHash;
-        },
-      });
+            return txHash;
+          },
+        })),
+        references: comment.references,
+      };
       try {
         commentRetryEdition.start({
           ...params,

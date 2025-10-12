@@ -434,11 +434,11 @@ export function CommentEditForm<TExtraEditData = unknown>({
   const onSubmitStartRef = useFreshRef(onSubmitStart);
 
   const handleSubmit = useCallback<OnSubmitFunction>(
-    async ({ author, content }) => {
+    async ({ author, content, references }) => {
       const result = await editComment({
         address: author,
         comment,
-        edit: { content, metadata: comment.metadata },
+        edit: { content, metadata: comment.metadata, references },
         queryKey,
         extra,
         onStart: () => {
