@@ -111,6 +111,7 @@ export const PendingEditCommentOperationSchema = z.object({
       error: z.instanceof(Error),
     }),
   ]),
+  references: IndexerAPICommentReferencesSchema,
 });
 
 export type PendingEditCommentOperationSchemaType = z.infer<

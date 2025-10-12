@@ -56,21 +56,24 @@ export function useRetryEditComment({
         throw new Error("Only edit comments can be retried");
       }
 
-      const pendingOperation = await submitEditComment({
-        address: connectedAddress,
-        comment,
-        editRequest: {
-          ...comment.pendingOperation.response.data,
-          chainId: comment.pendingOperation.chainId,
-        },
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        readContractAsync,
-        writeContractAsync,
-        signTypedDataAsync,
-        gasSponsorship: embedConfig.gasSponsorship,
-      });
+      const pendingOperation = {
+        ...(await submitEditComment({
+          address: connectedAddress,
+          comment,
+          editRequest: {
+            ...comment.pendingOperation.response.data,
+            chainId: comment.pendingOperation.chainId,
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
+          readContractAsync,
+          writeContractAsync,
+          signTypedDataAsync,
+          gasSponsorship: embedConfig.gasSponsorship,
+        })),
+        references: comment.references,
+      };
 
       try {
         commentRetryEdition.start({
