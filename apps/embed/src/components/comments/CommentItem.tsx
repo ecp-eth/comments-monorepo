@@ -225,7 +225,6 @@ export function CommentItem({ comment }: CommentItemProps) {
           key={reply.id}
           comment={reply}
           queryKey={replyItemsQueryKey}
-          parentCommentId={comment.id}
         />
       ))}
       {repliesQuery.hasNextPage && (

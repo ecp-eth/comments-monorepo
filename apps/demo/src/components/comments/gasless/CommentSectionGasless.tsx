@@ -327,7 +327,7 @@ export function CommentSectionGasless({
                 </Button>
               </div>
             )}
-          <CommentForm />
+          <CommentForm queryKey={queryKey} />
           {isPending && <LoadingScreen />}
           {error && (
             <div>Error loading comments: {(error as Error).message}</div>
