@@ -142,12 +142,8 @@ export class EventOutboxFanOutService {
           this.shouldProcessBatch = false;
         }
       }
-
+    } finally {
       cleanup();
-    } catch (error) {
-      cleanup();
-
-      throw error;
     }
   }
 
