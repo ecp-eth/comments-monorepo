@@ -16,6 +16,7 @@ CREATE TABLE "ecp_indexer_schema"."app_notification" (
 CREATE TABLE "ecp_indexer_schema"."app_recipient_notification_groups" (
 	"app_id" uuid NOT NULL,
 	"recipient_address" text NOT NULL,
+	"updated_at" timestamp with time zone NOT NULL,
 	"seen_status" text NOT NULL,
 	"notification_type" text NOT NULL,
 	"parent_id" text NOT NULL,
@@ -48,10 +49,11 @@ CREATE INDEX "an_list_unseen_idx" ON "ecp_indexer_schema"."app_notification" USI
 CREATE INDEX "an_grouped_idx" ON "ecp_indexer_schema"."app_notification" USING btree ("app_id","recipient_address","notification_type" desc,"parent_id" desc,"id" desc);--> statement-breakpoint
 CREATE INDEX "an_grouped_seen_idx" ON "ecp_indexer_schema"."app_notification" USING btree ("app_id","recipient_address","notification_type" desc,"parent_id" desc,"id" desc) WHERE "ecp_indexer_schema"."app_notification"."seen_at" IS NOT NULL;--> statement-breakpoint
 CREATE INDEX "an_grouped_unseen_idx" ON "ecp_indexer_schema"."app_notification" USING btree ("app_id","recipient_address","notification_type" desc,"parent_id" desc,"id" desc) WHERE "ecp_indexer_schema"."app_notification"."seen_at" IS NULL;--> statement-breakpoint
-CREATE INDEX "apng_all_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","notification_type" desc,"parent_id" desc,"app_notification_id" desc);--> statement-breakpoint
-CREATE INDEX "apng_seen_status_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","seen_status","notification_type" desc,"parent_id" desc,"app_notification_id" desc);--> statement-breakpoint
+CREATE INDEX "apng_all_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","updated_at" desc,"app_notification_id" desc) INCLUDE ("app_id","recipient_address","seen_status","notification_type","parent_id","app_signer");--> statement-breakpoint
+CREATE INDEX "apng_heads_latest_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","notification_type","parent_id","updated_at" desc,"app_notification_id" desc);--> statement-breakpoint
 CREATE INDEX "nt_by_id_unprocessed_idx" ON "ecp_indexer_schema"."notification_outbox" USING btree ("id") WHERE "ecp_indexer_schema"."notification_outbox"."processed_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "app_by_id_created_at_idx" ON "ecp_indexer_schema"."app" USING btree ("id","created_at");
+
 
 CREATE OR REPLACE FUNCTION ecp_indexer_schema.notify_new_notifications_in_outbox() RETURNS trigger
 LANGUAGE plpgsql AS $$

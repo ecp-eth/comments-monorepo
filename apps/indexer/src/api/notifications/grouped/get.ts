@@ -4,11 +4,9 @@ import {
   asc,
   desc,
   eq,
-  gt,
   inArray,
   isNotNull,
   isNull,
-  lt,
   sql,
 } from "drizzle-orm";
 import {
@@ -65,6 +63,10 @@ export const AppNotificationsGroupedCursorInputSchema = z
       }
     },
     z.object({
+      /**
+       * Updated at timestamp in microseconds unix timestamp
+       */
+      us: z.coerce.bigint(),
       id: z.coerce.bigint(),
     }),
   )
@@ -74,6 +76,10 @@ export const AppNotificationsGroupedCursorInputSchema = z
 
 export const AppNotificationsGroupedCursorOutputSchema = z
   .object({
+    /**
+     * Updated at timestamp in microseconds unix timestamp
+     */
+    us: OpenAPIBigintStringSchema,
     id: OpenAPIBigintStringSchema,
   })
   .transform((val) => Buffer.from(JSON.stringify(val)).toString("base64url"));
@@ -248,13 +254,15 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
 
         const { rows } = await db.execute<DBRow>(
           sql`
-            WITH 
-              per_group_latest AS (
+            WITH
+              notification_groups AS (
                 SELECT 
-                  DISTINCT ON (${schema.appRecipientNotificationGroups.notificationType}, ${schema.appRecipientNotificationGroups.parentId})
+                  ${schema.appRecipientNotificationGroups.appId},
+                  ${schema.appRecipientNotificationGroups.recipientAddress},
+                  ${schema.appRecipientNotificationGroups.updatedAt},
                   ${schema.appRecipientNotificationGroups.notificationType},
                   ${schema.appRecipientNotificationGroups.parentId},
-                  ${schema.appRecipientNotificationGroups.appNotificationId}
+                  ${schema.appRecipientNotificationGroups.appNotificationId} as "id"
                 FROM ${schema.appRecipientNotificationGroups}
                 WHERE ${and(
                   eq(schema.appRecipientNotificationGroups.appId, app.id),
@@ -287,24 +295,69 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                       )
                     : undefined,
                   before
-                    ? gt(
-                        schema.appRecipientNotificationGroups.appNotificationId,
-                        before.id,
-                      )
+                    ? sql`
+                        (${schema.appRecipientNotificationGroups.updatedAt}, ${schema.appRecipientNotificationGroups.appNotificationId}) > (to_timestamp(${before.us} / 1e6)::timestamptz, ${before.id})
+                      `
                     : undefined,
                   after
-                    ? lt(
-                        schema.appRecipientNotificationGroups.appNotificationId,
-                        after.id,
-                      )
+                    ? sql`
+                        (${schema.appRecipientNotificationGroups.updatedAt}, ${schema.appRecipientNotificationGroups.appNotificationId}) < (to_timestamp(${after.us} / 1e6)::timestamptz, ${after.id})
+                      `
                     : undefined,
+                  sql`
+                      -- keep only the latest row per group
+                      NOT EXISTS (
+                        SELECT 1 FROM ${schema.appRecipientNotificationGroups} g
+                        WHERE
+                          ${and(
+                            eq(
+                              sql`g.app_id`,
+                              schema.appRecipientNotificationGroups.appId,
+                            ),
+                            eq(
+                              sql`g.recipient_address`,
+                              schema.appRecipientNotificationGroups
+                                .recipientAddress,
+                            ),
+                            eq(
+                              sql`g.notification_type`,
+                              schema.appRecipientNotificationGroups
+                                .notificationType,
+                            ),
+                            eq(
+                              sql`g.parent_id`,
+                              schema.appRecipientNotificationGroups.parentId,
+                            ),
+                            seen === true
+                              ? eq(sql`g.seen_status`, "seen")
+                              : undefined,
+                            seen === false
+                              ? eq(sql`g.seen_status`, "unseen")
+                              : undefined,
+                            sql`
+                              (g.updated_at, g.app_notification_id) > (${schema.appRecipientNotificationGroups.updatedAt}, ${schema.appRecipientNotificationGroups.appNotificationId})
+                            `,
+                          )}
+                      )
+                  `,
                 )}
                 ORDER BY 
-                  ${before ? sql`${schema.appRecipientNotificationGroups.notificationType} ASC, ${schema.appRecipientNotificationGroups.parentId} ASC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC` : sql``}
-                  ${!before ? sql`${schema.appRecipientNotificationGroups.notificationType} DESC, ${schema.appRecipientNotificationGroups.parentId} DESC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC` : sql``}
+                  ${
+                    before
+                      ? sql`${schema.appRecipientNotificationGroups.updatedAt} ASC, ${schema.appRecipientNotificationGroups.appNotificationId} ASC`
+                      : sql`${schema.appRecipientNotificationGroups.updatedAt} DESC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC`
+                  }
+                -- +1 to get the next page or previous page depending on the used cursor  
+                LIMIT ${limit + 1}
               ),
               previous_group AS (
-                SELECT ${schema.appRecipientNotificationGroups.appNotificationId}::text as "id" FROM ${schema.appRecipientNotificationGroups}
+                SELECT
+                  -- convert updated_at to microseconds unix timestamp so we don't lose precision when using it as cursor
+                  (extract(epoch from ${schema.appRecipientNotificationGroups.updatedAt}) * 1e6)::bigint::text as "us",
+                  ${schema.appRecipientNotificationGroups.notificationType},
+                  ${schema.appRecipientNotificationGroups.parentId},
+                  ${schema.appRecipientNotificationGroups.appNotificationId}::text as "id"
+                FROM ${schema.appRecipientNotificationGroups}
                 WHERE ${and(
                   eq(schema.appRecipientNotificationGroups.appId, app.id),
                   eq(
@@ -337,27 +390,25 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                     : undefined,
                 )}
                 ORDER BY 
-                  ${before ? asc(schema.appRecipientNotificationGroups.appNotificationId) : desc(schema.appRecipientNotificationGroups.appNotificationId)}
+                  ${
+                    before
+                      ? sql`${schema.appRecipientNotificationGroups.updatedAt} ASC, ${schema.appRecipientNotificationGroups.appNotificationId} ASC`
+                      : sql`${schema.appRecipientNotificationGroups.updatedAt} DESC, ${schema.appRecipientNotificationGroups.appNotificationId} DESC`
+                  }
                 LIMIT 1
-              ),
-              -- per_group_latest is already prefiltered by cursor so we want just to limit them and sort them by id
-              page_groups AS (
-                SELECT * FROM per_group_latest pgl
-                ORDER BY ${before ? sql`app_notification_id ASC` : sql`app_notification_id DESC`}
-                LIMIT ${limit + 1} -- +1 to if the are more notification (next page or previous, depends on used cursor)
               ),
               per_group_unseen_counts AS (
                 SELECT
                   an.notification_type,
                   an.parent_id,
                   COUNT(*) as group_unseen_count
-                FROM page_groups pg 
+                FROM notification_groups ng 
                 JOIN ${schema.appNotification} an ON (
                   ${and(
-                    eq(sql`pg.notification_type`, sql`an.notification_type`),
-                    eq(sql`pg.parent_id`, sql`an.parent_id`),
-                    eq(sql`an.app_id`, app.id),
-                    eq(sql`an.recipient_address`, lowercasedResolvedUser),
+                    sql`ng.app_id = an.app_id`,
+                    sql`ng.recipient_address = an.recipient_address`,
+                    sql`ng.notification_type = an.notification_type`,
+                    sql`ng.parent_id = an.parent_id`,
                     apps.length > 0
                       ? inArray(sql`an.app_signer`, lowercasedApps)
                       : undefined,
@@ -392,18 +443,20 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               )
             
             SELECT 
-              g.app_notification_id as "id",
-              g.notification_type as "notificationType",
-              g.parent_id as "parentId",
+              ng.id,
+              -- convert updated_at to microseconds unix timestamp so we don't lose precision when using it as cursor
+              (extract(epoch from ng.updated_at) * 1e6)::bigint::text as "us",
+              ng.notification_type as "notificationType",
+              ng.parent_id as "parentId",
               pguc.group_unseen_count as "groupUnseenCount",
               to_jsonb(t) as "appNotification",
               (SELECT total_unseen_count FROM total_unseen_groups_count) as "totalUnseenGroupsCount",
               to_jsonb(pg) as "previousGroup",
               to_jsonb(p) as "parent",
               to_jsonb(c) as "comment"
-            FROM page_groups g
-            JOIN per_group_unseen_counts pguc ON (pguc.notification_type = g.notification_type AND pguc.parent_id = g.parent_id)
-            JOIN ${schema.comment} p ON (p.id = g.parent_id)
+            FROM notification_groups ng
+            JOIN per_group_unseen_counts pguc ON (pguc.notification_type = ng.notification_type AND pguc.parent_id = ng.parent_id)
+            JOIN ${schema.comment} p ON (p.id = ng.parent_id)
             JOIN LATERAL (SELECT * FROM previous_group) pg ON (true)
             JOIN LATERAL (
               SELECT
@@ -418,9 +471,9 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
                   ),
                   eq(
                     schema.appNotification.notificationType,
-                    sql`g.notification_type`,
+                    sql`ng.notification_type`,
                   ),
-                  eq(schema.appNotification.parentId, sql`g.parent_id`),
+                  eq(schema.appNotification.parentId, sql`ng.parent_id`),
                   apps.length > 0
                     ? inArray(schema.appNotification.appSigner, lowercasedApps)
                     : undefined,
@@ -435,7 +488,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
               LIMIT ${GROUPED_NOTIFICATIONS_LIMIT + 1} -- +1 to if the are more notification (next page)
             ) t ON true
             JOIN ${schema.comment} c ON (c.id = t.entity_id)
-            ORDER BY g.app_notification_id DESC
+            ORDER BY ng.updated_at DESC, ng.id DESC
             `,
         );
 
@@ -463,12 +516,22 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
   );
 }
 
+/**
+ * Unix timestamp in microseconds as string so we don't lose precision when using it as cursor
+ */
+type UnixTimestampMicroseconds = string;
+
 type GroupHead = {
   id: string;
+  us: UnixTimestampMicroseconds;
 };
 
 type DBRow = {
   id: string;
+  /**
+   * Updated at unix timestamp in microseconds
+   */
+  us: UnixTimestampMicroseconds;
   notificationType: NotificationTypeSchemaType;
   parentId: string;
   /**
@@ -487,6 +550,7 @@ type DBRow = {
 
 type Group = {
   id: string;
+  us: UnixTimestampMicroseconds;
   notificationType: NotificationTypeSchemaType;
   parentId: string;
   parent: JSONCommentSelectType;
@@ -546,6 +610,7 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
 
       currentGroup = {
         id: row.id,
+        us: row.us,
         notificationType: row.notificationType,
         parentId: row.parentId,
         parent: row.parent,
@@ -635,14 +700,18 @@ function formatGroupedNotificationsToResponse({
   let hasPreviousPage = false;
 
   if (isBeforeCursorUsed) {
-    hasNextPage = groups[0]?.id !== groups[0]?.previousGroup?.id;
+    hasNextPage =
+      groups[0]?.us !== groups[0]?.previousGroup?.us ||
+      groups[0]?.id !== groups[0]?.previousGroup?.id;
 
     if (groups.length > limit) {
       groups.shift();
       hasPreviousPage = true;
     }
   } else {
-    hasPreviousPage = groups[0]?.id !== groups[0]?.previousGroup?.id;
+    hasPreviousPage =
+      groups[0]?.us !== groups[0]?.previousGroup?.us ||
+      groups[0]?.id !== groups[0]?.previousGroup?.id;
 
     if (groups.length > limit) {
       groups.pop();

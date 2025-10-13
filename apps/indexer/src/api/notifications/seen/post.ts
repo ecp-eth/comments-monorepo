@@ -10,10 +10,7 @@ import {
 } from "../../../lib/schemas.ts";
 import { NotificationTypeSchema } from "../../../notifications/schemas.ts";
 import { formatResponseUsingZodSchema } from "../../../lib/response-formatters.ts";
-import {
-  NotificationService_InvalidEnsNamesError,
-  NotificationService_UsersRequiredError,
-} from "../../../services/notification-service.ts";
+import { NotificationService_InvalidEnsNamesError } from "../../../services/notification-service.ts";
 import { AppKeyAuthServiceError } from "../../../services/app-key-auth-service.ts";
 
 export const NotificationsMarkAsSeenRequestBodySchema = z.object({
@@ -113,7 +110,7 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
           appId: app.id,
           types: type,
           lastSeenNotificationDate,
-          users: [user],
+          user,
           appSigner,
         });
 
@@ -126,10 +123,6 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
       } catch (error) {
         if (error instanceof AppKeyAuthServiceError) {
           return c.json({ message: "Invalid app key" }, 401);
-        }
-
-        if (error instanceof NotificationService_UsersRequiredError) {
-          return c.json({ message: "Users are required" }, 400);
         }
 
         if (error instanceof NotificationService_InvalidEnsNamesError) {

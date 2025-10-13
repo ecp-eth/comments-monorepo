@@ -1,5 +1,5 @@
 {
-  "id": "60ef34bf-0a45-4438-8a59-c245ae7ddd2e",
+  "id": "974ecc9f-270e-4788-be2a-45f6886bda89",
   "prevId": "c3488c6d-a113-4a11-a130-35a46cd4beeb",
   "version": "7",
   "dialect": "postgresql",
@@ -506,6 +506,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
         "seen_status": {
           "name": "seen_status",
           "type": "text",
@@ -554,13 +560,7 @@
               "nulls": "last"
             },
             {
-              "expression": "\"notification_type\" desc",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "\"parent_id\" desc",
+              "expression": "\"updated_at\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"
@@ -577,8 +577,8 @@
           "method": "btree",
           "with": {}
         },
-        "apng_seen_status_idx": {
-          "name": "apng_seen_status_idx",
+        "apng_heads_latest_idx": {
+          "name": "apng_heads_latest_idx",
           "columns": [
             {
               "expression": "app_id",
@@ -593,19 +593,19 @@
               "nulls": "last"
             },
             {
-              "expression": "seen_status",
+              "expression": "notification_type",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "\"notification_type\" desc",
+              "expression": "parent_id",
+              "isExpression": false,
               "asc": true,
-              "isExpression": true,
               "nulls": "last"
             },
             {
-              "expression": "\"parent_id\" desc",
+              "expression": "\"updated_at\" desc",
               "asc": true,
               "isExpression": true,
               "nulls": "last"

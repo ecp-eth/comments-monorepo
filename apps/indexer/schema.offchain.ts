@@ -786,6 +786,7 @@ export const appRecipientNotificationGroups = offchainSchema.table(
         onUpdate: "cascade",
       }),
     recipientAddress: text().notNull().$type<Hex>(),
+    updatedAt: timestamp({ withTimezone: true }).notNull(),
     seenStatus: text({ enum: ["seen", "unseen"] }).notNull(),
     notificationType: notificationTypeColumnType.notNull(),
     parentId: text().notNull(),
@@ -798,6 +799,8 @@ export const appRecipientNotificationGroups = offchainSchema.table(
       }),
   },
   (table) => [
+    // creates distinct notification groups where we have at most 2 rows per group (app, recipient, type, parent, app_signer)
+    // one for seen and one for unseen
     primaryKey({
       columns: [
         table.appId,
@@ -809,20 +812,23 @@ export const appRecipientNotificationGroups = offchainSchema.table(
       ],
     }),
 
+    // groups are already working as distinct so we can just use updated_at for sorting
+    // this index also includes all columns so we can do index only scan to avoid heap fetches
+    // INCLUDE is specified only in migration, drizzle doesn't support it on schema builder level
     index("apng_all_idx").on(
       table.appId,
       table.recipientAddress,
-      desc(table.notificationType),
-      desc(table.parentId),
+      desc(table.updatedAt),
       desc(table.appNotificationId),
     ),
 
-    index("apng_seen_status_idx").on(
+    // "is there a new row?" probe
+    index("apng_heads_latest_idx").on(
       table.appId,
       table.recipientAddress,
-      table.seenStatus,
-      desc(table.notificationType),
-      desc(table.parentId),
+      table.notificationType,
+      table.parentId,
+      desc(table.updatedAt),
       desc(table.appNotificationId),
     ),
   ],
