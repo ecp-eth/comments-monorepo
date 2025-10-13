@@ -1,4 +1,3 @@
-import { Zap } from "lucide-react";
 import { Tooltip, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import {
   TooltipArrow,
@@ -7,16 +6,11 @@ import {
 } from "@radix-ui/react-tooltip";
 import { useEffect, useCallback, useRef, useState } from "react";
 
-export function GaslessIndicator({
-  children = <Zap className="h-3 w-3 fill-background stroke-lime-400" />,
-  enableTooltipOnClick = false,
-}: {
-  /**
-   * You may want to enable this on mobile for certain cases
-   */
-  enableTooltipOnClick?: boolean;
-  children?: React.ReactNode;
-}) {
+/**
+ * @description This component is used to display a gasless tooltip on the wrapped element.
+ * @returns
+ */
+export function GaslessIndicator({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const handleGlobalTouchStart = useCallback((e: TouchEvent) => {
@@ -50,7 +44,6 @@ export function GaslessIndicator({
         <Tooltip open={open}>
           <TooltipTrigger
             asChild
-            onClick={enableTooltipOnClick ? () => setOpen(!open) : undefined}
             onPointerEnter={(e) => {
               if (e.pointerType !== "mouse") {
                 return;
@@ -67,7 +60,7 @@ export function GaslessIndicator({
             {children}
           </TooltipTrigger>
 
-          <TooltipPortal container={ref.current}>
+          <TooltipPortal>
             <TooltipContent side="bottom" sideOffset={5}>
               <TooltipArrow className="fill-foreground" />
               <div className="text-xs bg-foreground text-background px-2 py-1 rounded-lg max-w-[200px]">
