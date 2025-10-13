@@ -23,14 +23,14 @@ export async function resolveCommentParents(
   }>(
     sql`
       WITH RECURSIVE comment_parents AS (
-        SELECT id, author, app, parent_id FROM ${schema.comment}
+        SELECT id, author, app, parent_id, created_at FROM ${schema.comment}
         WHERE id = ${parentId}
-        UNION ALL
-        SELECT c.id, c.author, c.app, c.parent_id FROM ${schema.comment} c
+        UNION -- removes duplicates and prevents infinite cycles
+        SELECT c.id, c.author, c.app, c.parent_id, c.created_at FROM ${schema.comment} c
         INNER JOIN comment_parents cp ON c.id = cp.parent_id
       )
 
-      SELECT * FROM comment_parents;
+      SELECT id, author, app FROM comment_parents ORDER BY created_at ASC;
     `,
   );
 
