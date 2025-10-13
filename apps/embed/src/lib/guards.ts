@@ -37,7 +37,7 @@ export async function guardAuthorSignature({
   signTypedDataParams,
   authorAddress,
 }: {
-  // using type inferring here somehow cause excessive type inference errors, had i to workaround it using any
+  // using type inferring here somehow cause excessive type inference errors, had to workaround it using any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   publicClient: PublicActions<any, any, any>;
   authorSignature?: Hex;
