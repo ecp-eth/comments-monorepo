@@ -37,7 +37,7 @@ export function ApplyTheme({ children }: ApplyThemeProps) {
     );
   }, [config]);
   const themeRootStyle = useMemo(() => {
-    return createThemeCSSVariables(config);
+    return styleToCss(createThemeCSSVariables(config));
   }, [config]);
   const [hydrated, setHydrated] = useState(false);
 
@@ -61,7 +61,7 @@ export function ApplyTheme({ children }: ApplyThemeProps) {
         {createPortal(
           <>
             <LinkGoogleFont config={config} />
-            <style type="text/css">{styleToCss(themeRootStyle)}</style>
+            <style type="text/css">{themeRootStyle}</style>
           </>,
           document.head,
         )}
