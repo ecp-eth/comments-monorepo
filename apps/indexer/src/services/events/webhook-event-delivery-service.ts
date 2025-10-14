@@ -193,7 +193,11 @@ export class WebhookEventDeliveryService {
           with: {
             app: {
               with: {
-                appSecretKeys: true,
+                appSecretKeys: {
+                  where(fields, operators) {
+                    return operators.isNull(fields.revokedAt);
+                  },
+                },
               },
             },
           },
