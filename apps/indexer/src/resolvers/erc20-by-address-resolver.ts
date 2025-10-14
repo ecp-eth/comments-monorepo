@@ -47,7 +47,7 @@ export type ERC20ByAddressResolverOptions = {
   simApiKey: string;
 } & Omit<
   DataLoader.Options<ERC20ByAddressResolverKey, ResolvedERC20Data | null>,
-  "batchLoadFn" | "maxBatchSize"
+  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn"
 >;
 
 export function createERC20ByAddressResolver({
@@ -119,6 +119,11 @@ export function createERC20ByAddressResolver({
         }),
       );
     },
-    dataLoaderOptions,
+    {
+      ...dataLoaderOptions,
+      cacheKeyFn(key) {
+        return key.toLowerCase() as Hex;
+      },
+    },
   );
 }
