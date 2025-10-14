@@ -16,7 +16,7 @@ import {
   CommentText,
 } from "@ecp.eth/shared/components";
 import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
-import { createCommentItemsQueryKey } from "./queries";
+import { createCommentItemsQueryKey } from "./queries/queryKeys";
 import { useAccount, useChainId } from "wagmi";
 import {
   EmbedConfigProviderByAuthorConfig,

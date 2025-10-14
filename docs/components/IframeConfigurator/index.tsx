@@ -352,6 +352,57 @@ export default function IframeConfigurator() {
 
               <FormField
                 control={form.control}
+                name="config.gasSponsorship"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gas Sponsorship</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          if (
+                            value === "not-gasless" ||
+                            value === "gasless-not-preapproved" ||
+                            value === "gasless-preapproved"
+                          ) {
+                            field.onChange(value);
+                            return;
+                          }
+                          // fallback to default
+                          field.onChange("gasless-not-preapproved");
+                        }}
+                        {...field}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={`Please select ${field.value}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent id="gas-sponsorship-mode-select">
+                          <SelectItem value="not-gasless">
+                            Users pay their own gas fees
+                          </SelectItem>
+                          <SelectItem value="gasless-not-preapproved">
+                            Gas sponsored, users sign each transaction
+                          </SelectItem>
+                          {publicEnv.VITE_ECP_ENABLE_PREAPPROVED_GASLESS && (
+                            <SelectItem
+                              value="gasless-preapproved"
+                              defaultChecked
+                            >
+                              Gas sponsored, users pre-approve all transactions
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="autoHeightAdjustment"
                 render={({ field }) => (
                   <FormItem>

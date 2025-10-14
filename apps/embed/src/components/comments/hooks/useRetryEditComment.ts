@@ -3,11 +3,12 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitEditCommentMutationFunction } from "../queries";
+import { submitEditComment } from "../queries/submitEditComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { useEditComment as useEditCommentSdk } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryEditCommentParams = {
   comment: Comment;
@@ -35,7 +36,9 @@ export function useRetryEditComment({
   const wagmiConfig = useConfig();
   const commentRetryEdition = useCommentRetryEdition();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: editComment } = useEditCommentSdk();
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
+  const embedConfig = useEmbedConfig();
 
   return useCallback<OnRetryEditComment>(
     async (params) => {
@@ -53,7 +56,7 @@ export function useRetryEditComment({
         throw new Error("Only edit comments can be retried");
       }
 
-      const pendingOperation = await submitEditCommentMutationFunction({
+      const pendingOperation = await submitEditComment({
         address: connectedAddress,
         comment,
         editRequest: {
@@ -63,14 +66,10 @@ export function useRetryEditComment({
         switchChainAsync(chainId) {
           return switchChainAsync({ chainId });
         },
-        async writeContractAsync({ signEditCommentResponse }) {
-          const { txHash } = await editComment({
-            edit: signEditCommentResponse.data,
-            appSignature: signEditCommentResponse.signature,
-          });
-
-          return txHash;
-        },
+        readContractAsync,
+        writeContractAsync,
+        signTypedDataAsync,
+        gasSponsorship: embedConfig.gasSponsorship,
       });
 
       try {
@@ -106,8 +105,11 @@ export function useRetryEditComment({
     },
     [
       connectedAddress,
+      readContractAsync,
+      writeContractAsync,
+      signTypedDataAsync,
+      embedConfig.gasSponsorship,
       switchChainAsync,
-      editComment,
       commentRetryEdition,
       wagmiConfig,
     ],

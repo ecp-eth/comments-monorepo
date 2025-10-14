@@ -3,7 +3,6 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useConnectorClient, useSwitchChain } from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
-import { usePostComment } from "@ecp.eth/sdk/comments/react";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
 import {
   PendingPostCommentOperationSchemaType,
@@ -11,7 +10,9 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { submitCommentMutationFunction } from "../queries";
+import { submitPostComment } from "../queries/submitPostComment";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 type UseLikeCommentProps = {
   /**
@@ -38,12 +39,14 @@ type UseLikeCommentProps = {
 
 export const useLikeComment = () => {
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postCommentMutation } = usePostComment();
   const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
+  const { writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
+  const embedConfig = useEmbedConfig();
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
@@ -66,29 +69,24 @@ export const useLikeComment = () => {
         undefined;
 
       try {
-        pendingOperation = await submitCommentMutationFunction({
-          author: connectedAddress,
-          commentRequest: {
-            chainId: comment.chainId,
-            content: COMMENT_REACTION_LIKE_CONTENT,
-            commentType: COMMENT_TYPE_REACTION,
-            parentId: comment.id,
-          },
+        pendingOperation = {
+          ...(await submitPostComment({
+            author: connectedAddress,
+            postCommentRequest: {
+              chainId: comment.chainId,
+              content: COMMENT_REACTION_LIKE_CONTENT,
+              commentType: COMMENT_TYPE_REACTION,
+              parentId: comment.id,
+            },
+            switchChainAsync(chainId) {
+              return switchChainAsync({ chainId });
+            },
+            writeContractAsync,
+            signTypedDataAsync,
+            gasSponsorship: embedConfig.gasSponsorship,
+          })),
           references: [],
-          switchChainAsync(chainId) {
-            return switchChainAsync({ chainId });
-          },
-          async writeContractAsync({
-            signCommentResponse: { signature: appSignature, data: commentData },
-          }) {
-            const { txHash } = await postCommentMutation({
-              appSignature,
-              comment: commentData,
-            });
-
-            return txHash;
-          },
-        });
+        };
 
         likeReactionSubmission.start({
           ...params,
@@ -129,9 +127,11 @@ export const useLikeComment = () => {
     [
       client,
       connectedAddress,
+      embedConfig.gasSponsorship,
       likeReactionSubmission,
-      postCommentMutation,
+      signTypedDataAsync,
       switchChainAsync,
+      writeContractAsync,
     ],
   );
 };

@@ -2,11 +2,14 @@ import { useCallback } from "react";
 import { waitForTransactionReceipt } from "viem/actions";
 import { useAccount, useConnectorClient, useSwitchChain } from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
-import { useDeleteComment } from "@ecp.eth/sdk/comments/react";
+
 import { useReactionRemoval } from "@ecp.eth/shared/hooks";
 import { type Comment } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
+import { submitDeleteComment } from "../queries/deleteComment";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 type UseUnlikeCommentProps = {
   /**
@@ -28,11 +31,13 @@ type UseUnlikeCommentProps = {
 };
 
 export const useUnlikeComment = () => {
-  const { address: connectedAddress } = useAccount();
+  const { address: viewer } = useAccount();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: deleteCommentMutation } = useDeleteComment();
   const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
   const { data: client } = useConnectorClient();
+  const config = useEmbedConfig();
+  const { writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   return useCallback(
     async (params: UseUnlikeCommentProps) => {
@@ -40,7 +45,7 @@ export const useUnlikeComment = () => {
         throw new Error("No client");
       }
 
-      if (!connectedAddress) {
+      if (!viewer) {
         throw new Error("Wallet not connected");
       }
 
@@ -69,10 +74,20 @@ export const useUnlikeComment = () => {
       try {
         onBeforeStart?.();
 
-        await switchChainAsync({ chainId: comment.chainId });
-
-        const { txHash } = await deleteCommentMutation({
-          commentId: reaction.id,
+        const commentId = reaction.id;
+        const { txHash } = await submitDeleteComment({
+          author: viewer,
+          deleteCommentRequest: {
+            commentId: commentId,
+            chainId: config.chainId,
+          },
+          switchChainAsync: async (chainId: number) => {
+            const result = await switchChainAsync({ chainId });
+            return result;
+          },
+          writeContractAsync,
+          signTypedDataAsync,
+          gasSponsorship: config.gasSponsorship,
         });
 
         // Optimistically remove the reaction from the UI
@@ -98,10 +113,13 @@ export const useUnlikeComment = () => {
     },
     [
       client,
-      connectedAddress,
-      deleteCommentMutation,
+      config.chainId,
+      config.gasSponsorship,
+      viewer,
       likeReactionRemoval,
+      signTypedDataAsync,
       switchChainAsync,
+      writeContractAsync,
     ],
   );
 };

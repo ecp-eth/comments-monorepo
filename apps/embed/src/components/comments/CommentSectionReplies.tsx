@@ -35,7 +35,7 @@ import {
 import { useAccount, useChainId } from "wagmi";
 import { CommentForm } from "./CommentForm";
 import { CommentItem } from "./CommentItem";
-import { createCommentItemsQueryKey } from "./queries";
+import { createCommentItemsQueryKey } from "./queries/queryKeys";
 import {
   useIsAccountStatusResolved,
   useNewCommentsChecker,

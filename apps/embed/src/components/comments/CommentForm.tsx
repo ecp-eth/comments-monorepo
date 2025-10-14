@@ -1,30 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useRef } from "react";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useAccount, useConfig, useSwitchChain } from "wagmi";
+import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
-import {
-  useCommentEdition,
-  useCommentSubmission,
-  useConnectAccount,
-  useFreshRef,
-} from "@ecp.eth/shared/hooks";
+import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
   EmbedConfigProviderByTargetURIConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { cn } from "@/lib/utils";
-import {
-  submitCommentMutationFunction,
-  submitEditCommentMutationFunction,
-} from "./queries";
+
 import {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_COMMENT_LENGTH,
   MAX_UPLOAD_FILE_SIZE,
-  TX_RECEIPT_TIMEOUT,
 } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
@@ -33,7 +23,6 @@ import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
 import { InvalidCommentError } from "@ecp.eth/shared/errors";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
-import { useEditComment, usePostComment } from "@ecp.eth/sdk/comments/react";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
@@ -53,6 +42,9 @@ import {
 import { ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
+import { GaslessIndicator } from "./GaslessIndicator";
+import { usePostComment } from "./hooks/usePostComment";
+import { useEditComment } from "./hooks/useEditComment";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -263,6 +255,10 @@ function BaseCommentForm({
 
   const isSubmitting = submitMutation.isPending;
 
+  const ButtonWrapper = publicEnv.NEXT_PUBLIC_ENABLE_GASLESS
+    ? GaslessIndicator
+    : React.Fragment;
+
   return (
     <form
       action={async (formData) => {
@@ -308,13 +304,15 @@ function BaseCommentForm({
           onCancel?.();
         }}
       />
-      <div className="flex gap-2 justify-between">
+      <div className="flex gap-2 justify-between text-xs">
         {address && <CommentFormAuthor address={address} />}
         <div className="flex gap-2 items-center ml-auto">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  // to match the size of the submit button
+                  className="w-8 h-8"
                   aria-label="Add media"
                   variant="outline"
                   size="icon"
@@ -325,14 +323,16 @@ function BaseCommentForm({
                   <ImageIcon className="stroke-foreground" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom">
                 <p>Add media</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <Button type="submit" disabled={isSubmitting || disabled} size="sm">
-            {isSubmitting ? submitPendingLabel : submitIdleLabel}
-          </Button>
+          <ButtonWrapper>
+            <Button type="submit" disabled={isSubmitting || disabled} size="sm">
+              {isSubmitting ? submitPendingLabel : submitIdleLabel}
+            </Button>
+          </ButtonWrapper>
           {onCancel && (
             <Button
               disabled={isSubmitting}
@@ -372,86 +372,29 @@ export function CommentForm({
   queryKey,
   ...props
 }: CommentFormProps) {
-  const wagmiConfig = useConfig();
-  const commentSubmission = useCommentSubmission();
-  const { switchChainAsync } = useSwitchChain();
-  const { targetUri, chainId } =
-    useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const { targetUri } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
+  const submitCommentMutation = usePostComment();
 
-  const { mutateAsync: postComment } = usePostComment();
-
-  const submitCommentMutation = useCallback<OnSubmitFunction>(
-    async ({ author, content, references }) => {
-      const pendingOperation = await submitCommentMutationFunction({
-        author: author,
-        commentRequest: {
-          chainId,
+  return (
+    <BaseCommentForm
+      {...props}
+      onSubmit={({ author, content, references }) =>
+        submitCommentMutation({
+          queryKey,
+          onSubmitStart: onSubmitStartRef.current,
+          author,
           content,
-          ...(parentId ? { parentId } : { targetUri }),
-        },
-        references,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        async writeContractAsync({ signCommentResponse }) {
-          const { txHash } = await postComment({
-            comment: signCommentResponse.data,
-            appSignature: signCommentResponse.signature,
-          });
-
-          return txHash;
-        },
-      });
-
-      try {
-        commentSubmission.start({
-          queryKey,
-          pendingOperation,
-        });
-
-        onSubmitStartRef.current?.();
-
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
-          timeout: TX_RECEIPT_TIMEOUT,
-        });
-
-        if (receipt.status !== "success") {
-          throw new Error("Transaction reverted");
-        }
-
-        commentSubmission.success({
-          queryKey,
-          pendingOperation,
-        });
-      } catch (e) {
-        commentSubmission.error({
-          commentId: pendingOperation.response.data.id,
-          queryKey,
-          error: e instanceof Error ? e : new Error(String(e)),
-        });
-
-        throw e;
+          references,
+          targetUriOrParentId: parentId ? { parentId } : { targetUri },
+        })
       }
-    },
-    [
-      chainId,
-      commentSubmission,
-      onSubmitStartRef,
-      parentId,
-      postComment,
-      queryKey,
-      switchChainAsync,
-      targetUri,
-      wagmiConfig,
-    ],
+    />
   );
-
-  return <BaseCommentForm {...props} onSubmit={submitCommentMutation} />;
 }
 
 function CommentFormAuthor({ address }: { address: Hex }) {
+  const embedConfig = useEmbedConfig();
   const { openAccountModal } = useAccountModal();
   const { openChainModal } = useChainModal();
   const queryResult = useQuery({
@@ -467,7 +410,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
   return (
     <div
       className="flex flex-row gap-2 items-center overflow-hidden"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}`}
+      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${embedConfig.gasSponsorship === "not-gasless" ? "" : " for free"}`}
     >
       <CommentAuthorAvatar author={queryResult.data ?? { address }} />
       <div className="flex-grow text-xs text-muted-foreground truncate">
@@ -521,78 +464,8 @@ export function CommentEditForm({
   queryKey,
   ...props
 }: CommentEditFormProps) {
-  const wagmiConfig = useConfig();
-  const commentEdition = useCommentEdition();
-  const { switchChainAsync } = useSwitchChain();
-  const { chainId } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const onSubmitStartRef = useFreshRef(onSubmitStart);
-
-  const { mutateAsync: editComment } = useEditComment();
-
-  const submitCommentMutation = useCallback<OnSubmitFunction>(
-    async ({ author, content }) => {
-      const pendingOperation = await submitEditCommentMutationFunction({
-        address: author,
-        comment,
-        editRequest: {
-          chainId,
-          content,
-        },
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        async writeContractAsync({ signEditCommentResponse }) {
-          const { txHash } = await editComment({
-            edit: signEditCommentResponse.data,
-            appSignature: signEditCommentResponse.signature,
-          });
-
-          return txHash;
-        },
-      });
-
-      try {
-        commentEdition.start({
-          queryKey,
-          pendingOperation,
-        });
-
-        onSubmitStartRef.current?.();
-
-        const receipt = await waitForTransactionReceipt(wagmiConfig, {
-          hash: pendingOperation.txHash,
-          timeout: TX_RECEIPT_TIMEOUT,
-        });
-
-        if (receipt.status !== "success") {
-          throw new Error("Transaction reverted");
-        }
-
-        commentEdition.success({
-          queryKey,
-          pendingOperation,
-        });
-      } catch (e) {
-        commentEdition.error({
-          commentId: pendingOperation.response.data.commentId,
-          queryKey,
-          error: e instanceof Error ? e : new Error(String(e)),
-        });
-
-        throw e;
-      }
-    },
-    [
-      chainId,
-      comment,
-      commentEdition,
-      editComment,
-      onSubmitStartRef,
-      queryKey,
-      switchChainAsync,
-      wagmiConfig,
-    ],
-  );
+  const submitCommentMutation = useEditComment();
 
   return (
     <BaseCommentForm
@@ -601,7 +474,16 @@ export function CommentEditForm({
         content: comment.content,
         references: comment.references,
       }}
-      onSubmit={submitCommentMutation}
+      onSubmit={({ author, content, references }) =>
+        submitCommentMutation({
+          queryKey,
+          onSubmitStart: onSubmitStartRef.current,
+          author,
+          content,
+          references,
+          comment,
+        })
+      }
       submitIdleLabel="Update"
       submitPendingLabel="Updating..."
     />

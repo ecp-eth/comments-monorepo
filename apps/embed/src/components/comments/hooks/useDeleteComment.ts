@@ -1,11 +1,13 @@
 import { useCallback } from "react";
 import type { Hex } from "viem";
-import { getChainId, waitForTransactionReceipt } from "viem/actions";
-import { useConnectorClient } from "wagmi";
+import { waitForTransactionReceipt } from "viem/actions";
+import { useConnectorClient, useSwitchChain } from "wagmi";
 import { useCommentDeletion } from "@ecp.eth/shared/hooks";
-import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
-import { useDeleteComment as useDeleteCommentSdk } from "@ecp.eth/sdk/comments/react";
+import { useAccount } from "wagmi";
+import { useEmbedConfig } from "../../EmbedConfigProvider";
+import { submitDeleteComment } from "../queries/deleteComment";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 
 type OnCommentDeleteParams = {
   commentId: Hex;
@@ -17,7 +19,11 @@ type OnCommentDelete = (params: OnCommentDeleteParams) => Promise<void>;
 export function useDeleteComment(): OnCommentDelete {
   const commentDeletion = useCommentDeletion();
   const { data: client } = useConnectorClient();
-  const { mutateAsync: deleteComment } = useDeleteCommentSdk();
+  const { address: viewer } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
+  const config = useEmbedConfig();
+  const { writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
 
   return useCallback(
     async (params: OnCommentDeleteParams) => {
@@ -26,20 +32,24 @@ export function useDeleteComment(): OnCommentDelete {
           throw new Error("No client");
         }
 
-        const { txHash } = await deleteComment({
-          commentId: params.commentId,
+        if (!viewer) {
+          throw new Error("Wallet not connected");
+        }
+
+        const pendingOperation = await submitDeleteComment({
+          author: viewer,
+          deleteCommentRequest: {
+            commentId: params.commentId,
+            chainId: config.chainId,
+          },
+          switchChainAsync: async (chainId: number) => {
+            const result = await switchChainAsync({ chainId });
+            return result;
+          },
+          writeContractAsync,
+          signTypedDataAsync,
+          gasSponsorship: config.gasSponsorship,
         });
-
-        const chainId = await getChainId(client);
-
-        const pendingOperation: PendingDeleteCommentOperationSchemaType = {
-          action: "delete",
-          chainId,
-          commentId: params.commentId,
-          state: { status: "pending" },
-          type: "non-gasless",
-          txHash,
-        };
 
         commentDeletion.start({
           pendingOperation,
@@ -47,7 +57,7 @@ export function useDeleteComment(): OnCommentDelete {
         });
 
         const txReceipt = await waitForTransactionReceipt(client, {
-          hash: txHash,
+          hash: pendingOperation.txHash,
         });
 
         if (txReceipt.status !== "success") {
@@ -68,6 +78,15 @@ export function useDeleteComment(): OnCommentDelete {
         throw e;
       }
     },
-    [client, commentDeletion, deleteComment],
+    [
+      client,
+      viewer,
+      config.chainId,
+      config.gasSponsorship,
+      writeContractAsync,
+      signTypedDataAsync,
+      commentDeletion,
+      switchChainAsync,
+    ],
   );
 }

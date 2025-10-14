@@ -3,11 +3,12 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, useSwitchChain } from "wagmi";
-import { submitCommentMutationFunction } from "../queries";
+import { submitPostComment } from "../queries/submitPostComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { usePostComment as usePostCommentSdk } from "@ecp.eth/sdk/comments/react";
 import { waitForTransactionReceipt } from "@wagmi/core";
+import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryPostCommentParams = {
   comment: Comment;
@@ -35,7 +36,9 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { mutateAsync: postComment } = usePostCommentSdk();
+  const { writeContractAsync, signTypedDataAsync } =
+    useReadWriteContractAsync();
+  const embedConfig = useEmbedConfig();
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
@@ -53,34 +56,30 @@ export function useRetryPostComment({
         throw new Error("Only post comments can be retried");
       }
 
-      const pendingOperation = await submitCommentMutationFunction({
-        author: connectedAddress,
-        commentRequest: {
-          chainId: comment.pendingOperation.chainId,
-          content: comment.content,
-          ...(comment.parentId
-            ? {
-                parentId: comment.parentId,
-              }
-            : {
-                targetUri: comment.targetUri,
-              }),
-        },
-        references: comment.references,
-        switchChainAsync(chainId) {
-          return switchChainAsync({ chainId });
-        },
-        async writeContractAsync({
-          signCommentResponse: { signature: appSignature, data: commentData },
-        }) {
-          const { txHash } = await postComment({
-            appSignature,
-            comment: commentData,
-          });
+      const pendingOperation = {
+        ...(await submitPostComment({
+          author: connectedAddress,
+          postCommentRequest: {
+            chainId: comment.pendingOperation.chainId,
+            content: comment.content,
+            ...(comment.parentId
+              ? {
+                  parentId: comment.parentId,
+                }
+              : {
+                  targetUri: comment.targetUri,
+                }),
+          },
+          switchChainAsync(chainId) {
+            return switchChainAsync({ chainId });
+          },
 
-          return txHash;
-        },
-      });
+          writeContractAsync,
+          signTypedDataAsync,
+          gasSponsorship: embedConfig.gasSponsorship,
+        })),
+        references: comment.references,
+      };
 
       try {
         commentRetrySubmission.start({
@@ -115,8 +114,10 @@ export function useRetryPostComment({
     },
     [
       connectedAddress,
+      writeContractAsync,
+      signTypedDataAsync,
+      embedConfig.gasSponsorship,
       switchChainAsync,
-      postComment,
       commentRetrySubmission,
       wagmiConfig,
     ],

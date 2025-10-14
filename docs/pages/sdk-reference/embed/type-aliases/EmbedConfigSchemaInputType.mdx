@@ -11,6 +11,7 @@ type EmbedConfigSchemaInputType = {
   app?: `0x${string}` | "all" | "embed";
   chainId?: 8453 | 31337;
   disablePromotion?: boolean;
+  gasSponsorship?: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
   restrictMaximumContainerWidth?: boolean;
   theme?: {
      colors?: {
@@ -1827,7 +1828,7 @@ type EmbedConfigSchemaInputType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L222)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:231](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L231)
 
 Custom configuration for `<CommentEmbed />` component.
 
@@ -1874,6 +1875,12 @@ Hide powered by ECP link
 
 ```ts
 false
+```
+
+### gasSponsorship?
+
+```ts
+optional gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
 ```
 
 ### restrictMaximumContainerWidth?
