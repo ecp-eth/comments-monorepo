@@ -110,11 +110,19 @@ export class NotificationOutboxFanOutService {
               RETURNING *
             ),
 
+            -- deduplicate notifications because ON CONFLICT can't handle if you have multiple same rows in one batch
+            deduplicated_inserted_notifications AS (
+              SELECT DISTINCT ON (i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.app_signer)
+                i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.app_signer, i.id, i.created_at
+              FROM inserted_notifications i
+              ORDER BY i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.app_signer, i.id DESC
+            ),
+
             -- 3) Insert the heads of the notification groups
             inserted_heads AS (
               INSERT INTO ${schema.appRecipientNotificationGroups} (app_id, recipient_address, notification_type, parent_id, app_notification_id, seen_status, app_signer, updated_at)
               SELECT i.app_id, i.recipient_address, i.notification_type, i.parent_id, i.id, 'unseen' as seen_status, i.app_signer, i.created_at as updated_at
-              FROM inserted_notifications i
+              FROM deduplicated_inserted_notifications i
               ON CONFLICT (app_id, recipient_address, seen_status, notification_type, parent_id, app_signer) 
               DO UPDATE SET 
                 app_notification_id = EXCLUDED.app_notification_id, 
