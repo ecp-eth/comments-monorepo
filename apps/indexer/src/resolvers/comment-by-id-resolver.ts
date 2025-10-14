@@ -2,6 +2,7 @@ import DataLoader from "dataloader";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import type { DB } from "../services/db";
 import type { CommentSelectType } from "ponder:schema";
+import { isSameHex } from "@ecp.eth/shared/helpers";
 
 export type CommentByIdResolver = DataLoader<
   {
@@ -37,7 +38,10 @@ export function createCommentByIdResolver({
           return operators.sql`
             (${fields.id}, ${fields.chainId}) IN (
               ${operators.sql.join(
-                keys.map((key) => operators.sql`(${key.id}, ${key.chainId})`),
+                keys.map(
+                  (key) =>
+                    operators.sql`(${key.id.toLowerCase()}, ${key.chainId})`,
+                ),
                 operators.sql`, `,
               )}
             )
@@ -49,7 +53,7 @@ export function createCommentByIdResolver({
         return (
           comments.find(
             (comment) =>
-              comment.id === key.id && comment.chainId === key.chainId,
+              isSameHex(comment.id, key.id) && comment.chainId === key.chainId,
           ) ?? null
         );
       });
@@ -58,7 +62,7 @@ export function createCommentByIdResolver({
       ...options,
       cacheKeyFn(key) {
         return JSON.stringify({
-          id: key.id,
+          id: key.id.toLowerCase(),
           chainId: key.chainId,
         });
       },

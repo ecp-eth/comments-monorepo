@@ -68,7 +68,7 @@ async function resolveEnsData(
 export type ENSByAddressResolverOptions = {
   chainRpcUrl: string;
   ensByQueryResolver: ENSByQueryResolver;
-} & DataLoader.Options<Hex, ResolvedENSData | null>;
+} & Omit<DataLoader.Options<Hex, ResolvedENSData | null>, "cacheKeyFn">;
 
 export function createENSByAddressResolver({
   chainRpcUrl,
@@ -80,11 +80,19 @@ export function createENSByAddressResolver({
     transport: http(chainRpcUrl),
   });
 
-  return new DataLoader<Hex, ResolvedENSData | null>(async (addresses) => {
-    return Promise.all(
-      addresses.map((address) =>
-        resolveEnsData(publicClient, address, ensByQueryResolver),
-      ),
-    );
-  }, dataLoaderOptions);
+  return new DataLoader<Hex, ResolvedENSData | null>(
+    async (addresses) => {
+      return Promise.all(
+        addresses.map((address) =>
+          resolveEnsData(publicClient, address, ensByQueryResolver),
+        ),
+      );
+    },
+    {
+      ...dataLoaderOptions,
+      cacheKeyFn(key) {
+        return key.toLowerCase() as Hex;
+      },
+    },
+  );
 }

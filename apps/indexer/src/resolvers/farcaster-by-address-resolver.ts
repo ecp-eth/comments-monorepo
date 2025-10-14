@@ -26,7 +26,7 @@ export type FarcasterByAddressResolverOptions = {
   generateProfileUrl?: (user: IndexerAPIFarcasterDataSchemaType) => string;
 } & Omit<
   DataLoader.Options<Hex, ResolvedFarcasterData | null>,
-  "batchLoadFn" | "maxBatchSize"
+  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn"
 >;
 
 export function createFarcasterByAddressResolver({
@@ -95,6 +95,9 @@ export function createFarcasterByAddressResolver({
     {
       ...dataLoaderOptions,
       maxBatchSize: 350, // this is limit coming from neynar api
+      cacheKeyFn(key) {
+        return key.toLowerCase() as Hex;
+      },
     },
   );
 }
