@@ -17,7 +17,6 @@ import type {
   Comment,
   PendingEditCommentOperationSchemaType,
 } from "@ecp.eth/shared/schemas";
-
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   ContractReadFunctions,
@@ -46,6 +45,10 @@ type SubmitEditCommentParams = {
   signTypedDataAsync: SignTypedDataMutateAsync;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
+type PendingEditCommentOperationSchemaTypeWithoutReferences = Omit<
+  PendingEditCommentOperationSchemaType,
+  "references"
+>;
 
 export async function submitEditComment({
   address,
@@ -56,7 +59,7 @@ export async function submitEditComment({
   readContractAsync,
   signTypedDataAsync,
   gasSponsorship,
-}: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaType> {
+}: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   if (!address) {
     throw new SubmitEditCommentMutationError("Wallet not connected.");
   }
@@ -112,7 +115,7 @@ async function editCommentWithGaslessAndAuthorSig({
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
   readContractAsync: ContractReadFunctions["getNonce"];
   signTypedDataAsync: SignTypedDataMutateAsync;
-}): Promise<PendingEditCommentOperationSchemaType> {
+}): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   const { commentId, content, author } = editCommentPayloadRequest;
   const nonce = await getNonce({
     author,
@@ -188,7 +191,7 @@ async function editCommentWithoutGasless({
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
   writeContractAsync: ContractWriteFunctions["editComment"];
   editRequest: EditCommentRequestType;
-}): Promise<PendingEditCommentOperationSchemaType> {
+}): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   const response = await fetch("/api/sign-edit-comment", {
     method: "POST",
     headers: {

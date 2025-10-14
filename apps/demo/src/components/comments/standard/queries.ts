@@ -171,7 +171,9 @@ export async function submitEditCommentMutationFunction({
   editRequest,
   switchChainAsync,
   writeContractAsync,
-}: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaType> {
+}: SubmitEditCommentParams): Promise<
+  Omit<PendingEditCommentOperationSchemaType, "references">
+> {
   if (!address) {
     throw new SubmitEditCommentMutationError("Wallet not connected.");
   }

@@ -227,12 +227,15 @@ export function useGaslessCommentActions({
 
   const editComment = useCallback<OnEditComment>(
     async (params) => {
-      const pendingOperation = await submitEditComment({
-        isApproved: hasApproval,
-        commentId: params.comment.id,
-        content: params.edit.content,
-        metadata: params.edit.metadata,
-      });
+      const pendingOperation = {
+        ...(await submitEditComment({
+          isApproved: hasApproval,
+          commentId: params.comment.id,
+          content: params.edit.content,
+          metadata: params.edit.metadata,
+        })),
+        references: params.edit.references,
+      };
 
       try {
         commentEdition.start({
@@ -282,12 +285,15 @@ export function useGaslessCommentActions({
         throw new Error("Only edit comments can be retried");
       }
 
-      const pendingOperation = await submitEditComment({
-        isApproved: comment.pendingOperation.type === "gasless-preapproved",
-        commentId: comment.id,
-        content: comment.content,
-        metadata: comment.metadata ?? [],
-      });
+      const pendingOperation = {
+        ...(await submitEditComment({
+          isApproved: comment.pendingOperation.type === "gasless-preapproved",
+          commentId: comment.id,
+          content: comment.content,
+          metadata: comment.metadata ?? [],
+        })),
+        references: comment.references,
+      };
 
       try {
         commentRetryEdition.start({

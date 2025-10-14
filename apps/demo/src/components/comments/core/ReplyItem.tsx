@@ -122,7 +122,7 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
           onRetryEditClick={onRetryEditClick}
           isLiking={isLiking}
           optimisticReferences={
-            comment.pendingOperation?.action === "post"
+            comment.pendingOperation && "references" in comment.pendingOperation
               ? comment.pendingOperation.references
               : undefined
           }

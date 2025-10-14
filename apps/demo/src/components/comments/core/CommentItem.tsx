@@ -228,7 +228,7 @@ export function CommentItem({ comment }: CommentItemProps) {
           onRetryEditClick={onRetryEditClick}
           isLiking={isLiking}
           optimisticReferences={
-            comment.pendingOperation?.action === "post"
+            comment.pendingOperation && "references" in comment.pendingOperation
               ? comment.pendingOperation.references
               : undefined
           }

@@ -229,7 +229,7 @@ type EditPriorNotApprovedResult = GaslessEditResponseSchemaType &
 
 export function useGaslessEditComment(
   options?: UseMutationOptions<
-    PendingEditCommentOperationSchemaType,
+    Omit<PendingEditCommentOperationSchemaType, "references">,
     Error,
     SubmitGaslessEditCommentVariables
   >,
@@ -306,7 +306,7 @@ export function useGaslessEditComment(
   });
 
   return useMutation<
-    PendingEditCommentOperationSchemaType,
+    Omit<PendingEditCommentOperationSchemaType, "references">,
     Error,
     SubmitGaslessEditCommentVariables
   >({

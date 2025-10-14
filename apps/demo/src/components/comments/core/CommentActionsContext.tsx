@@ -75,6 +75,10 @@ export type OnEditCommentParams<TExtra = unknown> = {
      * Updated Comment metadata
      */
     metadata: MetadataEntry[];
+    /**
+     * Updated Comment references
+     */
+    references: IndexerAPICommentReferencesSchemaType;
   };
   /**
    * Query key to a query where comment is stored
