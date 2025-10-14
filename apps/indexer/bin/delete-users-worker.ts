@@ -18,7 +18,7 @@ const command = workerCommand
     "--delete-after-days <days>",
     "Maximum age in days for users to be deleted",
     (value) => z.coerce.number().int().min(1).parse(value),
-    7, // Default: 30 days
+    7, // Default: 7 days
   )
   .option(
     "--dry-run",
