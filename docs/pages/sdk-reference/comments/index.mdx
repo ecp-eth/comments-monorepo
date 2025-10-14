@@ -16,6 +16,17 @@ Core functionality for managing comments and approvals
 | [AuthorAuthMethod](/sdk-reference/comments/enumerations/AuthorAuthMethod.mdx) | - |
 | [MetadataOperation](/sdk-reference/comments/enumerations/MetadataOperation.mdx) | - |
 
+## Classes
+
+| Class | Description |
+| ------ | ------ |
+| [CAIP373Error](/sdk-reference/comments/classes/CAIP373Error.mdx) | Base error for CAIP-373 errors |
+| [InvalidCommentIdError](/sdk-reference/comments/classes/InvalidCommentIdError.mdx) | Error thrown when the comment id is invalid |
+| [InvalidCommentManagerAddressError](/sdk-reference/comments/classes/InvalidCommentManagerAddressError.mdx) | Error thrown when the comment manager address is not the same as the chain's comment manager address |
+| [InvalidFunctionCallDataError](/sdk-reference/comments/classes/InvalidFunctionCallDataError.mdx) | Error thrown when the function call data is invalid |
+| [MalformedCaip373Error](/sdk-reference/comments/classes/MalformedCaip373Error.mdx) | Error thrown when the CAIP-373 is malformed |
+| [UnsupportedChainError](/sdk-reference/comments/classes/UnsupportedChainError.mdx) | Error thrown when the chain is unsupported |
+
 ## Type Aliases
 
 | Type Alias | Description |
@@ -27,6 +38,7 @@ Core functionality for managing comments and approvals
 | [AddApprovalWithSigResult](/sdk-reference/comments/type-aliases/AddApprovalWithSigResult.mdx) | - |
 | [AddCommentTypedDataSchemaType](/sdk-reference/comments/type-aliases/AddCommentTypedDataSchemaType.mdx) | - |
 | [BaseEditCommentDataParams](/sdk-reference/comments/type-aliases/BaseEditCommentDataParams.mdx) | - |
+| [CAIP373QuotedComment](/sdk-reference/comments/type-aliases/CAIP373QuotedComment.mdx) | - |
 | [CommentData](/sdk-reference/comments/type-aliases/CommentData.mdx) | The data structure of a comment returned by the contract |
 | [CommentInputData](/sdk-reference/comments/type-aliases/CommentInputData.mdx) | Comment input data schema. This is used as input of the functions. |
 | [CommentManagerABIType](/sdk-reference/comments/type-aliases/CommentManagerABIType.mdx) | - |
@@ -46,6 +58,7 @@ Core functionality for managing comments and approvals
 | [CreateReplyCommentDataParams](/sdk-reference/comments/type-aliases/CreateReplyCommentDataParams.mdx) | The parameters for creating a reply comment |
 | [CreateReportCommentTypedDataParams](/sdk-reference/comments/type-aliases/CreateReportCommentTypedDataParams.mdx) | - |
 | [CreateRootCommentDataParams](/sdk-reference/comments/type-aliases/CreateRootCommentDataParams.mdx) | The parameters for creating a root comment |
+| [DecodedQuotedCommentFromCaip373Result](/sdk-reference/comments/type-aliases/DecodedQuotedCommentFromCaip373Result.mdx) | - |
 | [DeleteCommentParams](/sdk-reference/comments/type-aliases/DeleteCommentParams.mdx) | - |
 | [DeleteCommentResult](/sdk-reference/comments/type-aliases/DeleteCommentResult.mdx) | - |
 | [DeleteCommentTypedDataSchemaType](/sdk-reference/comments/type-aliases/DeleteCommentTypedDataSchemaType.mdx) | - |
@@ -168,12 +181,14 @@ Core functionality for managing comments and approvals
 | [decodeMetadataTypes](/sdk-reference/comments/functions/decodeMetadataTypes.mdx) | Decodes metadata types from on-chain metadata entries by reverse-engineering the type information from the encoded key field. Works without requiring prior knowledge of the key-type mappings. |
 | [decodeMetadataValue](/sdk-reference/comments/functions/decodeMetadataValue.mdx) | Decodes a metadata entry value based on its type |
 | [decodeNumberValue](/sdk-reference/comments/functions/decodeNumberValue.mdx) | Decodes a number value from encoded metadata bytes. |
+| [decodeQuotedCommentFromCaip373](/sdk-reference/comments/functions/decodeQuotedCommentFromCaip373.mdx) | Parses a CAIP-373 quoted comment. |
 | [decodeStringValue](/sdk-reference/comments/functions/decodeStringValue.mdx) | Decodes a string value from encoded metadata bytes. |
 | [encodeAddressValue](/sdk-reference/comments/functions/encodeAddressValue.mdx) | Encodes an address value as bytes for metadata |
 | [encodeBoolValue](/sdk-reference/comments/functions/encodeBoolValue.mdx) | Encodes a boolean value as bytes for metadata |
 | [encodeBytesValue](/sdk-reference/comments/functions/encodeBytesValue.mdx) | Encodes a bytes value as bytes for metadata |
 | [encodeJsonValue](/sdk-reference/comments/functions/encodeJsonValue.mdx) | Encodes a JSON object as bytes for metadata |
 | [encodeNumberValue](/sdk-reference/comments/functions/encodeNumberValue.mdx) | Encodes a number value as bytes for metadata. |
+| [encodeQuotedCommentFromCaip373](/sdk-reference/comments/functions/encodeQuotedCommentFromCaip373.mdx) | Encodes a quoted comment from a CAIP-373 |
 | [encodeStringValue](/sdk-reference/comments/functions/encodeStringValue.mdx) | Encodes a string value as bytes for metadata |
 | [getAddApprovalHash](/sdk-reference/comments/functions/getAddApprovalHash.mdx) | Gets the EIP-712 hash for adding approval |
 | [getChannelManager](/sdk-reference/comments/functions/getChannelManager.mdx) | Gets the channel manager contract address |
