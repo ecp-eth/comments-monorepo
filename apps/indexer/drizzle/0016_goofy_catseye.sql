@@ -52,7 +52,7 @@ CREATE INDEX "an_grouped_unseen_idx" ON "ecp_indexer_schema"."app_notification" 
 CREATE INDEX "apng_all_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","updated_at" desc,"app_notification_id" desc) INCLUDE ("app_id","recipient_address","seen_status","notification_type","parent_id","app_signer");--> statement-breakpoint
 CREATE INDEX "apng_heads_latest_idx" ON "ecp_indexer_schema"."app_recipient_notification_groups" USING btree ("app_id","recipient_address","notification_type","parent_id","updated_at" desc,"app_notification_id" desc);--> statement-breakpoint
 CREATE INDEX "nt_by_id_unprocessed_idx" ON "ecp_indexer_schema"."notification_outbox" USING btree ("id") WHERE "ecp_indexer_schema"."notification_outbox"."processed_at" IS NULL;--> statement-breakpoint
-CREATE INDEX "app_by_id_created_at_idx" ON "ecp_indexer_schema"."app" USING btree ("id","created_at");
+CREATE INDEX "app_created_at_idx" ON "ecp_indexer_schema"."app" USING btree ("created_at","id");
 
 
 CREATE OR REPLACE FUNCTION ecp_indexer_schema.notify_new_notifications_in_outbox() RETURNS trigger

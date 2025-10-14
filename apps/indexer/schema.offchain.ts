@@ -287,11 +287,11 @@ export const app = offchainSchema.table(
   (table) => [
     index("app_by_owner_id_idx").on(table.ownerId),
     /**
-     * Used by queries WHERE app_id = ? AND created_at > ? for example in notification fan out service
+     * Used by queries WHERE created_at > ? for example in notification fan out service
      * where we don't want to send the notifications for apps that were created after the notification was created
      * (historical reindexing).
      */
-    index("app_by_id_created_at_idx").on(table.id, table.createdAt),
+    index("app_created_at_idx").on(table.createdAt, table.id),
   ],
 );
 

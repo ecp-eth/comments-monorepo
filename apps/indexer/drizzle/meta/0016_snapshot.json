@@ -1,5 +1,5 @@
 {
-  "id": "974ecc9f-270e-4788-be2a-45f6886bda89",
+  "id": "1dc8b4da-a451-4d58-aeb3-998de821a193",
   "prevId": "c3488c6d-a113-4a11-a130-35a46cd4beeb",
   "version": "7",
   "dialect": "postgresql",
@@ -126,17 +126,17 @@
           "method": "btree",
           "with": {}
         },
-        "app_by_id_created_at_idx": {
-          "name": "app_by_id_created_at_idx",
+        "app_created_at_idx": {
+          "name": "app_created_at_idx",
           "columns": [
             {
-              "expression": "id",
+              "expression": "created_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
-              "expression": "created_at",
+              "expression": "id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
