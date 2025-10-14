@@ -62,6 +62,7 @@ export class InvalidCommentManagerAddressError extends CAIP373Error {
 export class InvalidCommentIdError extends CAIP373Error {
   constructor(commentId: Hex) {
     super(`Invalid comment id: ${commentId}`);
+    this.name = "InvalidCommentIdError";
   }
 }
 
