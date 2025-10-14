@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useCommentActions } from "./CommentActionsContext";
-import { ContractFunctionExecutionError, type Hex } from "viem";
+import { ContractFunctionExecutionError } from "viem";
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
@@ -12,17 +12,9 @@ import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/compon
 type ReplyItemProps = {
   comment: CommentType;
   queryKey: QueryKey;
-  /**
-   * The id of the parent comment to update.
-   */
-  parentCommentId: Hex;
 };
 
-export function ReplyItem({
-  comment,
-  queryKey,
-  parentCommentId,
-}: ReplyItemProps) {
+export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
   const {
     deleteComment,
     retryPostComment,
@@ -139,13 +131,14 @@ export function ReplyItem({
       {isReplying && (
         <CommentForm
           autoFocus
+          queryKey={queryKey}
           onCancel={() => {
             setIsReplying(false);
           }}
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          parentId={parentCommentId}
+          parentId={comment.id}
         />
       )}
     </div>

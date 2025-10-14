@@ -5,7 +5,6 @@ import { CommentEditForm, CommentForm } from "./CommentForm";
 import { useDeleteComment } from "./hooks/useDeleteComment";
 import { useRetryPostComment } from "./hooks/useRetryPostComment";
 import { useRetryEditComment } from "./hooks/useRetryEditComment";
-import { type Hex } from "viem";
 import type { QueryKey } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
@@ -13,14 +12,9 @@ import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
 type ReplyItemProps = {
   comment: CommentType;
   queryKey: QueryKey;
-  parentCommentId: Hex;
 };
 
-export function ReplyItem({
-  comment,
-  queryKey,
-  parentCommentId,
-}: ReplyItemProps) {
+export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
   const { address: connectedAddress } = useAccount();
   const deleteComment = useDeleteComment();
   const retryPostComment = useRetryPostComment({ connectedAddress });
@@ -87,8 +81,8 @@ export function ReplyItem({
           onSubmitStart={() => {
             setIsReplying(false);
           }}
-          // make sure to update replies on top level comment because we are using flat replies mode
-          parentId={parentCommentId}
+          // because we support flat mode on api now, no need to always set to root comment id
+          parentId={comment.id}
           queryKey={queryKey}
         />
       )}

@@ -117,7 +117,7 @@ export function CommentSection() {
     <CommentActionsProvider value={commentActions}>
       <CommentSectionWrapper>
         <Heading2>Comments</Heading2>
-        <CommentForm />
+        <CommentForm queryKey={queryKey} />
         {isPending && <LoadingScreen />}
         {error && <div>Error loading comments: {(error as Error).message}</div>}
         {isSuccess && (
