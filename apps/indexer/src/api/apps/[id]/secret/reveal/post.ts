@@ -65,14 +65,14 @@ export function setupAppSecretReveal(app: OpenAPIHono) {
       const { id } = c.req.valid("param");
 
       try {
-        const { signingKey } = await appManager.getApp({
+        const { secretKey } = await appManager.getApp({
           id,
           ownerId: c.get("user").id,
         });
 
         return c.json(
           formatResponseUsingZodSchema(AppSecretResponseSchema, {
-            secret: signingKey.secret,
+            secret: secretKey.secret,
           }),
           200,
         );

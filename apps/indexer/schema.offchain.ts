@@ -302,13 +302,13 @@ export const appRelations = relations(app, ({ one, many }) => ({
     fields: [app.ownerId],
     references: [user.id],
   }),
-  appSigningKeys: many(appSigningKeys),
+  appSecretKeys: many(appSecretKeys),
   appWebhooks: many(appWebhook),
   appNotification: many(appNotification),
 }));
 
-export const appSigningKeys = offchainSchema.table(
-  "app_signing_keys",
+export const appSecretKeys = offchainSchema.table(
+  "app_secret_keys",
   {
     id: uuid().primaryKey().defaultRandom(),
     createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -328,11 +328,11 @@ export const appSigningKeys = offchainSchema.table(
   ],
 );
 
-export type AppSigningKeysSelectType = typeof appSigningKeys.$inferSelect;
+export type AppSecretKeysSelectType = typeof appSecretKeys.$inferSelect;
 
-export const appSigningKeysRelations = relations(appSigningKeys, ({ one }) => ({
+export const appSecretKeysRelations = relations(appSecretKeys, ({ one }) => ({
   app: one(app, {
-    fields: [appSigningKeys.appId],
+    fields: [appSecretKeys.appId],
     references: [app.id],
   }),
 }));

@@ -15,7 +15,7 @@ export class AppKeyAuthService implements IAppKeyAuthService {
   async verifyAppKey(appKey: string): Promise<{
     app: AppSelectType;
   }> {
-    const appSigningKey = await this.options.db.query.appSigningKeys.findFirst({
+    const appSecretKey = await this.options.db.query.appSecretKeys.findFirst({
       where(fields, operators) {
         return operators.and(
           operators.eq(fields.secret, appKey),
@@ -27,12 +27,12 @@ export class AppKeyAuthService implements IAppKeyAuthService {
       },
     });
 
-    if (!appSigningKey) {
+    if (!appSecretKey) {
       throw new AppKeyAuthService_InvalidAppKeyError();
     }
 
     return {
-      app: appSigningKey.app,
+      app: appSecretKey.app,
     };
   }
 }
