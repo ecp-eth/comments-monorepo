@@ -1,4 +1,4 @@
-import { sql, relations } from "drizzle-orm";
+import { sql, relations, desc, asc } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -284,7 +284,15 @@ export const app = offchainSchema.table(
       }),
     name: text().notNull(),
   },
-  (table) => [index("app_by_owner_id_idx").on(table.ownerId)],
+  (table) => [
+    index("app_by_owner_id_idx").on(table.ownerId),
+    /**
+     * Used by queries WHERE created_at > ? for example in notification fan out service
+     * where we don't want to send the notifications for apps that were created after the notification was created
+     * (historical reindexing).
+     */
+    index("app_created_at_idx").on(table.createdAt, table.id),
+  ],
 );
 
 export type AppSelectType = typeof app.$inferSelect;
@@ -296,6 +304,7 @@ export const appRelations = relations(app, ({ one, many }) => ({
   }),
   appSigningKeys: many(appSigningKeys),
   appWebhooks: many(appWebhook),
+  appNotification: many(appNotification),
 }));
 
 export const appSigningKeys = offchainSchema.table(
@@ -597,5 +606,230 @@ export const eventOutbox = offchainSchema.table(
   (table) => [
     index("event_outbox_by_processed_at_idx").on(table.processedAt),
     index("event_outbox_by_created_at_idx").on(table.createdAt),
+  ],
+);
+
+const notificationTypeColumnType = text({
+  enum: ["reply", "mention", "reaction", "quote"],
+});
+
+/**
+ * This table is used to store notifications all notifications in the system.
+ * These notifications are then fan out to app clients.
+ */
+export const notificationOutbox = offchainSchema.table(
+  "notification_outbox",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    /**
+     * For fan out services to track processed and uprocessed notifications
+     */
+    processedAt: timestamp({ withTimezone: true }),
+    /**
+     * Unique identifier for the deduplication
+     */
+    notificationUid: text().notNull().unique(),
+    notificationType: notificationTypeColumnType.notNull(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
+    recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
+    parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
+    appSigner: text().notNull().$type<Hex>(),
+  },
+  (table) => [
+    index("nt_by_id_unprocessed_idx")
+      .on(table.id)
+      .where(sql`${table.processedAt} IS NULL`),
+  ],
+);
+
+export type NotificationOutboxSelectType =
+  typeof notificationOutbox.$inferSelect;
+
+/**
+ * This table is used to store notifications per each app. It is almost the same copy of the notificationOutbox table
+ * but it is used to store notifications per each app.
+ */
+export const appNotification = offchainSchema.table(
+  "app_notification",
+  {
+    id: bigserial({ mode: "bigint" }).primaryKey(),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
+    notificationType: notificationTypeColumnType.notNull(),
+    notificationId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => notificationOutbox.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    /**
+     * Parent id can be anything but at the moment it is only comment id. In the future this can also be a channel id, etc.
+     */
+    parentId: text().notNull(),
+    /**
+     * The id of the entity that triggered the notification. At the moment it is only comment id.
+     */
+    entityId: text().notNull(),
+    /**
+     * App signer that created the comment that triggered the notification
+     */
+    appSigner: text().notNull().$type<Hex>(),
+    /**
+     * Author address of the comment that triggered the notification
+     */
+    authorAddress: text().notNull().$type<Hex>(),
+    /**
+     * Recipient address of the notification
+     */
+    recipientAddress: text().notNull().$type<Hex>(),
+    /**
+     * When the notification was seen by the recipient
+     */
+    seenAt: timestamp({ withTimezone: true }),
+  },
+  (table) => [
+    unique("an_dedupe_notifications_uq").on(table.notificationId, table.appId),
+    /**
+     * Recipient address and app are part of all indexes because they are required in list notifications api endpoints.
+     * All indexes end with created_at and id because it is used for ordering and cursor pagination.
+     */
+    index("an_list_all_idx").on(
+      table.appId,
+      table.recipientAddress,
+      desc(table.id),
+    ),
+    index("an_list_seen_idx")
+      .on(table.appId, table.recipientAddress, desc(table.id))
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_list_unseen_idx")
+      .on(table.appId, table.recipientAddress, desc(table.id))
+      .where(sql`${table.seenAt} IS NULL`),
+
+    index("an_grouped_idx").on(
+      table.appId,
+      table.recipientAddress,
+      desc(table.notificationType),
+      desc(table.parentId),
+      desc(table.id),
+    ),
+    index("an_grouped_seen_idx")
+      .on(
+        table.appId,
+        table.recipientAddress,
+        desc(table.notificationType),
+        desc(table.parentId),
+        desc(table.id),
+      )
+      .where(sql`${table.seenAt} IS NOT NULL`),
+    index("an_grouped_unseen_idx")
+      .on(
+        table.appId,
+        table.recipientAddress,
+        desc(table.notificationType),
+        desc(table.parentId),
+        desc(table.id),
+      )
+      .where(sql`${table.seenAt} IS NULL`),
+  ],
+);
+
+export type AppNotificationSelectType = typeof appNotification.$inferSelect;
+
+export const appNotificationRelations = relations(
+  appNotification,
+  ({ one }) => ({
+    notification: one(notificationOutbox, {
+      fields: [appNotification.notificationId],
+      references: [notificationOutbox.id],
+    }),
+    app: one(app, {
+      fields: [appNotification.appId],
+      references: [app.id],
+    }),
+  }),
+);
+
+/**
+ * This table is used to store the heads of the notification groups for each recipient and app.
+ *
+ * It supports groups by app signer
+ */
+export const appRecipientNotificationGroups = offchainSchema.table(
+  "app_recipient_notification_groups",
+  {
+    appId: uuid()
+      .notNull()
+      .references(() => app.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    recipientAddress: text().notNull().$type<Hex>(),
+    updatedAt: timestamp({ withTimezone: true }).notNull(),
+    seenStatus: text({ enum: ["seen", "unseen"] }).notNull(),
+    notificationType: notificationTypeColumnType.notNull(),
+    parentId: text().notNull(),
+    appSigner: text().notNull().$type<Hex>(),
+    appNotificationId: bigint({ mode: "bigint" })
+      .notNull()
+      .references(() => appNotification.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+  },
+  (table) => [
+    // creates distinct notification groups where we have at most 2 rows per group (app, recipient, type, parent, app_signer)
+    // one for seen and one for unseen
+    primaryKey({
+      columns: [
+        table.appId,
+        table.recipientAddress,
+        table.seenStatus,
+        table.notificationType,
+        table.parentId,
+        table.appSigner,
+      ],
+    }),
+
+    // groups are already working as distinct so we can just use updated_at for sorting
+    // this index also includes all columns so we can do index only scan to avoid heap fetches
+    // INCLUDE is specified only in migration, drizzle doesn't support it on schema builder level
+    index("apng_all_idx").on(
+      table.appId,
+      table.recipientAddress,
+      desc(table.updatedAt),
+      desc(table.appNotificationId),
+    ),
+
+    // "is there a new row?" probe
+    index("apng_heads_latest_idx").on(
+      table.appId,
+      table.recipientAddress,
+      table.notificationType,
+      table.parentId,
+      desc(table.updatedAt),
+      desc(table.appNotificationId),
+    ),
   ],
 );

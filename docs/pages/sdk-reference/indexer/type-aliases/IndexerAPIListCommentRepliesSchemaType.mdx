@@ -156,6 +156,15 @@ type IndexerAPIListCommentRepliesSchemaType = {
               width: number;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      replies: {
         extra: {
@@ -300,6 +309,15 @@ type IndexerAPIListCommentRepliesSchemaType = {
               type: "video";
               url: string;
               videoTracks?: ...[];
+            }
+              | {
+              chainId: number;
+              id: `0x${string}`;
+              position: {
+                 end: number;
+                 start: number;
+              };
+              type: "quoted_comment";
            })[];
            revision: number;
            targetUri: string;
@@ -334,7 +352,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
-              references: (... | ... | ... | ... | ... | ... | ...)[];
+              references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
@@ -494,6 +512,15 @@ type IndexerAPIListCommentRepliesSchemaType = {
            type: "video";
            url: string;
            videoTracks?: ...[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -530,7 +557,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:494](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L494)
+Defined in: [packages/sdk/src/indexer/schemas.ts:512](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L512)
 
 ## Type declaration
 
@@ -737,6 +764,15 @@ results: {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   replies: {
      extra: {
@@ -881,6 +917,15 @@ results: {
            type: "video";
            url: string;
            videoTracks?: ...[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -915,7 +960,7 @@ results: {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${(...)}`;
-           references: (... | ... | ... | ... | ... | ... | ...)[];
+           references: (... | ... | ... | ... | ... | ... | ... | ...)[];
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
@@ -1075,6 +1120,15 @@ results: {
         type: "video";
         url: string;
         videoTracks?: ...[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;

@@ -15,6 +15,7 @@ import type {
   ERC20ByAddressResolver,
   HTTPResolver,
   FarcasterByNameResolver,
+  CAIP373QuotedCommentResolver,
 } from "../resolvers/index.ts";
 import type { IPFSResolver } from "../resolvers/ipfs-resolver.ts";
 import type { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
@@ -24,6 +25,7 @@ import { type ResolveCommentReferencePosition } from "../lib/resolve-comment-ref
  * Type for a collection of comment reference resolvers
  */
 type CommentReferencesResolvers = {
+  caip373QuotedCommentResolver: CAIP373QuotedCommentResolver;
   ensByAddressResolver: ENSByAddressResolver;
   ensByNameResolver: ENSByNameResolver;
   erc20ByAddressResolver: ERC20ByAddressResolver;

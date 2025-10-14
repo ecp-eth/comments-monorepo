@@ -77,6 +77,12 @@ vi.mock("../../src/services/index.ts", async () => {
     eventOutboxService: {
       publishEvent: vi.spyOn(services.eventOutboxService, "publishEvent"),
     },
+    notificationOutboxService: {
+      publishNotifications: vi.spyOn(
+        services.notificationOutboxService,
+        "publishNotifications",
+      ),
+    },
   };
 });
 
@@ -271,6 +277,10 @@ describe("initializeCommentEventsIndexing", () => {
         saveAndNotify: saveAndNotifyMock,
       });
 
+      servicesMock.notificationOutboxService.publishNotifications.mockResolvedValueOnce(
+        undefined,
+      );
+
       servicesMock.eventOutboxService.publishEvent.mockResolvedValueOnce(
         undefined,
       );
@@ -302,10 +312,13 @@ describe("initializeCommentEventsIndexing", () => {
       });
 
       expect(servicesMock.db.insert).toHaveBeenCalledOnce();
+      expect(saveAndNotifyMock).toHaveBeenCalledOnce();
       expect(
         servicesMock.eventOutboxService.publishEvent,
       ).toHaveBeenCalledOnce();
-      expect(saveAndNotifyMock).toHaveBeenCalledOnce();
+      expect(
+        servicesMock.notificationOutboxService.publishNotifications,
+      ).toHaveBeenCalledOnce();
 
       // should update the reference resolution result bcz getReferenceResolutionResult is null
       expect(
@@ -367,6 +380,7 @@ describe("initializeCommentEventsIndexing", () => {
 
       servicesMock.db.query.comment.findFirst.mockResolvedValueOnce({
         id: "0xparent",
+        author: `0x${"0".repeat(40)}`,
         content: "parent",
         reactionCounts: {},
         rootCommentId: null,
@@ -395,6 +409,10 @@ describe("initializeCommentEventsIndexing", () => {
       ponderEventToCommentAddedEvent.mockReturnValueOnce({} as any);
 
       servicesMock.eventOutboxService.publishEvent.mockResolvedValueOnce(
+        undefined,
+      );
+
+      servicesMock.notificationOutboxService.publishNotifications.mockResolvedValueOnce(
         undefined,
       );
 
@@ -613,6 +631,10 @@ describe("initializeCommentEventsIndexing", () => {
 
       servicesMock.eventOutboxService.publishEvent.mockResolvedValue(undefined);
 
+      servicesMock.notificationOutboxService.publishNotifications.mockResolvedValueOnce(
+        undefined,
+      );
+
       ponderEventToCommentEditedEvent.mockReturnValueOnce({} as any);
 
       const newContent = "updated content";
@@ -646,6 +668,9 @@ describe("initializeCommentEventsIndexing", () => {
 
       expect(
         servicesMock.eventOutboxService.publishEvent,
+      ).toHaveBeenCalledOnce();
+      expect(
+        servicesMock.notificationOutboxService.publishNotifications,
       ).toHaveBeenCalledOnce();
       expect(saveAndNotifyMock).toHaveBeenCalled();
     });

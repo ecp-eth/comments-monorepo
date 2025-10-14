@@ -143,6 +143,15 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
@@ -164,7 +173,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:539](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L539)
+Defined in: [packages/sdk/src/indexer/schemas.ts:557](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L557)
 
 ## Type declaration
 
@@ -458,6 +467,15 @@ references: (
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

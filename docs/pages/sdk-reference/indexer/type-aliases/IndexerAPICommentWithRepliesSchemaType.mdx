@@ -144,6 +144,15 @@ type IndexerAPICommentWithRepliesSchemaType = {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   replies: {
      extra: {
@@ -294,6 +303,15 @@ type IndexerAPICommentWithRepliesSchemaType = {
                  width: ...;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -417,6 +435,15 @@ type IndexerAPICommentWithRepliesSchemaType = {
               type: "video";
               url: string;
               videoTracks?: ... | ...;
+            }
+              | {
+              chainId: number;
+              id: `0x${(...)}`;
+              position: {
+                 end: ...;
+                 start: ...;
+              };
+              type: "quoted_comment";
            })[];
            revision: number;
            targetUri: string;
@@ -591,6 +618,15 @@ type IndexerAPICommentWithRepliesSchemaType = {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -626,7 +662,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:450](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L450)
+Defined in: [packages/sdk/src/indexer/schemas.ts:468](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L468)
 
 ## Type declaration
 
@@ -926,6 +962,15 @@ references: (
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
@@ -1081,6 +1126,15 @@ replies: {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -1204,6 +1258,15 @@ replies: {
            type: "video";
            url: string;
            videoTracks?: ... | ...;
+         }
+           | {
+           chainId: number;
+           id: `0x${(...)}`;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -1443,6 +1506,15 @@ results: {
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
@@ -1566,6 +1638,15 @@ results: {
         type: "video";
         url: string;
         videoTracks?: ... | ...;
+      }
+        | {
+        chainId: number;
+        id: `0x${(...)}`;
+        position: {
+           end: ...;
+           start: ...;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -1764,6 +1845,15 @@ viewerReactions: Record<string, {
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;

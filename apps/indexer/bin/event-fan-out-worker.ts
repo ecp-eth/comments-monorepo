@@ -9,11 +9,11 @@ import { db } from "../src/services/db.ts";
 import { EventOutboxFanOutService } from "../src/services/events/event-outbox-fan-out-service.ts";
 import { parseWorkerCommandOptions } from "./shared.ts";
 
-initSentry("fan-out-worker");
+initSentry("event-outbox-fan-out-worker");
 
 const options = parseWorkerCommandOptions();
 
-console.log("Starting fan out worker");
+console.log("Starting event outbox fan out worker");
 const abortController = new AbortController();
 
 const eventOutboxFanOutService = new EventOutboxFanOutService({
@@ -44,11 +44,11 @@ await eventOutboxFanOutService
     signal: abortController.signal,
   })
   .then(() => {
-    console.log("Fan out was aborted");
+    console.log("Event outbox fan out was aborted");
     process.exit(0);
   })
   .catch((e) => {
-    console.error("Fan out worker failed", e);
+    console.error("Event outbox fan out worker failed", e);
     Sentry.captureException(e);
     void Sentry.flush().then(() => {
       process.exit(1);

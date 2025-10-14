@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { type ponder as Ponder } from "ponder:registry";
+import { type Context, type ponder as Ponder } from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -10,8 +10,10 @@ import {
   eventOutboxService,
   mutedAccountsManagementService,
   commentReferencesResolutionService,
+  notificationOutboxService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
+import { isSameHex } from "@ecp.eth/shared/helpers";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { env } from "../env.ts";
@@ -25,6 +27,20 @@ import {
 } from "../events/comment/index.ts";
 import { schema } from "../../schema.ts";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
+import type { Notifications } from "../notifications/types.ts";
+import {
+  createMentionNotification,
+  createQuoteNotification,
+  createReactionNotification,
+  createReplyNotifications,
+} from "../notifications/index.ts";
+import { resolveCommentParents } from "../lib/resolve-comment-parents.ts";
+import type {
+  NotificationMentionSchemaType,
+  NotificationQuoteSchemaType,
+} from "../notifications/schemas.ts";
+import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
   ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
@@ -67,6 +83,7 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
 
       const parentId = transformCommentParentId(event.args.parentId);
       let rootCommentId: Hex | null = null;
+      const notifications: Notifications[] = [];
 
       if (parentId) {
         const parentComment = await tx.query.comment.findFirst({
@@ -113,6 +130,34 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
             })
             .where(eq(schema.comment.id, parentId))
             .execute();
+
+          if (!isSameHex(parentComment.author, event.args.author)) {
+            notifications.push(
+              createReactionNotification({
+                chainId: context.chain.id,
+                parent: parentComment,
+                reaction: {
+                  app: event.args.app,
+                  author: event.args.author,
+                  id: event.args.commentId,
+                },
+              }),
+            );
+          }
+        } else {
+          const parents = await resolveCommentParents(parentComment.id, tx);
+
+          notifications.push(
+            ...createReplyNotifications({
+              chainId: context.chain.id,
+              reply: {
+                id: event.args.commentId,
+                author: event.args.author,
+                app: event.args.app,
+              },
+              parents,
+            }),
+          );
         }
 
         // if parent comment doesn't have a root comment id then it is a root comment itself
@@ -126,6 +171,19 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           content: event.args.content,
           chainId: context.chain.id,
         });
+
+      const notificationsFromReferences =
+        await resolveNotificationsFromReferences({
+          references: referencesResolutionResult.references,
+          comment: {
+            app: event.args.app,
+            author: event.args.author,
+            id: event.args.commentId,
+          },
+          context,
+        });
+
+      notifications.push(...notificationsFromReferences);
 
       // We need to check if the comment already has a moderation status
       // this is useful during the reindex process
@@ -183,6 +241,11 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         }),
         aggregateId: insertedComment.id,
         aggregateType: "comment",
+        tx,
+      });
+
+      await notificationOutboxService.publishNotifications({
+        notifications,
         tx,
       });
     });
@@ -389,6 +452,17 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
           chainId: context.chain.id,
         });
 
+      const notificationsFromReferences =
+        await resolveNotificationsFromReferences({
+          references: referencesResolutionResult.references,
+          comment: {
+            app: event.args.editedByApp,
+            author: event.args.author,
+            id: event.args.commentId,
+          },
+          context,
+        });
+
       const moderationResult = await commentModerationService.moderateUpdate({
         comment: event.args,
         commentRevision: newCommentRevision,
@@ -426,6 +500,105 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
       });
 
       await moderationResult.saveAndNotify();
+
+      await notificationOutboxService.publishNotifications({
+        notifications: notificationsFromReferences,
+        tx,
+      });
     });
   });
+}
+
+async function resolveNotificationsFromReferences({
+  references,
+  comment,
+  context,
+}: {
+  references: IndexerAPICommentReferencesSchemaType;
+  comment: {
+    app: Hex;
+    author: Hex;
+    id: Hex;
+  };
+  context:
+    | Context<"CommentsV1:CommentAdded">
+    | Context<"CommentsV1:CommentEdited">;
+}): Promise<(NotificationMentionSchemaType | NotificationQuoteSchemaType)[]> {
+  const notificationsFromReferencesPromises: Promise<
+    NotificationMentionSchemaType | NotificationQuoteSchemaType | void
+  >[] = [];
+
+  for (const reference of references) {
+    switch (reference.type) {
+      case "ens":
+      case "farcaster": {
+        if (isSameHex(reference.address, comment.author)) {
+          continue;
+        }
+
+        notificationsFromReferencesPromises.push(
+          Promise.resolve(
+            createMentionNotification({
+              chainId: context.chain.id,
+              comment,
+              mentionedUser: {
+                address: reference.address,
+              },
+            }),
+          ),
+        );
+
+        continue;
+      }
+      case "quoted_comment": {
+        notificationsFromReferencesPromises.push(
+          commentByIdResolverService
+            .load({
+              chainId: reference.chainId,
+              id: reference.id,
+            })
+            .then((quotedComment) => {
+              if (
+                !quotedComment ||
+                isSameHex(quotedComment.author, comment.author)
+              ) {
+                return;
+              }
+
+              return createQuoteNotification({
+                chainId: context.chain.id,
+                comment,
+                quotedComment: {
+                  app: quotedComment.app,
+                  author: quotedComment.author,
+                  id: quotedComment.id,
+                },
+              });
+            }),
+        );
+
+        continue;
+      }
+      case "erc20":
+      case "file":
+      case "image":
+      case "video":
+      case "webpage": {
+        // noop
+        continue;
+      }
+      default: {
+        reference satisfies never;
+      }
+    }
+  }
+
+  const resolvedNotifications = await Promise.all(
+    notificationsFromReferencesPromises,
+  );
+
+  return resolvedNotifications.filter(
+    (val): val is NotificationMentionSchemaType | NotificationQuoteSchemaType =>
+      !!val,
+  );
 }

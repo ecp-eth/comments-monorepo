@@ -151,6 +151,15 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
               width: number;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -173,7 +182,7 @@ type IndexerAPIModerationGetPendingCommentsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:514](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L514)
+Defined in: [packages/sdk/src/indexer/schemas.ts:532](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L532)
 
 ## Type declaration
 
@@ -358,6 +367,15 @@ results: {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;

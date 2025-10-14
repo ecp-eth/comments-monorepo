@@ -110,6 +110,15 @@ type CommentReferencesUpdatedEvent = {
                  width: number;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
         referencesResolutionStatusChangedAt: Date;
@@ -230,6 +239,15 @@ data: {
               width: number;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
      referencesResolutionStatusChangedAt: Date;
@@ -341,6 +359,15 @@ comment: {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
   referencesResolutionStatusChangedAt: Date;
@@ -455,6 +482,15 @@ references: (
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

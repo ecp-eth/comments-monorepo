@@ -106,7 +106,16 @@ type IndexerAPICommentReferenceSchemaType =
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:326](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L326)
+Defined in: [packages/sdk/src/indexer/schemas.ts:344](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L344)

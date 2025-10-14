@@ -144,6 +144,15 @@ type IndexerAPICommentReactionSchemaType = {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
@@ -285,6 +294,15 @@ type IndexerAPICommentReactionSchemaType = {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -320,7 +338,7 @@ type IndexerAPICommentReactionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:414](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L414)
+Defined in: [packages/sdk/src/indexer/schemas.ts:432](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L432)
 
 ## Type declaration
 
@@ -620,6 +638,15 @@ references: (
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
@@ -786,6 +813,15 @@ viewerReactions: Record<string, {
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
