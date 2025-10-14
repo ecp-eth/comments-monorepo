@@ -58,6 +58,13 @@ const CRON_PROCESSES = [
       INDEXER_URL,
     ],
   },
+  {
+    name: "cron:delete-users",
+    // run every hour
+    cron: "0 * * * *",
+    command: "pnpm",
+    args: ["run", "cron:delete-users", "--indexer-url", INDEXER_URL],
+  },
 ];
 
 const children = new Map<string, ChildProcess>();
