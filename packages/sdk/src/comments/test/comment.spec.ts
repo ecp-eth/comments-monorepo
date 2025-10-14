@@ -69,21 +69,18 @@ describe("comment", () => {
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
-    pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: appAccount,
-    pollingInterval: 500,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: thirdPartyAccount,
-    pollingInterval: 500,
   }).extend(publicActions);
 
   describe("postComment()", () => {

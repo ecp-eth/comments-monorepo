@@ -24,6 +24,7 @@ type SiweAuthServiceOptions = {
   jwtAudienceRefreshToken: string;
   jwtAudienceNonce: string;
   jwtNonceTokenLifetime: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   publicClient: PublicClient<any, any>;
   db: NodePgDatabase<typeof schema>;
 };
@@ -89,6 +90,7 @@ export class SiweAuthService {
   private readonly jwtAudienceRefreshToken: string;
   private readonly jwtAudienceNonce: string;
   private readonly jwtNonceTokenLifetime: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly publicClient: PublicClient<any, any>;
 
   constructor(options: SiweAuthServiceOptions) {

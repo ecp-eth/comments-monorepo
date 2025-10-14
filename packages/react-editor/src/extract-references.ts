@@ -101,7 +101,7 @@ export function extractReferences(
             }
             default:
               throw new Error(
-                `Unsupported mention type: ${(mention as any).type}`,
+                `Unsupported mention: ${JSON.stringify(mention)}`,
               );
           }
         }
