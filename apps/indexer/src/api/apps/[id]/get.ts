@@ -70,7 +70,7 @@ export function setupAppGet(app: OpenAPIHono) {
       const { id } = c.req.valid("param");
 
       try {
-        const { app, signingKey } = await appManager.getApp({
+        const { app, secretKey } = await appManager.getApp({
           id,
           ownerId: c.get("user").id,
         });
@@ -78,7 +78,7 @@ export function setupAppGet(app: OpenAPIHono) {
         return c.json(
           formatResponseUsingZodSchema(AppGetResponseSchema, {
             ...app,
-            secret: signingKey.secret,
+            secret: secretKey.secret,
           }),
           200,
         );

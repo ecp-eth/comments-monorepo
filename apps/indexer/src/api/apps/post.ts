@@ -74,7 +74,7 @@ export function setupAppCreate(app: OpenAPIHono) {
     },
     async (c) => {
       const { name } = c.req.valid("json");
-      const { app, signingKey } = await appManager.createApp({
+      const { app, secretKey } = await appManager.createApp({
         name,
         ownerId: c.get("user").id,
       });
@@ -82,7 +82,7 @@ export function setupAppCreate(app: OpenAPIHono) {
       return c.json(
         formatResponseUsingZodSchema(AppCreateResponseSchema, {
           ...app,
-          secret: signingKey.secret,
+          secret: secretKey.secret,
         }),
         200,
       );

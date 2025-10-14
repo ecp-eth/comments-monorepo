@@ -4,7 +4,7 @@ import { z } from "zod";
 import { schema } from "../../schema.ts";
 import type {
   AppSelectType,
-  AppSigningKeysSelectType,
+  AppSecretKeysSelectType,
 } from "../../schema.offchain.ts";
 import { and, eq, isNull } from "drizzle-orm";
 
@@ -38,9 +38,9 @@ export class AppManager implements IAppManager {
 
       const secret = this.generateRandomAppSecret();
 
-      // create signing key
-      const [signingKey] = await tx
-        .insert(schema.appSigningKeys)
+      // create secret key
+      const [secretKey] = await tx
+        .insert(schema.appSecretKeys)
         .values({
           appId: app.id,
           secret,
@@ -48,13 +48,13 @@ export class AppManager implements IAppManager {
         .returning()
         .execute();
 
-      if (!signingKey) {
+      if (!secretKey) {
         throw new AppManagerFailedToCreateSecretKeyError();
       }
 
       return {
         app,
-        signingKey,
+        secretKey,
       };
     });
   }
@@ -90,7 +90,7 @@ export class AppManager implements IAppManager {
         );
       },
       with: {
-        appSigningKeys: {
+        appSecretKeys: {
           where(fields, operators) {
             return operators.isNull(fields.revokedAt);
           },
@@ -102,15 +102,15 @@ export class AppManager implements IAppManager {
       throw new AppManagerAppNotFoundError();
     }
 
-    const [signingKey] = app.appSigningKeys;
+    const [secretKey] = app.appSecretKeys;
 
-    if (!signingKey) {
-      throw new AppManagerAppSigningKeyNotFoundError();
+    if (!secretKey) {
+      throw new AppManagerAppSecretKeyNotFoundError();
     }
 
     return {
       app,
-      signingKey,
+      secretKey,
     };
   }
 
@@ -134,32 +134,32 @@ export class AppManager implements IAppManager {
         throw new AppManagerAppNotFoundError();
       }
 
-      // revoke existing signing key
+      // revoke existing secret key
       await tx
-        .update(schema.appSigningKeys)
+        .update(schema.appSecretKeys)
         .set({ revokedAt: new Date() })
         .where(
           and(
-            eq(schema.appSigningKeys.appId, app.id),
-            isNull(schema.appSigningKeys.revokedAt),
+            eq(schema.appSecretKeys.appId, app.id),
+            isNull(schema.appSecretKeys.revokedAt),
           ),
         )
         .execute();
 
-      const [appSigningKey] = await tx
-        .insert(schema.appSigningKeys)
+      const [appSecretKey] = await tx
+        .insert(schema.appSecretKeys)
         .values({
           appId: app.id,
           secret,
         })
         .returning();
 
-      if (!appSigningKey) {
+      if (!appSecretKey) {
         throw new AppManagerFailedToRefreshAppSecretError();
       }
 
       return {
-        appSigningKey,
+        appSecretKey,
       };
     });
   }
@@ -224,7 +224,7 @@ type IAppManager_CreateAppParams = z.infer<typeof CreateAppParamsSchema>;
 
 type IAppManager_CreateAppResult = {
   app: AppSelectType;
-  signingKey: AppSigningKeysSelectType;
+  secretKey: AppSecretKeysSelectType;
 };
 
 const DeleteAppParamsSchema = z.object({
@@ -248,7 +248,7 @@ type IAppManager_RefreshAppSecretParams = z.infer<
 >;
 
 type IAppManager_RefreshAppSecretResult = {
-  appSigningKey: AppSigningKeysSelectType;
+  appSecretKey: AppSecretKeysSelectType;
 };
 
 const ListAppsParamsSchema = z.object({
@@ -275,7 +275,7 @@ type IAppManager_GetAppParams = z.infer<typeof GetAppParamsSchema>;
 
 type IAppManager_GetAppResult = {
   app: AppSelectType;
-  signingKey: AppSigningKeysSelectType;
+  secretKey: AppSecretKeysSelectType;
 };
 
 const UpdateAppParamsSchema = z.object({
@@ -350,9 +350,9 @@ export class AppManagerFailedToRefreshAppSecretError extends AppManagerError {
   }
 }
 
-export class AppManagerAppSigningKeyNotFoundError extends AppManagerError {
+export class AppManagerAppSecretKeyNotFoundError extends AppManagerError {
   constructor() {
-    super("App signing key not found");
-    this.name = "AppManagerAppSigningKeyNotFoundError";
+    super("App secret key not found");
+    this.name = "AppManagerAppSecretKeyNotFoundError";
   }
 }

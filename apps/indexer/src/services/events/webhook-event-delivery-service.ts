@@ -193,7 +193,11 @@ export class WebhookEventDeliveryService {
           with: {
             app: {
               with: {
-                appSigningKeys: true,
+                appSecretKeys: {
+                  where(fields, operators) {
+                    return operators.isNull(fields.revokedAt);
+                  },
+                },
               },
             },
           },
@@ -222,14 +226,14 @@ export class WebhookEventDeliveryService {
 
     try {
       const rawBody = JSON.stringify(event.payload);
-      const signingKey = appWebhook.app.appSigningKeys[0];
+      const secretKey = appWebhook.app.appSecretKeys[0];
 
-      if (!signingKey) {
-        throw new Error(`App with id ${appWebhook.app.id} has no signing key`);
+      if (!secretKey) {
+        throw new Error(`App with id ${appWebhook.app.id} has no secret key`);
       }
 
       const timestamp = Date.now();
-      const signature = createHmac("sha256", signingKey.secret)
+      const signature = createHmac("sha256", secretKey.secret)
         .update(`${timestamp}.${rawBody}`)
         .digest("hex");
       const response = await fetch(appWebhook.url, {
