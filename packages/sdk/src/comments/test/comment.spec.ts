@@ -69,25 +69,18 @@ describe("comment", () => {
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account,
-    // test to see if edit comment reverting is caused by lower polling interval
-    // my theory is that the polling interval is lowered but the total number of polling is unchanged
-    // resulting total wait time (= pollingInterval * total number of polling) not enough for the comment
-    // to be fully broadcasted
-    // pollingInterval: 500,
   }).extend(publicActions);
 
   const appClient = createWalletClient({
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: appAccount,
-    // pollingInterval: 500,
   }).extend(publicActions);
 
   const thirdPartyClient = createWalletClient({
     chain: anvil,
     transport: http(`http://localhost:${ANVIL_PORT_FOR_TESTS}`),
     account: thirdPartyAccount,
-    // pollingInterval: 500,
   }).extend(publicActions);
 
   describe("postComment()", () => {
