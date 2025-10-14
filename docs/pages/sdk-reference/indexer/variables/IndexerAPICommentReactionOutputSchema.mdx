@@ -191,6 +191,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
    })[], ZodTypeDef, (
      | {
      address: `0x${string}`;
@@ -290,6 +299,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[]>;
   revision: ZodNumber;
   targetUri: ZodString;
@@ -397,7 +415,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      parentId: ZodNullable<ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>>;
-     references: ZodType<(... | ... | ... | ... | ... | ... | ...)[], ZodTypeDef, (... | ... | ... | ... | ... | ... | ...)[]>;
+     references: ZodType<(... | ... | ... | ... | ... | ... | ... | ...)[], ZodTypeDef, (... | ... | ... | ... | ... | ... | ... | ...)[]>;
      revision: ZodNumber;
      targetUri: ZodString;
      txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
@@ -535,6 +553,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         type: "video";
         url: string;
         videoTracks?: ... | ...;
+      }
+        | {
+        chainId: number;
+        id: `0x${(...)}`;
+        position: {
+           end: ...;
+           start: ...;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -671,6 +698,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         type: "video";
         url: string;
         videoTracks?: ... | ...;
+      }
+        | {
+        chainId: number;
+        id: `0x${(...)}`;
+        position: {
+           end: ...;
+           start: ...;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -827,6 +863,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
@@ -965,6 +1010,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            codec?: ...;
            dimension: ...;
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -1134,6 +1188,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   revision: number;
   targetUri: string;
@@ -1272,6 +1335,15 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
            codec?: ...;
            dimension: ...;
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -1307,4 +1379,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:418](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L418)
+Defined in: [packages/sdk/src/indexer/schemas.ts:436](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L436)

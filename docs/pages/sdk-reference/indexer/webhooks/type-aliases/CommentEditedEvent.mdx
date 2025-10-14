@@ -114,6 +114,15 @@ type CommentEditedEvent = {
                  width: number;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         updatedAt: Date;
      };
@@ -255,6 +264,15 @@ data: {
               width: number;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      updatedAt: Date;
   };
@@ -369,6 +387,15 @@ comment: {
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   updatedAt: Date;
 };
@@ -502,6 +529,15 @@ references: (
         width: number;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

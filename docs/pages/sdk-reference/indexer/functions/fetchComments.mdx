@@ -156,6 +156,15 @@ function fetchComments(options): Promise<{
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      replies: {
         extra: {
@@ -288,6 +297,15 @@ function fetchComments(options): Promise<{
               type: "video";
               url: string;
               videoTracks?: ... | ...;
+            }
+              | {
+              chainId: number;
+              id: `0x${(...)}`;
+              position: {
+                 end: ...;
+                 start: ...;
+              };
+              type: "quoted_comment";
            })[];
            revision: number;
            targetUri: string;
@@ -460,6 +478,15 @@ function fetchComments(options): Promise<{
            type: "video";
            url: string;
            videoTracks?: ... | ...;
+         }
+           | {
+           chainId: number;
+           id: `0x${(...)}`;
+           position: {
+              end: ...;
+              start: ...;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -657,6 +684,15 @@ Fetch comments from the Indexer API
               `width`: ...;
            \};
         \}[];
+      \}
+        \| \{
+        `chainId`: `number`;
+        `id`: `` `0x${string}` ``;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"quoted_comment"`;
      \})[];
      `replies`: \{
         `extra`: \{
@@ -789,6 +825,15 @@ Fetch comments from the Indexer API
               `type`: `"video"`;
               `url`: `string`;
               `videoTracks?`: ... \| ...;
+            \}
+              \| \{
+              `chainId`: `number`;
+              `id`: `` `0x${(...)}` ``;
+              `position`: \{
+                 `end`: ...;
+                 `start`: ...;
+              \};
+              `type`: `"quoted_comment"`;
            \})[];
            `revision`: `number`;
            `targetUri`: `string`;
@@ -961,6 +1006,15 @@ Fetch comments from the Indexer API
            `type`: `"video"`;
            `url`: `string`;
            `videoTracks?`: ... \| ...;
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${(...)}` ``;
+           `position`: \{
+              `end`: ...;
+              `start`: ...;
+           \};
+           `type`: `"quoted_comment"`;
         \})[];
         `revision`: `number`;
         `targetUri`: `string`;

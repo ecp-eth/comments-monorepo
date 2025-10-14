@@ -118,6 +118,15 @@ function constructEventFromRequest(options): Promise<
            type: "video";
            url: string;
            videoTracks?: ...[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "root";
         updatedAt: Date;
@@ -228,6 +237,15 @@ function constructEventFromRequest(options): Promise<
            type: "video";
            url: string;
            videoTracks?: ...[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "reply";
         updatedAt: Date;
@@ -405,6 +423,15 @@ function constructEventFromRequest(options): Promise<
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         updatedAt: Date;
      };
@@ -732,6 +759,15 @@ The request to construct the event from.
            `type`: `"video"`;
            `url`: `string`;
            `videoTracks?`: ...[];
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${string}` ``;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"quoted_comment"`;
         \})[];
         `type`: `"root"`;
         `updatedAt`: `Date`;
@@ -842,6 +878,15 @@ The request to construct the event from.
            `type`: `"video"`;
            `url`: `string`;
            `videoTracks?`: ...[];
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${string}` ``;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"quoted_comment"`;
         \})[];
         `type`: `"reply"`;
         `updatedAt`: `Date`;
@@ -1019,6 +1064,15 @@ The request to construct the event from.
               `codec?`: ...;
               `dimension`: ...;
            \}[];
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${string}` ``;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"quoted_comment"`;
         \})[];
         `updatedAt`: `Date`;
      \};

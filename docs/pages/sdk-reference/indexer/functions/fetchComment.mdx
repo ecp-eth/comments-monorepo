@@ -144,6 +144,15 @@ function fetchComment(options): Promise<{
            width: number;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   replies: {
      extra: {
@@ -291,6 +300,15 @@ function fetchComment(options): Promise<{
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         revision: number;
         targetUri: string;
@@ -393,6 +411,12 @@ function fetchComment(options): Promise<{
               type: ...;
               url: ...;
               videoTracks?: ...;
+            }
+              | {
+              chainId: ...;
+              id: ...;
+              position: ...;
+              type: ...;
            })[];
            revision: number;
            targetUri: string;
@@ -564,6 +588,15 @@ function fetchComment(options): Promise<{
            codec?: ...;
            dimension: ...;
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      revision: number;
      targetUri: string;
@@ -748,6 +781,15 @@ Fetch one single comment from the Indexer API
            `width`: `number`;
         \};
      \}[];
+   \}
+     \| \{
+     `chainId`: `number`;
+     `id`: `` `0x${string}` ``;
+     `position`: \{
+        `end`: `number`;
+        `start`: `number`;
+     \};
+     `type`: `"quoted_comment"`;
   \})[];
   `replies`: \{
      `extra`: \{
@@ -895,6 +937,15 @@ Fetch one single comment from the Indexer API
               `codec?`: ...;
               `dimension`: ...;
            \}[];
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${string}` ``;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"quoted_comment"`;
         \})[];
         `revision`: `number`;
         `targetUri`: `string`;
@@ -997,6 +1048,12 @@ Fetch one single comment from the Indexer API
               `type`: ...;
               `url`: ...;
               `videoTracks?`: ...;
+            \}
+              \| \{
+              `chainId`: ...;
+              `id`: ...;
+              `position`: ...;
+              `type`: ...;
            \})[];
            `revision`: `number`;
            `targetUri`: `string`;
@@ -1168,6 +1225,15 @@ Fetch one single comment from the Indexer API
            `codec?`: ...;
            `dimension`: ...;
         \}[];
+      \}
+        \| \{
+        `chainId`: `number`;
+        `id`: `` `0x${string}` ``;
+        `position`: \{
+           `end`: `number`;
+           `start`: `number`;
+        \};
+        `type`: `"quoted_comment"`;
      \})[];
      `revision`: `number`;
      `targetUri`: `string`;

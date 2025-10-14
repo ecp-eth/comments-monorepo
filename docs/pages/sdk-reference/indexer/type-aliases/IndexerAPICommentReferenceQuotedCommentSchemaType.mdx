@@ -1,0 +1,67 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentReferenceQuotedCommentSchemaType
+
+# Type Alias: IndexerAPICommentReferenceQuotedCommentSchemaType
+
+```ts
+type IndexerAPICommentReferenceQuotedCommentSchemaType = {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:329](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L329)
+
+Handles caip373 quoted comment
+
+See https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-373.md
+and https://github.com/ecp-eth/ECPIP/discussions/2
+
+## Type declaration
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+### id
+
+```ts
+id: `0x${string}` = HexSchema;
+```
+
+### position
+
+```ts
+position: {
+  end: number;
+  start: number;
+} = IndexerAPICommentReferencePositionSchema;
+```
+
+#### position.end
+
+```ts
+end: number;
+```
+
+#### position.start
+
+```ts
+start: number;
+```
+
+### type
+
+```ts
+type: "quoted_comment";
+```

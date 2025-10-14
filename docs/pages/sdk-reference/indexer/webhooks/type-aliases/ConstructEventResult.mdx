@@ -121,6 +121,15 @@ type ConstructEventResult =
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "root";
         updatedAt: Date;
@@ -234,6 +243,15 @@ type ConstructEventResult =
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "reply";
         updatedAt: Date;
@@ -414,6 +432,15 @@ type ConstructEventResult =
                  width: ...;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         updatedAt: Date;
      };
@@ -726,6 +753,15 @@ Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/e
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "root";
         updatedAt: Date;
@@ -839,6 +875,15 @@ Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/e
               codec?: ...;
               dimension: ...;
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "reply";
         updatedAt: Date;
@@ -994,6 +1039,15 @@ data: {
            codec?: ...;
            dimension: ...;
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      type: "root";
      updatedAt: Date;
@@ -1107,6 +1161,15 @@ data: {
            codec?: ...;
            dimension: ...;
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      type: "reply";
      updatedAt: Date;
@@ -1242,6 +1305,15 @@ comment:
         codec?: ...;
         dimension: ...;
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "root";
   updatedAt: Date;
@@ -1355,6 +1427,15 @@ comment:
         codec?: ...;
         dimension: ...;
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "reply";
   updatedAt: Date;
@@ -1475,6 +1556,15 @@ Comment data
         codec?: ...;
         dimension: ...;
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "root";
   updatedAt: Date;
@@ -1591,6 +1681,15 @@ Comment data
         codec?: ...;
         dimension: ...;
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "reply";
   updatedAt: Date;
@@ -2081,6 +2180,15 @@ Version of the event
                  width: ...;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         updatedAt: Date;
      };
@@ -2216,6 +2324,15 @@ data: {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      updatedAt: Date;
   };
@@ -2330,6 +2447,15 @@ comment: {
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   updatedAt: Date;
 };
@@ -2463,6 +2589,15 @@ references: (
         width: ...;
      };
   }[];
+}
+  | {
+  chainId: number;
+  id: `0x${string}`;
+  position: {
+     end: number;
+     start: number;
+  };
+  type: "quoted_comment";
 })[] = IndexerAPICommentReferencesSchema;
 ```
 

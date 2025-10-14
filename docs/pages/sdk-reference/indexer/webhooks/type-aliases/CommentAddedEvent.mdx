@@ -123,6 +123,15 @@ type CommentAddedEvent = {
                  width: ...;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "root";
         updatedAt: Date;
@@ -239,6 +248,15 @@ type CommentAddedEvent = {
                  width: ...;
               };
            }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
         })[];
         type: "reply";
         updatedAt: Date;
@@ -403,6 +421,15 @@ data: {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      type: "root";
      updatedAt: Date;
@@ -519,6 +546,15 @@ data: {
               width: ...;
            };
         }[];
+      }
+        | {
+        chainId: number;
+        id: `0x${string}`;
+        position: {
+           end: number;
+           start: number;
+        };
+        type: "quoted_comment";
      })[];
      type: "reply";
      updatedAt: Date;
@@ -657,6 +693,15 @@ comment:
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "root";
   updatedAt: Date;
@@ -773,6 +818,15 @@ comment:
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "reply";
   updatedAt: Date;
@@ -896,6 +950,15 @@ Comment data
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "root";
   updatedAt: Date;
@@ -1015,6 +1078,15 @@ Comment data
            width: ...;
         };
      }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
   })[];
   type: "reply";
   updatedAt: Date;
