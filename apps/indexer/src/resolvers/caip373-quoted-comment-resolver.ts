@@ -4,7 +4,6 @@ import { type Hex } from "@ecp.eth/sdk/core";
 import DataLoader from "dataloader";
 import { decodeFunctionData } from "viem";
 import type config from "../../ponder.config.ts";
-import { sql } from "drizzle-orm";
 import { isSameHex } from "@ecp.eth/shared/helpers";
 import type { CommentByIdResolver } from "./comment-by-id-resolver.ts";
 
@@ -95,11 +94,7 @@ export function createCAIP373QuotedCommentResolver({
         );
       }
 
-      const resultPointerTuples = Object.entries(resultPointers).map(
-        ([, value]) => sql`(${value.commentId}, ${value.chainId})`,
-      );
-
-      if (resultPointerTuples.length > 0) {
+      if (Object.keys(resultPointers).length > 0) {
         const comments = await commentByIdResolver.loadMany(
           Object.entries(resultPointers).map(([, value]) => ({
             id: value.commentId,
@@ -113,7 +108,7 @@ export function createCAIP373QuotedCommentResolver({
           }
 
           const resultPointer =
-            resultPointers[`${comment.id}-${comment.chainId}`];
+            resultPointers[`${comment.id.toLowerCase()}-${comment.chainId}`];
 
           if (resultPointer) {
             // this updates the pointer so it is immediately available in keysToResults as well

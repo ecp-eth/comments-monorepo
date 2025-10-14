@@ -529,48 +529,67 @@ async function resolveNotificationsFromReferences({
   >[] = [];
 
   for (const reference of references) {
-    if (reference.type === "ens" || reference.type === "farcaster") {
-      if (isSameHex(reference.address, comment.author)) {
-        continue;
-      }
+    switch (reference.type) {
+      case "ens":
+      case "farcaster": {
+        if (isSameHex(reference.address, comment.author)) {
+          continue;
+        }
 
-      notificationsFromReferencesPromises.push(
-        Promise.resolve(
-          createMentionNotification({
-            chainId: context.chain.id,
-            comment,
-            mentionedUser: {
-              address: reference.address,
-            },
-          }),
-        ),
-      );
-    } else if (reference.type === "quoted_comment") {
-      notificationsFromReferencesPromises.push(
-        commentByIdResolverService
-          .load({
-            chainId: reference.chainId,
-            id: reference.id,
-          })
-          .then((quotedComment) => {
-            if (
-              !quotedComment ||
-              isSameHex(quotedComment.author, comment.author)
-            ) {
-              return;
-            }
-
-            return createQuoteNotification({
+        notificationsFromReferencesPromises.push(
+          Promise.resolve(
+            createMentionNotification({
               chainId: context.chain.id,
               comment,
-              quotedComment: {
-                app: quotedComment.app,
-                author: quotedComment.author,
-                id: quotedComment.id,
+              mentionedUser: {
+                address: reference.address,
               },
-            });
-          }),
-      );
+            }),
+          ),
+        );
+
+        continue;
+      }
+      case "quoted_comment": {
+        notificationsFromReferencesPromises.push(
+          commentByIdResolverService
+            .load({
+              chainId: reference.chainId,
+              id: reference.id,
+            })
+            .then((quotedComment) => {
+              if (
+                !quotedComment ||
+                isSameHex(quotedComment.author, comment.author)
+              ) {
+                return;
+              }
+
+              return createQuoteNotification({
+                chainId: context.chain.id,
+                comment,
+                quotedComment: {
+                  app: quotedComment.app,
+                  author: quotedComment.author,
+                  id: quotedComment.id,
+                },
+              });
+            }),
+        );
+
+        continue;
+      }
+      case "erc20":
+      case "file":
+      case "image":
+      case "video":
+      case "webpage": {
+        // noop
+        continue;
+      }
+      default: {
+        reference satisfies never;
+      }
     }
   }
 

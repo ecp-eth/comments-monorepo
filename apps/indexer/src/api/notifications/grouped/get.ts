@@ -1,14 +1,5 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
-import {
-  and,
-  asc,
-  desc,
-  eq,
-  inArray,
-  isNotNull,
-  isNull,
-  sql,
-} from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import {
   NotificationTypeSchema,
   type NotificationTypeSchemaType,
