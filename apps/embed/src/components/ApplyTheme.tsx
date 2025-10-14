@@ -37,7 +37,7 @@ export function ApplyTheme({ children }: ApplyThemeProps) {
     );
   }, [config]);
   const themeRootStyle = useMemo(() => {
-    return styleToCss(createThemeCSSVariables(config));
+    return `:root ${styleToCss(createThemeCSSVariables(config))}`;
   }, [config]);
   const [hydrated, setHydrated] = useState(false);
 
