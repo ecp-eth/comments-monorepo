@@ -1,0 +1,137 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / MarkNotificationsAsSeenOptions
+
+# Type Alias: MarkNotificationsAsSeenOptions
+
+```ts
+type MarkNotificationsAsSeenOptions = {
+  apiUrl?: string;
+  app?:   | Hex
+     | Hex[];
+  appSecretKey: string;
+  lastSeenNotificationDate?: Date;
+  retries?: number;
+  signal?: AbortSignal;
+  type?:   | IndexerAPINotificationTypeSchemaType
+     | IndexerAPINotificationTypeSchemaType[];
+  user: Hex | string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1533](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1533)
+
+## Properties
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1539](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1539)
+
+URL on which /api/notifications/seen endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### app?
+
+```ts
+optional app: 
+  | Hex
+  | Hex[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1552](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1552)
+
+The app signers to mark notifications as seen for
+
+***
+
+### appSecretKey
+
+```ts
+appSecretKey: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1544](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1544)
+
+App secret key to authenticate the request.
+Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+
+***
+
+### lastSeenNotificationDate?
+
+```ts
+optional lastSeenNotificationDate: Date;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1556](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1556)
+
+The date of the last seen notification, will mark as seen notifications created after this date
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1568](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1568)
+
+Number of times to retry the request in case of failure (non‑parsing/network errors).
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1572](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1572)
+
+The signal to abort the request
+
+***
+
+### type?
+
+```ts
+optional type: 
+  | IndexerAPINotificationTypeSchemaType
+  | IndexerAPINotificationTypeSchemaType[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1560](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1560)
+
+The types of notifications to mark as seen
+
+***
+
+### user
+
+```ts
+user: Hex | string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1548](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1548)
+
+The user to mark notifications as seen for, either ETH address or ENS name

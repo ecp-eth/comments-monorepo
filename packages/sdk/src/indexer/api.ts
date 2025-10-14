@@ -23,6 +23,14 @@ import {
   type IndexerAPIModerationClassificationLabelSchemaType,
   IndexerAPICommentWithRepliesSchema,
   type IndexerAPICommentWithRepliesSchemaType,
+  IndexerAPINotificationTypeSchema,
+  type IndexerAPINotificationTypeSchemaType,
+  IndexerAPIListNotificationsSchema,
+  type IndexerAPIListNotificationsSchemaType,
+  IndexerAPIListGroupedNotificationsSchema,
+  type IndexerAPIListGroupedNotificationsSchemaType,
+  IndexerAPIMarkNotificationsAsSeenSchema,
+  type IndexerAPIMarkNotificationsAsSeenSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
 import { z } from "zod";
@@ -1180,6 +1188,456 @@ export async function reportComment(
           response,
         );
       }
+    },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
+  );
+}
+
+/**
+ * The options for `fetchNotifications()`
+ */
+export type FetchNotificationsOptions = {
+  /**
+   * URL on which /api/notifications endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * App secret key to authenticate the request.
+   * Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+   */
+  appSecretKey: string;
+  /**
+   * The user to fetch notifications for, either ETH address or ENS name
+   */
+  user: Hex | string;
+  /**
+   * The app signers to fetch notifications for
+   */
+  app?: Hex | Hex[];
+  /**
+   * The types of notifications to fetch
+   */
+  type?:
+    | IndexerAPINotificationTypeSchemaType
+    | IndexerAPINotificationTypeSchemaType[];
+  /**
+   * Before cursor to fetch notifications from (newer notifications)
+   */
+  before?: string;
+  /**
+   * After cursor to fetch notifications from (older notifications)
+   */
+  after?: string;
+  /**
+   * Fetch notifications for a specific parent id
+   */
+  parentId?: Hex;
+  /**
+   * Whether to fetch only seen or unseen notifications
+   *
+   * @default undefined - fetches all notifications
+   */
+  seen?: boolean;
+  /**
+   * The number of notifications to fetch
+   *
+   * @default 10
+   */
+  limit?: number;
+  /**
+   * Number of times to retry the request in case of failure (non‑parsing/network errors).
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * The signal to abort the request
+   */
+  signal?: AbortSignal;
+};
+
+const FetchNotificationsOptionsSchema = z
+  .object({
+    apiUrl: z.string().url().default(INDEXER_API_URL),
+    appSecretKey: z.string(),
+    user: HexSchema.or(z.string()),
+    app: HexSchema.or(HexSchema.array().max(20)).optional(),
+    type: IndexerAPINotificationTypeSchema.or(
+      IndexerAPINotificationTypeSchema.array(),
+    ).optional(),
+    seen: z.boolean().optional(),
+    before: z.string().optional(),
+    after: z.string().optional(),
+    limit: z.number().int().positive().default(10),
+    parentId: HexSchema.optional(),
+    retries: z.number().int().positive().default(3),
+    signal: z.instanceof(AbortSignal).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.before && data.after) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cannot use both before and after",
+      });
+    }
+  });
+
+void ({} as FetchNotificationsOptions satisfies z.input<
+  typeof FetchNotificationsOptionsSchema
+>);
+
+/**
+ * Fetch notifications from the Indexer API
+ *
+ * @returns A promise that resolves to notifications fetched from the Indexer API
+ */
+export async function fetchNotifications(
+  options: FetchNotificationsOptions,
+): Promise<IndexerAPIListNotificationsSchemaType> {
+  const {
+    apiUrl,
+    appSecretKey,
+    signal,
+    retries,
+    user,
+    app,
+    limit,
+    seen,
+    before,
+    after,
+    parentId,
+    type,
+  } = FetchNotificationsOptionsSchema.parse(options);
+
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/notifications", apiUrl);
+
+      url.searchParams.set("user", user);
+
+      if (Array.isArray(app)) {
+        url.searchParams.set("app", app.join(","));
+      } else if (app) {
+        url.searchParams.set("app", app);
+      }
+
+      if (seen != null) {
+        url.searchParams.set("seen", seen.toString());
+      }
+
+      url.searchParams.set("limit", limit.toString());
+
+      if (before) {
+        url.searchParams.set("before", before);
+      }
+
+      if (after) {
+        url.searchParams.set("after", after);
+      }
+
+      if (parentId) {
+        url.searchParams.set("parentId", parentId);
+      }
+
+      if (Array.isArray(type)) {
+        url.searchParams.set("type", type.join(","));
+      } else if (type) {
+        url.searchParams.set("type", type);
+      }
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `App-Key ${appSecretKey}`,
+        },
+        cache: "no-cache",
+        signal,
+      });
+
+      if (!response.ok) {
+        throw new ResponseError(
+          `Failed to fetch notifications: ${response.statusText}`,
+          response,
+        );
+      }
+
+      return IndexerAPIListNotificationsSchema.parse(await response.json());
+    },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
+  );
+}
+
+/**
+ * The options for `fetchGroupedNotifications()`
+ */
+export type FetchGroupedNotificationsOptions = {
+  /**
+   * URL on which /api/notifications/grouped endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * App secret key to authenticate the request.
+   * Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+   */
+  appSecretKey: string;
+  /**
+   * The user to fetch grouped notifications for, either ETH address or ENS name
+   */
+  user: Hex | string;
+  /**
+   * The app signers to fetch grouped notifications for
+   */
+  app?: Hex | Hex[];
+  /**
+   * The types of grouped notifications to fetch
+   */
+  type?:
+    | IndexerAPINotificationTypeSchemaType
+    | IndexerAPINotificationTypeSchemaType[];
+  /**
+   * Before cursor to fetch grouped notifications from (newer grouped notifications)
+   */
+  before?: string;
+  /**
+   * After cursor to fetch grouped notifications from (older grouped notifications)
+   */
+  after?: string;
+  /**
+   * Whether to fetch only seen or unseen notifications
+   *
+   * @default undefined - fetches all grouped notifications
+   */
+  seen?: boolean;
+  /**
+   * The number of grouped notifications to fetch
+   *
+   * @default 10
+   */
+  limit?: number;
+  /**
+   * Number of times to retry the request in case of failure (non‑parsing/network errors).
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * The signal to abort the request
+   */
+  signal?: AbortSignal;
+};
+
+const FetchGroupedNotificationsOptionsSchema = z.object({
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  appSecretKey: z.string(),
+  user: HexSchema.or(z.string()),
+  app: HexSchema.or(HexSchema.array().max(20)).optional(),
+  type: IndexerAPINotificationTypeSchema.or(
+    IndexerAPINotificationTypeSchema.array(),
+  ).optional(),
+  seen: z.boolean().optional(),
+  before: z.string().optional(),
+  after: z.string().optional(),
+  limit: z.number().int().positive().default(10),
+  retries: z.number().int().positive().default(3),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+void ({} as FetchGroupedNotificationsOptions satisfies z.input<
+  typeof FetchGroupedNotificationsOptionsSchema
+>);
+
+/**
+ * Fetch grouped notifications from the Indexer API
+ *
+ * @returns A promise that resolves to grouped notifications fetched from the Indexer API
+ */
+export async function fetchGroupedNotifications(
+  options: FetchGroupedNotificationsOptions,
+): Promise<IndexerAPIListGroupedNotificationsSchemaType> {
+  const {
+    apiUrl,
+    appSecretKey,
+    signal,
+    retries,
+    user,
+    app,
+    seen,
+    limit,
+    before,
+    after,
+    type,
+  } = FetchGroupedNotificationsOptionsSchema.parse(options);
+
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/notifications/grouped", apiUrl);
+
+      url.searchParams.set("user", user);
+
+      if (Array.isArray(app)) {
+        url.searchParams.set("app", app.join(","));
+      } else if (app) {
+        url.searchParams.set("app", app);
+      }
+
+      if (seen != null) {
+        url.searchParams.set("seen", seen.toString());
+      }
+
+      url.searchParams.set("limit", limit.toString());
+
+      if (before) {
+        url.searchParams.set("before", before);
+      }
+
+      if (after) {
+        url.searchParams.set("after", after);
+      }
+
+      if (Array.isArray(type)) {
+        url.searchParams.set("type", type.join(","));
+      } else if (type) {
+        url.searchParams.set("type", type);
+      }
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `App-Key ${appSecretKey}`,
+        },
+        cache: "no-cache",
+        signal,
+      });
+
+      if (!response.ok) {
+        throw new ResponseError(
+          `Failed to fetch grouped notifications: ${response.statusText}`,
+          response,
+        );
+      }
+
+      return IndexerAPIListGroupedNotificationsSchema.parse(
+        await response.json(),
+      );
+    },
+    { signal, retries, retryCondition: indexerApiRetryCondition },
+  );
+}
+
+export type MarkNotificationsAsSeenOptions = {
+  /**
+   * URL on which /api/notifications/seen endpoint will be called
+   *
+   * @default "https://api.ethcomments.xyz"
+   */
+  apiUrl?: string;
+  /**
+   * App secret key to authenticate the request.
+   * Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+   */
+  appSecretKey: string;
+  /**
+   * The user to mark notifications as seen for, either ETH address or ENS name
+   */
+  user: Hex | string;
+  /**
+   * The app signers to mark notifications as seen for
+   */
+  app?: Hex | Hex[];
+  /**
+   * The date of the last seen notification, will mark as seen notifications created after this date
+   */
+  lastSeenNotificationDate?: Date;
+  /**
+   * The types of notifications to mark as seen
+   */
+  type?:
+    | IndexerAPINotificationTypeSchemaType
+    | IndexerAPINotificationTypeSchemaType[];
+  /**
+   * Number of times to retry the request in case of failure (non‑parsing/network errors).
+   *
+   * @default 3
+   */
+  retries?: number;
+  /**
+   * The signal to abort the request
+   */
+  signal?: AbortSignal;
+};
+
+const MarkNotificationsAsSeenOptionsSchema = z.object({
+  apiUrl: z.string().url().default(INDEXER_API_URL),
+  appSecretKey: z.string(),
+  user: HexSchema.or(z.string()),
+  app: HexSchema.or(HexSchema.array().max(20)).optional(),
+  lastSeenNotificationDate: z.coerce.date().optional(),
+  type: IndexerAPINotificationTypeSchema.or(
+    IndexerAPINotificationTypeSchema.array(),
+  ).optional(),
+  retries: z.number().int().positive().default(3),
+  signal: z.instanceof(AbortSignal).optional(),
+});
+
+void ({} as MarkNotificationsAsSeenOptions satisfies z.input<
+  typeof MarkNotificationsAsSeenOptionsSchema
+>);
+
+/**
+ * Mark notifications as seen
+ *
+ * @returns A promise that resolves to the number of notifications marked as seen
+ */
+export async function markNotificationsAsSeen(
+  options: MarkNotificationsAsSeenOptions,
+): Promise<IndexerAPIMarkNotificationsAsSeenSchemaType> {
+  const {
+    apiUrl,
+    appSecretKey,
+    user,
+    app,
+    lastSeenNotificationDate,
+    type,
+    retries,
+    signal,
+  } = MarkNotificationsAsSeenOptionsSchema.parse(options);
+
+  return runAsync(
+    async (signal) => {
+      const url = new URL("/api/notifications/seen", apiUrl);
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `App-Key ${appSecretKey}`,
+        },
+        body: JSON.stringify({
+          user,
+          app,
+          lastSeenNotificationDate,
+          type,
+        }),
+        cache: "no-cache",
+        signal,
+      });
+
+      if (!response.ok) {
+        throw new ResponseError(
+          `Failed to mark notifications as seen: ${response.statusText}`,
+          response,
+        );
+      }
+
+      return IndexerAPIMarkNotificationsAsSeenSchema.parse(
+        await response.json(),
+      );
     },
     { signal, retries, retryCondition: indexerApiRetryCondition },
   );

@@ -1,0 +1,190 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / FetchGroupedNotificationsOptions
+
+# Type Alias: FetchGroupedNotificationsOptions
+
+```ts
+type FetchGroupedNotificationsOptions = {
+  after?: string;
+  apiUrl?: string;
+  app?:   | Hex
+     | Hex[];
+  appSecretKey: string;
+  before?: string;
+  limit?: number;
+  retries?: number;
+  seen?: boolean;
+  signal?: AbortSignal;
+  type?:   | IndexerAPINotificationTypeSchemaType
+     | IndexerAPINotificationTypeSchemaType[];
+  user: Hex | string;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1376](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1376)
+
+The options for `fetchGroupedNotifications()`
+
+## Properties
+
+### after?
+
+```ts
+optional after: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1409](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1409)
+
+After cursor to fetch grouped notifications from (older grouped notifications)
+
+***
+
+### apiUrl?
+
+```ts
+optional apiUrl: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1382](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1382)
+
+URL on which /api/notifications/grouped endpoint will be called
+
+#### Default
+
+```ts
+"https://api.ethcomments.xyz"
+```
+
+***
+
+### app?
+
+```ts
+optional app: 
+  | Hex
+  | Hex[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1395](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1395)
+
+The app signers to fetch grouped notifications for
+
+***
+
+### appSecretKey
+
+```ts
+appSecretKey: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1387](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1387)
+
+App secret key to authenticate the request.
+Can be found in the https://dashboard.ethcomments.xyz after creating an app.
+
+***
+
+### before?
+
+```ts
+optional before: string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1405](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1405)
+
+Before cursor to fetch grouped notifications from (newer grouped notifications)
+
+***
+
+### limit?
+
+```ts
+optional limit: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1421](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1421)
+
+The number of grouped notifications to fetch
+
+#### Default
+
+```ts
+10
+```
+
+***
+
+### retries?
+
+```ts
+optional retries: number;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1427](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1427)
+
+Number of times to retry the request in case of failure (non‑parsing/network errors).
+
+#### Default
+
+```ts
+3
+```
+
+***
+
+### seen?
+
+```ts
+optional seen: boolean;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1415](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1415)
+
+Whether to fetch only seen or unseen notifications
+
+#### Default
+
+```ts
+undefined - fetches all grouped notifications
+```
+
+***
+
+### signal?
+
+```ts
+optional signal: AbortSignal;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1431](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1431)
+
+The signal to abort the request
+
+***
+
+### type?
+
+```ts
+optional type: 
+  | IndexerAPINotificationTypeSchemaType
+  | IndexerAPINotificationTypeSchemaType[];
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1399](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1399)
+
+The types of grouped notifications to fetch
+
+***
+
+### user
+
+```ts
+user: Hex | string;
+```
+
+Defined in: [packages/sdk/src/indexer/api.ts:1391](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1391)
+
+The user to fetch grouped notifications for, either ETH address or ENS name
