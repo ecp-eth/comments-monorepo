@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     const passedCommentData = parseResult.data;
     const {
-      comment: { content, author, chainId, commentType },
+      comment: { content, author, chainId, commentType, channelId },
       authorSignature,
       deadline,
     } = passedCommentData;
@@ -65,6 +65,7 @@ export async function POST(req: Request) {
       content,
       author,
       app: appAccount.address,
+      channelId,
       commentType,
       deadline,
 

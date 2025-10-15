@@ -225,3 +225,11 @@ export function runAsync<T>(
 export function getOneDayFromNowInSeconds(): bigint {
   return BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24);
 }
+
+/**
+ * Get the number of seconds to one minute from now
+ * @returns one minute from now in seconds in bigint
+ */
+export function getOneMinuteFromNowInSeconds(): bigint {
+  return BigInt(Math.floor(Date.now() / 1000) + 60);
+}

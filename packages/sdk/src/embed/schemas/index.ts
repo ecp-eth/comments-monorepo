@@ -214,7 +214,15 @@ export const EmbedConfigSchema = z.object({
   app: z
     .union([HexSchema, z.literal("embed"), z.literal("all")])
     .default("embed"),
-
+  /**
+   * The id of the channel to post the comments to.
+   */
+  channelId: z.coerce.bigint().optional(),
+  /**
+   * The gas sponsorship to use when posting comments.
+   *
+   * @default "gasless-not-preapproved"
+   */
   gasSponsorship: z
     .union([
       // this option is needed for when we want to support custom channel id
