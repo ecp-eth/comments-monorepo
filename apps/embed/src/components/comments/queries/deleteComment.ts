@@ -145,7 +145,7 @@ async function deleteCommentWithGaslessAndAuthorSig({
 
   return {
     txHash: deleteCommentResult.data.txHash,
-    type: authorSignature ? "gasless-not-approved" : "gasless-preapproved",
+    type: authorSignature ? "gasless-not-preapproved" : "gasless-preapproved",
     action: "delete",
     state: { status: "pending" },
     chainId: deleteCommentPayloadRequest.chainId,

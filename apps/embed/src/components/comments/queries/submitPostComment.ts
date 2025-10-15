@@ -179,7 +179,7 @@ async function postCommentWithGaslessAndAuthorSig({
     txHash: postCommentResult.data.txHash,
     resolvedAuthor,
     response: postCommentResult.data,
-    type: "gasless-not-approved",
+    type: "gasless-not-preapproved",
     action: "post",
     state: { status: "pending" },
     chainId: postCommentPayloadRequest.chainId,
