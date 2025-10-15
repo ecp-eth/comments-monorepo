@@ -45,6 +45,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   }
 
   const { targetUri, config } = parseSearchParamsResult.data;
+
   const cookieStore = await cookies();
   // viewer cookie is set by useSyncViewerCookie hook inside CommentSection
   const viewer = cookieStore.get("viewer")?.value as Hex | undefined;
@@ -59,6 +60,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
       mode: "flat",
       viewer,
       targetUri,
+      channelId: config.channelId,
     };
     const comments = await fetchComments(fetchCommentParams);
 

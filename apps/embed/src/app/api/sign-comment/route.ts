@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   }
 
   const passedCommentData = parseResult.data;
-  const { content, author, chainId, commentType } = passedCommentData;
+  const { content, author, chainId } = passedCommentData;
 
   if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
     return Response.json(
@@ -88,18 +88,8 @@ export async function POST(req: Request) {
 
   const account = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
   const commentData = createCommentData({
-    content,
-    author,
+    ...passedCommentData,
     app: account.address,
-    commentType,
-
-    ...("parentId" in passedCommentData
-      ? {
-          parentId: passedCommentData.parentId,
-        }
-      : {
-          targetUri: passedCommentData.targetUri,
-        }),
   });
 
   const typedCommentData = createCommentTypedData({

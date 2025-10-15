@@ -32,6 +32,7 @@ const SharedCommentInputSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty().max(MAX_COMMENT_LENGTH),
   chainId: z.number(),
+  channelId: z.coerce.bigint().optional(),
   commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 

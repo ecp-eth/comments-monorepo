@@ -11,12 +11,14 @@ contract DeployFlatFeeHook is Script {
   function setUp() public {}
 
   function run() public {
+    uint256 salt = uint256(0);
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-    address fundAddress = vm.envAddress("FUND_ADDRESS");
+    address deployerAddress = vm.addr(deployerPrivateKey);
 
     vm.startBroadcast(deployerPrivateKey);
 
-    flatFeeHook = new FlatFeeHook(fundAddress);
+    flatFeeHook = new FlatFeeHook{ salt: bytes32(salt) }(deployerAddress);
+    flatFeeHook.setShouldChargeOnEdit(true);
 
     // Log the address of the deployed contract
     console.log("FlatFeeHook deployed at:", address(flatFeeHook));

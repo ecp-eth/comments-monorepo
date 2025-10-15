@@ -24,10 +24,16 @@ import {
   createEditCommentData,
   createEditCommentTypedData,
   editComment,
+  getComment,
   getNonce,
 } from "@ecp.eth/sdk/comments";
 import { SignTypedDataMutateAsync } from "wagmi/query";
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
+import {
+  createEstimateChannelPostOrEditCommentFeeData,
+  estimateChannelEditCommentFee,
+  EstimateChannelEditCommentFeeReadContractType,
+} from "@ecp.eth/sdk/channel-manager";
 
 class SubmitEditCommentMutationError extends Error {}
 
@@ -41,7 +47,9 @@ type SubmitEditCommentParams = {
   editRequest: EditCommentRequestType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: ContractWriteFunctions["editComment"];
-  readContractAsync: ContractReadFunctions["getNonce"];
+  readContractAsync: ContractReadFunctions["getNonce"] &
+    ContractReadFunctions["getComment"] &
+    EstimateChannelEditCommentFeeReadContractType;
   signTypedDataAsync: SignTypedDataMutateAsync;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
@@ -88,6 +96,7 @@ export async function submitEditComment({
     case "not-gasless":
       return await editCommentWithoutGasless({
         editCommentPayloadRequest,
+        readContractAsync,
         writeContractAsync,
         editRequest,
       });
@@ -185,10 +194,13 @@ async function editCommentWithGaslessAndAuthorSig({
 
 async function editCommentWithoutGasless({
   editCommentPayloadRequest,
+  readContractAsync,
   writeContractAsync,
   editRequest,
 }: {
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
+  readContractAsync: ContractReadFunctions["getComment"] &
+    EstimateChannelEditCommentFeeReadContractType;
   writeContractAsync: ContractWriteFunctions["editComment"];
   editRequest: EditCommentRequestType;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
@@ -219,10 +231,45 @@ async function editCommentWithoutGasless({
   }
 
   try {
+    const { comment: existingComment } = await getComment({
+      readContract: readContractAsync as ContractReadFunctions["getComment"],
+      commentId: editCommentPayloadRequest.commentId,
+    });
+
+    let fee:
+      | Awaited<ReturnType<typeof estimateChannelEditCommentFee>>
+      | undefined;
+
+    if (existingComment.channelId) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { createdAt, updatedAt, ...commentDataExcludedDates } =
+        existingComment;
+      // Estimate the fee for posting a comment to the channel
+      const estimationCommentData =
+        createEstimateChannelPostOrEditCommentFeeData({
+          ...commentDataExcludedDates,
+        });
+      fee = await estimateChannelEditCommentFee({
+        commentData: estimationCommentData,
+        metadata: [],
+        msgSender: editCommentPayloadRequest.author,
+        readContract: readContractAsync,
+        channelId: existingComment.channelId,
+      });
+    }
+
+    if ((fee?.contractAsset?.amount ?? 0n) > 0n) {
+      // TODO: this will be supported in a separate PR or ticket
+      throw new SubmitEditCommentMutationError(
+        "We don't support editing to a channel requires fees to be paid in contract assets yet.",
+      );
+    }
+
     const { txHash } = await editComment({
       edit: signedCommentResult.data.data,
       appSignature: signedCommentResult.data.signature,
       writeContract: writeContractAsync,
+      fee: fee?.baseToken.amount,
     });
 
     return {
