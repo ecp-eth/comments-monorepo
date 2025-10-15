@@ -1,5 +1,15 @@
 # @ecp.eth/sdk
 
+## 0.0.30
+
+### Patch Changes
+
+- 315c2ee: fix(sdk): do not allow to encode decimals, improve docs
+- ee07e8f: fix(sdk): createCommentData was in wrong unit
+- 61c837b: chore(sdk): improve metadata helpers docs
+- a650552: fix(sdk): do not retry unretriable responses from indexer API
+- 90ef422: feat: notifications api helpers
+
 ## 0.0.29
 
 ### Patch Changes

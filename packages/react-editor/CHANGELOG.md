@@ -1,5 +1,18 @@
 # @ecp.eth/react-editor
 
+## 0.0.10
+
+### Patch Changes
+
+- f030c34: feat(react-editor): add file transformers for stripping image metadata for upload
+- Updated dependencies [315c2ee]
+- Updated dependencies [ee07e8f]
+- Updated dependencies [61c837b]
+- Updated dependencies [a650552]
+- Updated dependencies [90ef422]
+  - @ecp.eth/sdk@0.0.30
+  - @ecp.eth/shared@0.0.13
+
 ## 0.0.9
 
 ### Patch Changes

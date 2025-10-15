@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/sdk",
-  "version": "0.0.29",
+  "version": "0.0.30",
   "type": "module",
   "license": "MIT",
   "main": "./dist/cjs/index.cjs",
