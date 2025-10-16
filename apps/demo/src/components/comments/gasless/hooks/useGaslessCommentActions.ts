@@ -79,7 +79,7 @@ export function useGaslessCommentActions({
           chainId,
           commentId: params.comment.id,
           state: { status: "pending" },
-          type: hasApproval ? "gasless-preapproved" : "gasless-not-approved",
+          type: hasApproval ? "gasless-preapproved" : "gasless-not-preapproved",
           txHash,
         };
 

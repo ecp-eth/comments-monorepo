@@ -176,7 +176,7 @@ async function editCommentWithGaslessAndAuthorSig({
   return {
     txHash: editCommentResult.data.txHash,
     response: editCommentResult.data,
-    type: "gasless-not-approved",
+    type: "gasless-not-preapproved",
     action: "edit",
     state: { status: "pending" },
     chainId: editCommentPayloadRequest.chainId,

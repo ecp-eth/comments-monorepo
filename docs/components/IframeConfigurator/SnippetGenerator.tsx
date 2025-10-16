@@ -115,8 +115,8 @@ export default function SnippetGenerator({
       return;
     }
 
-    const reuslt = onBeforeCopy?.() ?? true;
-    if (!reuslt) {
+    const result = onBeforeCopy?.() ?? true;
+    if (!result) {
       return;
     }
 
