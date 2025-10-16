@@ -1,0 +1,29 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / createEstimateChannelPostOrEditCommentFeeData
+
+# Function: createEstimateChannelPostOrEditCommentFeeData()
+
+```ts
+function createEstimateChannelPostOrEditCommentFeeData(__namedParameters): CommentData;
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:961](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L961)
+
+## Parameters
+
+### \_\_namedParameters
+
+`Omit`\<`Omit`\<[`CommentData`](/sdk-reference/comments/type-aliases/CommentData.mdx), `"parentId"` \| `"targetUri"`\>, `"createdAt"` \| `"authMethod"` \| `"updatedAt"` \| `"commentType"` \| `"channelId"`\> & `ExactPartial`\<`Pick`\<`Omit`\<[`CommentData`](/sdk-reference/comments/type-aliases/CommentData.mdx), `"parentId"` \| `"targetUri"`\>, `"createdAt"` \| `"authMethod"` \| `"updatedAt"` \| `"commentType"` \| `"channelId"`\>\> & 
+  \| \{
+  `targetUri`: `string`;
+\}
+  \| \{
+  `parentId`: `` `0x${string}` ``;
+\}
+
+## Returns
+
+[`CommentData`](/sdk-reference/comments/type-aliases/CommentData.mdx)
