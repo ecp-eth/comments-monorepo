@@ -24,7 +24,7 @@ export const ERC165_ABI = [
     stateMutability: "view",
     type: "function",
   },
-];
+] as const;
 
 export const ERC20_ABI = [
   {
@@ -249,7 +249,7 @@ export const ERC20_ABI = [
     name: "Approval",
     type: "event",
   },
-];
+] as const;
 
 export const LEGACY_TAKES_CHANNEL_ABI = parseAbi([
   "function commentFee() view returns (uint256)",

@@ -1,6 +1,11 @@
 import { useCallback } from "react";
 import { waitForTransactionReceipt } from "@wagmi/core";
-import { useConfig, useSwitchChain } from "wagmi";
+import {
+  useConfig,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 import { useCommentEdition } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { submitEditComment } from "@/components/comments/queries/submitEditComment";
@@ -36,8 +41,12 @@ export function useEditComment() {
   const embedConfig = useEmbedConfig();
   const { chainId } = embedConfig;
 
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+
+  if (!publicClient) {
+    throw new Error("No public client found");
+  }
 
   return useCallback<UseEditCommentProps>(
     async ({
@@ -48,6 +57,10 @@ export function useEditComment() {
       comment,
       references,
     }) => {
+      if (!walletClient) {
+        throw new Error("No wallet client found");
+      }
+
       const pendingOperation = {
         ...(await submitEditComment({
           address: author,
@@ -59,9 +72,8 @@ export function useEditComment() {
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          readContractAsync,
-          writeContractAsync,
-          signTypedDataAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
         })),
         references,
@@ -101,12 +113,11 @@ export function useEditComment() {
     [
       chainId,
       commentEdition,
-      embedConfig,
-      readContractAsync,
-      signTypedDataAsync,
+      embedConfig.gasSponsorship,
+      publicClient,
       switchChainAsync,
       wagmiConfig,
-      writeContractAsync,
+      walletClient,
     ],
   );
 }

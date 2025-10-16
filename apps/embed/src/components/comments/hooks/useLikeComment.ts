@@ -1,6 +1,12 @@
 import { useCallback } from "react";
 import { waitForTransactionReceipt } from "viem/actions";
-import { useAccount, useConnectorClient, useSwitchChain } from "wagmi";
+import {
+  useAccount,
+  useConnectorClient,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
@@ -11,7 +17,6 @@ import {
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostComment } from "../queries/submitPostComment";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 type UseLikeCommentProps = {
@@ -44,12 +49,22 @@ export const useLikeComment = () => {
   );
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
   const { channelId, gasSponsorship } = useEmbedConfig();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+
+  if (!publicClient) {
+    throw new Error(
+      "No wagmi client found, this component must be used within a wagmi provider",
+    );
+  }
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
+      if (!walletClient) {
+        throw new Error("No wallet client found");
+      }
+
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
       if (!client) {
@@ -82,9 +97,8 @@ export const useLikeComment = () => {
             switchChainAsync(chainId) {
               return switchChainAsync({ chainId });
             },
-            readContractAsync,
-            writeContractAsync,
-            signTypedDataAsync,
+            publicClient,
+            walletClient,
             gasSponsorship: gasSponsorship,
           })),
           references: [],
@@ -127,13 +141,14 @@ export const useLikeComment = () => {
       }
     },
     [
+      channelId,
       client,
       connectedAddress,
       gasSponsorship,
       likeReactionSubmission,
-      signTypedDataAsync,
+      publicClient,
       switchChainAsync,
-      writeContractAsync,
+      walletClient,
     ],
   );
 };
