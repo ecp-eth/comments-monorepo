@@ -674,17 +674,21 @@ export async function getEstimatedChannelPostCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
   let estimation: HookFeeEstimation | undefined;
   try {
-    estimation = await readContract({
-      abi: BaseHookABI,
-      address: channelInfo.hook,
-      functionName: "estimateAddCommentFee",
-      args: [commentData, metadata, msgSender],
-    });
+    estimation = {
+      ...(await readContract({
+        abi: BaseHookABI,
+        address: channelInfo.hook,
+        functionName: "estimateAddCommentFee",
+        args: [commentData, metadata, msgSender],
+      })),
+      hook: channelInfo.hook,
+    };
   } catch (error) {
     if (!(error instanceof ContractFunctionExecutionError)) {
       throw error;
@@ -721,6 +725,7 @@ export async function getEstimatedChannelPostCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "Legacy Takes Channel Hook",
       metadata: [],
+      hook: channelInfo.hook,
     };
   }
 
@@ -766,17 +771,21 @@ export async function getEstimatedChannelEditCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
   let estimation: HookFeeEstimation;
   try {
-    estimation = await readContract({
-      abi: BaseHookABI,
-      address: channelInfo.hook,
-      functionName: "estimateEditCommentFee",
-      args: [commentData, metadata, msgSender],
-    });
+    estimation = {
+      ...(await readContract({
+        abi: BaseHookABI,
+        address: channelInfo.hook,
+        functionName: "estimateEditCommentFee",
+        args: [commentData, metadata, msgSender],
+      })),
+      hook: channelInfo.hook,
+    };
   } catch (error) {
     if (!(error instanceof ContractFunctionExecutionError)) {
       throw error;
@@ -788,6 +797,7 @@ export async function getEstimatedChannelEditCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "Legacy Takes Channel Hook",
       metadata: [],
+      hook: channelInfo.hook,
     };
   }
 
@@ -845,6 +855,7 @@ async function estimateChannelCommentActionFee<
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
@@ -884,6 +895,7 @@ async function estimateChannelCommentActionFee<
     contractAsset,
     description: hookEstimatedFee.description,
     metadata: hookEstimatedFee.metadata,
+    hook: hookEstimatedFee.hook,
   };
 }
 
@@ -926,34 +938,6 @@ export async function estimateChannelEditCommentFee({
     commentActionFunc: getEstimatedChannelEditCommentHookFee,
   });
 }
-
-/**
- * All read contract types needed for estimating fee for posting a comment to a channel
- */
-export type EstimateChannelPostCommentFeeReadContractType =
-  HookContractReadFunctions["estimateAddCommentFee"] &
-    ContractReadFunctions["getChannel"] &
-    LegacyTakesChannelContractReadFunctions["commentFee"] &
-    ContractReadFunctions["getHookTransactionFee"] &
-    ERC165ContractReadFunctions["supportsInterface"] &
-    ERC20ContractReadFunctions["name"] &
-    ERC20ContractReadFunctions["symbol"] &
-    ERC20ContractReadFunctions["decimals"] &
-    ERC20ContractReadFunctions["totalSupply"];
-
-/**
- * All read contract types needed for estimating fee for editing a comment to a channel
- */
-export type EstimateChannelEditCommentFeeReadContractType =
-  HookContractReadFunctions["estimateEditCommentFee"] &
-    ContractReadFunctions["getChannel"] &
-    LegacyTakesChannelContractReadFunctions["commentFee"] &
-    ContractReadFunctions["getHookTransactionFee"] &
-    ERC165ContractReadFunctions["supportsInterface"] &
-    ERC20ContractReadFunctions["name"] &
-    ERC20ContractReadFunctions["symbol"] &
-    ERC20ContractReadFunctions["decimals"] &
-    ERC20ContractReadFunctions["totalSupply"];
 
 /*
  * Helper function to the data structure for estimating fee for comment post or edit

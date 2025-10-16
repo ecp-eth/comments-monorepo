@@ -177,6 +177,7 @@ export type HookFeeEstimation = {
   asset: Hex;
   description: string;
   metadata: readonly MetadataEntry[];
+  hook: Hex;
 };
 
 export type ContractBasedAssetERCType =
@@ -209,4 +210,8 @@ export type TotalFeeEstimation = {
    * The metadata of the fee estimation
    */
   metadata: readonly MetadataEntry[];
+  /**
+   * The hook address to be paid
+   */
+  hook: Hex;
 };

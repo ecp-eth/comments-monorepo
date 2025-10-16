@@ -2,12 +2,16 @@ import { useCommentRetrySubmission } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useConfig, useSwitchChain } from "wagmi";
+import {
+  useConfig,
+  usePublicClient,
+  useSwitchChain,
+  useWalletClient,
+} from "wagmi";
 import { submitPostComment } from "../queries/submitPostComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { waitForTransactionReceipt } from "@wagmi/core";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryPostCommentParams = {
@@ -36,12 +40,19 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+
+  if (!publicClient) {
+    throw new Error("No public client found");
+  }
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
+      if (!walletClient) {
+        throw new Error("No wallet client found");
+      }
       const { comment } = params;
 
       if (!comment.pendingOperation) {
@@ -73,9 +84,8 @@ export function useRetryPostComment({
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          readContractAsync,
-          writeContractAsync,
-          signTypedDataAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
         })),
         references: comment.references,
@@ -113,9 +123,9 @@ export function useRetryPostComment({
       }
     },
     [
+      walletClient,
       connectedAddress,
-      writeContractAsync,
-      signTypedDataAsync,
+      publicClient,
       embedConfig.gasSponsorship,
       switchChainAsync,
       commentRetrySubmission,
