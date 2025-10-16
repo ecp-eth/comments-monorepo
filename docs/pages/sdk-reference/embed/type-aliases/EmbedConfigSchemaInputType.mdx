@@ -10,6 +10,7 @@
 type EmbedConfigSchemaInputType = {
   app?: `0x${string}` | "all" | "embed";
   chainId?: 8453 | 31337;
+  channelId?: bigint;
   disablePromotion?: boolean;
   gasSponsorship?: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
   restrictMaximumContainerWidth?: boolean;
@@ -1828,7 +1829,7 @@ type EmbedConfigSchemaInputType = {
 };
 ```
 
-Defined in: [packages/sdk/src/embed/schemas/index.ts:231](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L231)
+Defined in: [packages/sdk/src/embed/schemas/index.ts:239](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L239)
 
 Custom configuration for `<CommentEmbed />` component.
 
@@ -1863,6 +1864,14 @@ We don't filter chain id when fetching comments.
 
 default to [DEFAULT\_CHAIN\_ID](/sdk-reference/defaultExports/variables/DEFAULT_CHAIN_ID.mdx)
 
+### channelId?
+
+```ts
+optional channelId: bigint;
+```
+
+The id of the channel to post the comments to.
+
 ### disablePromotion?
 
 ```ts
@@ -1881,6 +1890,14 @@ false
 
 ```ts
 optional gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
+```
+
+The gas sponsorship to use when posting comments.
+
+#### Default
+
+```ts
+"gasless-not-preapproved"
 ```
 
 ### restrictMaximumContainerWidth?

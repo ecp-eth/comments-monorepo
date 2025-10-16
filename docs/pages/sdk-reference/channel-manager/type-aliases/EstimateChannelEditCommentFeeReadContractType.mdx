@@ -1,0 +1,15 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [channel-manager](/sdk-reference/channel-manager/index.mdx) / EstimateChannelEditCommentFeeReadContractType
+
+# Type Alias: EstimateChannelEditCommentFeeReadContractType
+
+```ts
+type EstimateChannelEditCommentFeeReadContractType = HookContractReadFunctions["estimateEditCommentFee"] & ContractReadFunctions["getChannel"] & LegacyTakesChannelContractReadFunctions["commentFee"] & ContractReadFunctions["getHookTransactionFee"] & ERC165ContractReadFunctions["supportsInterface"] & ERC20ContractReadFunctions["name"] & ERC20ContractReadFunctions["symbol"] & ERC20ContractReadFunctions["decimals"] & ERC20ContractReadFunctions["totalSupply"];
+```
+
+Defined in: [packages/sdk/src/channel-manager/channel.ts:947](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/channel.ts#L947)
+
+All read contract types needed for estimating fee for editing a comment to a channel
