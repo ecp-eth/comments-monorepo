@@ -3,7 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { getWagmiConfig } from "../lib/wagmi";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { PendingWalletConnectionActionsProvider } from "@ecp.eth/shared/components";
 import { ApplyTheme } from "@/components/ApplyTheme";
@@ -38,6 +38,10 @@ export function Providers<
       status: "connecting" as const,
     };
   }, [wagmiConfig.state]);
+
+  useEffect(() => {
+    console.log("Embed config:", config);
+  }, [config]);
 
   return (
     <EmbedConfigProvider value={config}>

@@ -80,7 +80,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/hooks</loc>
-    <lastmod>2025-09-23T08:46:18.000Z</lastmod>
+    <lastmod>2025-10-16T08:07:24.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -200,7 +200,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/protocol-fee</loc>
-    <lastmod>2025-09-23T08:46:18.000Z</lastmod>
+    <lastmod>2025-10-16T08:07:24.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -231,6 +231,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/channelExists</loc>
     <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/createEstimateChannelPostOrEditCommentFeeData</loc>
+    <lastmod>2025-10-16T09:01:28.364Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -705,6 +711,18 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/DeductProtocolHookTransactionFeeResult</loc>
     <lastmod>2025-05-19T15:00:00.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/EstimateChannelEditCommentFeeReadContractType</loc>
+    <lastmod>2025-10-16T09:01:28.348Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/EstimateChannelPostCommentFeeReadContractType</loc>
+    <lastmod>2025-10-16T09:01:28.348Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2511,6 +2529,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core/functions/getOneDayFromNowInSeconds</loc>
     <lastmod>2025-10-08T07:08:42.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/core/functions/getOneMinuteFromNowInSeconds</loc>
+    <lastmod>2025-10-16T09:01:28.463Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   CHANNEL_MANAGER_ADDRESS,
   COMMENT_TYPE_COMMENT,
+  DEFAULT_CHANNEL_ID,
+  DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
   NATIVE_ASSET_ADDRESS,
   ZERO_ADDRESS,
@@ -13,7 +15,11 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { BaseHookABI, ChannelManagerABI } from "../abis.js";
-import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
+import {
+  createWaitableWriteContractHelper,
+  getOneMinuteFromNowInSeconds,
+  isZeroHex,
+} from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
@@ -25,6 +31,7 @@ import type {
   ContractBasedAssetType,
 } from "./types.js";
 import {
+  AuthorAuthMethod,
   type CommentData,
   type MetadataEntry,
   type MetadataEntryOp,
@@ -41,7 +48,7 @@ import type {
 } from "../types.js";
 import { getERCType } from "./utils.js";
 import { LEGACY_TAKES_CHANNEL_ABI } from "../extraABIs.js";
-import { ContractFunctionExecutionError } from "viem";
+import { ContractFunctionExecutionError, PartialBy } from "viem";
 
 export type CreateChannelParams = {
   /**
@@ -918,4 +925,69 @@ export async function estimateChannelEditCommentFee({
     ...restOpts,
     commentActionFunc: getEstimatedChannelEditCommentHookFee,
   });
+}
+
+/**
+ * All read contract types needed for estimating fee for posting a comment to a channel
+ */
+export type EstimateChannelPostCommentFeeReadContractType =
+  HookContractReadFunctions["estimateAddCommentFee"] &
+    ContractReadFunctions["getChannel"] &
+    LegacyTakesChannelContractReadFunctions["commentFee"] &
+    ContractReadFunctions["getHookTransactionFee"] &
+    ERC165ContractReadFunctions["supportsInterface"] &
+    ERC20ContractReadFunctions["name"] &
+    ERC20ContractReadFunctions["symbol"] &
+    ERC20ContractReadFunctions["decimals"] &
+    ERC20ContractReadFunctions["totalSupply"];
+
+/**
+ * All read contract types needed for estimating fee for editing a comment to a channel
+ */
+export type EstimateChannelEditCommentFeeReadContractType =
+  HookContractReadFunctions["estimateEditCommentFee"] &
+    ContractReadFunctions["getChannel"] &
+    LegacyTakesChannelContractReadFunctions["commentFee"] &
+    ContractReadFunctions["getHookTransactionFee"] &
+    ERC165ContractReadFunctions["supportsInterface"] &
+    ERC20ContractReadFunctions["name"] &
+    ERC20ContractReadFunctions["symbol"] &
+    ERC20ContractReadFunctions["decimals"] &
+    ERC20ContractReadFunctions["totalSupply"];
+
+/*
+ * Helper function to the data structure for estimating fee for comment post or edit
+ */
+export function createEstimateChannelPostOrEditCommentFeeData({
+  createdAt = getOneMinuteFromNowInSeconds(),
+  updatedAt = getOneMinuteFromNowInSeconds(),
+  channelId = DEFAULT_CHANNEL_ID,
+  commentType = DEFAULT_COMMENT_TYPE,
+  authMethod = AuthorAuthMethod.DIRECT_TX,
+  ...params
+}: PartialBy<
+  Omit<CommentData, "parentId" | "targetUri">,
+  "createdAt" | "updatedAt" | "channelId" | "commentType" | "authMethod"
+> &
+  ({ targetUri: string } | { parentId: Hex })): CommentData {
+  const parentIdOrTargetUri =
+    "targetUri" in params
+      ? {
+          targetUri: params.targetUri,
+          parentId: EMPTY_PARENT_ID,
+        }
+      : {
+          targetUri: "",
+          parentId: params.parentId,
+        };
+
+  return {
+    ...params,
+    ...parentIdOrTargetUri,
+    commentType,
+    channelId,
+    createdAt,
+    updatedAt,
+    authMethod,
+  };
 }

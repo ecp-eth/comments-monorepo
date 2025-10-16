@@ -36,7 +36,7 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { writeContractAsync, signTypedDataAsync } =
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
 
@@ -73,7 +73,7 @@ export function useRetryPostComment({
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-
+          readContractAsync,
           writeContractAsync,
           signTypedDataAsync,
           gasSponsorship: embedConfig.gasSponsorship,

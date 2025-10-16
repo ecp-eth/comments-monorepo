@@ -68,7 +68,7 @@ export function useEmbedConfig<
     | EmbedConfigProviderByTargetURIConfig
     | EmbedConfigProviderByAuthorConfig
     | EmbedConfigProviderByRepliesConfig,
->() {
+>(): TConfig {
   const ctx = useContext(configContext) as TConfig;
   // create a new object with its prototype points to the real context
   // performance wise it is quicker this way, avoid spreading overhead
@@ -78,6 +78,12 @@ export function useEmbedConfig<
         if (!publicEnv.NEXT_PUBLIC_ENABLE_GASLESS) {
           return "not-gasless";
         }
+
+        if (ctx.channelId) {
+          // we don't support gasless for channel comment yet
+          return "not-gasless";
+        }
+
         return ctx.gasSponsorship;
       },
       enumerable: true,

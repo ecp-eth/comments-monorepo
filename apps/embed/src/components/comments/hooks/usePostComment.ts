@@ -22,12 +22,11 @@ type UsePostCommentProps = (params: {
 export function usePostComment() {
   const wagmiConfig = useConfig();
   const commentSubmission = useCommentSubmission();
-  const embedConfig = useEmbedConfig();
+  const { chainId, channelId, gasSponsorship } = useEmbedConfig();
   const { switchChainAsync } = useSwitchChain();
-  const { chainId } = embedConfig;
-
-  const { writeContractAsync, signTypedDataAsync } =
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
+
   return useCallback<UsePostCommentProps>(
     async ({
       author,
@@ -43,6 +42,7 @@ export function usePostComment() {
           postCommentRequest: {
             chainId,
             content,
+            channelId,
             ...("parentId" in targetUriOrParentId
               ? { parentId: targetUriOrParentId.parentId }
               : { targetUri: targetUriOrParentId.targetUri }),
@@ -51,8 +51,9 @@ export function usePostComment() {
             return switchChainAsync({ chainId });
           },
           signTypedDataAsync,
-          writeContractAsync: writeContractAsync,
-          gasSponsorship: embedConfig.gasSponsorship,
+          readContractAsync,
+          writeContractAsync,
+          gasSponsorship: gasSponsorship,
         })),
         references,
       };
@@ -90,8 +91,9 @@ export function usePostComment() {
     },
     [
       chainId,
+      channelId,
       commentSubmission,
-      embedConfig.gasSponsorship,
+      gasSponsorship,
       signTypedDataAsync,
       switchChainAsync,
       wagmiConfig,

@@ -26,7 +26,10 @@ import {
   postComment,
 } from "@ecp.eth/sdk/comments";
 
-import { estimateChannelPostCommentFee } from "@ecp.eth/sdk/channel-manager";
+import {
+  createEstimateChannelPostOrEditCommentFeeData,
+  estimateChannelPostCommentFee,
+} from "@ecp.eth/sdk/channel-manager";
 import { privateKeyToAccount } from "viem/accounts";
 
 const {
@@ -68,25 +71,34 @@ async function main() {
   // STEP 2: Prepare comment data
   // ========================================
 
-  // Set expiration time to 30 seconds from now, this is a rough estimation of the arrival time of the comment.
+  // Set expiration time to 1 minute from now, this is a rough estimation of the arrival time of the comment.
   // most hooks do not use the field to calculate the fee, but in case they do, these are required and potentially
   // the estimation can be off so be prepared for that (you mway want to add buffer fee amount or retry logic)
-  const eta = BigInt(Math.floor(Date.now() / 1000) + 30);
+  const eta = BigInt(Math.floor(Date.now() / 1000) + 60);
 
-  // Create the comment data structure with all required fields
-  const commentData: CommentData = {
+  // Create the comment data structure with all required fields.
+  // The helper function makes some default value assumptions to cover common cases.
+  // The result is equivalent to the following:
+  //
+  // {
+  //   content: "Hello, world!", // The actual comment text\
+  //   targetUri: "https://example.com", // URL this comment is about
+  //   commentType: 0, // Type of comment (0 = regular comment)
+  //   authMethod: AuthorAuthMethod.DIRECT_TX, // Author will sign and send transaction directly
+  //   channelId: retrieveEstimatableHookFeeChannelId, // Channel that has fee estimation
+  //   parentId: "0x0000000000000000000000000000000000000000000000000000000000000000", // No parent (top-level comment)
+  //   author: authorAccount.address, // Who is posting the comment
+  //   app: appAccount.address, // Which app manages this channel
+  //   createdAt: eta, // When comment was created
+  //   updatedAt: eta, // When comment was last updated
+  // }
+  const commentData = createEstimateChannelPostOrEditCommentFeeData({
     content: "Hello, world!", // The actual comment text
     targetUri: "https://example.com", // URL this comment is about
-    commentType: 0, // Type of comment (0 = regular comment)
-    authMethod: AuthorAuthMethod.DIRECT_TX, // Author will sign and send transaction directly
     channelId: retrieveEstimatableHookFeeChannelId, // Channel that has fee estimation
-    parentId:
-      "0x0000000000000000000000000000000000000000000000000000000000000000", // No parent (top-level comment)
     author: authorAccount.address, // Who is posting the comment
     app: appAccount.address, // Which app manages this channel
-    createdAt: eta, // When comment was created
-    updatedAt: eta, // When comment was last updated
-  };
+  });
 
   // No additional metadata for this example
   const metadata = [];

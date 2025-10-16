@@ -44,9 +44,9 @@ export const useLikeComment = () => {
   );
   const { address: connectedAddress } = useAccount();
   const { data: client } = useConnectorClient();
-  const { writeContractAsync, signTypedDataAsync } =
+  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
     useReadWriteContractAsync();
-  const embedConfig = useEmbedConfig();
+  const { channelId, gasSponsorship } = useEmbedConfig();
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
@@ -73,17 +73,19 @@ export const useLikeComment = () => {
           ...(await submitPostComment({
             author: connectedAddress,
             postCommentRequest: {
-              chainId: comment.chainId,
               content: COMMENT_REACTION_LIKE_CONTENT,
               commentType: COMMENT_TYPE_REACTION,
               parentId: comment.id,
+              chainId: comment.chainId,
+              channelId,
             },
             switchChainAsync(chainId) {
               return switchChainAsync({ chainId });
             },
+            readContractAsync,
             writeContractAsync,
             signTypedDataAsync,
-            gasSponsorship: embedConfig.gasSponsorship,
+            gasSponsorship: gasSponsorship,
           })),
           references: [],
         };
@@ -127,7 +129,7 @@ export const useLikeComment = () => {
     [
       client,
       connectedAddress,
-      embedConfig.gasSponsorship,
+      gasSponsorship,
       likeReactionSubmission,
       signTypedDataAsync,
       switchChainAsync,
