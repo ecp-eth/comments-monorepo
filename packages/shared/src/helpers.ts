@@ -54,19 +54,14 @@ export function hasNewComments(
     return false;
   }
 
-  const pendingComments: Set<PendingComment["id"]> = new Set(
+  const existingComments: Set<PendingComment["id"]> = new Set(
     oldQueryData.pages.flatMap((page) =>
-      page.results
-        .filter(
-          (comment): comment is PendingComment =>
-            comment.pendingOperation?.action === "post",
-        )
-        .map((comment) => comment.id),
+      page.results.map((comment) => comment.id.toLowerCase() as Hex),
     ),
   );
 
   for (const newComment of newCommentsPage.results) {
-    if (!pendingComments.has(newComment.id)) {
+    if (!existingComments.has(newComment.id.toLowerCase() as Hex)) {
       return true;
     }
   }
@@ -87,21 +82,16 @@ export function mergeNewComments(
     return oldQueryData;
   }
 
-  const pendingComments: Map<PendingComment["id"], { pageIndex: number }> =
+  const existingComments: Map<PendingComment["id"], { pageIndex: number }> =
     new Map(
       oldQueryData.pages.flatMap((page, pageIndex) =>
-        page.results
-          .filter(
-            (comment): comment is PendingComment =>
-              comment.pendingOperation?.action === "post",
-          )
-          .map((comment) => [comment.id, { pageIndex }]),
+        page.results.map((comment) => [comment.id, { pageIndex }]),
       ),
     );
 
   for (const newComment of newCommentsPage.results) {
-    if (pendingComments.has(newComment.id)) {
-      const { pageIndex } = pendingComments.get(newComment.id)!;
+    if (existingComments.has(newComment.id)) {
+      const { pageIndex } = existingComments.get(newComment.id)!;
 
       oldQueryData.pages[pageIndex]!.results = oldQueryData.pages[
         pageIndex
