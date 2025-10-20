@@ -57,7 +57,7 @@ export type SignEditCommentResponseClientSchemaType = z.infer<
 >;
 
 export const PendingOperationTypeSchema = z.enum([
-  "gasless-not-approved",
+  "gasless-not-preapproved",
   "gasless-preapproved",
   "non-gasless",
 ]);
