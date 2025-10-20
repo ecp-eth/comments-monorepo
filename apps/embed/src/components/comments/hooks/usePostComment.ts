@@ -3,8 +3,12 @@ import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { useCallback } from "react";
 import { submitPostComment } from "../queries/submitPostComment";
-import { useConfig, useSwitchChain } from "wagmi";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import {
+  useWalletClient,
+  useConfig,
+  useSwitchChain,
+  usePublicClient,
+} from "wagmi";
 import { waitForTransactionReceipt } from "@wagmi/core";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { QueryKey } from "@tanstack/react-query";
@@ -24,8 +28,14 @@ export function usePostComment() {
   const commentSubmission = useCommentSubmission();
   const { chainId, channelId, gasSponsorship } = useEmbedConfig();
   const { switchChainAsync } = useSwitchChain();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+
+  if (!publicClient) {
+    throw new Error(
+      "No wagmi client found, this component must be used within a wagmi provider",
+    );
+  }
 
   return useCallback<UsePostCommentProps>(
     async ({
@@ -36,6 +46,10 @@ export function usePostComment() {
       onSubmitStart,
       queryKey,
     }) => {
+      if (!walletClient) {
+        throw new Error("No wallet client found");
+      }
+
       const pendingOperation = {
         ...(await submitPostComment({
           author: author,
@@ -50,9 +64,8 @@ export function usePostComment() {
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          signTypedDataAsync,
-          readContractAsync,
-          writeContractAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: gasSponsorship,
         })),
         references,
@@ -94,10 +107,10 @@ export function usePostComment() {
       channelId,
       commentSubmission,
       gasSponsorship,
-      signTypedDataAsync,
+      publicClient,
       switchChainAsync,
       wagmiConfig,
-      writeContractAsync,
+      walletClient,
     ],
   );
 }
