@@ -145,6 +145,7 @@ export function CommentSectionGasless({
     fetchNextPage,
     isPending,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery({
     enabled: isAccountStatusResolved && !!currentUrl,
     queryKey,
@@ -184,6 +185,7 @@ export function CommentSectionGasless({
     enabled: isAccountStatusResolved && !!currentUrl,
     queryData: data,
     queryKey,
+    refetch,
     fetchComments({ cursor, signal }) {
       return fetchComments({
         chainId: chain.id,

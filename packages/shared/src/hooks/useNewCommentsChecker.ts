@@ -1,15 +1,12 @@
-import type {
-  CommentPageSchemaType,
-  ListCommentsQueryDataSchemaType,
-} from "../schemas.js";
+import type { CommentPageSchemaType } from "../schemas.js";
 import {
   type InfiniteData,
   type QueryKey,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
-import { hasNewComments, mergeNewComments } from "../helpers.js";
+import { useCallback, useMemo } from "react";
+import { hasNewComments } from "../helpers.js";
 import type {
   IndexerAPIListCommentRepliesSchemaType,
   IndexerAPIListCommentsSchemaType,
@@ -24,8 +21,9 @@ export function useNewCommentsChecker({
   enabled = true,
   queryKey,
   queryData,
+  refetch,
   fetchComments: fetchFn,
-  refetchInterval = 60000,
+  refetchInterval = 5000,
 }: {
   /**
    * Whether to enable the new comments checker.
@@ -34,10 +32,14 @@ export function useNewCommentsChecker({
    */
   enabled?: boolean;
   /**
-   * Query to update the first page pagination.
+   * Query key used by the main useInfiniteQuery hook.
    */
   queryKey: QueryKey;
   queryData: InfiniteData<CommentPageSchemaType> | undefined;
+  /**
+   * Function to trigger a refetch of the main useInfiniteQuery hook.
+   */
+  refetch: () => Promise<unknown>;
   fetchComments: (options: {
     cursor: Hex | undefined;
     signal: AbortSignal;
@@ -53,27 +55,10 @@ export function useNewCommentsChecker({
   fetchNewComments: () => void;
 } {
   const client = useQueryClient();
+
   const newCommentsQueryKey = useMemo(() => {
     return [...queryKey, "new-comments-checker"];
   }, [queryKey]);
-
-  const queryResult = useQuery({
-    enabled: !!queryData && enabled,
-    queryKey: newCommentsQueryKey,
-    queryFn: async ({ signal }) => {
-      if (!queryData || !queryData.pages[0]) {
-        return;
-      }
-
-      const response = await fetchFn({
-        cursor: queryData.pages[0].pagination.startCursor,
-        signal,
-      });
-
-      return response;
-    },
-    refetchInterval,
-  });
 
   const resetQuery = useCallback(() => {
     client.setQueryData<IndexerAPIListCommentsSchemaType>(
@@ -96,54 +81,23 @@ export function useNewCommentsChecker({
     );
   }, [client, newCommentsQueryKey]);
 
-  useEffect(() => {
-    if (!queryResult.data || !queryData) {
-      return;
-    }
+  const queryResult = useQuery({
+    enabled: !!queryData && enabled,
+    queryKey: newCommentsQueryKey,
+    queryFn: async ({ signal }) => {
+      if (!queryData || !queryData.pages[0]) {
+        return;
+      }
 
-    const newComments = queryResult.data;
+      const response = await fetchFn({
+        cursor: queryData.pages[0].pagination.startCursor,
+        signal,
+      });
 
-    // this also has new comments (not written by us, so let user decide if they want to see them, see fetchNewComments())
-    if (hasNewComments(queryData, newComments)) {
-      return;
-    }
-
-    // remove pending operations and make sure the order of new comments is correct
-    // based on indexer result
-    client.setQueryData<ListCommentsQueryDataSchemaType>(
-      queryKey,
-      (oldData) => {
-        if (!oldData) {
-          return oldData;
-        }
-
-        return mergeNewComments(oldData, newComments);
-      },
-    );
-
-    resetQuery();
-  }, [queryResult.data, queryData, resetQuery, client, queryKey]);
-
-  const fetchNewComments = useCallback(() => {
-    if (!queryData || !queryResult.data) {
-      return;
-    }
-
-    const newComments = queryResult.data;
-
-    client.setQueryData<ListCommentsQueryDataSchemaType>(
-      queryKey,
-      (oldData) => {
-        if (!oldData) {
-          return;
-        }
-
-        return mergeNewComments(oldData, newComments);
-      },
-    );
-
-    resetQuery();
-  }, [queryData, queryResult.data, client, queryKey, resetQuery]);
+      return response;
+    },
+    refetchInterval,
+  });
 
   return useMemo(() => {
     return {
@@ -151,7 +105,10 @@ export function useNewCommentsChecker({
         queryData && queryResult.data
           ? hasNewComments(queryData, queryResult.data)
           : false,
-      fetchNewComments,
+      fetchNewComments: async () => {
+        resetQuery();
+        await refetch();
+      },
     };
-  }, [queryData, queryResult.data, fetchNewComments]);
+  }, [queryData, queryResult, refetch, resetQuery]);
 }

@@ -109,6 +109,7 @@ export function CommentSection({
     enabled: isAccountStatusResolved,
     queryData: data,
     queryKey,
+    refetch,
     fetchComments(options) {
       return fetchComments({
         ...fetchCommentParams,

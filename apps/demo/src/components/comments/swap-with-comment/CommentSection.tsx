@@ -48,6 +48,7 @@ export function CommentSection() {
     fetchNextPage,
     isPending,
     isFetchingNextPage,
+    refetch,
   } = useInfiniteQuery({
     enabled: isAccountStatusResolved && !!currentUrl,
     queryKey,
@@ -87,6 +88,7 @@ export function CommentSection() {
     enabled: isAccountStatusResolved && !!currentUrl,
     queryData: data,
     queryKey,
+    refetch,
     fetchComments({ cursor, signal }) {
       return fetchComments({
         chainId: chain.id,

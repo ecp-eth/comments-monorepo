@@ -133,6 +133,7 @@ export function CommentSectionReplies({
     enabled: isAccountStatusResolved && !!selectedComment,
     queryData: data,
     queryKey,
+    refetch,
     fetchComments(options) {
       return fetchCommentReplies({
         ...fetchCommentRepliesParams,
