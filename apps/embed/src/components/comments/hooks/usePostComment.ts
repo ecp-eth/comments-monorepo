@@ -31,12 +31,6 @@ export function usePostComment() {
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
 
-  if (!publicClient) {
-    throw new Error(
-      "No wagmi client found, this component must be used within a wagmi provider",
-    );
-  }
-
   return useCallback<UsePostCommentProps>(
     async ({
       author,
@@ -46,6 +40,12 @@ export function usePostComment() {
       onSubmitStart,
       queryKey,
     }) => {
+      if (!publicClient) {
+        throw new Error(
+          "No wagmi client found, this component must be used within a wagmi provider",
+        );
+      }
+
       if (!walletClient) {
         throw new Error("No wallet client found");
       }

@@ -895,12 +895,17 @@ function usePreventKeyboardShortcut() {
   }, []);
 
   useEffect(() => {
-    ref.current?.addEventListener("keydown", handleKeyDown);
+    const wrappedElement = ref.current;
+    if (!wrappedElement) {
+      return;
+    }
+
+    wrappedElement.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      ref.current?.removeEventListener("keydown", handleKeyDown);
+      wrappedElement.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [handleKeyDown]);
 
   return {
     ref,

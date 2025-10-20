@@ -10,7 +10,6 @@ import { useCommentEdition } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { submitEditComment } from "@/components/comments/queries/submitEditComment";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { QueryKey } from "@tanstack/react-query";

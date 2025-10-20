@@ -43,7 +43,7 @@ export async function prepareContractAssetForTransfer({
         abi: ERC20_ABI,
         address: contractAsset.address,
         functionName: "approve",
-        args: [hook, contractAsset.amount - allowance],
+        args: [hook, contractAsset.amount],
       });
 
       await publicClient.waitForTransactionReceipt({

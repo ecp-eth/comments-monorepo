@@ -940,7 +940,7 @@ export async function estimateChannelEditCommentFee({
 }
 
 /*
- * Helper function to the data structure for estimating fee for comment post or edit
+ * Helper function to create the data structure for estimating fee for comment post or edit
  */
 export function createEstimateChannelPostOrEditCommentFeeData({
   createdAt = getOneMinuteFromNowInSeconds(),

@@ -1,8 +1,7 @@
 import { useCallback } from "react";
-import { waitForTransactionReceipt } from "viem/actions";
 import {
   useAccount,
-  useConnectorClient,
+  useConfig,
   usePublicClient,
   useSwitchChain,
   useWalletClient,
@@ -18,6 +17,7 @@ import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostComment } from "../queries/submitPostComment";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
+import { waitForTransactionReceipt } from "@wagmi/core";
 
 type UseLikeCommentProps = {
   /**
@@ -43,33 +43,29 @@ type UseLikeCommentProps = {
 };
 
 export const useLikeComment = () => {
+  const wagmiConfig = useConfig();
   const { switchChainAsync } = useSwitchChain();
   const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const { address: connectedAddress } = useAccount();
-  const { data: client } = useConnectorClient();
   const { channelId, gasSponsorship } = useEmbedConfig();
   const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
 
-  if (!publicClient) {
-    throw new Error(
-      "No wagmi client found, this component must be used within a wagmi provider",
-    );
-  }
-
   return useCallback(
     async (params: UseLikeCommentProps) => {
+      if (!publicClient) {
+        throw new Error(
+          "No wagmi client found, this component must be used within a wagmi provider",
+        );
+      }
+
       if (!walletClient) {
         throw new Error("No wallet client found");
       }
 
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
-
-      if (!client) {
-        throw new Error("No client");
-      }
 
       if (
         (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ??
@@ -110,7 +106,7 @@ export const useLikeComment = () => {
           pendingOperation,
         });
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -142,12 +138,12 @@ export const useLikeComment = () => {
     },
     [
       channelId,
-      client,
       connectedAddress,
       gasSponsorship,
       likeReactionSubmission,
       publicClient,
       switchChainAsync,
+      wagmiConfig,
       walletClient,
     ],
   );
