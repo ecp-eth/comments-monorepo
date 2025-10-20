@@ -709,7 +709,7 @@ export default function IframeConfigurator() {
                         <LabelWithHelp label={label} help={help} />
                         <div className="grid grid-cols-2 gap-2">
                           <FormField
-                            key="config.theme.font.sizes.${key}.size"
+                            key={`config.theme.font.sizes.${key}.size`}
                             control={form.control}
                             name={`config.theme.font.sizes.${key}.size`}
                             render={({ field }) => (
@@ -732,7 +732,7 @@ export default function IframeConfigurator() {
                             )}
                           />
                           <FormField
-                            key="config.theme.font.sizes.${key}.lineHeight"
+                            key={`config.theme.font.sizes.${key}.lineHeight`}
                             control={form.control}
                             name={`config.theme.font.sizes.${key}.lineHeight`}
                             render={({ field }) => (

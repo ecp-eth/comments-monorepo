@@ -48,7 +48,7 @@ import type {
 } from "../types.js";
 import { getERCType } from "./utils.js";
 import { LEGACY_TAKES_CHANNEL_ABI } from "../extraABIs.js";
-import { ContractFunctionExecutionError, PartialBy } from "viem";
+import { ContractFunctionExecutionError, type PartialBy } from "viem";
 
 export type CreateChannelParams = {
   /**
