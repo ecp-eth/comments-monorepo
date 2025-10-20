@@ -13,11 +13,12 @@ type TotalFeeEstimation = {
   };
   contractAsset?: ContractBasedAssetType;
   description: string;
+  hook: Hex;
   metadata: readonly MetadataEntry[];
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:193](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L193)
+Defined in: [packages/sdk/src/channel-manager/types.ts:194](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L194)
 
 ## Properties
 
@@ -29,7 +30,7 @@ baseToken: {
 };
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:197](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L197)
+Defined in: [packages/sdk/src/channel-manager/types.ts:198](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L198)
 
 The amount of the base token to be paid
 
@@ -47,7 +48,7 @@ amount: bigint;
 optional contractAsset: ContractBasedAssetType;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:203](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L203)
+Defined in: [packages/sdk/src/channel-manager/types.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L204)
 
 The contract based asset to be paid, such as ERC20, ERC721, ERC1155
 
@@ -59,9 +60,21 @@ The contract based asset to be paid, such as ERC20, ERC721, ERC1155
 description: string;
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:207](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L207)
+Defined in: [packages/sdk/src/channel-manager/types.ts:208](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L208)
 
 The description of the fee
+
+***
+
+### hook
+
+```ts
+hook: Hex;
+```
+
+Defined in: [packages/sdk/src/channel-manager/types.ts:216](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L216)
+
+The hook address to be paid
 
 ***
 
@@ -71,6 +84,6 @@ The description of the fee
 metadata: readonly MetadataEntry[];
 ```
 
-Defined in: [packages/sdk/src/channel-manager/types.ts:211](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L211)
+Defined in: [packages/sdk/src/channel-manager/types.ts:212](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/channel-manager/types.ts#L212)
 
 The metadata of the fee estimation
