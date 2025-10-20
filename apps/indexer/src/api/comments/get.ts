@@ -108,6 +108,7 @@ export default (app: OpenAPIHono) => {
           ? isNotNull(schema.comment.deletedAt)
           : isNull(schema.comment.deletedAt)
         : undefined,
+      // replies should be same as the containing comment type
       commentType != null
         ? eq(schema.comment.commentType, commentType)
         : undefined,
@@ -131,6 +132,9 @@ export default (app: OpenAPIHono) => {
       repliesConditions.push(
         inArray(schema.comment.moderationStatus, moderationStatusFilter),
       );
+      viewerReactionsConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
     } else if (env.MODERATION_ENABLED) {
       const approvedComments = eq(schema.comment.moderationStatus, "approved");
 
@@ -142,9 +146,11 @@ export default (app: OpenAPIHono) => {
 
         sharedConditions.push(approvedOrViewersComments);
         repliesConditions.push(approvedOrViewersComments);
+        viewerReactionsConditions.push(approvedOrViewersComments);
       } else {
         sharedConditions.push(approvedComments);
         repliesConditions.push(approvedComments);
+        viewerReactionsConditions.push(approvedComments);
       }
     }
 
@@ -196,29 +202,20 @@ export default (app: OpenAPIHono) => {
     const commentsQuery = db.query.comment.findMany({
       with: {
         [mode === "flat" ? "flatReplies" : "replies"]: {
-          where: and(
-            ...repliesConditions,
-            // replies should be same as the containing comment type
-            commentType != null
-              ? eq(schema.comment.commentType, commentType)
-              : undefined,
-          ),
+          where: and(...repliesConditions),
           orderBy: [desc(schema.comment.createdAt), desc(schema.comment.id)],
           limit: REPLIES_PER_COMMENT + 1,
           with: {
             viewerReactions: viewer
               ? {
-                  where: and(
-                    ...repliesConditions,
-                    ...viewerReactionsConditions,
-                  ),
+                  where: and(...viewerReactionsConditions),
                 }
               : undefined,
           },
         },
         viewerReactions: viewer
           ? {
-              where: and(...repliesConditions, ...viewerReactionsConditions),
+              where: and(...viewerReactionsConditions),
             }
           : undefined,
       },
