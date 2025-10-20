@@ -98,7 +98,26 @@ export default (app: OpenAPIHono) => {
         : undefined,
     ];
 
-    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const repliesConditions: (SQL<unknown> | undefined)[] = [
+      // we don't need to filter by:
+      // - channelId because replies can be created only in same channel
+      // - chainId because comments can't reply to comments outside of the chain (parentId is validated)
+      app ? eq(schema.comment.app, app) : undefined,
+      isDeleted != null
+        ? isDeleted
+          ? isNotNull(schema.comment.deletedAt)
+          : isNull(schema.comment.deletedAt)
+        : undefined,
+      commentType != null
+        ? eq(schema.comment.commentType, commentType)
+        : undefined,
+      excludeModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
+    ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 
     const moderationStatusFilter =
