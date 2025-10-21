@@ -2,17 +2,11 @@ import { useCommentRetryEdition } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
-import {
-  useConfig,
-  usePublicClient,
-  useSwitchChain,
-  useWalletClient,
-} from "wagmi";
+import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { submitEditComment } from "../queries/submitEditComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryEditCommentParams = {
@@ -43,7 +37,6 @@ export function useRetryEditComment({
   const { switchChainAsync } = useSwitchChain();
   const embedConfig = useEmbedConfig();
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
 
   if (!publicClient) {
     throw new Error("No public client found");
@@ -51,9 +44,7 @@ export function useRetryEditComment({
 
   return useCallback<OnRetryEditComment>(
     async (params) => {
-      if (!walletClient) {
-        throw new Error("No wallet client found");
-      }
+      const walletClient = await getWalletClient(wagmiConfig);
 
       const { comment } = params;
 
@@ -119,7 +110,6 @@ export function useRetryEditComment({
       }
     },
     [
-      walletClient,
       connectedAddress,
       publicClient,
       embedConfig.gasSponsorship,

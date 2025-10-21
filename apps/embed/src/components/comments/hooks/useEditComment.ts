@@ -1,11 +1,6 @@
 import { useCallback } from "react";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import {
-  useConfig,
-  usePublicClient,
-  useSwitchChain,
-  useWalletClient,
-} from "wagmi";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
+import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { useCommentEdition } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { submitEditComment } from "@/components/comments/queries/submitEditComment";
@@ -39,9 +34,7 @@ export function useEditComment() {
   const { switchChainAsync } = useSwitchChain();
   const embedConfig = useEmbedConfig();
   const { chainId } = embedConfig;
-
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
 
   if (!publicClient) {
     throw new Error("No public client found");
@@ -56,9 +49,7 @@ export function useEditComment() {
       comment,
       references,
     }) => {
-      if (!walletClient) {
-        throw new Error("No wallet client found");
-      }
+      const walletClient = await getWalletClient(wagmiConfig);
 
       const pendingOperation = {
         ...(await submitEditComment({
@@ -116,7 +107,6 @@ export function useEditComment() {
       publicClient,
       switchChainAsync,
       wagmiConfig,
-      walletClient,
     ],
   );
 }

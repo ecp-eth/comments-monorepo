@@ -1,11 +1,5 @@
 import { useCallback } from "react";
-import {
-  useAccount,
-  useConfig,
-  usePublicClient,
-  useSwitchChain,
-  useWalletClient,
-} from "wagmi";
+import { useAccount, useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
@@ -17,7 +11,7 @@ import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostComment } from "../queries/submitPostComment";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 
 type UseLikeCommentProps = {
   /**
@@ -50,7 +44,6 @@ export const useLikeComment = () => {
   );
   const { address: connectedAddress } = useAccount();
   const { channelId, gasSponsorship } = useEmbedConfig();
-  const { data: walletClient } = useWalletClient();
   const publicClient = usePublicClient();
 
   return useCallback(
@@ -61,9 +54,7 @@ export const useLikeComment = () => {
         );
       }
 
-      if (!walletClient) {
-        throw new Error("No wallet client found");
-      }
+      const walletClient = await getWalletClient(wagmiConfig);
 
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
@@ -144,7 +135,6 @@ export const useLikeComment = () => {
       publicClient,
       switchChainAsync,
       wagmiConfig,
-      walletClient,
     ],
   );
 };
