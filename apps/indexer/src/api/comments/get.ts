@@ -98,7 +98,27 @@ export default (app: OpenAPIHono) => {
         : undefined,
     ];
 
-    const repliesConditions: (SQL<unknown> | undefined)[] = [];
+    const repliesConditions: (SQL<unknown> | undefined)[] = [
+      // we don't need to filter by:
+      // - channelId because replies can be created only in same channel
+      // - chainId because comments can't reply to comments outside of the chain (parentId is validated)
+      app ? eq(schema.comment.app, app) : undefined,
+      isDeleted != null
+        ? isDeleted
+          ? isNotNull(schema.comment.deletedAt)
+          : isNull(schema.comment.deletedAt)
+        : undefined,
+      // replies should be same as the containing comment type
+      commentType != null
+        ? eq(schema.comment.commentType, commentType)
+        : undefined,
+      excludeModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+        : undefined,
+      moderationScore != null
+        ? lte(schema.comment.moderationClassifierScore, moderationScore)
+        : undefined,
+    ];
     const viewerReactionsConditions: (SQL<unknown> | undefined)[] = [];
 
     const moderationStatusFilter =
@@ -112,6 +132,9 @@ export default (app: OpenAPIHono) => {
       repliesConditions.push(
         inArray(schema.comment.moderationStatus, moderationStatusFilter),
       );
+      viewerReactionsConditions.push(
+        inArray(schema.comment.moderationStatus, moderationStatusFilter),
+      );
     } else if (env.MODERATION_ENABLED) {
       const approvedComments = eq(schema.comment.moderationStatus, "approved");
 
@@ -123,9 +146,11 @@ export default (app: OpenAPIHono) => {
 
         sharedConditions.push(approvedOrViewersComments);
         repliesConditions.push(approvedOrViewersComments);
+        viewerReactionsConditions.push(approvedOrViewersComments);
       } else {
         sharedConditions.push(approvedComments);
         repliesConditions.push(approvedComments);
+        viewerReactionsConditions.push(approvedComments);
       }
     }
 
@@ -177,29 +202,20 @@ export default (app: OpenAPIHono) => {
     const commentsQuery = db.query.comment.findMany({
       with: {
         [mode === "flat" ? "flatReplies" : "replies"]: {
-          where: and(
-            ...repliesConditions,
-            // replies should be same as the containing comment type
-            commentType != null
-              ? eq(schema.comment.commentType, commentType)
-              : undefined,
-          ),
+          where: and(...repliesConditions),
           orderBy: [desc(schema.comment.createdAt), desc(schema.comment.id)],
           limit: REPLIES_PER_COMMENT + 1,
           with: {
             viewerReactions: viewer
               ? {
-                  where: and(
-                    ...repliesConditions,
-                    ...viewerReactionsConditions,
-                  ),
+                  where: and(...viewerReactionsConditions),
                 }
               : undefined,
           },
         },
         viewerReactions: viewer
           ? {
-              where: and(...repliesConditions, ...viewerReactionsConditions),
+              where: and(...viewerReactionsConditions),
             }
           : undefined,
       },
