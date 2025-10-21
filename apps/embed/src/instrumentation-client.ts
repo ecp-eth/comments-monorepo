@@ -11,3 +11,5 @@ Sentry.init({
   // https://docs.sentry.io/platforms/javascript/configuration/options/#traces-sample-rate
   tracesSampleRate: 1.0,
 });
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
