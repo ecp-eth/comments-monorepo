@@ -75,10 +75,15 @@ export default function SnippetGenerator({
         throw new Error("Missing embed URI or source");
       }
 
+      const clonedConfig = structuredClone(config);
+      removeUndefinedValues(clonedConfig);
+
       const url = createCommentsEmbedURL({
         embedUri,
         source,
-        config: fastDeepEqual(config, DEFAULT_CONFIG) ? undefined : config,
+        config: fastDeepEqual(clonedConfig, DEFAULT_CONFIG)
+          ? undefined
+          : config,
       });
 
       const frameSrc = new URL(url).origin;
@@ -189,4 +194,19 @@ export default function SnippetGenerator({
       </div>
     </div>
   );
+}
+
+function removeUndefinedValues(obj: Record<string, unknown>) {
+  for (const key in obj) {
+    const value = obj[key];
+
+    if (value === undefined) {
+      delete obj[key];
+      continue;
+    }
+
+    if (value !== null && typeof value === "object") {
+      removeUndefinedValues(value as Record<string, unknown>);
+    }
+  }
 }

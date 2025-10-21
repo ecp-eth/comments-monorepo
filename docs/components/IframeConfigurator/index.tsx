@@ -394,6 +394,12 @@ export default function IframeConfigurator() {
                         type="number"
                         {...field}
                         value={field.value?.toString() || ""}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          field.onChange(
+                            newValue === "" ? undefined : newValue,
+                          );
+                        }}
                         placeholder="0"
                       />
                     </FormControl>
