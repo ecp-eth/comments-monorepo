@@ -12,3 +12,4 @@ export * from "./farcaster-by-name-resolver.ts";
 export * from "./farcaster.types.ts";
 export * from "./farcaster.utils.ts";
 export * from "./http-resolver.ts";
+export * from "./reply-counts-by-parent-id-resolver.ts";

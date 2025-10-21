@@ -132,6 +132,9 @@ export function setupGetPendingModerationComments(app: OpenAPIHono) {
         limit,
         replyLimit: 0,
         previousComment,
+        replyCountsConditions: {
+          mode: "nested",
+        },
       });
 
     return c.json(

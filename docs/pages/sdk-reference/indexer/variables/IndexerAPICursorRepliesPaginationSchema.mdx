@@ -1,0 +1,35 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICursorRepliesPaginationSchema
+
+# Variable: IndexerAPICursorRepliesPaginationSchema
+
+```ts
+const IndexerAPICursorRepliesPaginationSchema: ZodObject<{
+  endCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+  hasNext: ZodBoolean;
+  hasPrevious: ZodBoolean;
+  limit: ZodNumber;
+  startCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+} & {
+  count: ZodNumber;
+}, "strip", ZodTypeAny, {
+  count: number;
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+}, {
+  count: number;
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+}>;
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L41)

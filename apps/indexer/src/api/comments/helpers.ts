@@ -1,8 +1,8 @@
 import type { IndexerAPICommentModerationStatusSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { type CommentModerationLabel } from "../../services/types";
 import { and, or, sql, type SQL } from "drizzle-orm";
-import schema from "ponder:schema";
 import { env } from "../../env";
+import { schema } from "../../../schema";
 
 export function normalizeModerationStatusFilter(
   moderationStatus:

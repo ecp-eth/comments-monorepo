@@ -3,7 +3,10 @@ import schema from "ponder:schema";
 import { and, desc, eq, inArray, isNotNull, isNull, or } from "ponder";
 import { IndexerAPICommentWithRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
-import { createUserDataAndFormatSingleCommentResponseResolver } from "../../../lib/response-formatters";
+import {
+  createUserDataAndFormatSingleCommentResponseResolver,
+  mapReplyCountsByCommentId,
+} from "../../../lib/response-formatters";
 import { env } from "../../../env";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { SQL } from "drizzle-orm";
@@ -147,18 +150,24 @@ export const setupGetComment = (app: OpenAPIHono) => {
       }
     }
 
-    const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData] =
+    const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData, replyCounts] =
       await Promise.all([
         ensByAddressResolverService.loadMany([...authorAddresses]),
         farcasterByAddressResolverService.loadMany([...authorAddresses]),
+        mapReplyCountsByCommentId([comment], {
+          mode,
+          isDeleted: isReplyDeleted,
+          commentType,
+        }),
       ]);
 
     const resolveUserDataAndFormatSingleCommentResponse =
-      createUserDataAndFormatSingleCommentResponseResolver(
-        REPLIES_PER_COMMENT,
+      createUserDataAndFormatSingleCommentResponseResolver({
+        replyLimit: REPLIES_PER_COMMENT,
         resolvedAuthorsEnsData,
         resolvedAuthorsFarcasterData,
-      );
+        replyCounts,
+      });
 
     const formattedComment =
       await resolveUserDataAndFormatSingleCommentResponse(comment);

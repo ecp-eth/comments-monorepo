@@ -11,6 +11,8 @@ import type {
   CommentReportSelectType,
 } from "../../schema.offchain.ts";
 
+export type LowercasedHex = Hex;
+
 export type ModerationStatus = "pending" | "approved" | "rejected";
 
 export type ResolveAuthorFunction = (author: Hex) => Promise<string | Hex>;
