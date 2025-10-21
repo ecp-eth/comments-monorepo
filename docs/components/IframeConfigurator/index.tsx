@@ -1,5 +1,4 @@
-import * as React from "react";
-import { useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type EmbedConfigSchemaInputType,
@@ -38,7 +37,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { ChevronsDown, Info } from "lucide-react";
+import { ChevronsDown, Info, Link } from "lucide-react";
 
 const formSchema = z.object({
   mode: z.enum(["post", "author", "replies"]),
@@ -59,8 +58,9 @@ const formSchema = z.object({
 });
 
 export default function IframeConfigurator() {
-  const [showAdvanced, setShowAdvanced] = React.useState(false);
-  const [appSigner, setAppSigner] = React.useState<"embed" | "custom" | "all">(
+  const { ref } = usePreventKeyboardShortcut();
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [appSigner, setAppSigner] = useState<"embed" | "custom" | "all">(
     "embed",
   );
 
@@ -87,7 +87,7 @@ export default function IframeConfigurator() {
   });
 
   const [debouncedConfig] = useDebounce(config, 500);
-  const getEmbedUri = React.useCallback(() => {
+  const getEmbedUri = useCallback(() => {
     return mode === "post"
       ? publicEnv.VITE_ECP_ETH_EMBED_URL
       : mode === "author"
@@ -121,9 +121,13 @@ export default function IframeConfigurator() {
 
   return (
     <Form {...form}>
-      <div className="space-y-8 border border-input-border rounded-iframe-configurator-section p-4">
+      <div
+        ref={ref}
+        className="space-y-8 border border-input-border rounded-iframe-configurator-section p-4"
+      >
         <div className="space-y-6">
           <FormField
+            key="mode"
             control={form.control}
             name="mode"
             render={({ field }) => (
@@ -156,6 +160,7 @@ export default function IframeConfigurator() {
           />
 
           <FormField
+            key="source"
             control={form.control}
             name="source"
             render={({ field }) => (
@@ -250,6 +255,7 @@ export default function IframeConfigurator() {
           {showAdvanced && (
             <>
               <FormField
+                key="config.theme.mode"
                 control={form.control}
                 name="config.theme.mode"
                 render={({ field }) => (
@@ -315,6 +321,7 @@ export default function IframeConfigurator() {
 
               {appSigner === "custom" && (
                 <FormField
+                  key="config.app"
                   control={form.control}
                   name="config.app"
                   render={({ field }) => (
@@ -351,6 +358,58 @@ export default function IframeConfigurator() {
               )}
 
               <FormField
+                key="config.channelId"
+                control={form.control}
+                name="config.channelId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Channel ID</FormLabel>
+                    <FormDescription>
+                      You can specify a custom channel ID for posting comments.
+                      If you plan to charge users for posting, please ensure
+                      your channel hook follows the{" "}
+                      <a
+                        href="/hooks"
+                        target="_blank"
+                        style={{ textDecoration: "underline" }}
+                      >
+                        instructions
+                      </a>{" "}
+                      <a
+                        href="/hooks"
+                        target="_blank"
+                        style={{ textDecoration: "underline" }}
+                      >
+                        <Link className="inline-block w-3 h-3" />
+                      </a>
+                      . <br />
+                      <span className="text-yellow-400">
+                        <Info className="w-3 h-3 stroke-yellow-400 inline-block" />
+                        &nbsp;Gasless transactions are not supported when the
+                        channel requires a fee for posting comments.
+                      </span>
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        value={field.value?.toString() || ""}
+                        onChange={(e) => {
+                          const newValue = e.target.value;
+                          field.onChange(
+                            newValue === "" ? undefined : newValue,
+                          );
+                        }}
+                        placeholder="0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                key="config.gasSponsorship"
                 control={form.control}
                 name="config.gasSponsorship"
                 render={({ field }) => (
@@ -402,6 +461,7 @@ export default function IframeConfigurator() {
               />
 
               <FormField
+                key="autoHeightAdjustment"
                 control={form.control}
                 name="autoHeightAdjustment"
                 render={({ field }) => (
@@ -430,6 +490,7 @@ export default function IframeConfigurator() {
               />
 
               <FormField
+                key="config.disablePromotion"
                 control={form.control}
                 name="config.disablePromotion"
                 render={({ field }) => (
@@ -458,6 +519,7 @@ export default function IframeConfigurator() {
               />
 
               <FormField
+                key="config.restrictMaximumContainerWidth"
                 control={form.control}
                 name="config.restrictMaximumContainerWidth"
                 render={({ field }) => (
@@ -492,6 +554,7 @@ export default function IframeConfigurator() {
                   <h3 className="text-md font-medium">Light Theme Colors</h3>
                   {COLOR_FIELDS.map(({ key, label, help }) => (
                     <FormField
+                      key={`color-light-${key}`}
                       control={form.control}
                       name={`config.theme.colors.light.${key}`}
                       render={({ field }) => (
@@ -523,6 +586,7 @@ export default function IframeConfigurator() {
                   <h3 className="text-md font-medium">Dark Theme Colors</h3>
                   {COLOR_FIELDS.map(({ key, label, help }) => (
                     <FormField
+                      key={`color-dark-${key}`}
                       control={form.control}
                       name={`config.theme.colors.dark.${key}`}
                       render={({ field }) => (
@@ -585,6 +649,7 @@ export default function IframeConfigurator() {
 
                 {hasGoogleFont && (
                   <FormField
+                    key="config.theme.font.fontFamily.google"
                     control={form.control}
                     name="config.theme.font.fontFamily.google"
                     render={({ field }) => (
@@ -621,6 +686,7 @@ export default function IframeConfigurator() {
 
                 {hasSystemFont && (
                   <FormField
+                    key="config.theme.font.fontFamily.system"
                     control={form.control}
                     name="config.theme.font.fontFamily.system"
                     render={({ field }) => (
@@ -649,6 +715,7 @@ export default function IframeConfigurator() {
                         <LabelWithHelp label={label} help={help} />
                         <div className="grid grid-cols-2 gap-2">
                           <FormField
+                            key={`config.theme.font.sizes.${key}.size`}
                             control={form.control}
                             name={`config.theme.font.sizes.${key}.size`}
                             render={({ field }) => (
@@ -671,6 +738,7 @@ export default function IframeConfigurator() {
                             )}
                           />
                           <FormField
+                            key={`config.theme.font.sizes.${key}.lineHeight`}
                             control={form.control}
                             name={`config.theme.font.sizes.${key}.lineHeight`}
                             render={({ field }) => (
@@ -724,6 +792,7 @@ export default function IframeConfigurator() {
                 </div>
               </div>
               <FormField
+                key="embedUri"
                 control={form.control}
                 name="embedUri"
                 render={({ field }) => (
@@ -758,9 +827,8 @@ export default function IframeConfigurator() {
               embedUri={embedUri}
               source={source}
               autoHeightAdjustment={autoHeightAdjustment}
-              onBeforeCopy={() => {
-                form.trigger();
-                return form.formState.isValid;
+              onBeforeCopy={async () => {
+                return await form.trigger();
               }}
             />
           </div>
@@ -809,4 +877,43 @@ function hasFontFamilyGoogle(
   return (
     !!config.theme?.font?.fontFamily && "google" in config.theme.font.fontFamily
   );
+}
+
+/**
+ * Vocs trigger next page when holding shift key down and press directional key,
+ * this interfere with input editing, let's block it
+ */
+function usePreventKeyboardShortcut() {
+  const ref = useRef<HTMLDivElement>(null);
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    if (!event.target || !(event.target instanceof HTMLElement)) {
+      return;
+    }
+
+    if (
+      event.target.tagName === "INPUT" ||
+      event.target.tagName === "TEXTAREA" ||
+      event.target.tagName === "SELECT"
+    ) {
+      event.stopPropagation();
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
+    const wrappedElement = ref.current;
+    if (!wrappedElement) {
+      return;
+    }
+
+    wrappedElement.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      wrappedElement.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  return {
+    ref,
+  };
 }

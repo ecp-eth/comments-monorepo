@@ -2,12 +2,11 @@ import { useCommentRetryEdition } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useConfig, useSwitchChain } from "wagmi";
+import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { submitEditComment } from "../queries/submitEditComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryEditCommentParams = {
@@ -36,12 +35,17 @@ export function useRetryEditComment({
   const wagmiConfig = useConfig();
   const commentRetryEdition = useCommentRetryEdition();
   const { switchChainAsync } = useSwitchChain();
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
+  const publicClient = usePublicClient();
+
+  if (!publicClient) {
+    throw new Error("No public client found");
+  }
 
   return useCallback<OnRetryEditComment>(
     async (params) => {
+      const walletClient = await getWalletClient(wagmiConfig);
+
       const { comment } = params;
 
       if (!comment.pendingOperation) {
@@ -67,9 +71,8 @@ export function useRetryEditComment({
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          readContractAsync,
-          writeContractAsync,
-          signTypedDataAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
         })),
         references: comment.references,
@@ -108,9 +111,7 @@ export function useRetryEditComment({
     },
     [
       connectedAddress,
-      readContractAsync,
-      writeContractAsync,
-      signTypedDataAsync,
+      publicClient,
       embedConfig.gasSponsorship,
       switchChainAsync,
       commentRetryEdition,

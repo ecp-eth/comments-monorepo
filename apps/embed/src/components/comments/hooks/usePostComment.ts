@@ -3,9 +3,8 @@ import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { useCallback } from "react";
 import { submitPostComment } from "../queries/submitPostComment";
-import { useConfig, useSwitchChain } from "wagmi";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
-import { waitForTransactionReceipt } from "@wagmi/core";
+import { useConfig, useSwitchChain, usePublicClient } from "wagmi";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { QueryKey } from "@tanstack/react-query";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
@@ -22,12 +21,10 @@ type UsePostCommentProps = (params: {
 export function usePostComment() {
   const wagmiConfig = useConfig();
   const commentSubmission = useCommentSubmission();
-  const embedConfig = useEmbedConfig();
+  const { chainId, channelId, gasSponsorship } = useEmbedConfig();
   const { switchChainAsync } = useSwitchChain();
-  const { chainId } = embedConfig;
+  const publicClient = usePublicClient();
 
-  const { writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
   return useCallback<UsePostCommentProps>(
     async ({
       author,
@@ -37,12 +34,20 @@ export function usePostComment() {
       onSubmitStart,
       queryKey,
     }) => {
+      if (!publicClient) {
+        throw new Error(
+          "No wagmi client found, this component must be used within a wagmi provider",
+        );
+      }
+
+      const walletClient = await getWalletClient(wagmiConfig);
       const pendingOperation = {
         ...(await submitPostComment({
           author: author,
           postCommentRequest: {
             chainId,
             content,
+            channelId,
             ...("parentId" in targetUriOrParentId
               ? { parentId: targetUriOrParentId.parentId }
               : { targetUri: targetUriOrParentId.targetUri }),
@@ -50,9 +55,9 @@ export function usePostComment() {
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          signTypedDataAsync,
-          writeContractAsync: writeContractAsync,
-          gasSponsorship: embedConfig.gasSponsorship,
+          publicClient,
+          walletClient,
+          gasSponsorship: gasSponsorship,
         })),
         references,
       };
@@ -90,12 +95,12 @@ export function usePostComment() {
     },
     [
       chainId,
+      channelId,
       commentSubmission,
-      embedConfig.gasSponsorship,
-      signTypedDataAsync,
+      gasSponsorship,
+      publicClient,
       switchChainAsync,
       wagmiConfig,
-      writeContractAsync,
     ],
   );
 }

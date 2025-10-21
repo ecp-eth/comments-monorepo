@@ -1,11 +1,10 @@
 import { useCallback } from "react";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useConfig, useSwitchChain } from "wagmi";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
+import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { useCommentEdition } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { submitEditComment } from "@/components/comments/queries/submitEditComment";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { QueryKey } from "@tanstack/react-query";
@@ -35,9 +34,11 @@ export function useEditComment() {
   const { switchChainAsync } = useSwitchChain();
   const embedConfig = useEmbedConfig();
   const { chainId } = embedConfig;
+  const publicClient = usePublicClient();
 
-  const { readContractAsync, writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
+  if (!publicClient) {
+    throw new Error("No public client found");
+  }
 
   return useCallback<UseEditCommentProps>(
     async ({
@@ -48,6 +49,8 @@ export function useEditComment() {
       comment,
       references,
     }) => {
+      const walletClient = await getWalletClient(wagmiConfig);
+
       const pendingOperation = {
         ...(await submitEditComment({
           address: author,
@@ -59,9 +62,8 @@ export function useEditComment() {
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-          readContractAsync,
-          writeContractAsync,
-          signTypedDataAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
         })),
         references,
@@ -101,12 +103,10 @@ export function useEditComment() {
     [
       chainId,
       commentEdition,
-      embedConfig,
-      readContractAsync,
-      signTypedDataAsync,
+      embedConfig.gasSponsorship,
+      publicClient,
       switchChainAsync,
       wagmiConfig,
-      writeContractAsync,
     ],
   );
 }

@@ -61,6 +61,7 @@ export default async function EmbedCommentsByAuthorPage({
       mode: "flat",
       author,
       viewer,
+      channelId: config.channelId,
     };
     const comments = await fetchComments(fetchCommentParams);
 

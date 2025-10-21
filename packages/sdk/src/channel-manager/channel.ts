@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   CHANNEL_MANAGER_ADDRESS,
   COMMENT_TYPE_COMMENT,
+  DEFAULT_CHANNEL_ID,
+  DEFAULT_COMMENT_TYPE,
   EMPTY_PARENT_ID,
   NATIVE_ASSET_ADDRESS,
   ZERO_ADDRESS,
@@ -13,7 +15,11 @@ import type {
   WriteContractHelperResult,
 } from "../core/types.js";
 import { BaseHookABI, ChannelManagerABI } from "../abis.js";
-import { createWaitableWriteContractHelper, isZeroHex } from "../core/utils.js";
+import {
+  createWaitableWriteContractHelper,
+  getOneMinuteFromNowInSeconds,
+  isZeroHex,
+} from "../core/utils.js";
 import type {
   ContractWriteFunctions,
   ContractReadFunctions,
@@ -25,6 +31,7 @@ import type {
   ContractBasedAssetType,
 } from "./types.js";
 import {
+  AuthorAuthMethod,
   type CommentData,
   type MetadataEntry,
   type MetadataEntryOp,
@@ -41,7 +48,7 @@ import type {
 } from "../types.js";
 import { getERCType } from "./utils.js";
 import { LEGACY_TAKES_CHANNEL_ABI } from "../extraABIs.js";
-import { ContractFunctionExecutionError } from "viem";
+import { ContractFunctionExecutionError, type PartialBy } from "viem";
 
 export type CreateChannelParams = {
   /**
@@ -667,17 +674,21 @@ export async function getEstimatedChannelPostCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
   let estimation: HookFeeEstimation | undefined;
   try {
-    estimation = await readContract({
-      abi: BaseHookABI,
-      address: channelInfo.hook,
-      functionName: "estimateAddCommentFee",
-      args: [commentData, metadata, msgSender],
-    });
+    estimation = {
+      ...(await readContract({
+        abi: BaseHookABI,
+        address: channelInfo.hook,
+        functionName: "estimateAddCommentFee",
+        args: [commentData, metadata, msgSender],
+      })),
+      hook: channelInfo.hook,
+    };
   } catch (error) {
     if (!(error instanceof ContractFunctionExecutionError)) {
       throw error;
@@ -714,6 +725,7 @@ export async function getEstimatedChannelPostCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "Legacy Takes Channel Hook",
       metadata: [],
+      hook: channelInfo.hook,
     };
   }
 
@@ -759,17 +771,21 @@ export async function getEstimatedChannelEditCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
   let estimation: HookFeeEstimation;
   try {
-    estimation = await readContract({
-      abi: BaseHookABI,
-      address: channelInfo.hook,
-      functionName: "estimateEditCommentFee",
-      args: [commentData, metadata, msgSender],
-    });
+    estimation = {
+      ...(await readContract({
+        abi: BaseHookABI,
+        address: channelInfo.hook,
+        functionName: "estimateEditCommentFee",
+        args: [commentData, metadata, msgSender],
+      })),
+      hook: channelInfo.hook,
+    };
   } catch (error) {
     if (!(error instanceof ContractFunctionExecutionError)) {
       throw error;
@@ -781,6 +797,7 @@ export async function getEstimatedChannelEditCommentHookFee({
       asset: NATIVE_ASSET_ADDRESS,
       description: "Legacy Takes Channel Hook",
       metadata: [],
+      hook: channelInfo.hook,
     };
   }
 
@@ -838,6 +855,7 @@ async function estimateChannelCommentActionFee<
       asset: NATIVE_ASSET_ADDRESS,
       description: "",
       metadata: [],
+      hook: ZERO_ADDRESS,
     };
   }
 
@@ -877,6 +895,7 @@ async function estimateChannelCommentActionFee<
     contractAsset,
     description: hookEstimatedFee.description,
     metadata: hookEstimatedFee.metadata,
+    hook: hookEstimatedFee.hook,
   };
 }
 
@@ -918,4 +937,41 @@ export async function estimateChannelEditCommentFee({
     ...restOpts,
     commentActionFunc: getEstimatedChannelEditCommentHookFee,
   });
+}
+
+/*
+ * Helper function to create the data structure for estimating fee for comment post or edit
+ */
+export function createEstimateChannelPostOrEditCommentFeeData({
+  createdAt = getOneMinuteFromNowInSeconds(),
+  updatedAt = getOneMinuteFromNowInSeconds(),
+  channelId = DEFAULT_CHANNEL_ID,
+  commentType = DEFAULT_COMMENT_TYPE,
+  authMethod = AuthorAuthMethod.DIRECT_TX,
+  ...params
+}: PartialBy<
+  Omit<CommentData, "parentId" | "targetUri">,
+  "createdAt" | "updatedAt" | "channelId" | "commentType" | "authMethod"
+> &
+  ({ targetUri: string } | { parentId: Hex })): CommentData {
+  const parentIdOrTargetUri =
+    "targetUri" in params
+      ? {
+          targetUri: params.targetUri,
+          parentId: EMPTY_PARENT_ID,
+        }
+      : {
+          targetUri: "",
+          parentId: params.parentId,
+        };
+
+  return {
+    ...params,
+    ...parentIdOrTargetUri,
+    commentType,
+    channelId,
+    createdAt,
+    updatedAt,
+    authMethod,
+  };
 }

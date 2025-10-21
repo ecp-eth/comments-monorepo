@@ -7,8 +7,15 @@ import {
 } from "@/lib/schemas";
 import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
-
-import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
+import {
+  Account,
+  type Chain,
+  ContractFunctionExecutionError,
+  type Hex,
+  PublicClient,
+  Transport,
+  WalletClient,
+} from "viem";
 import {
   InvalidCommentError,
   throwKnownResponseCodeError,
@@ -19,15 +26,19 @@ import type {
 } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
-  ContractReadFunctions,
-  ContractWriteFunctions,
   createEditCommentData,
   createEditCommentTypedData,
   editComment,
+  getComment,
   getNonce,
 } from "@ecp.eth/sdk/comments";
-import { SignTypedDataMutateAsync } from "wagmi/query";
+
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
+import {
+  createEstimateChannelPostOrEditCommentFeeData,
+  estimateChannelEditCommentFee,
+} from "@ecp.eth/sdk/channel-manager";
+import { prepareContractAssetForTransfer } from "./prepareContractAssetForTransfer";
 
 class SubmitEditCommentMutationError extends Error {}
 
@@ -40,9 +51,8 @@ type SubmitEditCommentParams = {
   comment: Comment;
   editRequest: EditCommentRequestType;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  writeContractAsync: ContractWriteFunctions["editComment"];
-  readContractAsync: ContractReadFunctions["getNonce"];
-  signTypedDataAsync: SignTypedDataMutateAsync;
+  publicClient: PublicClient<Transport, Chain, undefined>;
+  walletClient: WalletClient<Transport, Chain, Account>;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
 };
 type PendingEditCommentOperationSchemaTypeWithoutReferences = Omit<
@@ -55,9 +65,8 @@ export async function submitEditComment({
   comment,
   editRequest,
   switchChainAsync,
-  writeContractAsync,
-  readContractAsync,
-  signTypedDataAsync,
+  publicClient,
+  walletClient,
   gasSponsorship,
 }: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   if (!address) {
@@ -88,14 +97,15 @@ export async function submitEditComment({
     case "not-gasless":
       return await editCommentWithoutGasless({
         editCommentPayloadRequest,
-        writeContractAsync,
+        publicClient,
+        walletClient,
         editRequest,
       });
     case "gasless-not-preapproved":
       return await editCommentWithGaslessAndAuthorSig({
         editCommentPayloadRequest,
-        readContractAsync,
-        signTypedDataAsync,
+        publicClient,
+        walletClient,
       });
     case "gasless-preapproved":
       throw new SubmitEditCommentMutationError(
@@ -109,18 +119,18 @@ export async function submitEditComment({
 
 async function editCommentWithGaslessAndAuthorSig({
   editCommentPayloadRequest,
-  readContractAsync,
-  signTypedDataAsync,
+  publicClient,
+  walletClient,
 }: {
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
-  readContractAsync: ContractReadFunctions["getNonce"];
-  signTypedDataAsync: SignTypedDataMutateAsync;
+  publicClient: PublicClient<Transport, Chain, undefined>;
+  walletClient: WalletClient<Transport, Chain, Account>;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   const { commentId, content, author } = editCommentPayloadRequest;
   const nonce = await getNonce({
     author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    readContract: readContractAsync as ContractReadFunctions["getNonce"],
+    readContract: publicClient.readContract,
   });
   const editCommentData = createEditCommentData({
     commentId,
@@ -138,7 +148,7 @@ async function editCommentWithGaslessAndAuthorSig({
   });
 
   const deadline = editCommentData.deadline;
-  const authorSignature = await signTypedDataAsync(typedCommentData);
+  const authorSignature = await walletClient.signTypedData(typedCommentData);
 
   const response = await fetch("/api/edit-comment", {
     method: "POST",
@@ -185,13 +195,16 @@ async function editCommentWithGaslessAndAuthorSig({
 
 async function editCommentWithoutGasless({
   editCommentPayloadRequest,
-  writeContractAsync,
+  publicClient,
+  walletClient,
   editRequest,
 }: {
   editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
-  writeContractAsync: ContractWriteFunctions["editComment"];
+  publicClient: PublicClient<Transport, Chain, undefined>;
+  walletClient: WalletClient<Transport, Chain, Account>;
   editRequest: EditCommentRequestType;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
+  const { author } = editCommentPayloadRequest;
   const response = await fetch("/api/sign-edit-comment", {
     method: "POST",
     headers: {
@@ -219,10 +232,48 @@ async function editCommentWithoutGasless({
   }
 
   try {
+    const { comment: existingComment } = await getComment({
+      readContract: publicClient.readContract,
+      commentId: editCommentPayloadRequest.commentId,
+    });
+
+    let fee:
+      | Awaited<ReturnType<typeof estimateChannelEditCommentFee>>
+      | undefined;
+
+    if (existingComment.channelId) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { createdAt, updatedAt, ...commentDataExcludedDates } =
+        existingComment;
+      // Estimate the fee for posting a comment to the channel
+      const estimationCommentData =
+        createEstimateChannelPostOrEditCommentFeeData({
+          ...commentDataExcludedDates,
+        });
+      fee = await estimateChannelEditCommentFee({
+        commentData: estimationCommentData,
+        metadata: [],
+        msgSender: author,
+        readContract: publicClient.readContract,
+        channelId: existingComment.channelId,
+      });
+    }
+
+    if (fee?.contractAsset && fee.contractAsset.amount > 0n) {
+      await prepareContractAssetForTransfer({
+        contractAsset: fee.contractAsset,
+        hook: fee.hook,
+        author,
+        publicClient,
+        walletClient,
+      });
+    }
+
     const { txHash } = await editComment({
       edit: signedCommentResult.data.data,
       appSignature: signedCommentResult.data.signature,
-      writeContract: writeContractAsync,
+      writeContract: walletClient.writeContract,
+      fee: fee?.baseToken.amount,
     });
 
     return {

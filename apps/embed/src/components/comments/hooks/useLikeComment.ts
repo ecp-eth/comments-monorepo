@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import { waitForTransactionReceipt } from "viem/actions";
-import { useAccount, useConnectorClient, useSwitchChain } from "wagmi";
+import { useAccount, useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import type { QueryKey } from "@tanstack/react-query";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { useReactionSubmission } from "@ecp.eth/shared/hooks";
@@ -11,8 +10,8 @@ import {
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostComment } from "../queries/submitPostComment";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 
 type UseLikeCommentProps = {
   /**
@@ -38,23 +37,26 @@ type UseLikeCommentProps = {
 };
 
 export const useLikeComment = () => {
+  const wagmiConfig = useConfig();
   const { switchChainAsync } = useSwitchChain();
   const likeReactionSubmission = useReactionSubmission(
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const { address: connectedAddress } = useAccount();
-  const { data: client } = useConnectorClient();
-  const { writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
-  const embedConfig = useEmbedConfig();
+  const { channelId, gasSponsorship } = useEmbedConfig();
+  const publicClient = usePublicClient();
 
   return useCallback(
     async (params: UseLikeCommentProps) => {
-      const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
-
-      if (!client) {
-        throw new Error("No client");
+      if (!publicClient) {
+        throw new Error(
+          "No wagmi client found, this component must be used within a wagmi provider",
+        );
       }
+
+      const walletClient = await getWalletClient(wagmiConfig);
+
+      const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
 
       if (
         (comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT]?.length ??
@@ -73,17 +75,18 @@ export const useLikeComment = () => {
           ...(await submitPostComment({
             author: connectedAddress,
             postCommentRequest: {
-              chainId: comment.chainId,
               content: COMMENT_REACTION_LIKE_CONTENT,
               commentType: COMMENT_TYPE_REACTION,
               parentId: comment.id,
+              chainId: comment.chainId,
+              channelId,
             },
             switchChainAsync(chainId) {
               return switchChainAsync({ chainId });
             },
-            writeContractAsync,
-            signTypedDataAsync,
-            gasSponsorship: embedConfig.gasSponsorship,
+            publicClient,
+            walletClient,
+            gasSponsorship: gasSponsorship,
           })),
           references: [],
         };
@@ -94,7 +97,7 @@ export const useLikeComment = () => {
           pendingOperation,
         });
 
-        const receipt = await waitForTransactionReceipt(client, {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, {
           hash: pendingOperation.txHash,
           timeout: TX_RECEIPT_TIMEOUT,
         });
@@ -125,13 +128,13 @@ export const useLikeComment = () => {
       }
     },
     [
-      client,
+      channelId,
       connectedAddress,
-      embedConfig.gasSponsorship,
+      gasSponsorship,
       likeReactionSubmission,
-      signTypedDataAsync,
+      publicClient,
       switchChainAsync,
-      writeContractAsync,
+      wagmiConfig,
     ],
   );
 };

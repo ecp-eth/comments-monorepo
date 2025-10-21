@@ -10,6 +10,7 @@ import { CircleX, Info } from "lucide-react";
 import { DEFAULT_CONFIG } from "./constants";
 import { Button } from "../ui/button";
 import { ZodError } from "zod";
+import fastDeepEqual from "fast-deep-equal";
 
 function CodeSnippet({
   iframeUrl,
@@ -60,7 +61,7 @@ export default function SnippetGenerator({
     | { commentId: Hex }
     | undefined;
   autoHeightAdjustment: boolean;
-  onBeforeCopy?: () => boolean;
+  onBeforeCopy?: () => Promise<boolean>;
 }) {
   const [copied, setCopied] = React.useState(false);
   const timeoutRef = React.useRef<any>(null);
@@ -74,14 +75,17 @@ export default function SnippetGenerator({
         throw new Error("Missing embed URI or source");
       }
 
+      const clonedConfig = structuredClone(config);
+      removeUndefinedValues(clonedConfig);
+
       const url = createCommentsEmbedURL({
         embedUri,
         source,
-        config:
-          JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-            ? config
-            : undefined,
+        config: fastDeepEqual(clonedConfig, DEFAULT_CONFIG)
+          ? undefined
+          : config,
       });
+
       const frameSrc = new URL(url).origin;
 
       const snippet = renderToString(
@@ -110,12 +114,12 @@ export default function SnippetGenerator({
     }
   }, [embedUri, source, config, autoHeightAdjustment]);
 
-  const copyToClipboard = () => {
+  const copyToClipboard = async () => {
     if (error || !snippet) {
       return;
     }
 
-    const result = onBeforeCopy?.() ?? true;
+    const result = (await onBeforeCopy?.()) ?? true;
     if (!result) {
       return;
     }
@@ -190,4 +194,19 @@ export default function SnippetGenerator({
       </div>
     </div>
   );
+}
+
+function removeUndefinedValues(obj: Record<string, unknown>) {
+  for (const key in obj) {
+    const value = obj[key];
+
+    if (value === undefined) {
+      delete obj[key];
+      continue;
+    }
+
+    if (value !== null && typeof value === "object") {
+      removeUndefinedValues(value as Record<string, unknown>);
+    }
+  }
 }

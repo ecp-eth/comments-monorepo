@@ -8,7 +8,24 @@ import {
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
-import { type Chain, ContractFunctionExecutionError, type Hex } from "viem";
+import {
+  estimateChannelPostCommentFee,
+  createEstimateChannelPostOrEditCommentFeeData,
+} from "@ecp.eth/sdk/channel-manager";
+import {
+  createCommentData,
+  createCommentTypedData,
+  postComment,
+} from "@ecp.eth/sdk/comments";
+import {
+  Account,
+  type Chain,
+  ContractFunctionExecutionError,
+  type Hex,
+  PublicClient,
+  Transport,
+  type WalletClient,
+} from "viem";
 import {
   InvalidCommentError,
   throwKnownResponseCodeError,
@@ -19,14 +36,8 @@ import {
   bigintReplacer,
   formatContractFunctionExecutionError,
 } from "@ecp.eth/shared/helpers";
-import {
-  ContractWriteFunctions,
-  createCommentData,
-  createCommentTypedData,
-  postComment,
-} from "@ecp.eth/sdk/comments";
-import { SignTypedDataMutateAsync } from "wagmi/query";
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
+import { prepareContractAssetForTransfer } from "./prepareContractAssetForTransfer";
 
 class SubmitPostCommentMutationError extends Error {}
 
@@ -37,9 +48,9 @@ type SubmitPostCommentParams = {
     "author"
   >;
   switchChainAsync: (chainId: number) => Promise<Chain>;
-  writeContractAsync: ContractWriteFunctions["postComment"];
-  signTypedDataAsync: SignTypedDataMutateAsync;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
+  publicClient: PublicClient<Transport, Chain, undefined>;
+  walletClient: WalletClient<Transport, Chain, Account>;
 };
 
 type SubmitPostCommentMutationResult = Omit<
@@ -51,8 +62,8 @@ export async function submitPostComment({
   author,
   postCommentRequest,
   switchChainAsync,
-  writeContractAsync,
-  signTypedDataAsync,
+  publicClient,
+  walletClient,
   gasSponsorship,
 }: SubmitPostCommentParams): Promise<SubmitPostCommentMutationResult> {
   if (!author) {
@@ -88,15 +99,16 @@ export async function submitPostComment({
     case "not-gasless":
       return await postCommentWithoutGasless({
         postCommentPayloadRequest: commentPayloadRequest,
-        writeContractAsync,
+        publicClient,
+        walletClient,
         resolvedAuthor,
       });
 
     case "gasless-not-preapproved":
       return await postCommentWithGaslessAndAuthorSig({
         postCommentPayloadRequest: commentPayloadRequest,
-        signTypedDataAsync,
         resolvedAuthor,
+        walletClient,
       });
 
     case "gasless-preapproved":
@@ -111,36 +123,26 @@ export async function submitPostComment({
 
 async function postCommentWithGaslessAndAuthorSig({
   postCommentPayloadRequest,
-  signTypedDataAsync,
+  walletClient,
   resolvedAuthor,
 }: {
   postCommentPayloadRequest: PostCommentPayloadInputSchemaType;
-  signTypedDataAsync: SignTypedDataMutateAsync;
+  walletClient: WalletClient<Transport, Chain, Account>;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
 }): Promise<SubmitPostCommentMutationResult> {
-  const { content, author, commentType } = postCommentPayloadRequest;
+  const { chainId } = postCommentPayloadRequest;
   const commentData = createCommentData({
-    content,
-    author,
+    ...postCommentPayloadRequest,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    commentType: commentType,
-    ...("parentId" in postCommentPayloadRequest
-      ? {
-          parentId: postCommentPayloadRequest.parentId,
-        }
-      : {
-          targetUri: postCommentPayloadRequest.targetUri,
-        }),
   });
 
-  const chainId = postCommentPayloadRequest.chainId;
   const typedCommentData = createCommentTypedData({
     commentData,
     chainId,
   });
 
   const deadline = commentData.deadline;
-  const authorSignature = await signTypedDataAsync(typedCommentData);
+  const authorSignature = await walletClient.signTypedData(typedCommentData);
 
   const response = await fetch("/api/post-comment", {
     method: "POST",
@@ -182,19 +184,22 @@ async function postCommentWithGaslessAndAuthorSig({
     type: "gasless-not-preapproved",
     action: "post",
     state: { status: "pending" },
-    chainId: postCommentPayloadRequest.chainId,
+    chainId,
   };
 }
 
 async function postCommentWithoutGasless({
   postCommentPayloadRequest,
-  writeContractAsync,
+  publicClient,
+  walletClient,
   resolvedAuthor,
 }: {
   postCommentPayloadRequest: PostCommentPayloadInputSchemaType;
+  publicClient: PublicClient<Transport, Chain, undefined>;
+  walletClient: WalletClient<Transport, Chain, Account>;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
-  writeContractAsync: ContractWriteFunctions["postComment"];
 }): Promise<SubmitPostCommentMutationResult> {
+  const { chainId, channelId, author } = postCommentPayloadRequest;
   const response = await fetch("/api/sign-comment", {
     method: "POST",
     headers: {
@@ -202,6 +207,7 @@ async function postCommentWithoutGasless({
     },
     body: JSON.stringify(
       postCommentPayloadRequest satisfies SignCommentPayloadRequestSchemaType,
+      bigintReplacer,
     ),
   });
 
@@ -224,10 +230,41 @@ async function postCommentWithoutGasless({
   }
 
   try {
+    let fee:
+      | Awaited<ReturnType<typeof estimateChannelPostCommentFee>>
+      | undefined;
+
+    if (channelId) {
+      // Estimate the fee for posting a comment to the channel
+      const estimationCommentData =
+        createEstimateChannelPostOrEditCommentFeeData({
+          ...postCommentPayloadRequest,
+          app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        });
+      fee = await estimateChannelPostCommentFee({
+        commentData: estimationCommentData,
+        metadata: [],
+        msgSender: author,
+        readContract: publicClient.readContract,
+        channelId,
+      });
+    }
+
+    if (fee?.contractAsset && fee.contractAsset.amount > 0n) {
+      await prepareContractAssetForTransfer({
+        contractAsset: fee.contractAsset,
+        hook: fee.hook,
+        author,
+        publicClient,
+        walletClient,
+      });
+    }
+
     const { txHash } = await postComment({
       comment: signedCommentResult.data.data,
       appSignature: signedCommentResult.data.signature,
-      writeContract: writeContractAsync,
+      fee: fee?.baseToken.amount,
+      writeContract: walletClient.writeContract,
     });
 
     return {
@@ -237,7 +274,7 @@ async function postCommentWithoutGasless({
       type: "non-gasless",
       action: "post",
       state: { status: "pending" },
-      chainId: postCommentPayloadRequest.chainId,
+      chainId,
     };
   } catch (e) {
     if (!(e instanceof Error)) {

@@ -2,12 +2,11 @@ import { useCommentRetrySubmission } from "@ecp.eth/shared/hooks";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
-import { useConfig, useSwitchChain } from "wagmi";
+import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { submitPostComment } from "../queries/submitPostComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 export type OnRetryPostCommentParams = {
@@ -36,12 +35,16 @@ export function useRetryPostComment({
   const wagmiConfig = useConfig();
   const commentRetrySubmission = useCommentRetrySubmission();
   const { switchChainAsync } = useSwitchChain();
-  const { writeContractAsync, signTypedDataAsync } =
-    useReadWriteContractAsync();
   const embedConfig = useEmbedConfig();
+  const publicClient = usePublicClient();
+
+  if (!publicClient) {
+    throw new Error("No public client found");
+  }
 
   return useCallback<OnRetryPostComment>(
     async (params) => {
+      const walletClient = await getWalletClient(wagmiConfig);
       const { comment } = params;
 
       if (!comment.pendingOperation) {
@@ -73,9 +76,8 @@ export function useRetryPostComment({
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
-
-          writeContractAsync,
-          signTypedDataAsync,
+          publicClient,
+          walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
         })),
         references: comment.references,
@@ -114,8 +116,7 @@ export function useRetryPostComment({
     },
     [
       connectedAddress,
-      writeContractAsync,
-      signTypedDataAsync,
+      publicClient,
       embedConfig.gasSponsorship,
       switchChainAsync,
       commentRetrySubmission,

@@ -224,13 +224,19 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/channelExists</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/createEstimateChannelPostOrEditCommentFeeData</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -242,49 +248,49 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/estimateChannelEditCommentFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/estimateChannelPostCommentFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getChannel</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getChannelCreationFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getChannelMetadata</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getCommentCreationFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getEstimatedChannelEditCommentHookFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/getEstimatedChannelPostCommentHookFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -296,25 +302,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/ownerOf</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/setBaseURI</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/setChannelCreationFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/setCommentCreationFee</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -332,7 +338,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/functions/withdrawFees</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -680,19 +686,19 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/ChannelExistsParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/CreateChannelParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/CreateChannelResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -710,49 +716,49 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelCreationFeeParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelCreationFeeResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelMetadataParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelMetadataResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetChannelResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetCommentCreationFeeParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/GetCommentCreationFeeResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -770,49 +776,49 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/OwnerOfParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/OwnerOfResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetBaseURIParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetBaseURIResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetChannelCreationFeeParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetChannelCreationFeeResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetCommentCreationFeeParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/SetCommentCreationFeeResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -842,25 +848,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/UpdateChannelParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/UpdateChannelResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/WithdrawFeesParams</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/type-aliases/WithdrawFeesResult</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -896,13 +902,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetERCType</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/ContractBasedAssetType</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -926,25 +932,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/HookFeeEstimation</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/types/type-aliases/TotalFeeEstimation</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/variables/createChannel</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/channel-manager/variables/updateChannel</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2498,7 +2504,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core</loc>
-    <lastmod>2025-10-08T07:08:42.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2511,6 +2517,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core/functions/getOneDayFromNowInSeconds</loc>
     <lastmod>2025-10-08T07:08:42.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/core/functions/getOneMinuteFromNowInSeconds</loc>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2558,7 +2570,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports</loc>
-    <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/type-aliases/ERC165ContractReadFunctions</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/type-aliases/ERC20ContractReadFunctions</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/type-aliases/LegacyTakesChannelContractReadFunctions</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2659,6 +2689,18 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/ERC165_ABI</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/ERC20_ABI</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INDEXER_API_URL</loc>
     <lastmod>2025-07-30T09:05:23.000Z</lastmod>
     <changefreq>weekly</changefreq>
@@ -2679,6 +2721,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/INTERFACE_ID_ERC721</loc>
     <lastmod>2025-09-09T01:16:21.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/defaultExports/variables/LEGACY_TAKES_CHANNEL_ABI</loc>
+    <lastmod>2025-10-20T14:19:04.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2768,13 +2816,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigSchemaInputType</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedConfigSchemaOutputType</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2810,13 +2858,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedGetDimensionsEventSchemaType</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/type-aliases/EmbedResizedEventSchemaType</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2876,13 +2924,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedGetDimensionsEventSchema</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/embed/variables/EmbedResizedEventSchema</loc>
-    <lastmod>2025-10-14T07:31:11.000Z</lastmod>
+    <lastmod>2025-10-16T09:18:32.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
