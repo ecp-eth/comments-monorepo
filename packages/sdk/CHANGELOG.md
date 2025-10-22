@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.31
+
+### Patch Changes
+
+- 47366bb: feat(sdk): add createEstimateChannelPostOrEditCommentFeeData to help with fee estimation data creation
+- 877a63f: feat: add reply counts to replies page info
+
 ## 0.0.30
 
 ### Patch Changes
