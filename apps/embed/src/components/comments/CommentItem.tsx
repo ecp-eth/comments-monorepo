@@ -128,6 +128,7 @@ export function CommentItem({ comment }: CommentItemProps) {
     enabled: comment.pendingOperation?.action !== "post",
     queryData: repliesQuery.data,
     queryKey: replyItemsQueryKey,
+    refetch: repliesQuery.refetch,
     fetchComments({ cursor, signal }) {
       return fetchCommentReplies({
         chainId,

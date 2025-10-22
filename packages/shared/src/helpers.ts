@@ -74,65 +74,6 @@ export function hasNewComments(
   return false;
 }
 
-export function mergeNewComments(
-  oldQueryData: InfiniteData<
-    CommentPageSchemaType,
-    ListCommentsQueryPageParamsSchemaType
-  >,
-  newCommentsPage:
-    | IndexerAPIListCommentsSchemaType
-    | IndexerAPIListCommentRepliesSchemaType,
-): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
-  if (newCommentsPage.results.length === 0) {
-    return oldQueryData;
-  }
-
-  const pendingComments: Map<PendingComment["id"], { pageIndex: number }> =
-    new Map(
-      oldQueryData.pages.flatMap((page, pageIndex) =>
-        page.results
-          .filter(
-            (comment): comment is PendingComment =>
-              comment.pendingOperation?.action === "post",
-          )
-          .map((comment) => [comment.id, { pageIndex }]),
-      ),
-    );
-
-  for (const newComment of newCommentsPage.results) {
-    if (pendingComments.has(newComment.id)) {
-      const { pageIndex } = pendingComments.get(newComment.id)!;
-
-      oldQueryData.pages[pageIndex]!.results = oldQueryData.pages[
-        pageIndex
-      ]!.results.filter((comment) => comment.id !== newComment.id);
-    }
-  }
-
-  return {
-    pages: [
-      {
-        extra: newCommentsPage.extra,
-        results: newCommentsPage.results.slice().reverse(),
-        pagination: {
-          ...newCommentsPage.pagination,
-          // new comments is using reverse ordering therefore we have to swap the start and end cursors
-          // so it matches the old query data ordering
-          startCursor: newCommentsPage.pagination.endCursor,
-          endCursor: newCommentsPage.pagination.startCursor,
-        },
-      },
-      ...oldQueryData.pages,
-    ],
-    pageParams: [
-      {
-        limit: newCommentsPage.pagination.limit,
-      },
-      ...oldQueryData.pageParams,
-    ],
-  };
-}
-
 /**
  * Mark a comment as deleting by setting the `pendingOperation` field to a pending delete operation
  *
