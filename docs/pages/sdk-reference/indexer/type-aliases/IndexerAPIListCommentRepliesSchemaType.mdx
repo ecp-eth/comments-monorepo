@@ -172,6 +172,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
            moderationKnownReactions: string[];
         };
         pagination: {
+           count: number;
            endCursor?: `0x${string}`;
            hasNext: boolean;
            hasPrevious: boolean;
@@ -557,7 +558,7 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:512](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L512)
+Defined in: [packages/sdk/src/indexer/schemas.ts:517](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L517)
 
 ## Type declaration
 
@@ -780,6 +781,7 @@ results: {
         moderationKnownReactions: string[];
      };
      pagination: {
+        count: number;
         endCursor?: `0x${string}`;
         hasNext: boolean;
         hasPrevious: boolean;

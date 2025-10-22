@@ -132,6 +132,7 @@ function getMockFetchCommentResponseData() {
         limit: 2,
         hasNext: false,
         hasPrevious: false,
+        count: 0,
       },
     },
   };
@@ -198,6 +199,7 @@ function getMockFetchCommentRepliesResponseData() {
             limit: 2,
             hasNext: false,
             hasPrevious: false,
+            count: 0,
           },
         },
       },
@@ -256,6 +258,7 @@ function getMockFetchCommentRepliesResponseData() {
             limit: 2,
             hasNext: false,
             hasPrevious: false,
+            count: 0,
           },
         },
       },

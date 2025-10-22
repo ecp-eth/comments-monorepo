@@ -160,6 +160,7 @@ function fetchComment(options): Promise<{
         moderationKnownReactions: string[];
      };
      pagination: {
+        count: number;
         endCursor?: `0x${string}`;
         hasNext: boolean;
         hasPrevious: boolean;
@@ -797,6 +798,7 @@ Fetch one single comment from the Indexer API
         `moderationKnownReactions`: `string`[];
      \};
      `pagination`: \{
+        `count`: `number`;
         `endCursor?`: `` `0x${string}` ``;
         `hasNext`: `boolean`;
         `hasPrevious`: `boolean`;

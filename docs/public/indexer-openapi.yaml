@@ -2336,10 +2336,14 @@ paths:
                             type: boolean
                           startCursor: {}
                           endCursor: {}
+                          count:
+                            type: integer
+                            minimum: 0
                         required:
                           - limit
                           - hasNext
                           - hasPrevious
+                          - count
                     required:
                       - extra
                       - results
@@ -4608,10 +4612,14 @@ paths:
                                   type: boolean
                                 startCursor: {}
                                 endCursor: {}
+                                count:
+                                  type: integer
+                                  minimum: 0
                               required:
                                 - limit
                                 - hasNext
                                 - hasPrevious
+                                - count
                           required:
                             - extra
                             - results
@@ -6895,10 +6903,14 @@ paths:
                                   type: boolean
                                 startCursor: {}
                                 endCursor: {}
+                                count:
+                                  type: integer
+                                  minimum: 0
                               required:
                                 - limit
                                 - hasNext
                                 - hasPrevious
+                                - count
                           required:
                             - extra
                             - results

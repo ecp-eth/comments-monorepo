@@ -160,6 +160,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
         moderationKnownReactions: string[];
      };
      pagination: {
+        count: number;
         endCursor?: `0x${string}`;
         hasNext: boolean;
         hasPrevious: boolean;
@@ -662,7 +663,7 @@ type IndexerAPICommentWithRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:468](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L468)
+Defined in: [packages/sdk/src/indexer/schemas.ts:473](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L473)
 
 ## Type declaration
 
@@ -983,6 +984,7 @@ replies: {
      moderationKnownReactions: string[];
   };
   pagination: {
+     count: number;
      endCursor?: `0x${string}`;
      hasNext: boolean;
      hasPrevious: boolean;
@@ -1328,12 +1330,19 @@ moderationKnownReactions: string[];
 
 ```ts
 pagination: {
+  count: number;
   endCursor?: `0x${string}`;
   hasNext: boolean;
   hasPrevious: boolean;
   limit: number;
   startCursor?: `0x${string}`;
-} = IndexerAPICursorPaginationSchema;
+} = IndexerAPICursorRepliesPaginationSchema;
+```
+
+#### replies.pagination.count
+
+```ts
+count: number;
 ```
 
 #### replies.pagination.endCursor?

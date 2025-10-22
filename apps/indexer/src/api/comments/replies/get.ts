@@ -73,7 +73,7 @@ export default (app: OpenAPIHono) => {
       commentType,
       moderationStatus,
       chainId,
-      excludeByModerationLabels: excludeModerationLabels,
+      excludeByModerationLabels,
       author,
       moderationScore,
       isDeleted,
@@ -90,8 +90,8 @@ export default (app: OpenAPIHono) => {
       chainId.length === 1
         ? eq(schema.comment.chainId, chainId[0]!)
         : inArray(schema.comment.chainId, chainId),
-      excludeModerationLabels
-        ? convertExcludeModerationLabelsToConditions(excludeModerationLabels)
+      excludeByModerationLabels
+        ? convertExcludeModerationLabelsToConditions(excludeByModerationLabels)
         : undefined,
       moderationScore != null
         ? lte(schema.comment.moderationClassifierScore, moderationScore)
@@ -248,6 +248,15 @@ export default (app: OpenAPIHono) => {
         limit,
         previousComment: previousReply,
         replyLimit: REPLIES_PER_COMMENT,
+        replyCountsConditions: {
+          mode,
+          app,
+          commentType,
+          excludeModerationLabels: excludeByModerationLabels,
+          isDeleted,
+          moderationScore,
+          moderationStatus: moderationStatusFilter,
+        },
       });
 
     return c.json(

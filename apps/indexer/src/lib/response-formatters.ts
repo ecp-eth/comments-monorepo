@@ -12,9 +12,16 @@ import { farcasterByAddressResolverService } from "../services/farcaster-by-addr
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
 import { env } from "../env.ts";
 import type {
+  ReplyCountsByParentIdResolverKey,
   ResolvedENSData,
   ResolvedFarcasterData,
 } from "../resolvers/index.ts";
+import type {
+  CommentModerationLabel,
+  LowercasedHex,
+  ModerationStatus,
+} from "../services/types.ts";
+import { replyCountsByParentIdResolverService } from "../services/reply-counts-by-parent-id-resolver.ts";
 
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];
@@ -30,11 +37,21 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   limit,
   replyLimit,
   previousComment,
+  replyCountsConditions,
 }: {
   comments: CommentFromDB[];
   limit: number;
   replyLimit: number;
   previousComment: CommentSelectType | undefined;
+  replyCountsConditions: {
+    mode: "flat" | "nested";
+    app?: Hex;
+    isDeleted?: boolean;
+    commentType?: number;
+    excludeModerationLabels?: CommentModerationLabel[];
+    moderationScore?: number;
+    moderationStatus?: ModerationStatus[];
+  };
 }): Promise<IndexerAPIListCommentsSchemaType> {
   if (comments.length === 0) {
     return {
@@ -65,10 +82,13 @@ export async function resolveUserDataAndFormatListCommentsResponse({
     }
   }
 
-  const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData] =
+  const dedupedAuthorAddresses = [...authorAddresses];
+
+  const [resolvedAuthorsEnsData, resolvedAuthorsFarcasterData, replyCounts] =
     await Promise.all([
-      ensByAddressResolverService.loadMany([...authorAddresses]),
-      farcasterByAddressResolverService.loadMany([...authorAddresses]),
+      ensByAddressResolverService.loadMany([...dedupedAuthorAddresses]),
+      farcasterByAddressResolverService.loadMany([...dedupedAuthorAddresses]),
+      mapReplyCountsByCommentId(comments, replyCountsConditions),
     ]);
 
   const nextComment = comments[comments.length - 1];
@@ -77,11 +97,12 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   const endComment = results[results.length - 1];
 
   const resolveUserDataAndFormatSingleCommentResponse =
-    createUserDataAndFormatSingleCommentResponseResolver(
+    createUserDataAndFormatSingleCommentResponseResolver({
       replyLimit,
       resolvedAuthorsEnsData,
       resolvedAuthorsFarcasterData,
-    );
+      replyCounts,
+    });
 
   return {
     results: results.map(resolveUserDataAndFormatSingleCommentResponse),
@@ -103,11 +124,17 @@ export async function resolveUserDataAndFormatListCommentsResponse({
   };
 }
 
-export const createUserDataAndFormatSingleCommentResponseResolver = (
-  replyLimit: number,
-  resolvedAuthorsEnsData: (ResolvedENSData | Error | null)[],
-  resolvedAuthorsFarcasterData: (ResolvedFarcasterData | Error | null)[],
-) => {
+export function createUserDataAndFormatSingleCommentResponseResolver({
+  replyCounts,
+  replyLimit,
+  resolvedAuthorsEnsData,
+  resolvedAuthorsFarcasterData,
+}: {
+  replyLimit: number;
+  resolvedAuthorsEnsData: (ResolvedENSData | Error | null)[];
+  resolvedAuthorsFarcasterData: (ResolvedFarcasterData | Error | null)[];
+  replyCounts: Record<LowercasedHex, number>;
+}) {
   return (comment: CommentFromDB) => {
     const {
       replies: nestedReplies,
@@ -182,11 +209,12 @@ export const createUserDataAndFormatSingleCommentResponseResolver = (
           endCursor: endReply
             ? getCommentCursor(endReply.id as Hex, endReply.createdAt)
             : undefined,
+          count: replyCounts[comment.id.toLowerCase() as LowercasedHex] ?? 0,
         },
       },
     };
   };
-};
+}
 
 /**
  * This function formats the author data for API response
@@ -201,6 +229,38 @@ export function formatAuthor(
     ens: resolvedEnsData ?? undefined,
     farcaster: resolvedFarcasterData ?? undefined,
   };
+}
+
+/**
+ * Creates a hash map of lower cased comment ids to reply counts
+ */
+export async function mapReplyCountsByCommentId(
+  /**
+   * Comments in the order their counts were resolver
+   */
+  comments: { id: Hex }[],
+  replyCountsConditions: Omit<ReplyCountsByParentIdResolverKey, "parentId">,
+): Promise<Record<LowercasedHex, number>> {
+  const replyCounts = await replyCountsByParentIdResolverService.loadMany(
+    comments.map((comment) => ({
+      parentId: comment.id,
+      ...replyCountsConditions,
+    })),
+  );
+  const result: Record<Hex, number> = {};
+
+  for (let i = 0; i < comments.length; i++) {
+    const loweredCommentId = comments[i]!.id.toLowerCase() as LowercasedHex;
+    const countOrError = replyCounts[i];
+
+    if (typeof countOrError === "number") {
+      result[loweredCommentId] = countOrError;
+    } else {
+      result[loweredCommentId] = 0;
+    }
+  }
+
+  return result;
 }
 
 function formatComment(

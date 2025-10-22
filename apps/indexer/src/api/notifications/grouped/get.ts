@@ -19,6 +19,7 @@ import {
   createUserDataAndFormatSingleCommentResponseResolver,
   formatAuthor,
   formatResponseUsingZodSchema,
+  mapReplyCountsByCommentId,
   resolveUserData,
 } from "../../../lib/response-formatters.ts";
 import {
@@ -37,6 +38,8 @@ import { farcasterByAddressResolverService } from "../../../services/farcaster-b
 import { convertJsonCommentToCommentSelectType } from "../utils.ts";
 import type { ResolvedENSData } from "../../../resolvers/ens.types.ts";
 import type { ResolvedFarcasterData } from "../../../resolvers/farcaster.types.ts";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
+import type { LowercasedHex } from "../../../services/types.ts";
 
 const GROUPED_NOTIFICATIONS_LIMIT = 5;
 
@@ -483,8 +486,12 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             `,
         );
 
-        const { groups, resolvedUsersEnsData, resolvedUsersFarcasterData } =
-          await resolveGroupedNotificationsFromRows(rows);
+        const {
+          groups,
+          resolvedUsersEnsData,
+          resolvedUsersFarcasterData,
+          replyCounts,
+        } = await resolveGroupedNotificationsFromRows(rows);
 
         return c.json(
           formatGroupedNotificationsToResponse({
@@ -493,6 +500,7 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
             resolvedUsersFarcasterData,
             limit,
             isBeforeCursorUsed: !!before,
+            replyCounts,
           }),
           200,
         );
@@ -579,6 +587,7 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
   groups: Group[];
   resolvedUsersEnsData: ResolvedENSData[];
   resolvedUsersFarcasterData: ResolvedFarcasterData[];
+  replyCounts: Record<LowercasedHex, number>;
 }> {
   const userAddresses = new Set<Hex>();
   const groups: Group[] = [];
@@ -649,10 +658,18 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
     groups.push(currentGroup);
   }
 
-  const [resolvedUsersEnsData, resolvedUsersFarcasterData] = await Promise.all([
-    ensByAddressResolverService.loadMany([...userAddresses]),
-    farcasterByAddressResolverService.loadMany([...userAddresses]),
-  ]);
+  const [resolvedUsersEnsData, resolvedUsersFarcasterData, replyCounts] =
+    await Promise.all([
+      ensByAddressResolverService.loadMany([...userAddresses]),
+      farcasterByAddressResolverService.loadMany([...userAddresses]),
+      mapReplyCountsByCommentId(
+        rows.map((row) => row.parent),
+        {
+          mode: "nested",
+          commentType: COMMENT_TYPE_COMMENT,
+        },
+      ),
+    ]);
 
   return {
     groups,
@@ -664,6 +681,7 @@ async function resolveGroupedNotificationsFromRows(rows: DBRow[]): Promise<{
       (data): data is ResolvedFarcasterData =>
         data != null && !(data instanceof Error),
     ),
+    replyCounts,
   };
 }
 
@@ -673,19 +691,22 @@ function formatGroupedNotificationsToResponse({
   resolvedUsersFarcasterData,
   limit,
   isBeforeCursorUsed,
+  replyCounts,
 }: {
   groups: Group[];
   resolvedUsersEnsData: ResolvedENSData[];
   resolvedUsersFarcasterData: ResolvedFarcasterData[];
+  replyCounts: Record<LowercasedHex, number>;
   limit: number;
   isBeforeCursorUsed: boolean;
 }) {
   const resolveUserDataAndFormatSingleCommentResponse =
-    createUserDataAndFormatSingleCommentResponseResolver(
-      0,
-      resolvedUsersEnsData,
-      resolvedUsersFarcasterData,
-    );
+    createUserDataAndFormatSingleCommentResponseResolver({
+      replyLimit: 0,
+      resolvedAuthorsEnsData: resolvedUsersEnsData,
+      resolvedAuthorsFarcasterData: resolvedUsersFarcasterData,
+      replyCounts,
+    });
 
   let hasNextPage = false;
   let hasPreviousPage = false;

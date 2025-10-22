@@ -262,6 +262,15 @@ export default (app: OpenAPIHono) => {
         limit,
         previousComment,
         replyLimit: REPLIES_PER_COMMENT,
+        replyCountsConditions: {
+          mode,
+          app,
+          isDeleted,
+          commentType,
+          excludeModerationLabels,
+          moderationScore,
+          moderationStatus: moderationStatusFilter,
+        },
       });
 
     return c.json(

@@ -28,6 +28,7 @@ import {
   createUserDataAndFormatSingleCommentResponseResolver,
   formatAuthor,
   formatResponseUsingZodSchema,
+  mapReplyCountsByCommentId,
   resolveUserData,
 } from "../../lib/response-formatters.ts";
 import {
@@ -40,6 +41,7 @@ import { ensByAddressResolverService } from "../../services/ens-by-address-resol
 import { farcasterByAddressResolverService } from "../../services/farcaster-by-address-resolver.ts";
 import type { JSONCommentSelectType } from "./types.ts";
 import { convertJsonCommentToCommentSelectType } from "./utils.ts";
+import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 
 export const AppNotificationsCursorInputSchema = z
   .preprocess(
@@ -316,18 +318,29 @@ export function setupNotificationsGet(app: OpenAPIHono) {
         ),
       );
 
-      const [resolvedUsersEnsData, resolvedUsersFarcasterData] =
-        await Promise.all([
-          ensByAddressResolverService.loadMany([...userAddresses]),
-          farcasterByAddressResolverService.loadMany([...userAddresses]),
-        ]);
+      const [
+        resolvedAuthorsEnsData,
+        resolvedAuthorsFarcasterData,
+        replyCounts,
+      ] = await Promise.all([
+        ensByAddressResolverService.loadMany([...userAddresses]),
+        farcasterByAddressResolverService.loadMany([...userAddresses]),
+        mapReplyCountsByCommentId(
+          rows.map((row) => row.comment),
+          {
+            mode: "nested",
+            commentType: COMMENT_TYPE_COMMENT,
+          },
+        ),
+      ]);
 
       const resolveUserDataAndFormatSingleCommentResponse =
-        createUserDataAndFormatSingleCommentResponseResolver(
-          0,
-          resolvedUsersEnsData,
-          resolvedUsersFarcasterData,
-        );
+        createUserDataAndFormatSingleCommentResponseResolver({
+          replyLimit: 0,
+          resolvedAuthorsEnsData,
+          resolvedAuthorsFarcasterData,
+          replyCounts,
+        });
 
       return c.json(
         formatResponseUsingZodSchema(AppNotificationsGetResponseSchema, {
@@ -357,11 +370,11 @@ export function setupNotificationsGet(app: OpenAPIHono) {
                 };
               case "mention": {
                 const resolvedUserEnsData = resolveUserData(
-                  resolvedUsersEnsData,
+                  resolvedAuthorsEnsData,
                   row.recipientAddress,
                 );
                 const resolvedUserFarcasterData = resolveUserData(
-                  resolvedUsersFarcasterData,
+                  resolvedAuthorsFarcasterData,
                   row.recipientAddress,
                 );
 

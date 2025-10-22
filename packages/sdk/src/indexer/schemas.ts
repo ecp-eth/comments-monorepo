@@ -38,6 +38,11 @@ export const IndexerAPICursorPaginationSchema = z.object({
   endCursor: HexSchema.optional(),
 });
 
+export const IndexerAPICursorRepliesPaginationSchema =
+  IndexerAPICursorPaginationSchema.extend({
+    count: z.number().int().nonnegative(),
+  });
+
 export type IndexerAPICursorPaginationSchemaType = z.infer<
   typeof IndexerAPICursorPaginationSchema
 >;
@@ -461,7 +466,7 @@ export const IndexerAPICommentWithRepliesSchema =
     replies: z.object({
       extra: IndexerAPIExtraSchema,
       results: z.array(IndexerAPICommentReactionSchema),
-      pagination: IndexerAPICursorPaginationSchema,
+      pagination: IndexerAPICursorRepliesPaginationSchema,
     }),
   });
 
@@ -474,7 +479,7 @@ export const IndexerAPICommentWithRepliesOutputSchema =
     replies: z.object({
       extra: IndexerAPIExtraSchema,
       results: z.array(IndexerAPICommentReactionOutputSchema),
-      pagination: IndexerAPICursorPaginationSchema,
+      pagination: IndexerAPICursorRepliesPaginationSchema,
     }),
   });
 
