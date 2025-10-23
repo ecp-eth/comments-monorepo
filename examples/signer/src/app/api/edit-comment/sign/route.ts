@@ -1,10 +1,4 @@
 import { env } from "@/lib/env";
-import {
-  BadRequestResponseSchema,
-  ErrorResponseSchema,
-  SignEditCommentPayloadRequestSchema,
-  SignEditCommentResponseServerSchema,
-} from "@/lib/schemas";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createEditCommentData,
@@ -16,6 +10,15 @@ import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http } from "viem";
 import { getRpcUrl } from "@/lib/env";
+import {
+  SignEditCommentRequestPayloadSchema,
+  SignEditCommentResponseBodySchema,
+} from "@/lib/schemas/edit";
+import { guardRequestPayloadSchemaIsValid } from "@/lib/guards";
+import {
+  BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@/lib/schemas/shared";
 
 /**
  * Signs an edit comment to be sent by the author.
@@ -24,35 +27,25 @@ export async function POST(
   req: Request,
 ): Promise<
   JSONResponse<
-    | typeof SignEditCommentResponseServerSchema
-    | typeof BadRequestResponseSchema
-    | typeof ErrorResponseSchema
+    | typeof SignEditCommentResponseBodySchema
+    | typeof BadRequestResponseBodySchema
+    | typeof ErrorResponseBodySchema
   >
 > {
   if (!env.APP_SIGNER_PRIVATE_KEY) {
     return new JSONResponse(
-      ErrorResponseSchema,
+      ErrorResponseBodySchema,
       { error: "Not Found" },
       { status: 404 },
     );
   }
 
   try {
-    const parsedBodyResult = SignEditCommentPayloadRequestSchema.safeParse(
-      await req.json(),
-    );
-
-    if (!parsedBodyResult.success) {
-      return new JSONResponse(
-        BadRequestResponseSchema,
-        parsedBodyResult.error.flatten().fieldErrors,
-        { status: 400 },
-      );
-    }
-
-    const passedCommentData = parsedBodyResult.data;
     const { commentId, content, author, metadata, chainConfig } =
-      passedCommentData;
+      guardRequestPayloadSchemaIsValid(
+        SignEditCommentRequestPayloadSchema,
+        await req.json(),
+      );
 
     // Check if author is muted (if indexer URL is configured)
     if (env.COMMENTS_INDEXER_URL) {
@@ -63,7 +56,7 @@ export async function POST(
         })
       ) {
         return new JSONResponse(
-          ErrorResponseSchema,
+          ErrorResponseBodySchema,
           { error: "Author is muted" },
           { status: 403 },
         );
@@ -100,7 +93,7 @@ export async function POST(
     const hash = hashTypedData(typedCommentData);
 
     return new JSONResponse(
-      SignEditCommentResponseServerSchema,
+      SignEditCommentResponseBodySchema,
       {
         signature,
         hash,
@@ -111,10 +104,14 @@ export async function POST(
       },
     );
   } catch (error) {
+    if (error instanceof JSONResponse) {
+      return error;
+    }
+
     console.error("Error in edit comment sign endpoint:", error);
 
     return new JSONResponse(
-      ErrorResponseSchema,
+      ErrorResponseBodySchema,
       { error: "Internal server error" },
       { status: 500 },
     );
