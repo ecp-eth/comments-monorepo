@@ -1,6 +1,8 @@
 import {
   guardAPIDeadline,
+  guardAuthorIsNotMuted,
   guardAuthorSignature,
+  guardContentLength,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import {
@@ -52,7 +54,9 @@ export async function POST(
       deadline,
     } = parsedBodyData;
 
+    guardContentLength(content);
     guardAPIDeadline(deadline);
+    await guardAuthorIsNotMuted(author);
 
     const selectedChain = chainConfig.chain;
     const publicClient = createPublicClient({

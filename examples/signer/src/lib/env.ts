@@ -57,6 +57,7 @@ const BaseEnvSchema = z.object({
     .default([DEFAULT_CHAIN_ID]),
   DEFAULT_CHAIN_ID: ChainIdSchema.default(DEFAULT_CHAIN_ID),
   COMMENTS_INDEXER_URL: z.string().url().optional(),
+  COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().min(1).default(10240),
 });
 
 const PrivateKeyGaslessEnvSchema = BaseEnvSchema.extend({
