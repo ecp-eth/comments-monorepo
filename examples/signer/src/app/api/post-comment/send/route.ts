@@ -1,6 +1,5 @@
 import {
   guardAPIDeadline,
-  guardAppSignerPrivateKey,
   guardAuthorSignature,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
@@ -16,7 +15,6 @@ import {
   hashTypedData,
   http,
 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import {
   SendPostCommentRequestPayloadSchema,
   SendPostCommentResponseBodySchema,
@@ -26,7 +24,7 @@ import {
   ErrorResponseBodySchema,
 } from "@/lib/schemas/shared";
 import { getRpcUrl } from "@/lib/env";
-import { getGaslessSubmitter } from "@/lib/helpers";
+import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
 
 export async function POST(
   req: Request,
@@ -38,7 +36,6 @@ export async function POST(
   >
 > {
   try {
-    const appSignerPrivateKey = guardAppSignerPrivateKey();
     const parsedBodyData = guardRequestPayloadSchemaIsValid(
       SendPostCommentRequestPayloadSchema,
       await req.json(),
@@ -62,7 +59,7 @@ export async function POST(
       chain: selectedChain,
       transport: http(getRpcUrl(chainConfig.chain.id)),
     });
-    const appAccount = privateKeyToAccount(appSignerPrivateKey);
+    const appAccount = await getGaslessSigner();
     const commentData = createCommentData({
       content,
       author,

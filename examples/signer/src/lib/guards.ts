@@ -10,14 +10,16 @@ import z, { ZodSchema } from "zod";
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
     if (deadline < BigInt(Date.now()) / 1000n) {
-      throw JSONResponse.json(
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
         { error: "Deadline is in the past" },
         { status: 400 },
       );
     }
 
     if (deadline > BigInt(Date.now() + 24 * 60 * 60 * 1000) / 1000n) {
-      throw JSONResponse.json(
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
         { error: "Deadline is too far in the future" },
         { status: 400 },
       );
@@ -39,7 +41,8 @@ export async function guardAuthorSignature({
   authorAddress: Address;
 }) {
   if (!authorSignature) {
-    throw JSONResponse.json(
+    throw new JSONResponse(
+      ErrorResponseBodySchema,
       { error: "Author signature is required" },
       { status: 400 },
     );
@@ -52,7 +55,8 @@ export async function guardAuthorSignature({
   });
 
   if (!verified) {
-    throw JSONResponse.json(
+    throw new JSONResponse(
+      ErrorResponseBodySchema,
       { error: "Invalid author signature" },
       { status: 400 },
     );

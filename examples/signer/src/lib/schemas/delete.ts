@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { AllowedChainIdSchema } from "../env";
