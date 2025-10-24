@@ -1,18 +1,24 @@
 import { env } from "@/lib/env";
-import {
-  BadRequestResponseSchema,
-  ErrorResponseSchema,
-  SignCommentPayloadRequestSchema,
-  SignCommentResponseServerSchema,
-} from "@/lib/schemas";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk/comments";
+import {
+  SignPostCommentRequestPayloadSchema,
+  SignPostCommentResponseBodySchema,
+} from "@/lib/schemas/post";
+import {
+  BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@/lib/schemas/shared";
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import {
+  guardAppSignerPrivateKey,
+  guardRequestPayloadSchemaIsValid,
+} from "@/lib/guards";
 
 /**
  * Signs a comment to be sent by the author.
@@ -21,35 +27,19 @@ export async function POST(
   req: Request,
 ): Promise<
   JSONResponse<
-    | typeof SignCommentResponseServerSchema
-    | typeof BadRequestResponseSchema
-    | typeof ErrorResponseSchema
+    | typeof SignPostCommentResponseBodySchema
+    | typeof BadRequestResponseBodySchema
+    | typeof ErrorResponseBodySchema
   >
 > {
-  if (!env.APP_SIGNER_PRIVATE_KEY) {
-    return new JSONResponse(
-      ErrorResponseSchema,
-      { error: "Not Found" },
-      { status: 404 },
-    );
-  }
-
   try {
-    const parsedBodyResult = SignCommentPayloadRequestSchema.safeParse(
+    const appSignerPrivateKey = guardAppSignerPrivateKey();
+    const parsedBodyData = guardRequestPayloadSchemaIsValid(
+      SignPostCommentRequestPayloadSchema,
       await req.json(),
     );
-
-    if (!parsedBodyResult.success) {
-      return new JSONResponse(
-        BadRequestResponseSchema,
-        parsedBodyResult.error.flatten().fieldErrors,
-        { status: 400 },
-      );
-    }
-
-    const passedCommentData = parsedBodyResult.data;
     const { content, author, metadata, chainConfig, commentType, channelId } =
-      passedCommentData;
+      parsedBodyData;
 
     // Check if author is muted (if indexer URL is configured)
     if (env.COMMENTS_INDEXER_URL) {
@@ -60,26 +50,26 @@ export async function POST(
         })
       ) {
         return new JSONResponse(
-          ErrorResponseSchema,
+          ErrorResponseBodySchema,
           { error: "Author is muted" },
           { status: 403 },
         );
       }
     }
 
-    const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+    const app = privateKeyToAccount(appSignerPrivateKey);
     const commentData = createCommentData({
       content,
       metadata,
       author,
       app: app.address,
       channelId,
-      ...("parentId" in passedCommentData
+      ...("parentId" in parsedBodyData
         ? {
-            parentId: passedCommentData.parentId,
+            parentId: parsedBodyData.parentId,
           }
         : {
-            targetUri: passedCommentData.targetUri,
+            targetUri: parsedBodyData.targetUri,
           }),
       commentType,
     });
@@ -93,7 +83,7 @@ export async function POST(
     const hash = hashTypedData(typedCommentData);
 
     return new JSONResponse(
-      SignCommentResponseServerSchema,
+      SignPostCommentResponseBodySchema,
       {
         signature,
         hash,
@@ -104,10 +94,14 @@ export async function POST(
       },
     );
   } catch (error) {
+    if (error instanceof JSONResponse) {
+      return error;
+    }
+
     console.error("Error in sign endpoint:", error);
 
     return new JSONResponse(
-      ErrorResponseSchema,
+      ErrorResponseBodySchema,
       { error: "Internal server error" },
       { status: 500 },
     );

@@ -63,91 +63,6 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Post Comment - Gasless Prepare Endpoint */}
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">
-                POST /api/post-comment/gasless/prepare
-              </h3>
-              <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  gaslessAvailable
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {gaslessAvailable ? "Available" : "Not Configured"}
-              </span>
-            </div>
-            <p className="text-gray-600 mb-2">
-              Prepare gasless comment data. Returns either transaction hash or
-              typed data for user signature.
-            </p>
-            {gaslessAvailable ? (
-              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;content&quot;: &quot;Comment text&quot;,
-                  <br />
-                  &quot;metadata&quot;: [],
-                  <br />
-                  &quot;targetUri&quot;: &quot;https://example.com&quot;,
-                  <br />
-                  &quot;submitIfApproved&quot;: true
-                </div>
-                <div>{"}"}</div>
-              </div>
-            ) : (
-              <div className="bg-yellow-50 p-3 rounded text-sm">
-                Configure GASLESS_METHOD and related environment variables to
-                enable gasless signing.
-              </div>
-            )}
-          </div>
-
-          {/* Post Comment - Gasless Send Endpoint */}
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">
-                POST /api/post-comment/gasless/send
-              </h3>
-              <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  gaslessAvailable
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {gaslessAvailable ? "Available" : "Not Configured"}
-              </span>
-            </div>
-            <p className="text-gray-600 mb-2">
-              Send signed gasless comment data.
-            </p>
-            {gaslessAvailable ? (
-              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
-                  <br />
-                  &quot;appSignature&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;authorSignature&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;chainId&quot;: 1
-                </div>
-                <div>{"}"}</div>
-              </div>
-            ) : (
-              <div className="bg-yellow-50 p-3 rounded text-sm">
-                Configure GASLESS_METHOD and related environment variables to
-                enable gasless signing.
-              </div>
-            )}
-          </div>
-
           {/* Edit Comment - Standard Sign Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
@@ -191,11 +106,11 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Edit Comment - Gasless Prepare Endpoint */}
+          {/* Post Comment - Gasless Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
-                POST /api/edit-comment/gasless/prepare
+                POST /api/post-comment/send
               </h3>
               <span
                 className={`px-2 py-1 rounded-full text-sm ${
@@ -208,7 +123,58 @@ export default function HomePage() {
               </span>
             </div>
             <p className="text-gray-600 mb-2">
-              Prepare gasless edit comment data.
+              Send gasless comment data. Returns either transaction hash and
+              typed data for user signature.
+              <br />
+              <code>authorSignature</code> is required if the user has not
+              approved our submitter address.
+            </p>
+            {gaslessAvailable ? (
+              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
+                <div>Request: {"{"}</div>
+                <div className="ml-4">
+                  &quot;author&quot;: &quot;0x...&quot;,
+                  <br />
+                  &quot;content&quot;: &quot;Comment text&quot;,
+                  <br />
+                  &quot;metadata&quot;: [],
+                  <br />
+                  &quot;targetUri&quot;: &quot;https://example.com&quot;,
+                  <br />
+                  &quot;submitIfApproved&quot;: true
+                </div>
+                <div>{"}"}</div>
+              </div>
+            ) : (
+              <div className="bg-yellow-50 p-3 rounded text-sm">
+                Configure GASLESS_METHOD and related environment variables to
+                enable gasless signing.
+              </div>
+            )}
+          </div>
+
+          {/* Edit Comment - Gasless Endpoint */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-medium">
+                POST /api/edit-comment/send
+              </h3>
+              <span
+                className={`px-2 py-1 rounded-full text-sm ${
+                  gaslessAvailable
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {gaslessAvailable ? "Available" : "Not Configured"}
+              </span>
+            </div>
+            <p className="text-gray-600 mb-2">
+              Send gasless edit comment data. Returns either transaction hash
+              and typed data for user signature.
+              <br />
+              <code>authorSignature</code> is required if the user has not
+              approved our submitter address.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
@@ -236,11 +202,11 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Edit Comment - Gasless Send Endpoint */}
+          {/* Delete Comment - Gasless  Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
-                POST /api/edit-comment/gasless/send
+                POST /api/delete-comment/send
               </h3>
               <span
                 className={`px-2 py-1 rounded-full text-sm ${
@@ -253,50 +219,10 @@ export default function HomePage() {
               </span>
             </div>
             <p className="text-gray-600 mb-2">
-              Send signed gasless edit comment data.
-            </p>
-            {gaslessAvailable ? (
-              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
-                  <br />
-                  &quot;appSignature&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;authorSignature&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;edit&quot;: {"{"} ... {"}"},
-                  <br />
-                  &quot;chainId&quot;: 1
-                </div>
-                <div>{"}"}</div>
-              </div>
-            ) : (
-              <div className="bg-yellow-50 p-3 rounded text-sm">
-                Configure GASLESS_METHOD and related environment variables to
-                enable gasless signing.
-              </div>
-            )}
-          </div>
-
-          {/* Delete Comment - Gasless Prepare Endpoint */}
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">
-                POST /api/delete-comment/gasless/prepare
-              </h3>
-              <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  gaslessAvailable
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {gaslessAvailable ? "Available" : "Not Configured"}
-              </span>
-            </div>
-            <p className="text-gray-600 mb-2">
-              Prepare gasless delete comment data.
+              Send gasless delete comment data.
+              <br />
+              <code>authorSignature</code> is required if the user has not
+              approved our submitter address.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
@@ -307,47 +233,6 @@ export default function HomePage() {
                   &quot;commentId&quot;: &quot;0x...&quot;,
                   <br />
                   &quot;submitIfApproved&quot;: true,
-                  <br />
-                  &quot;chainId&quot;: 1
-                </div>
-                <div>{"}"}</div>
-              </div>
-            ) : (
-              <div className="bg-yellow-50 p-3 rounded text-sm">
-                Configure GASLESS_METHOD and related environment variables to
-                enable gasless signing.
-              </div>
-            )}
-          </div>
-
-          {/* Delete Comment - Gasless Send Endpoint */}
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">
-                POST /api/delete-comment/gasless/send
-              </h3>
-              <span
-                className={`px-2 py-1 rounded-full text-sm ${
-                  gaslessAvailable
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
-              >
-                {gaslessAvailable ? "Available" : "Not Configured"}
-              </span>
-            </div>
-            <p className="text-gray-600 mb-2">
-              Send signed gasless delete comment data.
-            </p>
-            {gaslessAvailable ? (
-              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;signTypedDataParams&quot;: {"{"} ... {"}"},
-                  <br />
-                  &quot;appSignature&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;authorSignature&quot;: &quot;0x...&quot;,
                   <br />
                   &quot;chainId&quot;: 1
                 </div>
@@ -426,7 +311,7 @@ export default function HomePage() {
 
       <div className="text-center">
         <a
-          href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fepc-eth%2Fcomments-monorepo%2Fapps%2Fsigner&env=ENABLED_CHAINS,APP_SIGNER_PRIVATE_KEY"
+          href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fecp-eth%2Fcomments-monorepo%2Ftree%2Ftemplate-signer-api&env=RPC_URL_8453,APP_SIGNER_PRIVATE_KEY,COMMENTS_INDEXER_URL&envDescription=For%20detailed%20Environment%20Variables%20configuration%20please%20see%3A&envLink=https%3A%2F%2Fdocs.ethcomments.xyz%2Fdemos%2Fsigner-api-service%23environment-variables&project-name=signer-api-service&repository-name=signer-api-service"
           className="inline-flex items-center px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
