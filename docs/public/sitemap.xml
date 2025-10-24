@@ -2312,7 +2312,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/CommentDataSchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2426,25 +2426,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/MetadataArrayOpSchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/MetadataArraySchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/MetadataEntryOpSchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/MetadataEntrySchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2480,7 +2480,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/ReplyCommentInputDataSchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2498,7 +2498,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/variables/RootCommentInputDataSchema</loc>
-    <lastmod>2025-06-24T09:50:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2540,7 +2540,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core/type-aliases/Hex</loc>
-    <lastmod>2025-04-29T08:02:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2564,7 +2564,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/core/variables/HexSchema</loc>
-    <lastmod>2025-04-29T08:02:26.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3554,7 +3554,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentReactionOutputSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3662,7 +3662,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICursorRepliesPaginationSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3782,7 +3782,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationBaseSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3866,7 +3866,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIZeroExSwapPossibleEmptyAddressSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4220,7 +4220,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EventFromChainSchema</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4238,7 +4238,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/MetadataSetOperationSchema</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-10-24T14:39:15.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
