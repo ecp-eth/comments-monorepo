@@ -2,8 +2,12 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod";
 import { DEFAULT_CHAIN_ID, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
-export function getRpcUrl(chainId: number) {
-  return process.env[`RPC_URL_${chainId}`];
+export function getRpcUrl(chainId: number): string {
+  const rpcUrl = process.env[`RPC_URL_${chainId}`];
+  if (!rpcUrl) {
+    throw new Error(`RPC URL for chain ${chainId} is not set`);
+  }
+  return rpcUrl;
 }
 
 export const ChainIdSchema = z.coerce.number().transform((val, ctx) => {
