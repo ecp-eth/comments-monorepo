@@ -5,7 +5,6 @@ import {
   createEditCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk/comments";
-import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http } from "viem";

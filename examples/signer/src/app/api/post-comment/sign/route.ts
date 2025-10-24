@@ -1,4 +1,3 @@
-import { env } from "@/lib/env";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createCommentData,
@@ -12,7 +11,6 @@ import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
 } from "@/lib/schemas/shared";
-import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
