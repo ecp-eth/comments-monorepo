@@ -17,6 +17,8 @@ import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
   guardAppSignerPrivateKey,
+  guardAuthorIsNotMuted,
+  guardContentLength,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 
@@ -41,21 +43,8 @@ export async function POST(
     const { content, author, metadata, chainConfig, commentType, channelId } =
       parsedBodyData;
 
-    // Check if author is muted (if indexer URL is configured)
-    if (env.COMMENTS_INDEXER_URL) {
-      if (
-        await isMuted({
-          address: author,
-          apiUrl: env.COMMENTS_INDEXER_URL,
-        })
-      ) {
-        return new JSONResponse(
-          ErrorResponseBodySchema,
-          { error: "Author is muted" },
-          { status: 403 },
-        );
-      }
-    }
+    guardContentLength(content);
+    await guardAuthorIsNotMuted(author);
 
     const app = privateKeyToAccount(appSignerPrivateKey);
     const commentData = createCommentData({
