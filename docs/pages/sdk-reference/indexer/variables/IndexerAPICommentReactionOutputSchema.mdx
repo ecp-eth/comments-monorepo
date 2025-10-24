@@ -8,9 +8,9 @@
 
 ```ts
 const IndexerAPICommentReactionOutputSchema: ZodObject<{
-  app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   author: ZodObject<{
-     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      ens: ZodOptional<ZodObject<{
         avatarUrl: ZodNullable<ZodString>;
         name: ZodString;
@@ -65,10 +65,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   chainId: ZodNumber;
   commentType: ZodNumber;
   content: ZodString;
-  cursor: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  cursor: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   hookMetadata: ZodArray<ZodObject<{
-     key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
    }, "strip", ZodTypeAny, {
      key: `0x${string}`;
      value: `0x${string}`;
@@ -76,11 +76,11 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">;
-  id: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  id: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   logIndex: ZodNullable<ZodNumber>;
   metadata: ZodArray<ZodObject<{
-     key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
    }, "strip", ZodTypeAny, {
      key: `0x${string}`;
      value: `0x${string}`;
@@ -91,7 +91,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<["llm_generated", "spam", "sexual", "hate", "violence", "harassment", "self_harm", "sexual_minors", "hate_threatening", "violence_graphic"]>, ZodString]>, ZodNumber>;
   moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
-  parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+  parentId: ZodNullable<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
   references: ZodType<(
      | {
      address: `0x${string}`;
@@ -311,10 +311,10 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   })[]>;
   revision: ZodNumber;
   targetUri: ZodString;
-  txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   zeroExSwap: ZodNullable<ZodObject<{
      from: ZodObject<{
-        address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+        address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
         amount: ZodString;
         symbol: ZodString;
       }, "strip", ZodTypeAny, {
@@ -327,7 +327,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         symbol: string;
      }>;
      to: ZodObject<{
-        address: ZodUnion<[ZodType<..., ..., ...>, ZodLiteral<...>]>;
+        address: ZodUnion<[ZodEffects<..., ..., ...>, ZodLiteral<...>]>;
         amount: ZodUnion<[ZodString, ZodLiteral<...>]>;
         symbol: ZodString;
       }, "strip", ZodTypeAny, {
@@ -371,9 +371,9 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 } & {
   reactionCounts: ZodRecord<ZodString, ZodNumber>;
   viewerReactions: ZodRecord<ZodString, ZodArray<ZodObject<{
-     app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      author: ZodObject<{
-        address: ZodType<..., ..., ...>;
+        address: ZodEffects<..., ..., ...>;
         ens: ZodOptional<...>;
         farcaster: ZodOptional<...>;
       }, "strip", ZodTypeAny, {
@@ -388,7 +388,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      chainId: ZodNumber;
      commentType: ZodNumber;
      content: ZodString;
-     cursor: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     cursor: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      hookMetadata: ZodArray<ZodObject<{
         key: ...;
         value: ...;
@@ -399,7 +399,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
         key: ...;
         value: ...;
      }>, "many">;
-     id: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     id: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      logIndex: ZodNullable<ZodNumber>;
      metadata: ZodArray<ZodObject<{
         key: ...;
@@ -414,11 +414,11 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationClassifierResult: ZodRecord<ZodUnion<[..., ...]>, ZodNumber>;
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
-     parentId: ZodNullable<ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>>;
+     parentId: ZodNullable<ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>>;
      references: ZodType<(... | ... | ... | ... | ... | ... | ... | ...)[], ZodTypeDef, (... | ... | ... | ... | ... | ... | ... | ...)[]>;
      revision: ZodNumber;
      targetUri: ZodString;
-     txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      zeroExSwap: ZodNullable<ZodObject<{
         from: ...;
         to: ...;

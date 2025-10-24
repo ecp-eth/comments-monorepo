@@ -15,7 +15,7 @@ export function ZodSchemaRenderer({ schema }: { schema: ZodSchema }) {
 
 function renderZodSchema(
   schema: ZodSchema,
-  subfix: React.ReactNode = null,
+  hasArraySubfix: boolean = false,
 ): React.ReactNode {
   const def = schema._def;
 
@@ -39,7 +39,7 @@ function renderZodSchema(
       return (
         <>
           {typedSchema.options
-            .map((option) => renderZodSchema(option))
+            .map((option) => renderZodSchema(option, hasArraySubfix))
             .flatMap((x, i, arr) =>
               i < arr.length - 1
                 ? [
@@ -76,24 +76,20 @@ function renderZodSchema(
             ))}
           </div>
           {"}"}
-          {subfix}
+          {hasArraySubfix && <span>[]</span>}
         </>
       );
     }
-    case "ZodAny": {
-      const typedSchema = schema as ZodAny;
-      return <span>{typedSchema.description}</span>;
-    }
     case "ZodArray": {
       const typedSchema = schema as ZodArray<ZodSchema>;
-      return <>{renderZodSchema(typedSchema.element, <span>[]</span>)}</>;
+      return <>{renderZodSchema(typedSchema.element, true)}</>;
     }
     case "ZodDefault": {
       const typedSchema = schema as ZodDefault<ZodSchema>;
       const defaultValue = String(typedSchema._def.defaultValue());
       return (
         <span>
-          {renderZodSchema(typedSchema._def.innerType)}{" "}
+          {renderZodSchema(typedSchema._def.innerType, hasArraySubfix)}{" "}
           <span className="text-[#999]">
             {" // "}
             {defaultValue
@@ -105,8 +101,11 @@ function renderZodSchema(
     }
     case "ZodOptional": {
       const typedSchema = schema as ZodOptional<ZodSchema>;
-      return <span>{renderZodSchema(typedSchema.unwrap())}</span>;
+      return (
+        <span>{renderZodSchema(typedSchema.unwrap(), hasArraySubfix)}</span>
+      );
     }
+    case "ZodAny":
     case "ZodBoolean":
     case "ZodString":
     case "ZodBigInt":
@@ -114,7 +113,10 @@ function renderZodSchema(
       return (
         <>
           <span className="inline-block rounded-md px-1 py-0.5 bg-[#f0f0f0] text-[#666]">
-            {"<" + typeName.replace("Zod", "") + ">"}
+            {"<" +
+              typeName.replace("Zod", "") +
+              (hasArraySubfix ? "[]" : "") +
+              ">"}
           </span>
           {schema.description && (
             <span className="text-[#999]">{" // " + schema.description}</span>
