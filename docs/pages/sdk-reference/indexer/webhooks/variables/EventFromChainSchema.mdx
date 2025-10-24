@@ -11,7 +11,7 @@ const EventFromChainSchema: ZodObject<{
   blockNumber: ZodEffects<ZodString, bigint, string>;
   chainId: ZodNumber;
   logIndex: ZodNumber;
-  txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
   chainId: number;

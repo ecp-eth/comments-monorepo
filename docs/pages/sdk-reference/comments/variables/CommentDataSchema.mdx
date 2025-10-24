@@ -8,16 +8,16 @@
 
 ```ts
 const CommentDataSchema: ZodObject<{
-  app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   authMethod: ZodNativeEnum<typeof AuthorAuthMethod>;
-  author: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  author: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   channelId: ZodBigInt;
   commentType: ZodNumber;
   content: ZodString;
   createdAt: ZodBigInt;
   metadata: ZodDefault<ZodArray<ZodObject<{
-     key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-     value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
    }, "strip", ZodTypeAny, {
      key: `0x${string}`;
      value: `0x${string}`;
@@ -25,7 +25,7 @@ const CommentDataSchema: ZodObject<{
      key: `0x${string}`;
      value: `0x${string}`;
   }>, "many">>;
-  parentId: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  parentId: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   targetUri: ZodString;
   updatedAt: ZodBigInt;
 }, "strip", ZodTypeAny, {

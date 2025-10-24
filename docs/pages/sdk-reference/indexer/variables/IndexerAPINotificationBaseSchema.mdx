@@ -8,9 +8,9 @@
 
 ```ts
 const IndexerAPINotificationBaseSchema: ZodObject<{
-  app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
   author: ZodObject<{
-     address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      ens: ZodOptional<ZodObject<{
         avatarUrl: ZodNullable<ZodString>;
         name: ZodString;
@@ -63,9 +63,9 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      };
   }>;
   comment: ZodObject<{
-     app: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      author: ZodObject<{
-        address: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+        address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
         ens: ZodOptional<ZodObject<{
            avatarUrl: ZodNullable<ZodString>;
            name: ZodString;
@@ -122,11 +122,11 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      commentType: ZodNumber;
      content: ZodString;
      createdAt: ZodDate;
-     cursor: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     cursor: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      deletedAt: ZodNullable<ZodDate>;
      hookMetadata: ZodArray<ZodObject<{
-        key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-        value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+        key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+        value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
       }, "strip", ZodTypeAny, {
         key: `0x${string}`;
         value: `0x${string}`;
@@ -134,11 +134,11 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         key: `0x${string}`;
         value: `0x${string}`;
      }>, "many">;
-     id: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     id: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      logIndex: ZodNullable<ZodNumber>;
      metadata: ZodArray<ZodObject<{
-        key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-        value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+        key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+        value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
       }, "strip", ZodTypeAny, {
         key: `0x${string}`;
         value: `0x${string}`;
@@ -150,7 +150,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      moderationStatusChangedAt: ZodDate;
-     parentId: ZodNullable<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+     parentId: ZodNullable<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
      references: ZodType<(
         | {
         address: `0x${string}`;
@@ -364,11 +364,11 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      })[]>;
      revision: ZodNumber;
      targetUri: ZodString;
-     txHash: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+     txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
      updatedAt: ZodDate;
      zeroExSwap: ZodNullable<ZodObject<{
         from: ZodObject<{
-           address: ZodType<`0x${(...)}`, ZodTypeDef, `0x${(...)}`>;
+           address: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
            amount: ZodString;
            symbol: ZodString;
          }, "strip", ZodTypeAny, {

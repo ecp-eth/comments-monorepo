@@ -8,11 +8,11 @@
 
 ```ts
 const IndexerAPICursorRepliesPaginationSchema: ZodObject<{
-  endCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+  endCursor: ZodOptional<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
   hasNext: ZodBoolean;
   hasPrevious: ZodBoolean;
   limit: ZodNumber;
-  startCursor: ZodOptional<ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>>;
+  startCursor: ZodOptional<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
 } & {
   count: ZodNumber;
 }, "strip", ZodTypeAny, {

@@ -8,8 +8,8 @@
 
 ```ts
 const MetadataEntrySchema: ZodObject<{
-  key: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
-  value: ZodType<`0x${string}`, ZodTypeDef, `0x${string}`>;
+  key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+  value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 }, "strip", ZodTypeAny, {
   key: `0x${string}`;
   value: `0x${string}`;

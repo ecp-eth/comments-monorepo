@@ -1,8 +1,17 @@
 import { env } from "@/lib/env";
+import {
+  SendEditCommentRequestPayloadSchema,
+  SignEditCommentRequestPayloadSchema,
+} from "@/lib/schemas/edit";
+import {
+  SendPostCommentRequestPayloadSchema,
+  SignPostCommentRequestPayloadSchema,
+} from "@/lib/schemas/post";
+import { ZodSchemaRenderer } from "./components/ZodSchemaRenderer";
+import { SendDeleteCommentRequestPayloadSchema } from "@/lib/schemas/delete";
 
 const gaslessAvailable =
   env.GASLESS_METHOD === "private-key" || env.GASLESS_METHOD === "privy";
-
 const signerAvailable = !!env.APP_SIGNER_PRIVATE_KEY;
 
 export default function HomePage() {
@@ -43,17 +52,12 @@ export default function HomePage() {
             </p>
             {signerAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;content&quot;: &quot;Comment text&quot;,
-                  <br />
-                  &quot;metadata&quot;: [],
-                  <br />
-                  &quot;targetUri&quot;: &quot;https://example.com&quot;
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SignPostCommentRequestPayloadSchema}
+                  />
                 </div>
-                <div>{"}"}</div>
               </div>
             ) : (
               <div className="bg-yellow-50 p-3 rounded text-sm">
@@ -84,19 +88,12 @@ export default function HomePage() {
             </p>
             {signerAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;commentId&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;content&quot;: &quot;Updated comment text&quot;,
-                  <br />
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;metadata&quot;: [],
-                  <br />
-                  &quot;chainId&quot;: 1
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SignEditCommentRequestPayloadSchema}
+                  />
                 </div>
-                <div>{"}"}</div>
               </div>
             ) : (
               <div className="bg-yellow-50 p-3 rounded text-sm">
@@ -106,7 +103,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Post Comment - Gasless Endpoint */}
+          {/* Post Comment - Send Gasless Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -125,25 +122,15 @@ export default function HomePage() {
             <p className="text-gray-600 mb-2">
               Send gasless comment data. Returns either transaction hash and
               typed data for user signature.
-              <br />
-              <code>authorSignature</code> is required if the user has not
-              approved our submitter address.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;content&quot;: &quot;Comment text&quot;,
-                  <br />
-                  &quot;metadata&quot;: [],
-                  <br />
-                  &quot;targetUri&quot;: &quot;https://example.com&quot;,
-                  <br />
-                  &quot;submitIfApproved&quot;: true
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SendPostCommentRequestPayloadSchema}
+                  />
                 </div>
-                <div>{"}"}</div>
               </div>
             ) : (
               <div className="bg-yellow-50 p-3 rounded text-sm">
@@ -172,27 +159,15 @@ export default function HomePage() {
             <p className="text-gray-600 mb-2">
               Send gasless edit comment data. Returns either transaction hash
               and typed data for user signature.
-              <br />
-              <code>authorSignature</code> is required if the user has not
-              approved our submitter address.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;commentId&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;content&quot;: &quot;Updated comment text&quot;,
-                  <br />
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;metadata&quot;: [],
-                  <br />
-                  &quot;submitIfApproved&quot;: true,
-                  <br />
-                  &quot;chainId&quot;: 1
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SendEditCommentRequestPayloadSchema}
+                  />
                 </div>
-                <div>{"}"}</div>
               </div>
             ) : (
               <div className="bg-yellow-50 p-3 rounded text-sm">
@@ -220,23 +195,15 @@ export default function HomePage() {
             </div>
             <p className="text-gray-600 mb-2">
               Send gasless delete comment data.
-              <br />
-              <code>authorSignature</code> is required if the user has not
-              approved our submitter address.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
-                <div>Request: {"{"}</div>
-                <div className="ml-4">
-                  &quot;author&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;commentId&quot;: &quot;0x...&quot;,
-                  <br />
-                  &quot;submitIfApproved&quot;: true,
-                  <br />
-                  &quot;chainId&quot;: 1
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SendDeleteCommentRequestPayloadSchema}
+                  />
                 </div>
-                <div>{"}"}</div>
               </div>
             ) : (
               <div className="bg-yellow-50 p-3 rounded text-sm">
