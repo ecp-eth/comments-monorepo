@@ -20,7 +20,10 @@ export const SharedCommentRequestPayloadSchema = z.object({
 
 export const CommentWithTargetURIRequestPayloadSchema =
   SharedCommentRequestPayloadSchema.extend({
-    targetUri: z.string().url(),
+    targetUri: z
+      .string()
+      .url()
+      .describe("The URI of the target resource, e.g. https://example.com"),
   });
 
 export const CommentWithParentIdRequestPayloadSchema =
