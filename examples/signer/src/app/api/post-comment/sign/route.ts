@@ -17,6 +17,7 @@ import {
   guardAppSignerPrivateKey,
   guardAuthorIsNotMuted,
   guardContentLength,
+  guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 
@@ -42,6 +43,7 @@ export async function POST(
       parsedBodyData;
 
     guardContentLength(content);
+    await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
     const app = privateKeyToAccount(appSignerPrivateKey);

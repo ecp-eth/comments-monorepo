@@ -4,6 +4,7 @@ import {
   guardAuthorIsNotMuted,
   guardAuthorSignature,
   guardContentLength,
+  guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import {
@@ -55,6 +56,7 @@ export async function POST(
 
     guardContentLength(content);
     guardAPIDeadline(deadline);
+    await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
     const selectedChain = chainConfig.chain;
