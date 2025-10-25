@@ -16,6 +16,7 @@ import {
 import {
   guardAuthorIsNotMuted,
   guardContentLength,
+  guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import {
@@ -51,6 +52,7 @@ export async function POST(
       );
 
     guardContentLength(content);
+    await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
     const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);

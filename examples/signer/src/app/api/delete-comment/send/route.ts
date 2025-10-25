@@ -2,6 +2,7 @@ import { getRpcUrl } from "@/lib/env";
 import {
   guardAPIDeadline,
   guardAuthorSignature,
+  guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
@@ -36,6 +37,9 @@ export async function POST(req: Request) {
     );
 
     guardAPIDeadline(deadline);
+    await guardRateLimitNotExceeded(author);
+    // do we want to block muted author from deleting comments?
+    // await guardAuthorIsNotMuted(author);
 
     const publicClient = createPublicClient({
       chain: chainConfig.chain,

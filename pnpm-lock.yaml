@@ -1159,6 +1159,12 @@ importers:
       '@hpke/core':
         specifier: ^1.7.2
         version: 1.7.2
+      '@upstash/ratelimit':
+        specifier: ^2.0.5
+        version: 2.0.5(@upstash/redis@1.35.0)
+      '@upstash/redis':
+        specifier: ^1.35.0
+        version: 1.35.0
       next:
         specifier: ^15.3.0
         version: 15.3.3(@babel/core@7.26.10)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

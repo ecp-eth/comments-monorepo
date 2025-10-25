@@ -7,6 +7,7 @@ import {
 } from "./schemas/shared";
 import z, { ZodSchema } from "zod";
 import { isMuted } from "@ecp.eth/sdk/indexer";
+import { rateLimiter } from "@/instances";
 
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
@@ -111,5 +112,24 @@ export async function guardAuthorIsNotMuted(author: Address) {
         { status: 403 },
       );
     }
+  }
+}
+
+export async function guardRateLimitNotExceeded(author: Address) {
+  const rateLimitResult = await rateLimiter.isRateLimited(author);
+
+  if (!rateLimitResult.success) {
+    throw new JSONResponse(
+      BadRequestResponseBodySchema,
+      { author: ["Too many requests"] },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+          ),
+        },
+      },
+    );
   }
 }
