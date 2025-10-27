@@ -132,17 +132,3 @@ if (!parseResult.success) {
 }
 
 export const env = parseResult.data;
-
-export const AllowedChainIdSchema = z.coerce.number().transform((val, ctx) => {
-  if (env.ENABLED_CHAINS.includes(val as keyof typeof SUPPORTED_CHAINS)) {
-    return val as keyof typeof SUPPORTED_CHAINS;
-  }
-
-  ctx.addIssue({
-    code: z.ZodIssueCode.custom,
-    message: `Chain ${val} is not supported`,
-    path: ctx.path,
-  });
-
-  return z.NEVER;
-});

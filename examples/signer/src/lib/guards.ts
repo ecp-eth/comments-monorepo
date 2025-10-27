@@ -1,12 +1,12 @@
+import { isMuted } from "@ecp.eth/sdk/indexer";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
-import { Hex, VerifyTypedDataParameters, PublicActions, Address } from "viem";
-import { env } from "./env";
 import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "./schemas/shared";
+} from "@ecp.eth/shared/schemas/signer-api/shared";
+import { Hex, VerifyTypedDataParameters, PublicActions, Address } from "viem";
+import { env } from "./env";
 import z, { ZodSchema } from "zod";
-import { isMuted } from "@ecp.eth/sdk/indexer";
 import { rateLimiter } from "@/instances";
 import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 

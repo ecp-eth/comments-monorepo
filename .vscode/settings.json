@@ -42,6 +42,7 @@
     "packages/sdk/indexer/webhooks": true,
     "packages/sdk/indexer/webhooks/schemas": true,
     "packages/shared/helpers/getApprovalAndNonce/*": true,
-    "packages/shared/helpers/*": true
+    "packages/shared/helpers/*": true,
+    "packages/shared/schemas/signer-api/*": true
   }
 }

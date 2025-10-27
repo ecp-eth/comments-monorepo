@@ -1,28 +1,26 @@
-import { env } from "@/lib/env";
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createEditCommentData,
   createEditCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk/comments";
+import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
+import {
+  BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/shared";
+import { SignEditCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/edit";
+import { env } from "@/lib/env";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http } from "viem";
 import { getRpcUrl } from "@/lib/env";
-import {
-  SignEditCommentRequestPayloadSchema,
-  SignEditCommentResponseBodySchema,
-} from "@/lib/schemas/edit";
+import { SignEditCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/edit";
 import {
   guardAuthorIsNotMuted,
   guardContentLength,
   guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
-import {
-  BadRequestResponseBodySchema,
-  ErrorResponseBodySchema,
-} from "@/lib/schemas/shared";
 
 /**
  * Signs an edit comment to be sent by the author.
@@ -47,7 +45,7 @@ export async function POST(
   try {
     const { commentId, content, author, metadata, chainConfig } =
       guardRequestPayloadSchemaIsValid(
-        SignEditCommentRequestPayloadSchema,
+        SignEditCommentRequestPayloadRestrictedSchema,
         await req.json(),
       );
 

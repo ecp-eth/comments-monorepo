@@ -3,6 +3,8 @@ import { createViemAccount } from "@privy-io/server-auth/viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { env } from "./env";
 import type { Hex } from "@ecp.eth/sdk/core";
+import z from "zod";
+import { SUPPORTED_CHAINS, SupportedChainConfig } from "@ecp.eth/sdk";
 
 export class GaslessNotAvailableError extends Error {
   constructor() {
@@ -85,4 +87,48 @@ export async function createPrivyAccount(configuration: PrivyConfiguration) {
     privy,
     walletId: configuration.walletId,
   });
+}
+
+type RawShapeOf<T> =
+  T extends z.ZodObject<infer S, any, any, any, any> ? S : never;
+
+export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
+  T extends
+    | z.ZodObject<{
+        chainId: z.ZodNumber;
+      }>
+    | z.ZodUnion<
+        [
+          z.ZodObject<{ chainId: z.ZodNumber }>,
+          z.ZodObject<{ chainId: z.ZodNumber }>,
+        ]
+      >,
+  OutputZodObject extends z.ZodTypeAny = z.ZodObject<
+    RawShapeOf<T>,
+    "strip",
+    z.ZodTypeAny,
+    z.output<T> & { chainConfig: SupportedChainConfig },
+    z.input<T>
+  >,
+  RetType = T extends z.ZodObject<{ chainId: z.ZodNumber }>
+    ? z.ZodEffects<OutputZodObject>
+    : z.ZodEffects<z.ZodUnion<[OutputZodObject, OutputZodObject]>>,
+>(schema: T): RetType {
+  const ret = schema.transform((val) => {
+    const isAllowedChainId = env.ENABLED_CHAINS.includes(
+      val.chainId as keyof typeof SUPPORTED_CHAINS,
+    );
+
+    if (!isAllowedChainId) {
+      throw new Error("Invalid chain ID");
+    }
+
+    return {
+      ...val,
+      chainConfig:
+        SUPPORTED_CHAINS[val.chainId as keyof typeof SUPPORTED_CHAINS],
+    };
+  });
+
+  return ret as unknown as RetType;
 }

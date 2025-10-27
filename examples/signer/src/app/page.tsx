@@ -1,14 +1,14 @@
 import { env } from "@/lib/env";
 import {
-  SendEditCommentRequestPayloadSchema,
-  SignEditCommentRequestPayloadSchema,
+  SendEditCommentRequestPayloadRestrictedSchema,
+  SignEditCommentRequestPayloadRestrictedSchema,
 } from "@/lib/schemas/edit";
 import {
-  SendPostCommentRequestPayloadSchema,
-  SignPostCommentRequestPayloadSchema,
+  SendPostCommentRequestPayloadRestrictedSchema,
+  SignPostCommentRequestPayloadRestrictedSchema,
 } from "@/lib/schemas/post";
 import { ZodSchemaRenderer } from "./components/ZodSchemaRenderer";
-import { SendDeleteCommentRequestPayloadSchema } from "@/lib/schemas/delete";
+import { SendDeleteCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/delete";
 
 const gaslessAvailable =
   env.GASLESS_METHOD === "private-key" || env.GASLESS_METHOD === "privy";
@@ -55,7 +55,7 @@ export default function HomePage() {
                 <div>
                   Request:{" "}
                   <ZodSchemaRenderer
-                    schema={SignPostCommentRequestPayloadSchema}
+                    schema={SignPostCommentRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function HomePage() {
                 <div>
                   Request:{" "}
                   <ZodSchemaRenderer
-                    schema={SignEditCommentRequestPayloadSchema}
+                    schema={SignEditCommentRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default function HomePage() {
                 <div>
                   Request:{" "}
                   <ZodSchemaRenderer
-                    schema={SendPostCommentRequestPayloadSchema}
+                    schema={SendPostCommentRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function HomePage() {
                 <div>
                   Request:{" "}
                   <ZodSchemaRenderer
-                    schema={SendEditCommentRequestPayloadSchema}
+                    schema={SendEditCommentRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>
@@ -201,7 +201,7 @@ export default function HomePage() {
                 <div>
                   Request:{" "}
                   <ZodSchemaRenderer
-                    schema={SendDeleteCommentRequestPayloadSchema}
+                    schema={SendDeleteCommentRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>

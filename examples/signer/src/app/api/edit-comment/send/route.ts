@@ -15,20 +15,18 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
+  BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/shared";
+import { SendEditCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/edit";
+import {
   createPublicClient,
   createWalletClient,
   hashTypedData,
   http,
 } from "viem";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
-import {
-  SendEditCommentRequestPayloadSchema,
-  SendEditCommentResponseBodySchema,
-} from "@/lib/schemas/edit";
-import {
-  BadRequestResponseBodySchema,
-  ErrorResponseBodySchema,
-} from "@/lib/schemas/shared";
+import { SendEditCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/edit";
 
 export async function POST(
   req: Request,
@@ -50,7 +48,7 @@ export async function POST(
       deadline,
       chainConfig,
     } = guardRequestPayloadSchemaIsValid(
-      SendEditCommentRequestPayloadSchema,
+      SendEditCommentRequestPayloadRestrictedSchema,
       await req.json(),
     );
 
