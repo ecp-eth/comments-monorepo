@@ -58,6 +58,25 @@ const BaseEnvSchema = z.object({
   DEFAULT_CHAIN_ID: ChainIdSchema.default(DEFAULT_CHAIN_ID),
   COMMENTS_INDEXER_URL: z.string().url().optional(),
   COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().min(1).default(10240),
+  TARGET_URI_REGEX: z
+    .string()
+    .refine(
+      (val) => {
+        try {
+          new RegExp(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: "TARGET_URI_REGEX must be a valid regular expression" },
+    )
+    .optional(),
+
+  // Rate limiter environment variables
+  KV_REST_API_URL: z.string().url().optional(),
+  KV_REST_API_TOKEN: z.string().optional(),
+  RATE_LIMITER_NAMESPACE: z.string().optional(),
 });
 
 const PrivateKeyGaslessEnvSchema = BaseEnvSchema.extend({
