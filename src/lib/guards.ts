@@ -7,6 +7,8 @@ import {
 } from "./schemas/shared";
 import z, { ZodSchema } from "zod";
 import { isMuted } from "@ecp.eth/sdk/indexer";
+import { rateLimiter } from "@/instances";
+import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
@@ -111,5 +113,57 @@ export async function guardAuthorIsNotMuted(author: Address) {
         { status: 403 },
       );
     }
+  }
+}
+
+export async function guardRateLimitNotExceeded(author: Address) {
+  const rateLimitResult = await rateLimiter.isRateLimited(author);
+
+  if (!rateLimitResult.success) {
+    throw new JSONResponse(
+      BadRequestResponseBodySchema,
+      { author: ["Too many requests"] },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(
+            Math.ceil((rateLimitResult.reset - Date.now()) / 1000),
+          ),
+        },
+      },
+    );
+  }
+}
+
+export function guardTargetUriMatchesRegex(
+  params:
+    | {
+        targetUri: string;
+      }
+    | {
+        parentId: Hex;
+      },
+) {
+  if (!env.TARGET_URI_REGEX) {
+    return;
+  }
+
+  if (
+    "parentId" in params &&
+    params.parentId &&
+    params.parentId !== EMPTY_PARENT_ID
+  ) {
+    return;
+  }
+
+  if (
+    !("targetUri" in params) ||
+    !new RegExp(env.TARGET_URI_REGEX).test(params.targetUri ?? "")
+  ) {
+    throw new JSONResponse(
+      BadRequestResponseBodySchema,
+      { targetUri: ["Invalid target URI"] },
+      { status: 400 },
+    );
   }
 }

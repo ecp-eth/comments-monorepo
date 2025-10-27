@@ -3,7 +3,9 @@ import {
   guardAuthorIsNotMuted,
   guardAuthorSignature,
   guardContentLength,
+  guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
+  guardTargetUriMatchesRegex,
 } from "@/lib/guards";
 import {
   createCommentData,
@@ -55,7 +57,9 @@ export async function POST(
     } = parsedBodyData;
 
     guardContentLength(content);
+    guardTargetUriMatchesRegex(parsedBodyData);
     guardAPIDeadline(deadline);
+    await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
     const selectedChain = chainConfig.chain;
