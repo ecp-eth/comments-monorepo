@@ -42,7 +42,6 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
 
 // Required environment variables for basic signing
 const BaseEnvSchema = z.object({
-  NODE_ENV: z.enum(["development", "production"]).default("development"),
   APP_SIGNER_PRIVATE_KEY: HexSchema.optional(),
   ENABLED_CHAINS: z
     .preprocess((val) => {
@@ -59,7 +58,6 @@ const BaseEnvSchema = z.object({
   DEFAULT_CHAIN_ID: ChainIdSchema.default(DEFAULT_CHAIN_ID),
   COMMENTS_INDEXER_URL: z.string().url().optional(),
   COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().min(1).default(10240),
-  ACCESS_CONTROL_ALLOW_ORIGIN: z.string().default("*"),
   TARGET_URI_REGEX: z
     .string()
     .regex(/^https?:\/\/.*$/)

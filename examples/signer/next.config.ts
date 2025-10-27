@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
-import { env } from "@/lib/env";
+import { envForConfig } from "./env.config";
 
 const nextConfig: NextConfig = {
   eslint: {
-    ignoreDuringBuilds: env.NODE_ENV !== "production",
+    ignoreDuringBuilds: envForConfig.NODE_ENV !== "production",
   },
   typescript: {
-    ignoreBuildErrors: env.NODE_ENV !== "production",
+    ignoreBuildErrors: envForConfig.NODE_ENV !== "production",
   },
   async headers() {
     return [
@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: env.ACCESS_CONTROL_ALLOW_ORIGIN,
+            value: envForConfig.ACCESS_CONTROL_ALLOW_ORIGIN,
           },
           {
             key: "Access-Control-Allow-Methods",
