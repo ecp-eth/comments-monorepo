@@ -5,7 +5,6 @@ import {
   createEditCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk/comments";
-import { isMuted } from "@ecp.eth/sdk/indexer";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createPublicClient, http } from "viem";
@@ -14,7 +13,11 @@ import {
   SignEditCommentRequestPayloadSchema,
   SignEditCommentResponseBodySchema,
 } from "@/lib/schemas/edit";
-import { guardRequestPayloadSchemaIsValid } from "@/lib/guards";
+import {
+  guardAuthorIsNotMuted,
+  guardContentLength,
+  guardRequestPayloadSchemaIsValid,
+} from "@/lib/guards";
 import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
@@ -47,21 +50,8 @@ export async function POST(
         await req.json(),
       );
 
-    // Check if author is muted (if indexer URL is configured)
-    if (env.COMMENTS_INDEXER_URL) {
-      if (
-        await isMuted({
-          address: author,
-          apiUrl: env.COMMENTS_INDEXER_URL,
-        })
-      ) {
-        return new JSONResponse(
-          ErrorResponseBodySchema,
-          { error: "Author is muted" },
-          { status: 403 },
-        );
-      }
-    }
+    guardContentLength(content);
+    await guardAuthorIsNotMuted(author);
 
     const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
     const publicClient = createPublicClient({

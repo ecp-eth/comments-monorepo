@@ -6,6 +6,7 @@ import {
   ErrorResponseBodySchema,
 } from "./schemas/shared";
 import z, { ZodSchema } from "zod";
+import { isMuted } from "@ecp.eth/sdk/indexer";
 
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
@@ -89,4 +90,26 @@ export function guardRequestPayloadSchemaIsValid<
   }
 
   return result.data;
+}
+
+export function guardContentLength(content: string) {
+  if (content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
+    throw new JSONResponse(
+      BadRequestResponseBodySchema,
+      { content: ["Content length limit exceeded"] },
+      { status: 400 },
+    );
+  }
+}
+
+export async function guardAuthorIsNotMuted(author: Address) {
+  if (env.COMMENTS_INDEXER_URL) {
+    if (await isMuted({ address: author, apiUrl: env.COMMENTS_INDEXER_URL })) {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        { error: "Author is muted" },
+        { status: 403 },
+      );
+    }
+  }
 }
