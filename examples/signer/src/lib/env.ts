@@ -60,7 +60,17 @@ const BaseEnvSchema = z.object({
   COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().min(1).default(10240),
   TARGET_URI_REGEX: z
     .string()
-    .regex(/^https?:\/\/.*$/)
+    .refine(
+      (val) => {
+        try {
+          new RegExp(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: "TARGET_URI_REGEX must be a valid regular expression" },
+    )
     .optional(),
 
   // Rate limiter environment variables
