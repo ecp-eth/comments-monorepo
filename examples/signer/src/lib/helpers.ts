@@ -90,6 +90,7 @@ export async function createPrivyAccount(configuration: PrivyConfiguration) {
 }
 
 type RawShapeOf<T> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends z.ZodObject<infer S, any, any, any, any> ? S : never;
 
 export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
