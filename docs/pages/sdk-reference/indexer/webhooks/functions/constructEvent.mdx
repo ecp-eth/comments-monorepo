@@ -131,6 +131,7 @@ function constructEvent(options):
            };
            type: "quoted_comment";
         })[];
+        targetUri: string;
         type: "root";
         updatedAt: Date;
       }
@@ -147,6 +148,7 @@ function constructEvent(options):
            value: `0x${string}`;
         }[];
         moderationStatus: "approved" | "pending" | "rejected";
+        parentId: `0x${string}`;
         references: (
            | {
            address: `0x${string}`;
@@ -795,6 +797,7 @@ The timestamp from X-ECP-Webhook-Timestamp header.
            };
            type: "quoted_comment";
         })[];
+        targetUri: string;
         type: "root";
         updatedAt: Date;
       }
@@ -811,6 +814,7 @@ The timestamp from X-ECP-Webhook-Timestamp header.
            value: `0x${string}`;
         }[];
         moderationStatus: "approved" | "pending" | "rejected";
+        parentId: `0x${string}`;
         references: (
            | {
            address: `0x${string}`;
@@ -1081,6 +1085,7 @@ data: {
         };
         type: "quoted_comment";
      })[];
+     targetUri: string;
      type: "root";
      updatedAt: Date;
    }
@@ -1097,6 +1102,7 @@ data: {
         value: `0x${string}`;
      }[];
      moderationStatus: "approved" | "pending" | "rejected";
+     parentId: `0x${string}`;
      references: (
         | {
         address: `0x${string}`;
@@ -1347,6 +1353,7 @@ comment:
      };
      type: "quoted_comment";
   })[];
+  targetUri: string;
   type: "root";
   updatedAt: Date;
 }
@@ -1363,6 +1370,7 @@ comment:
      value: `0x${string}`;
   }[];
   moderationStatus: "approved" | "pending" | "rejected";
+  parentId: `0x${string}`;
   references: (
      | {
      address: `0x${string}`;
@@ -1598,6 +1606,7 @@ Comment data
      };
      type: "quoted_comment";
   })[];
+  targetUri: string;
   type: "root";
   updatedAt: Date;
 }
@@ -1617,6 +1626,7 @@ Comment data
      value: `0x${string}`;
   }[];
   moderationStatus: "approved" | "pending" | "rejected";
+  parentId: `0x${string}`;
   references: (
      | {
      address: `0x${string}`;

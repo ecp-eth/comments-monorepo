@@ -128,6 +128,7 @@ function constructEventFromRequest(options): Promise<
            };
            type: "quoted_comment";
         })[];
+        targetUri: string;
         type: "root";
         updatedAt: Date;
       }
@@ -144,6 +145,7 @@ function constructEventFromRequest(options): Promise<
            value: `0x${string}`;
         }[];
         moderationStatus: "approved" | "pending" | "rejected";
+        parentId: `0x${string}`;
         references: (
            | {
            address: `0x${string}`;
@@ -769,6 +771,7 @@ The request to construct the event from.
            \};
            `type`: `"quoted_comment"`;
         \})[];
+        `targetUri`: `string`;
         `type`: `"root"`;
         `updatedAt`: `Date`;
       \}
@@ -785,6 +788,7 @@ The request to construct the event from.
            `value`: `` `0x${string}` ``;
         \}[];
         `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
+        `parentId`: `` `0x${string}` ``;
         `references`: (
            \| \{
            `address`: `` `0x${string}` ``;
