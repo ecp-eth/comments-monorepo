@@ -1,7 +1,9 @@
 import { getRpcUrl } from "@/lib/env";
 import {
   guardAPIDeadline,
+  guardAuthorIsNotMuted,
   guardAuthorSignature,
+  guardContentLength,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import {
@@ -51,7 +53,9 @@ export async function POST(
       await req.json(),
     );
 
+    guardContentLength(content);
     guardAPIDeadline(deadline);
+    await guardAuthorIsNotMuted(author);
 
     const selectedChain = chainConfig.chain;
     const publicClient = createPublicClient({
