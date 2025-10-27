@@ -58,6 +58,10 @@ const BaseEnvSchema = z.object({
   DEFAULT_CHAIN_ID: ChainIdSchema.default(DEFAULT_CHAIN_ID),
   COMMENTS_INDEXER_URL: z.string().url().optional(),
   COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().min(1).default(10240),
+  TARGET_URI_REGEX: z
+    .string()
+    .regex(/^https?:\/\/.*$/)
+    .optional(),
 
   // Rate limiter environment variables
   KV_REST_API_URL: z.string().url().optional(),

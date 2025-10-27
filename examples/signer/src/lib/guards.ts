@@ -8,6 +8,7 @@ import {
 import z, { ZodSchema } from "zod";
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { rateLimiter } from "@/instances";
+import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
@@ -130,6 +131,39 @@ export async function guardRateLimitNotExceeded(author: Address) {
           ),
         },
       },
+    );
+  }
+}
+
+export function guardTargetUriMatchesRegex(
+  params:
+    | {
+        targetUri: string;
+      }
+    | {
+        parentId: Hex;
+      },
+) {
+  if (!env.TARGET_URI_REGEX) {
+    return;
+  }
+
+  if (
+    "parentId" in params &&
+    params.parentId &&
+    params.parentId !== EMPTY_PARENT_ID
+  ) {
+    return;
+  }
+
+  if (
+    !("targetUri" in params) ||
+    !new RegExp(env.TARGET_URI_REGEX).test(params.targetUri ?? "")
+  ) {
+    throw new JSONResponse(
+      BadRequestResponseBodySchema,
+      { targetUri: ["Invalid target URI"] },
+      { status: 400 },
     );
   }
 }
