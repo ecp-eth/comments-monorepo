@@ -82,10 +82,12 @@ const CommentEventDataSchema = z.object({
 
 const RootCommentEventDataSchema = CommentEventDataSchema.extend({
   type: z.literal("root"),
+  targetUri: z.string(),
 });
 
 const ReplyCommentEventDataSchema = CommentEventDataSchema.extend({
   type: z.literal("reply"),
+  parentId: HexSchema,
 });
 
 /**
