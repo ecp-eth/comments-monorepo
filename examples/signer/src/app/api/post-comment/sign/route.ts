@@ -1,16 +1,14 @@
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
+import { SignPostCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/post";
 import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk/comments";
+import { SignPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
 import {
-  SignPostCommentRequestPayloadSchema,
-  SignPostCommentResponseBodySchema,
-} from "@/lib/schemas/post";
-import {
-  BadRequestResponseBodySchema,
+  type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@/lib/schemas/shared";
+} from "@ecp.eth/shared/schemas/signer-api/shared";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import {
@@ -37,7 +35,7 @@ export async function POST(
   try {
     const appSignerPrivateKey = guardAppSignerPrivateKey();
     const parsedBodyData = guardRequestPayloadSchemaIsValid(
-      SignPostCommentRequestPayloadSchema,
+      SignPostCommentRequestPayloadRestrictedSchema,
       await req.json(),
     );
     const { content, author, metadata, chainConfig, commentType, channelId } =

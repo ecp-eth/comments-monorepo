@@ -6,14 +6,12 @@ import {
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
-import {
-  SendDeleteCommentRequestPayloadSchema,
-  SendDeleteCommentResponseBodySchema,
-} from "@/lib/schemas/delete";
+import { SendDeleteCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/delete";
 import {
   createDeleteCommentTypedData,
   deleteCommentWithSig,
 } from "@ecp.eth/sdk/comments";
+import { SendDeleteCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/delete";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
   createPublicClient,
@@ -32,7 +30,7 @@ export async function POST(req: Request) {
       authorSignature,
       deadline,
     } = guardRequestPayloadSchemaIsValid(
-      SendDeleteCommentRequestPayloadSchema,
+      SendDeleteCommentRequestPayloadRestrictedSchema,
       await req.json(),
     );
 

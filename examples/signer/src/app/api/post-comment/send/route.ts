@@ -1,4 +1,10 @@
 import {
+  createPublicClient,
+  createWalletClient,
+  hashTypedData,
+  http,
+} from "viem";
+import {
   guardAPIDeadline,
   guardAuthorIsNotMuted,
   guardAuthorSignature,
@@ -14,19 +20,11 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
-  createPublicClient,
-  createWalletClient,
-  hashTypedData,
-  http,
-} from "viem";
-import {
-  SendPostCommentRequestPayloadSchema,
-  SendPostCommentResponseBodySchema,
-} from "@/lib/schemas/post";
-import {
-  BadRequestResponseBodySchema,
+  type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@/lib/schemas/shared";
+} from "@ecp.eth/shared/schemas/signer-api/shared";
+import { SendPostCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/post";
+import { SendPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
 import { getRpcUrl } from "@/lib/env";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
 
@@ -41,7 +39,7 @@ export async function POST(
 > {
   try {
     const parsedBodyData = guardRequestPayloadSchemaIsValid(
-      SendPostCommentRequestPayloadSchema,
+      SendPostCommentRequestPayloadRestrictedSchema,
       await req.json(),
     );
 

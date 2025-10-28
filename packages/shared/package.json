@@ -68,6 +68,11 @@
       "import": "./dist/esm/schemas.js",
       "default": "./dist/cjs/schemas.cjs"
     },
+    "./schemas/signer-api/*": {
+      "types": "./dist/esm/schemas/signer-api/*.d.ts",
+      "import": "./dist/esm/schemas/signer-api/*.js",
+      "default": "./dist/cjs/schemas/signer-api/*.cjs"
+    },
     "./services/*": {
       "types": "./dist/esm/services/*.d.ts",
       "import": "./dist/esm/services/*.js",
