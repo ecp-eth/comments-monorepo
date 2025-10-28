@@ -4,9 +4,14 @@ import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/shared";
-import { Hex, VerifyTypedDataParameters, PublicActions, Address } from "viem";
+import type {
+  Hex,
+  VerifyTypedDataParameters,
+  PublicActions,
+  Address,
+} from "viem";
 import { env } from "./env";
-import z, { ZodSchema } from "zod";
+import type { z, ZodSchema } from "zod";
 import { rateLimiter } from "@/instances";
 import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
@@ -51,7 +56,7 @@ export async function guardAuthorSignature({
     );
   }
 
-  const verified = await publicClient.verifyTypedData({
+  const verified = publicClient.verifyTypedData({
     ...signTypedDataParams,
     address: authorAddress,
     signature: authorSignature,

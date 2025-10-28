@@ -6,7 +6,7 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { SignPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
 import {
-  BadRequestResponseBodySchema,
+  type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/shared";
 import { hashTypedData } from "viem";

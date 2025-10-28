@@ -15,7 +15,7 @@ import {
 } from "@ecp.eth/sdk/comments";
 import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
 import {
-  BadRequestResponseBodySchema,
+  type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/shared";
 import { SendEditCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/edit";
