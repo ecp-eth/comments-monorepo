@@ -133,3 +133,7 @@ export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
 
   return ret as unknown as RetType;
 }
+
+export function never(message: string = "Unreachable code"): never {
+  throw new Error(message);
+}

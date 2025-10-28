@@ -9,7 +9,7 @@ import {
 } from "@ecp.eth/shared/schemas";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
-import { submitPostComment } from "../queries/submitPostComment";
+import { submitPostComment } from "../queries/postComment";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 

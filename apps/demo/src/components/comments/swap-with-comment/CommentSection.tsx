@@ -18,7 +18,7 @@ import { CommentForm } from "./CommentForm";
 import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useAccount } from "wagmi";
 import { CommentItem } from "../core/CommentItem";
-import { createRootCommentsQueryKey } from "../core/queries";
+import { createCommentItemsQueryKey } from "../core/queryKeys";
 import { useCommentActions } from "./hooks/useCommentActions";
 import { CommentActionsProvider } from "./context";
 import { chain } from "@/lib/clientWagmi";
@@ -32,7 +32,7 @@ export function CommentSection() {
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
+    () => createCommentItemsQueryKey(viewer, currentUrl),
     [currentUrl, viewer],
   );
 

@@ -1,13 +1,13 @@
 import type { Hex } from "viem";
 
-export function createRootCommentsQueryKey(
+export function createCommentItemsQueryKey(
   author: Hex | undefined,
   targetUri: string,
 ) {
   return ["comments", author, targetUri];
 }
 
-export function createCommentRepliesQueryKey(
+export function createReplyItemsQueryKey(
   author: Hex | undefined,
   commentId: Hex,
 ) {

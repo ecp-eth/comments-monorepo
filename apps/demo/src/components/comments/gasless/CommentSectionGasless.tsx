@@ -12,9 +12,9 @@ import {
 } from "@ecp.eth/sdk/comments/react";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
-  ChangeApprovalStatusRequestBodySchemaType,
-  ChangeApprovalStatusResponseSchema,
-} from "@/lib/schemas";
+  SendApproveSignerRequestPayloadSchema,
+  SendApproveSignerResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/approve";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -37,13 +37,15 @@ import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
-import { createRootCommentsQueryKey } from "../core/queries";
+import { createCommentItemsQueryKey } from "../core/queryKeys";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
 import { useConnectedAction } from "./hooks/useConnectedAction";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
 import { LoadingScreen } from "../core/LoadingScreen";
+import { getSignerURL } from "@/lib/utils";
+import z from "zod";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -57,7 +59,7 @@ export function CommentSectionGasless({
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
+    () => createCommentItemsQueryKey(viewer, currentUrl),
     [currentUrl, viewer],
   );
 
@@ -99,7 +101,7 @@ export function CommentSectionGasless({
         throw new Error("No viewer address found");
       }
 
-      const response = await fetch("/api/approval", {
+      const response = await fetch(getSignerURL("/api/approve-signer"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +111,8 @@ export function CommentSectionGasless({
             signTypedDataParams,
             authorSignature: signature,
             authorAddress: viewer,
-          } satisfies ChangeApprovalStatusRequestBodySchemaType,
+            chainId: chain.id,
+          } satisfies z.infer<typeof SendApproveSignerRequestPayloadSchema>,
           bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
@@ -120,7 +123,7 @@ export function CommentSectionGasless({
         );
       }
 
-      return ChangeApprovalStatusResponseSchema.parse(await response.json())
+      return SendApproveSignerResponseBodySchema.parse(await response.json())
         .txHash;
     },
   });

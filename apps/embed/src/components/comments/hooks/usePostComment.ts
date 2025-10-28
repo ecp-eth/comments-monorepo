@@ -2,7 +2,7 @@ import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { useCallback } from "react";
-import { submitPostComment } from "../queries/submitPostComment";
+import { submitPostComment } from "../queries/postComment";
 import { useConfig, useSwitchChain, usePublicClient } from "wagmi";
 import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";

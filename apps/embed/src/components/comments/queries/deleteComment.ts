@@ -97,17 +97,14 @@ async function deleteCommentWithGaslessAndAuthorSig({
   signTypedDataAsync: SignTypedDataMutateAsync;
 }): Promise<PendingDeleteCommentOperationSchemaType> {
   const { commentId, author } = deleteCommentPayloadRequest;
-  const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600); // 1 hour from now
-
   const chainId = deleteCommentPayloadRequest.chainId;
   const typedDeleteData = createDeleteCommentTypedData({
     commentId,
     author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-    deadline,
     chainId,
   });
-
+  const deadline = typedDeleteData.message.deadline;
   const authorSignature = await signTypedDataAsync(typedDeleteData);
 
   const response = await fetch("/api/delete-comment", {
