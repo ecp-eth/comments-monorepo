@@ -131,6 +131,7 @@ type ConstructEventResult =
            };
            type: "quoted_comment";
         })[];
+        targetUri: string;
         type: "root";
         updatedAt: Date;
       }
@@ -147,6 +148,7 @@ type ConstructEventResult =
            value: `0x${string}`;
         }[];
         moderationStatus: "approved" | "pending" | "rejected";
+        parentId: `0x${string}`;
         references: (
            | {
            address: `0x${string}`;
@@ -763,6 +765,7 @@ Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/e
            };
            type: "quoted_comment";
         })[];
+        targetUri: string;
         type: "root";
         updatedAt: Date;
       }
@@ -779,6 +782,7 @@ Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:37](https://github.com/e
            value: `0x${string}`;
         }[];
         moderationStatus: "approved" | "pending" | "rejected";
+        parentId: `0x${string}`;
         references: (
            | {
            address: `0x${string}`;
@@ -1049,6 +1053,7 @@ data: {
         };
         type: "quoted_comment";
      })[];
+     targetUri: string;
      type: "root";
      updatedAt: Date;
    }
@@ -1065,6 +1070,7 @@ data: {
         value: `0x${string}`;
      }[];
      moderationStatus: "approved" | "pending" | "rejected";
+     parentId: `0x${string}`;
      references: (
         | {
         address: `0x${string}`;
@@ -1315,6 +1321,7 @@ comment:
      };
      type: "quoted_comment";
   })[];
+  targetUri: string;
   type: "root";
   updatedAt: Date;
 }
@@ -1331,6 +1338,7 @@ comment:
      value: `0x${string}`;
   }[];
   moderationStatus: "approved" | "pending" | "rejected";
+  parentId: `0x${string}`;
   references: (
      | {
      address: `0x${string}`;
@@ -1566,6 +1574,7 @@ Comment data
      };
      type: "quoted_comment";
   })[];
+  targetUri: string;
   type: "root";
   updatedAt: Date;
 }
@@ -1585,6 +1594,7 @@ Comment data
      value: `0x${string}`;
   }[];
   moderationStatus: "approved" | "pending" | "rejected";
+  parentId: `0x${string}`;
   references: (
      | {
      address: `0x${string}`;
