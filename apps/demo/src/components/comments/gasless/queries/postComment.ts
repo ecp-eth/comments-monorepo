@@ -13,7 +13,6 @@ import { throwKnownResponseCodeError } from "@ecp.eth/shared/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
-import { DistributiveOmit } from "@ecp.eth/shared/types";
 
 class PostCommentGaslesslyError extends Error {}
 
@@ -22,15 +21,16 @@ type PostCommentGaslesslyResult = Omit<
   "references" | "resolvedAuthor"
 >;
 
-export async function sendPostCommentGaslesslyNotPreapproved({
+export async function sendPostCommentGaslessly({
   requestPayload,
   walletClient,
+  gasSponsorship,
 }: {
-  requestPayload: DistributiveOmit<
-    z.input<typeof SendPostCommentRequestPayloadSchema>,
-    "authorSignature" | "deadline"
-  >;
+  requestPayload: z.input<
+    typeof SendPostCommentRequestPayloadSchema
+  >["comment"];
   walletClient: WalletClient<Transport, Chain, Account>;
+  gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
 }): Promise<PostCommentGaslesslyResult> {
   const { chainId } = requestPayload;
   const commentData = createCommentData({
@@ -53,7 +53,9 @@ export async function sendPostCommentGaslesslyNotPreapproved({
     },
     body: JSON.stringify(
       {
-        ...requestPayload,
+        comment: {
+          ...requestPayload,
+        },
         authorSignature,
         deadline,
       } satisfies z.input<typeof SendPostCommentRequestPayloadSchema>,

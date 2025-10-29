@@ -3,6 +3,7 @@ import {
   SignPostCommentRequestPayloadSchema,
 } from "@ecp.eth/shared/schemas/signer-api/post";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
+import z from "zod";
 
 /**
  * Request payload schema for signing comment to post
@@ -10,6 +11,7 @@ import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 export const SignPostCommentRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SignPostCommentRequestPayloadSchema,
+    undefined,
   );
 
 /**
@@ -18,4 +20,5 @@ export const SignPostCommentRequestPayloadRestrictedSchema =
 export const SendPostCommentRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SendPostCommentRequestPayloadSchema,
+    "comment",
   );

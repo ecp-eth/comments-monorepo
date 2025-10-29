@@ -19,3 +19,8 @@ export function getSignerURL(path: string) {
   const url = new URL(path, publicEnv.NEXT_PUBLIC_SIGNER_API_URL);
   return url.toString();
 }
+
+export function getIndexerURL(path: string) {
+  const url = new URL(path, publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL);
+  return url.toString();
+}

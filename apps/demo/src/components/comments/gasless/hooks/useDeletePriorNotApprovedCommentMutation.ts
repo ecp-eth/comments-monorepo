@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import type { Hex } from "viem";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { sendDeleteCommentGaslesslyNotPreapproved } from "../queries/deleteComment";
+import { sendDeleteCommentGaslessly } from "../queries/deleteComment";
 import { useConfig } from "wagmi";
 import { getWalletClient } from "@wagmi/core";
 import { chain } from "@/lib/clientWagmi";
@@ -24,13 +24,14 @@ export function useDeletePriorNotApprovedCommentMutation({
 
       const walletClient = await getWalletClient(wagmiConfig);
 
-      const result = await sendDeleteCommentGaslesslyNotPreapproved({
+      const result = await sendDeleteCommentGaslessly({
         requestPayload: {
           chainId: chain.id,
           commentId: comment.id,
           author: connectedAddress,
         },
         walletClient,
+        gasSponsorship: "not-preapproved",
       });
 
       return result.txHash;

@@ -70,6 +70,7 @@ export async function POST(
       authorSignature,
       signTypedDataParams,
       authorAddress,
+      request: req,
     });
 
     const appSignerAccount = await getGaslessSigner();

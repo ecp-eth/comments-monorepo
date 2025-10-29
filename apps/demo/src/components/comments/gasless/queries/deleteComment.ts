@@ -18,15 +18,17 @@ type DeleteCommentGaslesslyResult = Omit<
   "references" | "resolvedAuthor"
 >;
 
-export async function sendDeleteCommentGaslesslyNotPreapproved({
+export async function sendDeleteCommentGaslessly({
   requestPayload,
   walletClient,
+  gasSponsorship,
 }: {
   requestPayload: Omit<
     z.input<typeof SendDeleteCommentRequestPayloadSchema>,
     "authorSignature" | "deadline"
   >;
   walletClient: WalletClient<Transport, Chain, Account>;
+  gasSponsorship: "preapproved" | "not-preapproved";
 }): Promise<DeleteCommentGaslesslyResult> {
   const { commentId, author } = requestPayload;
   const chainId = requestPayload.chainId;

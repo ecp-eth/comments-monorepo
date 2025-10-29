@@ -27,7 +27,7 @@ import type {
 } from "@ecp.eth/shared/schemas";
 import {
   useGaslessEditComment,
-  useGaslessSubmitComment,
+  useGaslessPostComment,
 } from "./useGaslessSubmitComment";
 import { useGaslessDeleteComment } from "./useGaslessDeleteComment";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
@@ -50,13 +50,13 @@ export function useGaslessCommentActions({
   const deleteCommentMutation = useGaslessDeleteComment({
     connectedAddress,
   });
-  const submitCommentMutation = useGaslessSubmitComment();
-  const { mutateAsync: submitComment } = submitCommentMutation;
+  const postCommentMutation = useGaslessPostComment();
+  const { mutateAsync: sendPostComment } = postCommentMutation;
   const commentDeletion = useCommentDeletion();
   const commentRetrySubmission = useCommentRetrySubmission();
   const commentSubmission = useCommentSubmission();
   const editCommentMutation = useGaslessEditComment();
-  const { mutateAsync: submitEditComment } = editCommentMutation;
+  const { mutateAsync: sendEditComment } = editCommentMutation;
   const commentEdition = useCommentEdition();
   const commentRetryEdition = useCommentRetryEdition();
   const likeReactionSubmission = useReactionSubmission(
@@ -132,7 +132,7 @@ export function useGaslessCommentActions({
         throw new Error("Only post comments can be retried");
       }
 
-      const pendingOperation = await submitComment({
+      const pendingOperation = await sendPostComment({
         content: comment.content,
         gasSponsorship: comment.pendingOperation.type,
         targetUri: comment.targetUri,
@@ -172,12 +172,12 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, submitComment, commentRetrySubmission],
+    [wagmiConfig, sendPostComment, commentRetrySubmission],
   );
 
   const postComment = useCallback<OnPostComment>(
     async (params) => {
-      const pendingOperation = await submitComment({
+      const pendingOperation = await sendPostComment({
         content: params.comment.content,
         references: params.comment.references,
         gasSponsorship: hasApproval
@@ -224,14 +224,16 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, hasApproval, commentSubmission, submitComment],
+    [wagmiConfig, hasApproval, commentSubmission, sendPostComment],
   );
 
   const editComment = useCallback<OnEditComment>(
     async (params) => {
       const pendingOperation = {
-        ...(await submitEditComment({
-          isApproved: hasApproval,
+        ...(await sendEditComment({
+          gasSponsorship: hasApproval
+            ? "gasless-preapproved"
+            : "gasless-not-preapproved",
           commentId: params.comment.id,
           content: params.edit.content,
           metadata: params.edit.metadata,
@@ -268,7 +270,7 @@ export function useGaslessCommentActions({
         });
       }
     },
-    [hasApproval, submitEditComment, commentEdition, wagmiConfig],
+    [hasApproval, sendEditComment, commentEdition, wagmiConfig],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -288,8 +290,8 @@ export function useGaslessCommentActions({
       }
 
       const pendingOperation = {
-        ...(await submitEditComment({
-          isApproved: comment.pendingOperation.type === "gasless-preapproved",
+        ...(await sendEditComment({
+          gasSponsorship: comment.pendingOperation.type,
           commentId: comment.id,
           content: comment.content,
           metadata: comment.metadata ?? [],
@@ -328,7 +330,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [submitEditComment, commentRetryEdition, wagmiConfig],
+    [sendEditComment, commentRetryEdition, wagmiConfig],
   );
 
   const likeComment = useCallback<OnLikeComment>(
@@ -347,7 +349,7 @@ export function useGaslessCommentActions({
         undefined;
 
       try {
-        pendingOperation = await submitComment({
+        pendingOperation = await sendPostComment({
           content: COMMENT_REACTION_LIKE_CONTENT,
           metadata: [],
           commentType: COMMENT_TYPE_REACTION,
@@ -394,7 +396,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [hasApproval, likeReactionSubmission, submitComment, wagmiConfig],
+    [hasApproval, likeReactionSubmission, sendPostComment, wagmiConfig],
   );
 
   const unlikeComment = useCallback<OnUnlikeComment>(

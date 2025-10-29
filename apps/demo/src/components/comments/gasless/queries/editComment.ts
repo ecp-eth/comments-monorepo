@@ -1,3 +1,4 @@
+import z from "zod";
 import { publicEnv } from "@/publicEnv";
 import {
   Account,
@@ -18,8 +19,6 @@ import {
   SendEditCommentRequestPayloadSchema,
   SendEditCommentResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/edit";
-import z from "zod";
-import { DistributiveOmit } from "@ecp.eth/shared/types";
 import { getSignerURL } from "@/lib/utils";
 
 class EditCommentGaslesslyError extends Error {}
@@ -29,19 +28,18 @@ type EditCommentGaslesslyResult = Omit<
   "references"
 >;
 
-export async function sendEditCommentGaslesslyNotPreapproved({
+export async function sendEditCommentGaslessly({
   requestPayload,
   publicClient,
   walletClient,
+  gasSponsorship,
 }: {
-  requestPayload: DistributiveOmit<
-    z.input<typeof SendEditCommentRequestPayloadSchema>,
-    "authorSignature" | "deadline"
-  >;
+  requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
+  gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
 }): Promise<EditCommentGaslesslyResult> {
-  const { commentId, content, author } = requestPayload;
+  const { commentId, content, author, chainId, metadata } = requestPayload;
   const nonce = await getNonce({
     author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
@@ -52,10 +50,9 @@ export async function sendEditCommentGaslesslyNotPreapproved({
     content,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     nonce,
-    metadata: requestPayload.metadata,
+    metadata,
   });
 
-  const chainId = requestPayload.chainId;
   const typedCommentData = createEditCommentTypedData({
     author,
     edit: editCommentData,
@@ -72,7 +69,9 @@ export async function sendEditCommentGaslesslyNotPreapproved({
     },
     body: JSON.stringify(
       {
-        ...requestPayload,
+        edit: {
+          ...requestPayload,
+        },
         authorSignature,
         deadline,
       } satisfies z.input<typeof SendEditCommentRequestPayloadSchema>,
@@ -104,6 +103,6 @@ export async function sendEditCommentGaslesslyNotPreapproved({
     type: "gasless-not-preapproved",
     action: "edit",
     state: { status: "pending" },
-    chainId: requestPayload.chainId,
+    chainId,
   };
 }
