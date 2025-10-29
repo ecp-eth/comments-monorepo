@@ -340,3 +340,16 @@ export const CommentReferencesUpdatedEventSchema = z
 export type CommentReferencesUpdatedEvent = z.infer<
   typeof CommentReferencesUpdatedEventSchema
 >;
+
+/**
+ * Comment events schema.
+ */
+export const CommentEventsSchema = z.discriminatedUnion("event", [
+  CommentAddedEventSchema,
+  CommentHookMetadataSetEventSchema,
+  CommentDeletedEventSchema,
+  CommentEditedEventSchema,
+  CommentModerationStatusUpdatedEventSchema,
+  CommentReactionsUpdatedEventSchema,
+  CommentReferencesUpdatedEventSchema,
+]);

@@ -1,0 +1,149 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ApprovalEventsSchema
+
+# Variable: ApprovalEventsSchema
+
+```ts
+const ApprovalEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
+  data: ZodObject<{
+     approval: ZodObject<{
+        app: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        author: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        createdAt: ZodEffects<ZodString, Date, string>;
+        id: ZodString;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+      }, {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        id: string;
+        updatedAt: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+   }, {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  }>;
+  event: ZodLiteral<"approval:added">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>, ZodObject<{
+  data: ZodObject<{
+     approval: ZodObject<{
+        id: ZodString;
+      }, "strip", ZodTypeAny, {
+        id: string;
+      }, {
+        id: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     approval: {
+        id: string;
+     };
+   }, {
+     approval: {
+        id: string;
+     };
+  }>;
+  event: ZodLiteral<"approval:removed">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        id: string;
+     };
+  };
+  event: "approval:removed";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     approval: {
+        id: string;
+     };
+  };
+  event: "approval:removed";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>]>;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:97](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L97)
+
+Approval events schema.

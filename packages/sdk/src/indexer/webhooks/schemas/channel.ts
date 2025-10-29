@@ -271,3 +271,14 @@ export const ChannelTransferredEventSchema = z
 export type ChannelTransferredEvent = z.infer<
   typeof ChannelTransferredEventSchema
 >;
+
+/**
+ * Channel events schema.
+ */
+export const ChannelEventsSchema = z.discriminatedUnion("event", [
+  ChannelCreatedEventSchema,
+  ChannelUpdatedEventSchema,
+  ChannelHookStatusUpdatedEventSchema,
+  ChannelMetadataSetEventSchema,
+  ChannelTransferredEventSchema,
+]);

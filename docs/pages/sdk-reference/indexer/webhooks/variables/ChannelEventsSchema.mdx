@@ -1,0 +1,586 @@
+[**@ecp.eth/sdk**](../../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer/webhooks](/sdk-reference/indexer/webhooks/index.mdx) / ChannelEventsSchema
+
+# Variable: ChannelEventsSchema
+
+```ts
+const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
+  data: ZodObject<{
+     channel: ZodObject<{
+        chainId: ZodNumber;
+        createdAt: ZodEffects<ZodString, Date, string>;
+        description: ZodString;
+        hook: ZodNullable<ZodEffects<..., ..., ...>>;
+        id: ZodEffects<ZodString, bigint, string>;
+        metadata: ZodArray<ZodObject<..., ..., ..., ..., ...>, "many">;
+        name: ZodString;
+        owner: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${(...)}`;
+        id: bigint;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+      }, {
+        chainId: number;
+        createdAt: string;
+        description: string;
+        hook: null | `0x${(...)}`;
+        id: string;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     channel: {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${string}`;
+        id: bigint;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+   }, {
+     channel: {
+        chainId: number;
+        createdAt: string;
+        description: string;
+        hook: null | `0x${string}`;
+        id: string;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     };
+  }>;
+  event: ZodLiteral<"channel:created">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        chainId: number;
+        createdAt: Date;
+        description: string;
+        hook: null | `0x${string}`;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:created";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     channel: {
+        chainId: number;
+        createdAt: string;
+        description: string;
+        hook: null | `0x${string}`;
+        id: string;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     };
+  };
+  event: "channel:created";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>, ZodObject<{
+  data: ZodObject<{
+     channel: ZodObject<{
+        description: ZodString;
+        id: ZodEffects<ZodString, bigint, string>;
+        metadata: ZodArray<ZodObject<..., ..., ..., ..., ...>, "many">;
+        name: ZodString;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        name: string;
+        updatedAt: Date;
+      }, {
+        description: string;
+        id: string;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        name: string;
+        updatedAt: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     channel: {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        name: string;
+        updatedAt: Date;
+     };
+   }, {
+     channel: {
+        description: string;
+        id: string;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        name: string;
+        updatedAt: string;
+     };
+  }>;
+  event: ZodLiteral<"channel:updated">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        description: string;
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        updatedAt: Date;
+     };
+  };
+  event: "channel:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     channel: {
+        description: string;
+        id: string;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        name: string;
+        updatedAt: string;
+     };
+  };
+  event: "channel:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>, ZodObject<{
+  data: ZodObject<{
+     channel: ZodObject<{
+        hook: ZodNullable<ZodEffects<..., ..., ...>>;
+        id: ZodEffects<ZodString, bigint, string>;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        hook: null | `0x${(...)}`;
+        id: bigint;
+        updatedAt: Date;
+      }, {
+        hook: null | `0x${(...)}`;
+        id: string;
+        updatedAt: string;
+     }>;
+     hook: ZodObject<{
+        address: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        enabled: ZodBoolean;
+      }, "strip", ZodTypeAny, {
+        address: `0x${string}`;
+        enabled: boolean;
+      }, {
+        address: `0x${string}`;
+        enabled: boolean;
+     }>;
+   }, "strip", ZodTypeAny, {
+     channel: {
+        hook: null | `0x${string}`;
+        id: bigint;
+        updatedAt: Date;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+   }, {
+     channel: {
+        hook: null | `0x${string}`;
+        id: string;
+        updatedAt: string;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  }>;
+  event: ZodLiteral<"channel:hook:status:updated">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        hook: null | `0x${string}`;
+        id: bigint;
+        updatedAt: Date;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  };
+  event: "channel:hook:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     channel: {
+        hook: null | `0x${string}`;
+        id: string;
+        updatedAt: string;
+     };
+     hook: {
+        address: `0x${string}`;
+        enabled: boolean;
+     };
+  };
+  event: "channel:hook:status:updated";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>, ZodObject<{
+  data: ZodObject<{
+     channel: ZodObject<{
+        id: ZodEffects<ZodString, bigint, string>;
+        metadata: ZodArray<ZodObject<..., ..., ..., ..., ...>, "many">;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        id: bigint;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        updatedAt: Date;
+      }, {
+        id: string;
+        metadata: {
+           key: ...;
+           value: ...;
+        }[];
+        updatedAt: string;
+     }>;
+     metadataOperation: ZodDiscriminatedUnion<"type", [ZodObject<{
+        key: ...;
+        type: ...;
+      }, "strip", ZodTypeAny, {
+        key: ...;
+        type: ...;
+      }, {
+        key: ...;
+        type: ...;
+      }>, ZodObject<{
+        key: ...;
+        type: ...;
+        value: ...;
+      }, "strip", ZodTypeAny, {
+        key: ...;
+        type: ...;
+        value: ...;
+      }, {
+        key: ...;
+        type: ...;
+        value: ...;
+      }>, ZodObject<{
+        key: ...;
+        type: ...;
+        value: ...;
+      }, "strip", ZodTypeAny, {
+        key: ...;
+        type: ...;
+        value: ...;
+      }, {
+        key: ...;
+        type: ...;
+        value: ...;
+     }>]>;
+   }, "strip", ZodTypeAny, {
+     channel: {
+        id: bigint;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        updatedAt: Date;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+   }, {
+     channel: {
+        id: string;
+        metadata: {
+           key: `0x${(...)}`;
+           value: `0x${(...)}`;
+        }[];
+        updatedAt: string;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  }>;
+  event: ZodLiteral<"channel:metadata:set">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        updatedAt: Date;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "channel:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     channel: {
+        id: string;
+        metadata: {
+           key: `0x${string}`;
+           value: `0x${string}`;
+        }[];
+        updatedAt: string;
+     };
+     metadataOperation:   | {
+        key: `0x${string}`;
+        type: "delete";
+      }
+        | {
+        key: `0x${string}`;
+        type: "create";
+        value: `0x${string}`;
+      }
+        | {
+        key: `0x${string}`;
+        type: "update";
+        value: `0x${string}`;
+      };
+  };
+  event: "channel:metadata:set";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>, ZodObject<{
+  data: ZodObject<{
+     channel: ZodObject<{
+        id: ZodEffects<ZodString, bigint, string>;
+        owner: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+      }, {
+        id: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     }>;
+     from: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     to: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+   }, "strip", ZodTypeAny, {
+     channel: {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+   }, {
+     channel: {
+        id: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  }>;
+  event: ZodLiteral<"channel:transferred">;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     channel: {
+        id: bigint;
+        owner: `0x${string}`;
+        updatedAt: Date;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  };
+  event: "channel:transferred";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     channel: {
+        id: string;
+        owner: `0x${string}`;
+        updatedAt: string;
+     };
+     from: `0x${string}`;
+     to: `0x${string}`;
+  };
+  event: "channel:transferred";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}>]>;
+```
+
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:278](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/channel.ts#L278)
+
+Channel events schema.
