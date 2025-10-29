@@ -16,7 +16,7 @@ import {
   EditCommentDataSchema,
   MetadataEntrySchema,
 } from "@ecp.eth/sdk/comments/schemas";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   id: HexSchema,

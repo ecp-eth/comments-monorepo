@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { HexSchema } from "../../../core/schemas.js";
 import { MetadataArraySchema } from "../../../comments/schemas.js";
 import {
@@ -271,3 +271,14 @@ export const ChannelTransferredEventSchema = z
 export type ChannelTransferredEvent = z.infer<
   typeof ChannelTransferredEventSchema
 >;
+
+/**
+ * Channel events schema.
+ */
+export const ChannelEventsSchema = z.discriminatedUnion("event", [
+  ChannelCreatedEventSchema,
+  ChannelUpdatedEventSchema,
+  ChannelHookStatusUpdatedEventSchema,
+  ChannelMetadataSetEventSchema,
+  ChannelTransferredEventSchema,
+]);

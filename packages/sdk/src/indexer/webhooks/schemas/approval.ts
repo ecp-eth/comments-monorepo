@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
   EventFromChainSchema,
   EventV1Schema,
@@ -90,3 +90,11 @@ export const ApprovalRemovedEventSchema = z
   .merge(EventV1Schema);
 
 export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
+
+/**
+ * Approval events schema.
+ */
+export const ApprovalEventsSchema = z.discriminatedUnion("event", [
+  ApprovalAddedEventSchema,
+  ApprovalRemovedEventSchema,
+]);

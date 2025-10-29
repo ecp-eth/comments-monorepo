@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { EmbedConfigSupportedFont } from "./fonts.js";
 import { DEFAULT_CHAIN_ID, DEFAULT_CHAIN_ID_DEV } from "../../constants.js";
 import { HexSchema } from "../../core/schemas.js";

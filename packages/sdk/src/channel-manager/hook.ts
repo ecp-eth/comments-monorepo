@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { CHANNEL_MANAGER_ADDRESS } from "../constants.js";
 import { ChannelManagerABI } from "../abis.js";
 import type { ContractWriteFunctions, ContractReadFunctions } from "./types.js";

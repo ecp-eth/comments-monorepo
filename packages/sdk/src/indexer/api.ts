@@ -33,7 +33,7 @@ import {
   type IndexerAPIMarkNotificationsAsSeenSchemaType,
 } from "./schemas.js";
 import { INDEXER_API_URL } from "../constants.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { ResponseError } from "./errors.js";
 import { indexerApiRetryCondition } from "./utils.js";
 

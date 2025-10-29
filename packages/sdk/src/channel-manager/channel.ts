@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import {
   CHANNEL_MANAGER_ADDRESS,
   COMMENT_TYPE_COMMENT,

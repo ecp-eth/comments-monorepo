@@ -14,7 +14,7 @@ import type { Chain, ContractFunctionExecutionError, Hex } from "viem";
 import { http } from "wagmi";
 import * as allChains from "wagmi/chains";
 import type { AuthorType, ProcessEnvNetwork } from "./types.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { twMerge } from "tailwind-merge";
 import {
   getCommentCursor,

@@ -3,7 +3,7 @@ import {
   EditCommentDataSchema,
   MetadataArraySchema,
 } from "@ecp.eth/sdk/comments/schemas";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 const SharedEditCommentRequestPayloadSchema = z.object({
   commentId: HexSchema,

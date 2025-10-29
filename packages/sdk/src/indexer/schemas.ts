@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { HexSchema } from "../core/schemas.js";
 import type { MetadataType, MetadataRecord } from "../comments/metadata.js";
 import {
