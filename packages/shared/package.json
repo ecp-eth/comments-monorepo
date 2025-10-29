@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/shared",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "type": "module",
   "license": "MIT",
   "main": "./dist/cjs/index.cjs",
@@ -125,7 +125,7 @@
     "zod": "^3.25.76"
   },
   "peerDependencies": {
-    "@ecp.eth/sdk": ">=0.0.31",
+    "@ecp.eth/sdk": ">=0.0.32",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.5",
     "@tanstack/react-query": ">=5.0.0",
