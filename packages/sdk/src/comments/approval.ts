@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { COMMENT_MANAGER_ADDRESS } from "../constants.js";
 import { type Hex, HexSchema } from "../core/schemas.js";
 import { CommentManagerABI } from "../abis.js";

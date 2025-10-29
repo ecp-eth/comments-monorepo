@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 
 // Error response schemas
 export const BadRequestResponseBodySchema = z.record(

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { EventV1Schema } from "./shared.js";
 
 export const EVENT_TEST = "test" as const;

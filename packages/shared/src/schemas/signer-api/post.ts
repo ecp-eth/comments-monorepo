@@ -1,7 +1,7 @@
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments/schemas";
 import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
-import { z } from "zod";
+import { z } from "zod/v3";
 import { CommentDataWithIdSchema } from "../../schemas";
 
 /**

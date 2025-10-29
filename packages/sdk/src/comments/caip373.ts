@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v3";
 import { type Hex, HexSchema } from "../core/schemas.js";
 import { SUPPORTED_CHAINS } from "../constants.js";
 import { decodeFunctionData, encodeFunctionData } from "viem";

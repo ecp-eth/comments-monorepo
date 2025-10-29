@@ -1,7 +1,7 @@
 import { stringToHex } from "viem";
 import type { Hex } from "../core/schemas.js";
 import { ResponseError } from "./errors.js";
-import { z } from "zod";
+import { z } from "zod/v3";
 
 /**
  * Get the cursor for a comment
