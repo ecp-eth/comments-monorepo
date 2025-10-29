@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.32
+
+### Patch Changes
+
+- fbeaca3: fix(sdk): add missing targetUri and parentId properties to comment added event
+- 7586ba2: feat: zod v4 support + all events schemas
+
 ## 0.0.31
 
 ### Patch Changes

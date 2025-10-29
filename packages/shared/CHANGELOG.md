@@ -1,5 +1,14 @@
 # @ecp.eth/shared
 
+## 0.0.14
+
+### Patch Changes
+
+- 7586ba2: feat: zod v4 support + all events schemas
+- Updated dependencies [fbeaca3]
+- Updated dependencies [7586ba2]
+  - @ecp.eth/sdk@0.0.32
+
 ## 0.0.13
 
 ### Patch Changes
