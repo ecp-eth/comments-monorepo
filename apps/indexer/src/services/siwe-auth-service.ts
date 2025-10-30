@@ -30,9 +30,13 @@ export type SiweAuthService_Options = {
    */
   jwtAccessTokenAudience: string;
   /**
-   * The secret to sign the access token with
+   * The private key (PEM) to sign the access token with (RS256)
    */
-  jwtAccessTokenSecret: string;
+  jwtAccessTokenPrivateKey: string;
+  /**
+   * The public key (PEM) to verify the access token with (RS256)
+   */
+  jwtAccessTokenPublicKey: string;
   /**
    * Refresh token lifetime in seconds
    */
@@ -46,9 +50,13 @@ export type SiweAuthService_Options = {
    */
   jwtRefreshTokenIssuer: string;
   /**
-   * The secret to sign the refresh token with
+   * The private key (PEM) to sign the refresh token with (RS256)
    */
-  jwtRefreshTokenSecret: string;
+  jwtRefreshTokenPrivateKey: string;
+  /**
+   * The public key (PEM) to verify the refresh token with (RS256)
+   */
+  jwtRefreshTokenPublicKey: string;
   /**
    * The audience to sign the nonce token with
    */
@@ -62,9 +70,13 @@ export type SiweAuthService_Options = {
    */
   jwtNonceTokenLifetime: number;
   /**
-   * The secret to sign the nonce token with
+   * The private key (PEM) to sign the nonce token with (RS256)
    */
-  jwtNonceTokenSecret: string;
+  jwtNonceTokenPrivateKey: string;
+  /**
+   * The public key (PEM) to verify the nonce token with (RS256)
+   */
+  jwtNonceTokenPublicKey: string;
   /**
    * Resolve the chain client
    * @param chainId - The chain id
@@ -92,8 +104,8 @@ export class SiweAuthService implements ISiweAuthService {
         iss: this.options.jwtNonceTokenIssuer,
         nonce,
       },
-      this.options.jwtNonceTokenSecret,
-      "HS256",
+      getPEMPrivateKey(this.options.jwtNonceTokenPrivateKey),
+      "RS256",
     );
 
     return {
@@ -108,9 +120,9 @@ export class SiweAuthService implements ISiweAuthService {
     try {
       const decodedJWTToken = await jwt.verify(
         refreshToken,
-        this.options.jwtRefreshTokenSecret,
+        getPEMPublicKey(this.options.jwtRefreshTokenPublicKey),
         {
-          alg: "HS256",
+          alg: "RS256",
           iss: this.options.jwtRefreshTokenIssuer,
         },
       );
@@ -206,9 +218,9 @@ export class SiweAuthService implements ISiweAuthService {
     try {
       const decodedJWTToken = await jwt.verify(
         token,
-        this.options.jwtAccessTokenSecret,
+        getPEMPublicKey(this.options.jwtAccessTokenPublicKey),
         {
-          alg: "HS256",
+          alg: "RS256",
           iss: this.options.jwtAccessTokenIssuer,
         },
       );
@@ -275,9 +287,9 @@ export class SiweAuthService implements ISiweAuthService {
 
       const decodedJWTToken = await jwt.verify(
         token,
-        this.options.jwtNonceTokenSecret,
+        getPEMPublicKey(this.options.jwtNonceTokenPublicKey),
         {
-          alg: "HS256",
+          alg: "RS256",
           iss: this.options.jwtNonceTokenIssuer,
         },
       );
@@ -436,8 +448,8 @@ export class SiweAuthService implements ISiweAuthService {
           sessionId,
         }),
       },
-      this.options.jwtAccessTokenSecret,
-      "HS256",
+      getPEMPrivateKey(this.options.jwtAccessTokenPrivateKey),
+      "RS256",
     );
 
     return {
@@ -468,8 +480,8 @@ export class SiweAuthService implements ISiweAuthService {
           id: refreshTokenId,
         }),
       },
-      this.options.jwtRefreshTokenSecret,
-      "HS256",
+      getPEMPrivateKey(this.options.jwtRefreshTokenPrivateKey),
+      "RS256",
     );
 
     return {
@@ -477,6 +489,22 @@ export class SiweAuthService implements ISiweAuthService {
       expiresAt: expiresAt * 1000,
     };
   }
+}
+
+function getPEMPrivateKey(privateKey: string) {
+  if (privateKey.startsWith("-----BEGIN PRIVATE KEY-----")) {
+    return privateKey;
+  }
+
+  return `-----BEGIN PRIVATE KEY-----\n${privateKey}\n-----END PRIVATE KEY-----`;
+}
+
+function getPEMPublicKey(publicKey: string) {
+  if (publicKey.startsWith("-----BEGIN PUBLIC KEY-----")) {
+    return publicKey;
+  }
+
+  return `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
 }
 
 const siweMessagePayloadSchema = z.object({

@@ -198,17 +198,20 @@ const EnvSchema = z
     CHAIN_ANVIL_ECP_CHANNEL_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
     CHAIN_ANVIL_ECP_COMMENT_MANAGER_ADDRESS_OVERRIDE: HexSchema.optional(),
 
-    JWT_SIWE_NONCE_SECRET: z.string().nonempty(),
+    JWT_SIWE_NONCE_PRIVATE_KEY: z.string().nonempty(),
+    JWT_SIWE_NONCE_PUBLIC_KEY: z.string().nonempty(),
     JWT_SIWE_NONCE_LIFETIME: z.coerce.number().int().positive().default(600),
     JWT_SIWE_NONCE_ISSUER: z.string().nonempty().default("ecp-indexer"),
     JWT_SIWE_NONCE_AUDIENCE: z.string().nonempty().default("ecp-indexer-nonce"),
 
-    JWT_ACCESS_TOKEN_SECRET: z.string().nonempty(),
+    JWT_ACCESS_TOKEN_PRIVATE_KEY: z.string().nonempty(),
+    JWT_ACCESS_TOKEN_PUBLIC_KEY: z.string().nonempty(),
     JWT_ACCESS_TOKEN_LIFETIME: z.coerce.number().int().positive().default(900),
     JWT_ACCESS_TOKEN_ISSUER: z.string().nonempty().default("ecp-indexer"),
     JWT_ACCESS_TOKEN_AUDIENCE: z.string().nonempty().default("ecp-indexer-at"),
 
-    JWT_REFRESH_TOKEN_SECRET: z.string().nonempty(),
+    JWT_REFRESH_TOKEN_PRIVATE_KEY: z.string().nonempty(),
+    JWT_REFRESH_TOKEN_PUBLIC_KEY: z.string().nonempty(),
     JWT_REFRESH_TOKEN_LIFETIME: z.coerce
       .number()
       .int()
