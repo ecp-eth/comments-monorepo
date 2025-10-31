@@ -298,7 +298,7 @@ const APIBadRequestResponseIssueNotFiniteSchema =
 const APIBadRequestResponseIssueCustomSchema =
   APIBadRequestResponseIssueSharedSchema.extend({
     code: z.literal(ZodIssueCode.custom),
-    params: z.record(z.string(), z.unknown()),
+    params: z.record(z.string(), z.unknown()).optional(),
   });
 
 const APIBadRequestResponseIssueSchema = z.discriminatedUnion("code", [
