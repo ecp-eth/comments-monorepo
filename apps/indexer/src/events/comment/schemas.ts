@@ -27,6 +27,7 @@ import {
   type CommentModerationStatusUpdatedEventSchema as OutputCommentModerationStatusUpdatedEventSchema,
   type CommentReactionsUpdatedEventSchema as OutputCommentReactionsUpdatedEventSchema,
   type CommentEvents as SDKCommentEvents,
+  type CommentReferencesUpdatedEventSchema as OutputCommentReferencesUpdatedEventSchema,
 } from "@ecp.eth/sdk/indexer/webhooks/schemas";
 
 export const CommentEvents = [
@@ -238,3 +239,6 @@ export type CommentReferencesUpdatedEvent = z.infer<
   typeof OutputCommentReactionsUpdatedEventSchema
 >;
 ({}) as unknown as typeof SDKCommentEvents satisfies typeof CommentEvents;
+({}) as unknown as CommentReferencesUpdatedEvent satisfies z.input<
+  typeof OutputCommentReferencesUpdatedEventSchema
+>;
