@@ -7,4 +7,5 @@ import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 export const SendDeleteCommentRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SendDeleteCommentRequestPayloadSchema,
+    "delete",
   );

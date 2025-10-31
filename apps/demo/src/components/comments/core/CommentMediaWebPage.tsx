@@ -1,4 +1,5 @@
 import type { IndexerAPICommentReferenceURLWebPageSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import Image from "next/image";
 
 export function CommentMediaWebPage({
   reference,
@@ -8,7 +9,7 @@ export function CommentMediaWebPage({
   return (
     <div className="w-full h-full flex flex-col">
       {reference.opengraph?.image && (
-        <img
+        <Image
           src={reference.opengraph.image}
           alt={reference.opengraph.title}
           className="w-full h-full object-cover"

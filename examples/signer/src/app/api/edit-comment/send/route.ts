@@ -39,14 +39,9 @@ export async function POST(
 > {
   try {
     const {
-      commentId,
-      content,
-      author,
-      chainId,
-      metadata,
+      edit: { commentId, content, author, chainId, metadata, chainConfig },
       authorSignature,
       deadline,
-      chainConfig,
     } = guardRequestPayloadSchemaIsValid(
       SendEditCommentRequestPayloadRestrictedSchema,
       await req.json(),
@@ -87,6 +82,7 @@ export async function POST(
       authorSignature,
       signTypedDataParams: typedEditCommentData,
       authorAddress: author,
+      request: req,
     });
 
     const hash = hashTypedData(typedEditCommentData);

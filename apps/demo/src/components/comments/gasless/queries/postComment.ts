@@ -13,7 +13,8 @@ import { throwKnownResponseCodeError } from "@ecp.eth/shared/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
-import { DistributiveOmit } from "@ecp.eth/shared/types";
+import { FetchFn } from "./types";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
 
 class PostCommentGaslesslyError extends Error {}
 
@@ -22,15 +23,18 @@ type PostCommentGaslesslyResult = Omit<
   "references" | "resolvedAuthor"
 >;
 
-export async function sendPostCommentGaslesslyNotPreapproved({
+export async function sendPostCommentGaslessly({
   requestPayload,
   walletClient,
+  gasSponsorship,
+  fetch,
 }: {
-  requestPayload: DistributiveOmit<
-    z.input<typeof SendPostCommentRequestPayloadSchema>,
-    "authorSignature" | "deadline"
-  >;
+  requestPayload: z.input<
+    typeof SendPostCommentRequestPayloadSchema
+  >["comment"];
   walletClient: WalletClient<Transport, Chain, Account>;
+  gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
+  fetch: FetchFn;
 }): Promise<PostCommentGaslesslyResult> {
   const { chainId } = requestPayload;
   const commentData = createCommentData({
@@ -44,7 +48,11 @@ export async function sendPostCommentGaslesslyNotPreapproved({
   });
 
   const deadline = commentData.deadline;
-  const authorSignature = await walletClient.signTypedData(typedCommentData);
+
+  let authorSignature: Hex | undefined;
+  if (gasSponsorship === "gasless-not-preapproved") {
+    authorSignature = await walletClient.signTypedData(typedCommentData);
+  }
 
   const response = await fetch(getSignerURL("/api/post-comment/send"), {
     method: "POST",
@@ -53,7 +61,9 @@ export async function sendPostCommentGaslesslyNotPreapproved({
     },
     body: JSON.stringify(
       {
-        ...requestPayload,
+        comment: {
+          ...requestPayload,
+        },
         authorSignature,
         deadline,
       } satisfies z.input<typeof SendPostCommentRequestPayloadSchema>,

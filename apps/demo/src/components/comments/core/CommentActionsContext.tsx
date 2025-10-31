@@ -173,6 +173,8 @@ export type CommentActionsContextType<TExtraPostComment = unknown> = {
 };
 
 export const CommentActionsContext =
+  // TODO: find a better way than `any`
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createContext<CommentActionsContextType<any> | null>(null);
 
 export function useCommentActions<

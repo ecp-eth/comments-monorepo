@@ -4,6 +4,7 @@ import {
   MetadataArraySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod/v3";
+import { AuthorSignatureSchema } from "./shared";
 
 const SharedEditCommentRequestPayloadSchema = z.object({
   commentId: HexSchema,
@@ -34,18 +35,11 @@ export const SignEditCommentResponseBodySchema =
 /**
  * Request payload schema for submitting comment to edit
  */
-export const SendEditCommentRequestPayloadSchema =
-  SharedEditCommentRequestPayloadSchema.extend({
-    authorSignature: HexSchema.describe(
-      "Signature of the author, required if the user has not approved our submitter address",
-    ),
-    deadline: z.coerce
-      .bigint()
-      .optional()
-      .describe(
-        "Deadline of the request, required if the user has not approved our submitter address",
-      ),
-  });
+export const SendEditCommentRequestPayloadSchema = z.object({
+  edit: SharedEditCommentRequestPayloadSchema,
+  authorSignature: AuthorSignatureSchema,
+  deadline: z.coerce.bigint().optional().describe("Deadline of the request"),
+});
 
 /**
  * Response body schema for submitting comment to edit
