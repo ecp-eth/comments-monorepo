@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { AllEvents } from "@ecp.eth/sdk/indexer/webhooks/schemas";
 
 export const AppSchema = z.object({
   id: z.string().uuid(),
@@ -82,22 +83,7 @@ export type AppDeleteResponseSchemaType = z.infer<
   typeof AppDeleteResponseSchema
 >;
 
-export const WebhookEventNames = [
-  "approval:added",
-  "approval:removed",
-  "channel:created",
-  "channel:updated",
-  "channel:hook:status:updated",
-  "channel:metadata:set",
-  "channel:transferred",
-  "comment:added",
-  "comment:hook:metadata:set",
-  "comment:deleted",
-  "comment:edited",
-  "comment:moderation:status:updated",
-  "comment:reactions:updated",
-  "test",
-] as const;
+export const WebhookEventNames = AllEvents;
 
 export const WebhookEventNamesSchema = z.enum(WebhookEventNames);
 

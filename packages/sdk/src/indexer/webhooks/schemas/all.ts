@@ -1,10 +1,12 @@
 import { z } from "zod/v3";
 import {
   ApprovalAddedEventSchema,
+  ApprovalEvents,
   ApprovalRemovedEventSchema,
 } from "./approval.js";
 import {
   ChannelCreatedEventSchema,
+  ChannelEvents,
   ChannelHookStatusUpdatedEventSchema,
   ChannelMetadataSetEventSchema,
   ChannelTransferredEventSchema,
@@ -14,12 +16,13 @@ import {
   CommentAddedEventSchema,
   CommentDeletedEventSchema,
   CommentEditedEventSchema,
+  CommentEvents,
   CommentHookMetadataSetEventSchema,
   CommentModerationStatusUpdatedEventSchema,
   CommentReactionsUpdatedEventSchema,
   CommentReferencesUpdatedEventSchema,
 } from "./comment.js";
-import { TestEventSchema } from "./test.js";
+import { TestEvents, TestEventSchema } from "./test.js";
 
 /**
  * All events schema.
@@ -41,3 +44,13 @@ export const AllEventsSchema = z.discriminatedUnion("event", [
   CommentReferencesUpdatedEventSchema,
   TestEventSchema,
 ]);
+
+/**
+ * All events.
+ */
+export const AllEvents = [
+  ...ApprovalEvents,
+  ...ChannelEvents,
+  ...CommentEvents,
+  ...TestEvents,
+] as const;
