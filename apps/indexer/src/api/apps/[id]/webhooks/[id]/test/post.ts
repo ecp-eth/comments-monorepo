@@ -6,7 +6,10 @@ import {
   eventOutboxService,
   siweMiddleware,
 } from "../../../../../../services/index.ts";
-import { APIErrorResponseSchema } from "../../../../../../lib/schemas.ts";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../../../lib/schemas.ts";
 import { AppManagerAppNotFoundError } from "../../../../../../services/app-manager-service.ts";
 import { AppWebhookManagerAppWebhookNotFoundError } from "../../../../../../services/app-webhook-manager-service.ts";
 import { createTestEvent } from "../../../../../../events/test/index.ts";
@@ -32,10 +35,10 @@ export function setupAppWebhookTest(app: OpenAPIHono) {
           description: "Webhook test event queued successfully",
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

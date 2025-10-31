@@ -1,7 +1,10 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { SiweAuthService_Error } from "../../../../services/siwe-auth-service";
 import { siweAuthService } from "../../../../services";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 
 const AuthSiweRefreshHeadersSchema = z.object({
@@ -45,10 +48,10 @@ export function setupAuthSiweRefresh(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

@@ -1,5 +1,6 @@
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   ChangeModerationStatusOnCommentParamsSchema,
 } from "../../../lib/schemas";
@@ -28,6 +29,14 @@ const getCommentRoute = createRoute({
             IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema,
         },
       },
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
     401: {
       content: {

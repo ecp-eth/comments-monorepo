@@ -17,7 +17,10 @@ import {
 import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../lib/response-formatters";
-import { GetCommentsQuerySchema } from "../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  GetCommentsQuerySchema,
+} from "../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../lib/constants";
 import { env } from "../../env";
 import type { SQL } from "drizzle-orm";
@@ -43,6 +46,14 @@ const getCommentsRoute = createRoute({
         },
       },
       description: "Retrieve a list of comments",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
   },
 });

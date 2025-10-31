@@ -5,6 +5,7 @@ import {
   type NotificationTypeSchemaType,
 } from "../../../notifications/schemas.ts";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIENSNameOrAddressSchema,
@@ -188,10 +189,10 @@ export function setupAppNotificationsGroupedGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

@@ -4,7 +4,10 @@ import { OpenAPIBigintStringSchema } from "../../../../lib/schemas";
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 
 export const AnalyticsKpiDeliveriesGetQueryParamsSchema = z
   .object({
@@ -47,10 +50,10 @@ export function setupAnalyticsKpiDeliveriesGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

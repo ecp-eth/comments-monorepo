@@ -19,7 +19,7 @@ import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/respo
 import {
   GetCommentRepliesQuerySchema,
   GetCommentRepliesParamSchema,
-  APIErrorResponseSchema,
+  APIBadRequestResponseSchema,
 } from "../../../lib/schemas";
 import { REPLIES_PER_COMMENT } from "../../../lib/constants";
 import { env } from "../../../env";
@@ -52,10 +52,10 @@ const getCommentsRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request is not valid",
+      description: "Bad request",
     },
   },
 });

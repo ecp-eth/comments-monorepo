@@ -3,6 +3,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, desc, eq, inArray } from "ponder";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   GetApprovalsQuerySchema,
   GetApprovalsResponseSchema,
@@ -28,10 +29,10 @@ const getApprovalsRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "Invalid request",
+      description: "Bad request",
     },
     500: {
       description: "Internal server error",

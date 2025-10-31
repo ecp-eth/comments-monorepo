@@ -1,6 +1,9 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { appManager, siweMiddleware } from "../../../../../services/index.ts";
-import { APIErrorResponseSchema } from "../../../../../lib/schemas.ts";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../../lib/schemas.ts";
 import {
   AppManagerAppNotFoundError,
   AppManagerFailedToRefreshAppSecretError,
@@ -34,6 +37,14 @@ export function setupAppSecretReveal(app: OpenAPIHono) {
               schema: AppSecretResponseSchema,
             },
           },
+        },
+        400: {
+          content: {
+            "application/json": {
+              schema: APIBadRequestResponseSchema,
+            },
+          },
+          description: "Bad request",
         },
         401: {
           content: {

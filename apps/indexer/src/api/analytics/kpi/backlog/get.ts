@@ -7,7 +7,10 @@ import {
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 
 export const AnalyticsKpiBacklogGetQueryParamsSchema = z.object({
   appId: z.string().uuid().optional(),
@@ -43,10 +46,10 @@ export function setupAnalyticsKpiBacklogGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

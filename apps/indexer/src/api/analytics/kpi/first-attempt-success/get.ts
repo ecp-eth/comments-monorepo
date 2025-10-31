@@ -4,7 +4,10 @@ import { OpenAPIFloatFromDbSchema } from "../../../../lib/schemas";
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 
 export const AnalyticsKpiFirstAttemptSuccessGetQueryParamsSchema = z
   .object({
@@ -49,10 +52,10 @@ export function setupAnalyticsKpiFirstAttemptSuccessGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

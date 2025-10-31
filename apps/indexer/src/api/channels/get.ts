@@ -3,7 +3,10 @@ import schema from "ponder:schema";
 import { and, asc, desc, eq, gt, gte, lt, lte, or, inArray } from "ponder";
 import { IndexerAPIListChannelsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
-import { GetChannelsQuerySchema } from "../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  GetChannelsQuerySchema,
+} from "../../lib/schemas";
 import { getChannelCursor } from "@ecp.eth/sdk/indexer";
 
 const getChannelsRoute = createRoute({
@@ -22,6 +25,14 @@ const getChannelsRoute = createRoute({
         },
       },
       description: "Retrieve a list of channels",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
   },
 });

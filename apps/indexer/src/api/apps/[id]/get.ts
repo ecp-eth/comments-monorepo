@@ -1,5 +1,6 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
   OpenAPIMaskedAppSecretSchema,
@@ -39,6 +40,14 @@ export function setupAppGet(app: OpenAPIHono) {
               schema: AppGetResponseSchema,
             },
           },
+        },
+        400: {
+          content: {
+            "application/json": {
+              schema: APIBadRequestResponseSchema,
+            },
+          },
+          description: "Bad request",
         },
         401: {
           description: "Unauthorized",

@@ -2,7 +2,10 @@ import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { siweAuthService } from "../../../../services";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { SiweAuthService_Error } from "../../../../services/siwe-auth-service";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
 
 export const AuthSiweVerifyRequestSchema = z.object({
@@ -49,10 +52,10 @@ export function setupAuthSiweVerify(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "SIWE verification failed",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

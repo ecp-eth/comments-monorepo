@@ -1,6 +1,9 @@
 import { IndexerAPIAuthorDataSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
-import { GetAuthorParamsSchema } from "../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  GetAuthorParamsSchema,
+} from "../../lib/schemas";
 import { formatAuthor } from "../../lib/response-formatters";
 import { rateLimiter } from "hono-rate-limiter";
 import { generateRateLimiterKey } from "../../lib/rate-limiter-key-generator";
@@ -31,6 +34,14 @@ const getAuthor = createRoute({
         },
       },
       description: "An object with author address and ENS and Farcaster data",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
   },
 });

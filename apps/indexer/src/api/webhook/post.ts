@@ -1,5 +1,8 @@
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
-import { APIErrorResponseSchema } from "../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../lib/schemas";
 import * as Sentry from "@sentry/node";
 
 import {
@@ -48,10 +51,10 @@ const webhookRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request is not valid",
+      description: "Bad request",
     },
     401: {
       content: {
