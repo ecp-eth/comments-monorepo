@@ -158,17 +158,20 @@ export const siweAuthService = new SiweAuthService({
   jwtNonceTokenAudience: env.JWT_SIWE_NONCE_AUDIENCE,
   jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
   jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
-  jwtNonceTokenSecret: env.JWT_SIWE_NONCE_SECRET,
+  jwtNonceTokenPrivateKey: env.JWT_SIWE_NONCE_PRIVATE_KEY,
+  jwtNonceTokenPublicKey: env.JWT_SIWE_NONCE_PUBLIC_KEY,
 
   jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
   jwtAccessTokenIssuer: env.JWT_ACCESS_TOKEN_ISSUER,
   jwtAccessTokenAudience: env.JWT_ACCESS_TOKEN_AUDIENCE,
-  jwtAccessTokenSecret: env.JWT_ACCESS_TOKEN_SECRET,
+  jwtAccessTokenPrivateKey: env.JWT_ACCESS_TOKEN_PRIVATE_KEY,
+  jwtAccessTokenPublicKey: env.JWT_ACCESS_TOKEN_PUBLIC_KEY,
 
   jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
   jwtRefreshTokenIssuer: env.JWT_REFRESH_TOKEN_ISSUER,
   jwtRefreshTokenAudience: env.JWT_REFRESH_TOKEN_AUDIENCE,
-  jwtRefreshTokenSecret: env.JWT_REFRESH_TOKEN_SECRET,
+  jwtRefreshTokenPrivateKey: env.JWT_REFRESH_TOKEN_PRIVATE_KEY,
+  jwtRefreshTokenPublicKey: env.JWT_REFRESH_TOKEN_PUBLIC_KEY,
 
   db,
   resolveChainClient: async (chainId) => {
