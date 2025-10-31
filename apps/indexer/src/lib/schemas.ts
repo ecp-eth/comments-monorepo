@@ -8,6 +8,7 @@ import { hexToString } from "viem";
 import { normalizeUrl } from "./utils.ts";
 import { SUPPORTED_CHAIN_IDS } from "../env.ts";
 import { CommentModerationLabel } from "../services/types.ts";
+import { ZodIssueCode } from "zod";
 
 export const OpenAPIHexSchema = HexSchema.openapi({
   type: "string",
@@ -126,6 +127,214 @@ export const APIErrorResponseSchema = z.object({
     description: "The error message",
   }),
 });
+
+/**
+ * Shared schema for all API bad request response issues.
+ *
+ * These are based on zod types
+ */
+const APIBadRequestResponseIssueSharedSchema = z.object({
+  fatal: z.boolean().optional(),
+  message: z.string().optional(),
+  path: z.array(z.string().or(z.number())),
+});
+
+const APIBadRequestResponseIssueInvalidTypeSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_type),
+    expected: z.string(),
+    received: z.string(),
+  });
+
+const APIBadRequestResponseIssueInvalidLiteralSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_literal),
+    expected: z.unknown(),
+    received: z.unknown(),
+  });
+
+const APIBadRequestResponseIssueUnrecognizedKeysSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.unrecognized_keys),
+    keys: z.array(z.string()),
+  });
+
+const APIBadRequestResponseIssueInvalidUnionSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_union),
+    unionErrors: z.array(
+      z
+        .lazy(() => APIBadRequestZodErrorSchema)
+        .openapi({
+          type: "object",
+          properties: {
+            issues: {
+              type: "array",
+              description:
+                "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+            },
+          },
+        }),
+    ),
+  });
+
+const APIBadRequestResponseInvalidUnionDiscriminatorSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_union_discriminator),
+    options: z.array(
+      z.union([
+        z.string(),
+        z.number(),
+        z.bigint(),
+        z.boolean(),
+        z.symbol().openapi({ type: "string", description: "A symbol" }),
+        z.null(),
+      ]),
+    ),
+  });
+
+const APIBadRequestResponseIssueInvalidEnumValueSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_enum_value),
+    options: z.array(z.string().or(z.number())),
+  });
+
+const APIBadRequestResponseIssueInvalidArgumentsSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_arguments),
+    argumentsError: z
+      .lazy(() => APIBadRequestZodErrorSchema)
+      .openapi({
+        type: "object",
+        properties: {
+          issues: {
+            type: "array",
+            description:
+              "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+          },
+        },
+      }),
+  });
+
+const APIBadRequestResponseIssueInvalidReturnTypeSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_return_type),
+    returnTypeError: z
+      .lazy(() => APIBadRequestZodErrorSchema)
+      .openapi({
+        type: "object",
+        properties: {
+          issues: {
+            type: "array",
+            description:
+              "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+          },
+        },
+      }),
+  });
+
+const APIBadRequestResponseIssueInvalidDateSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_date),
+  });
+
+const APIBadRequestResponseIssueInvalidStringSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_string),
+    validation: z.string().or(
+      z
+        .object({
+          includes: z.string(),
+          position: z.number().optional(),
+        })
+        .or(
+          z
+            .object({
+              startsWith: z.string(),
+            })
+            .or(
+              z.object({
+                endsWith: z.string(),
+              }),
+            ),
+        ),
+    ),
+  });
+
+const APIBadRequestResponseIssueTooSmallSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.too_small),
+    minimum: z.number().or(z.bigint()),
+    inclusive: z.boolean(),
+    exact: z.boolean().optional(),
+    type: z.string(),
+  });
+
+const APIBadRequestResponseIssueTooBigSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.too_big),
+    maximum: z.number().or(z.bigint()),
+    inclusive: z.boolean(),
+    exact: z.boolean().optional(),
+    type: z.string(),
+  });
+
+const APIBadRequestResponseIssueInvalidIntersectionTypesSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.invalid_intersection_types),
+  });
+
+const APIBadRequestResponseIssueNotMultipleOfSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.not_multiple_of),
+    multipleOf: z.number().or(z.bigint()),
+  });
+
+const APIBadRequestResponseIssueNotFiniteSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.not_finite),
+  });
+
+const APIBadRequestResponseIssueCustomSchema =
+  APIBadRequestResponseIssueSharedSchema.extend({
+    code: z.literal(ZodIssueCode.custom),
+    params: z.record(z.string(), z.unknown()),
+  });
+
+const APIBadRequestResponseIssueSchema = z.discriminatedUnion("code", [
+  APIBadRequestResponseIssueInvalidTypeSchema,
+  APIBadRequestResponseIssueInvalidLiteralSchema,
+  APIBadRequestResponseIssueUnrecognizedKeysSchema,
+  APIBadRequestResponseIssueInvalidUnionSchema,
+  APIBadRequestResponseInvalidUnionDiscriminatorSchema,
+  APIBadRequestResponseIssueInvalidEnumValueSchema,
+  APIBadRequestResponseIssueInvalidArgumentsSchema,
+  APIBadRequestResponseIssueInvalidReturnTypeSchema,
+  APIBadRequestResponseIssueInvalidDateSchema,
+  APIBadRequestResponseIssueInvalidStringSchema,
+  APIBadRequestResponseIssueTooSmallSchema,
+  APIBadRequestResponseIssueTooBigSchema,
+  APIBadRequestResponseIssueInvalidIntersectionTypesSchema,
+  APIBadRequestResponseIssueNotMultipleOfSchema,
+  APIBadRequestResponseIssueNotFiniteSchema,
+  APIBadRequestResponseIssueCustomSchema,
+]);
+
+const APIBadRequestZodErrorSchema: z.ZodType<{
+  issues: z.output<typeof APIBadRequestResponseIssueSchema>[];
+}> = z.object({
+  issues: z.array(APIBadRequestResponseIssueSchema),
+});
+
+/**
+ * Response schema for a bad request.
+ */
+export const APIBadRequestResponseSchema = z
+  .object({
+    success: z.literal(false),
+    error: APIBadRequestZodErrorSchema,
+  })
+  .or(APIErrorResponseSchema);
 
 const CommentCursorSchema = z.object({
   createdAt: z.coerce.date(),

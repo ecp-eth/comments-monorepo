@@ -11,6 +11,7 @@ import { env } from "../../../env";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import type { SQL } from "drizzle-orm";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   GetCommentParamSchema,
   GetCommentQuerySchema,
@@ -37,6 +38,14 @@ const getCommentRoute = createRoute({
         },
       },
       description: "A single comment",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
     404: {
       content: {

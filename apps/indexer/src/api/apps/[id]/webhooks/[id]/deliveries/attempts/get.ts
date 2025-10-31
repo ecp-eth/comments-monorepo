@@ -6,6 +6,7 @@ import {
   siweMiddleware,
 } from "../../../../../../../services";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIDateStringSchema,
@@ -114,10 +115,10 @@ export function setupAppWebhookDeliveryAttemptsGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

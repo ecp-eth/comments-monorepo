@@ -1,6 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { appManager, siweMiddleware } from "../../../../../services/index.ts";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIMaskedAppSecretSchema,
 } from "../../../../../lib/schemas.ts";
@@ -37,6 +38,14 @@ export function setupAppSecretRefresh(app: OpenAPIHono) {
               schema: AppSecretRefreshResponseSchema,
             },
           },
+        },
+        400: {
+          content: {
+            "application/json": {
+              schema: APIBadRequestResponseSchema,
+            },
+          },
+          description: "Bad request",
         },
         401: {
           content: {

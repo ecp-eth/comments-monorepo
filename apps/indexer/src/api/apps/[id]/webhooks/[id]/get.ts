@@ -5,6 +5,7 @@ import {
   siweMiddleware,
 } from "../../../../../services/index.ts";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../../lib/schemas.ts";
@@ -56,10 +57,10 @@ export function setupAppWebhookGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

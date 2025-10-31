@@ -4,7 +4,10 @@ import { OpenAPIFloatFromDbSchema } from "../../../../lib/schemas";
 import { type SQL, sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 
 export const AnalyticsKpiE2ELatencyGetQueryParamsSchema = z
   .object({
@@ -52,10 +55,10 @@ export function setupAnalyticsKpiE2ELatencyGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

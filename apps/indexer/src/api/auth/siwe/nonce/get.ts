@@ -1,7 +1,10 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { siweAuthService } from "../../../../services";
 import { formatResponseUsingZodSchema } from "../../../../lib/response-formatters";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 
 export const AuthSiweResponseSchema = z.object({
   nonce: z.string().nonempty(),
@@ -25,10 +28,10 @@ export function setupAuthSiweNonce(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

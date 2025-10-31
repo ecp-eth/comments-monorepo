@@ -1,5 +1,8 @@
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
-import { APIErrorResponseSchema } from "../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../lib/schemas";
 import { authMiddleware } from "../../../middleware/auth";
 import { IndexerAPIReportOutputSchema } from "@ecp.eth/sdk/indexer";
 import { commentReportsService } from "../../../services";
@@ -29,10 +32,10 @@ const getReportRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request is not valid",
+      description: "Bad request",
     },
     401: {
       content: {

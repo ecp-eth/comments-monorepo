@@ -1,5 +1,6 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIDateStringSchema,
@@ -48,10 +49,10 @@ export function setupAnalyticsTerminalGet(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

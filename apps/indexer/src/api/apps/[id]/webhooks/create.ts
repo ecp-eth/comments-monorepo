@@ -1,5 +1,6 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIDateStringSchema,
 } from "../../../../lib/schemas.ts";
@@ -66,10 +67,10 @@ export function setupAppWebhookCreate(app: OpenAPIHono) {
           },
         },
         400: {
-          description: "Invalid request",
+          description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

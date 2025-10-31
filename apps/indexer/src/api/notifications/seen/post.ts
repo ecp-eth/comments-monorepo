@@ -4,6 +4,7 @@ import {
   notificationService,
 } from "../../../services/index.ts";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIENSNameOrAddressSchema,
   OpenAPIHexSchema,
@@ -73,7 +74,7 @@ export function setupNotificationsSeenPost(app: OpenAPIHono) {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

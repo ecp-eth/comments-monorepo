@@ -4,6 +4,7 @@ import { eq } from "ponder";
 import { IndexerAPIChannelOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   GetChannelParamsSchema,
 } from "../../../lib/schemas";
@@ -24,6 +25,14 @@ const getChannelRoute = createRoute({
         },
       },
       description: "Retrieve a list of channels",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIBadRequestResponseSchema,
+        },
+      },
+      description: "Bad request",
     },
     404: {
       content: {

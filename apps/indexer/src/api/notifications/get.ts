@@ -1,6 +1,7 @@
 import { z, type OpenAPIHono } from "@hono/zod-openapi";
 import { appKeyMiddleware, db } from "../../services/index.ts";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIENSNameOrAddressSchema,
@@ -141,7 +142,7 @@ export function setupNotificationsGet(app: OpenAPIHono) {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: APIErrorResponseSchema,
+              schema: APIBadRequestResponseSchema,
             },
           },
         },

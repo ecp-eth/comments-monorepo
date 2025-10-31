@@ -1,5 +1,6 @@
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   PostMutedAccountBodySchema,
   PostMutedAccountResponseSchema,
@@ -36,10 +37,10 @@ const postMutedAccountRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request data is not valid",
+      description: "Bad request",
     },
     401: {
       content: {

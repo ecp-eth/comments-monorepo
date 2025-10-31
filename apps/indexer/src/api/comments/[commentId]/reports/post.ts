@@ -1,7 +1,10 @@
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { commentReportsService } from "../../../../services";
-import { APIErrorResponseSchema } from "../../../../lib/schemas";
+import {
+  APIBadRequestResponseSchema,
+  APIErrorResponseSchema,
+} from "../../../../lib/schemas";
 import { CommentNotFoundError } from "../../../../services/errors";
 import { createPublicClient } from "viem";
 import { createReportCommentTypedData } from "@ecp.eth/sdk/comments";
@@ -53,10 +56,10 @@ const reportCommentRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request is not valid",
+      description: "Bad request",
     },
     404: {
       content: {

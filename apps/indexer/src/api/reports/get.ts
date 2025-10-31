@@ -1,5 +1,6 @@
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   InputReportsCursorSchema,
 } from "../../lib/schemas";
@@ -50,10 +51,10 @@ const getReportsRoute = createRoute({
     400: {
       content: {
         "application/json": {
-          schema: APIErrorResponseSchema,
+          schema: APIBadRequestResponseSchema,
         },
       },
-      description: "When request is not valid",
+      description: "Bad request",
     },
     401: {
       content: {
