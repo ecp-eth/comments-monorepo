@@ -7798,6 +7798,10 @@ paths:
                           type: string
                           description: Hex format string, e.g. `0x1234567890abcdef`
                           pattern: ^0x[a-fA-F0-9]+$
+                        author:
+                          type: string
+                          description: Hex format string, e.g. `0x1234567890abcdef`
+                          pattern: ^0x[a-fA-F0-9]+$
                         deletedAt:
                           type:
                             - string
@@ -7811,6 +7815,7 @@ paths:
                       required:
                         - id
                         - app
+                        - author
                         - deletedAt
                         - chainId
                         - txHash
