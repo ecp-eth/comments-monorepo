@@ -14,6 +14,7 @@ import { chain } from "@/lib/clientWagmi";
 import { getPublicClient, getWalletClient } from "@wagmi/core";
 import { useConfig } from "wagmi";
 import { sendEditCommentGaslessly } from "../queries/editComment";
+import { useSIWEFetch } from "./useSIWEFetch";
 
 type SubmitGaslessCommentVariables =
   | {
@@ -42,6 +43,7 @@ export function useGaslessPostComment(
 ) {
   const connectAccount = useConnectAccount();
   const wagmiConfig = useConfig();
+  const fetch = useSIWEFetch();
 
   return useMutation<
     PendingPostCommentOperationSchemaType,
@@ -72,6 +74,7 @@ export function useGaslessPostComment(
         },
         walletClient: walletClient,
         gasSponsorship,
+        fetch,
       });
 
       return {
@@ -108,6 +111,7 @@ export function useGaslessEditComment(
 ) {
   const connectAccount = useConnectAccount();
   const wagmiConfig = useConfig();
+  const fetch = useSIWEFetch();
 
   return useMutation<
     Omit<PendingEditCommentOperationSchemaType, "references">,
@@ -138,6 +142,7 @@ export function useGaslessEditComment(
         publicClient,
         walletClient,
         gasSponsorship,
+        fetch,
       });
 
       return {

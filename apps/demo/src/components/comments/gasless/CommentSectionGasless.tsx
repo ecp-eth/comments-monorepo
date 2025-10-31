@@ -47,6 +47,7 @@ import { Heading2 } from "../core/Heading2";
 import { LoadingScreen } from "../core/LoadingScreen";
 import { getSignerURL } from "@/lib/utils";
 import { SIWELoginProvider } from "./SIWELoginProvider";
+import { useSIWEFetch } from "./hooks/useSIWEFetch";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -69,6 +70,7 @@ export function CommentSectionGasless({
     publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     chain,
   );
+  const fetch = useSIWEFetch();
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
@@ -210,7 +212,10 @@ export function CommentSectionGasless({
 
   const gaslessCommentActions = useGaslessCommentActions({
     connectedAddress: viewer,
-    hasApproval: !disableApprovals && !!approvalStatus.data?.approved,
+    gasSponsorship:
+      !disableApprovals && !!approvalStatus.data?.approved
+        ? "gasless-preapproved"
+        : "gasless-not-preapproved",
   });
 
   useEffect(() => {

@@ -49,7 +49,12 @@ function renderZodSchema(
               .map((option) => renderZodSchema(option, false))
               .flatMap((x, i, arr) =>
                 i < arr.length - 1
-                  ? [x, <span className="font-bold">Or: </span>]
+                  ? [
+                      x,
+                      <span key={i} className="font-bold">
+                        Or:{" "}
+                      </span>,
+                    ]
                   : [x],
               )
               .map((x, i) => (

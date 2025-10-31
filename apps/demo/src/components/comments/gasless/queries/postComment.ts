@@ -13,6 +13,8 @@ import { throwKnownResponseCodeError } from "@ecp.eth/shared/errors";
 import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
+import { FetchFn } from "./types";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
 
 class PostCommentGaslesslyError extends Error {}
 
@@ -25,12 +27,14 @@ export async function sendPostCommentGaslessly({
   requestPayload,
   walletClient,
   gasSponsorship,
+  fetch,
 }: {
   requestPayload: z.input<
     typeof SendPostCommentRequestPayloadSchema
   >["comment"];
   walletClient: WalletClient<Transport, Chain, Account>;
   gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
+  fetch: FetchFn;
 }): Promise<PostCommentGaslesslyResult> {
   const { chainId } = requestPayload;
   const commentData = createCommentData({
@@ -44,7 +48,11 @@ export async function sendPostCommentGaslessly({
   });
 
   const deadline = commentData.deadline;
-  const authorSignature = await walletClient.signTypedData(typedCommentData);
+
+  let authorSignature: Hex | undefined;
+  if (gasSponsorship === "gasless-not-preapproved") {
+    authorSignature = await walletClient.signTypedData(typedCommentData);
+  }
 
   const response = await fetch(getSignerURL("/api/post-comment/send"), {
     method: "POST",

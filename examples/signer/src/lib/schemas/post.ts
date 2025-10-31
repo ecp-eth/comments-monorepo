@@ -3,7 +3,6 @@ import {
   SignPostCommentRequestPayloadSchema,
 } from "@ecp.eth/shared/schemas/signer-api/post";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
-import z from "zod";
 
 /**
  * Request payload schema for signing comment to post

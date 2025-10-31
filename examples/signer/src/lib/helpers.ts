@@ -3,7 +3,7 @@ import { createViemAccount } from "@privy-io/server-auth/viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { env } from "./env";
 import type { Hex } from "@ecp.eth/sdk/core";
-import type { z, ZodTypeAny } from "zod";
+import type { z } from "zod";
 import { SUPPORTED_CHAINS, type SupportedChainConfig } from "@ecp.eth/sdk";
 
 export class GaslessNotAvailableError extends Error {

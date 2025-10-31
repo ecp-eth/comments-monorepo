@@ -7,6 +7,7 @@ import {
   Transport,
   WalletClient,
 } from "viem";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { throwKnownResponseCodeError } from "@ecp.eth/shared/errors";
 import type { PendingEditCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
@@ -20,6 +21,7 @@ import {
   SendEditCommentResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/edit";
 import { getSignerURL } from "@/lib/utils";
+import { FetchFn } from "./types";
 
 class EditCommentGaslesslyError extends Error {}
 
@@ -33,11 +35,13 @@ export async function sendEditCommentGaslessly({
   publicClient,
   walletClient,
   gasSponsorship,
+  fetch,
 }: {
   requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
   gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
+  fetch: FetchFn;
 }): Promise<EditCommentGaslesslyResult> {
   const { commentId, content, author, chainId, metadata } = requestPayload;
   const nonce = await getNonce({
@@ -60,7 +64,11 @@ export async function sendEditCommentGaslessly({
   });
 
   const deadline = editCommentData.deadline;
-  const authorSignature = await walletClient.signTypedData(typedCommentData);
+  let authorSignature: Hex | undefined;
+
+  if (gasSponsorship === "gasless-not-preapproved") {
+    authorSignature = await walletClient.signTypedData(typedCommentData);
+  }
 
   const response = await fetch(getSignerURL("/api/edit-comment/send"), {
     method: "POST",

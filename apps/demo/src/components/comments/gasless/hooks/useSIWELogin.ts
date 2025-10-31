@@ -14,6 +14,12 @@ import { SIWETokens } from "../SIWELoginProvider";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentGaslessContext } from "../CommentGaslessProvider";
 
+/**
+ * Call this hook to make sure user is SIWE-logged in after wallet is connected
+ *
+ * @param siweTokensRef
+ * @param onSuccess
+ */
 export function useSIWELogin(
   siweTokensRef: React.RefObject<SIWETokens | undefined>,
   onSuccess: (tokens: SIWETokens) => void,

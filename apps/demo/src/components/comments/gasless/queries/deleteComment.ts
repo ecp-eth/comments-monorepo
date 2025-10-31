@@ -10,6 +10,8 @@ import {
 } from "@ecp.eth/shared/schemas/signer-api/delete";
 import { createDeleteCommentTypedData } from "@ecp.eth/sdk/comments";
 import { getSignerURL } from "@/lib/utils";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
+import { FetchFn } from "./types";
 
 class DeleteCommentGaslesslyError extends Error {}
 
@@ -22,13 +24,14 @@ export async function sendDeleteCommentGaslessly({
   requestPayload,
   walletClient,
   gasSponsorship,
+  fetch,
 }: {
-  requestPayload: Omit<
-    z.input<typeof SendDeleteCommentRequestPayloadSchema>,
-    "authorSignature" | "deadline"
+  requestPayload: z.input<
+    typeof SendDeleteCommentRequestPayloadSchema.shape.delete
   >;
   walletClient: WalletClient<Transport, Chain, Account>;
-  gasSponsorship: "preapproved" | "not-preapproved";
+  gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
+  fetch: FetchFn;
 }): Promise<DeleteCommentGaslesslyResult> {
   const { commentId, author } = requestPayload;
   const chainId = requestPayload.chainId;
@@ -39,7 +42,12 @@ export async function sendDeleteCommentGaslessly({
     chainId,
   });
   const deadline = typedDeleteData.message.deadline;
-  const authorSignature = await walletClient.signTypedData(typedDeleteData);
+
+  let authorSignature: Hex | undefined;
+
+  if (gasSponsorship === "gasless-not-preapproved") {
+    authorSignature = await walletClient.signTypedData(typedDeleteData);
+  }
 
   const response = await fetch(getSignerURL("/api/delete-comment/send"), {
     method: "POST",
@@ -48,7 +56,9 @@ export async function sendDeleteCommentGaslessly({
     },
     body: JSON.stringify(
       {
-        ...requestPayload,
+        delete: {
+          ...requestPayload,
+        },
         authorSignature,
         deadline,
       } satisfies z.input<typeof SendDeleteCommentRequestPayloadSchema>,

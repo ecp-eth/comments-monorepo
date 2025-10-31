@@ -1,5 +1,11 @@
 import z from "zod";
-import { PropsWithChildren, createContext, useEffect, useRef } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { useSIWELogin } from "./hooks/useSIWELogin";
 import { IndexerSIWEVerifyResponseBodySchema } from "@ecp.eth/shared/schemas/indexer-siwe-api/verify";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
@@ -10,13 +16,14 @@ const SIWETokensSchema = IndexerSIWEVerifyResponseBodySchema.extend({
   address: HexSchema,
 });
 export type SIWETokens = z.output<typeof SIWETokensSchema>;
-export const SIWELoginProviderContext = createContext<SIWETokens | undefined>(
-  undefined,
-);
+export const SIWELoginProviderContext = createContext<{
+  tokens?: SIWETokens;
+}>({});
 
 export function SIWELoginProvider({ children }: PropsWithChildren) {
   const { address: connectedAddress } = useAccount();
   const siweTokensRef = useRef<SIWETokens | undefined>(undefined);
+
   useEffect(() => {
     if (!connectedAddress) {
       return;
@@ -42,8 +49,18 @@ export function SIWELoginProvider({ children }: PropsWithChildren) {
   });
 
   return (
-    <SIWELoginProviderContext.Provider value={siweTokensRef.current}>
+    <SIWELoginProviderContext.Provider
+      value={{
+        get tokens() {
+          return siweTokensRef.current;
+        },
+      }}
+    >
       {children}
     </SIWELoginProviderContext.Provider>
   );
+}
+
+export function useSIWELoginProvider() {
+  return useContext(SIWELoginProviderContext);
 }
