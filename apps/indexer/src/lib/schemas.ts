@@ -410,6 +410,7 @@ export const GetApprovalsQuerySchema = z
 export const GetApprovalSchema = z.object({
   id: z.string(),
   app: OpenAPIHexSchema,
+  author: OpenAPIHexSchema,
   deletedAt: z.coerce.date().nullable(),
   chainId: z.number().int(),
   txHash: OpenAPIHexSchema,

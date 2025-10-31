@@ -3,6 +3,7 @@ import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, desc, eq, inArray } from "ponder";
 import {
+  APIErrorResponseSchema,
   GetApprovalsQuerySchema,
   GetApprovalsResponseSchema,
 } from "../../lib/schemas";
@@ -23,6 +24,22 @@ const getApprovalsRoute = createRoute({
         },
       },
       description: "Retrieve a list of approvals according to the criteria",
+    },
+    400: {
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
+      description: "Invalid request",
+    },
+    500: {
+      description: "Internal server error",
+      content: {
+        "application/json": {
+          schema: APIErrorResponseSchema,
+        },
+      },
     },
   },
 });
@@ -55,7 +72,7 @@ export default (app: OpenAPIHono) => {
       },
     };
 
-    return c.json(res);
+    return c.json(res, 200);
   });
 
   return app;

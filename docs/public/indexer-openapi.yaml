@@ -7798,6 +7798,10 @@ paths:
                           type: string
                           description: Hex format string, e.g. `0x1234567890abcdef`
                           pattern: ^0x[a-fA-F0-9]+$
+                        author:
+                          type: string
+                          description: Hex format string, e.g. `0x1234567890abcdef`
+                          pattern: ^0x[a-fA-F0-9]+$
                         deletedAt:
                           type:
                             - string
@@ -7811,6 +7815,7 @@ paths:
                       required:
                         - id
                         - app
+                        - author
                         - deletedAt
                         - chainId
                         - txHash
@@ -7830,6 +7835,30 @@ paths:
                 required:
                   - results
                   - pagination
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
   /api/authors/{authorAddress}:
     get:
       tags:
