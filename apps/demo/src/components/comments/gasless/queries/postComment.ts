@@ -1,0 +1,90 @@
+import z from "zod";
+import {
+  SendPostCommentRequestPayloadSchema,
+  SendPostCommentResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/post";
+import { publicEnv } from "@/publicEnv";
+import {
+  createCommentData,
+  createCommentTypedData,
+} from "@ecp.eth/sdk/comments";
+import { Account, type Chain, Transport, type WalletClient } from "viem";
+import { throwKnownResponseCodeError } from "@ecp.eth/shared/errors";
+import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
+import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { getSignerURL } from "@/lib/utils";
+import { DistributiveOmit } from "@ecp.eth/shared/types";
+
+class PostCommentGaslesslyError extends Error {}
+
+type PostCommentGaslesslyResult = Omit<
+  PendingPostCommentOperationSchemaType,
+  "references" | "resolvedAuthor"
+>;
+
+export async function sendPostCommentGaslesslyNotPreapproved({
+  requestPayload,
+  walletClient,
+}: {
+  requestPayload: DistributiveOmit<
+    z.input<typeof SendPostCommentRequestPayloadSchema>,
+    "authorSignature" | "deadline"
+  >;
+  walletClient: WalletClient<Transport, Chain, Account>;
+}): Promise<PostCommentGaslesslyResult> {
+  const { chainId } = requestPayload;
+  const commentData = createCommentData({
+    ...requestPayload,
+    app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+  });
+
+  const typedCommentData = createCommentTypedData({
+    commentData,
+    chainId,
+  });
+
+  const deadline = commentData.deadline;
+  const authorSignature = await walletClient.signTypedData(typedCommentData);
+
+  const response = await fetch(getSignerURL("/api/post-comment/send"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(
+      {
+        ...requestPayload,
+        authorSignature,
+        deadline,
+      } satisfies z.input<typeof SendPostCommentRequestPayloadSchema>,
+      bigintReplacer,
+    ),
+  });
+
+  if (!response.ok) {
+    await throwKnownResponseCodeError(response);
+
+    throw new PostCommentGaslesslyError(
+      "Failed to post comment sponsored, please try again.",
+    );
+  }
+
+  const postCommentResult = SendPostCommentResponseBodySchema.safeParse(
+    await response.json(),
+  );
+
+  if (!postCommentResult.success) {
+    throw new PostCommentGaslesslyError(
+      "Server returned malformed posted comment data, please try again.",
+    );
+  }
+
+  return {
+    txHash: postCommentResult.data.txHash,
+    response: postCommentResult.data,
+    type: "gasless-not-preapproved",
+    action: "post",
+    state: { status: "pending" },
+    chainId,
+  };
+}

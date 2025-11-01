@@ -1,7 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import type { Hex } from "viem";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { deletePriorApprovedCommentMutationFunction } from "../queries";
+import { sendDeleteCommentGaslesslyNotPreapproved } from "../queries/deleteComment";
+import { useConfig } from "wagmi";
+import { getWalletClient } from "@wagmi/core";
+import { chain } from "@/lib/clientWagmi";
 
 /**
  * Deletes a comment that was previously approved, so not need for
@@ -12,15 +15,22 @@ export function useDeletePriorApprovedCommentMutation({
 }: {
   connectedAddress: Hex | undefined;
 }) {
+  const wagmiConfig = useConfig();
   return useMutation({
     mutationFn: async (comment: Comment) => {
       if (!connectedAddress) {
         throw new Error("No connected address");
       }
 
-      const result = await deletePriorApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
+      const walletClient = await getWalletClient(wagmiConfig);
+
+      const result = await sendDeleteCommentGaslesslyNotPreapproved({
+        requestPayload: {
+          chainId: chain.id,
+          commentId: comment.id,
+          author: connectedAddress,
+        },
+        walletClient,
       });
 
       return result.txHash;

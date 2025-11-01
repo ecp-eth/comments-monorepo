@@ -3,7 +3,7 @@ import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
 import { useCommentEdition } from "@ecp.eth/shared/hooks";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
-import { submitEditComment } from "@/components/comments/queries/submitEditComment";
+import { submitEditComment } from "@/components/comments/queries/editComment";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { Hex } from "@ecp.eth/sdk/core/schemas";

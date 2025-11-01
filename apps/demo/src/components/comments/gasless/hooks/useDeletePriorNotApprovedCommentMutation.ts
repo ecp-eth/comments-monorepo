@@ -1,56 +1,39 @@
-import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
+import { useMutation } from "@tanstack/react-query";
 import type { Hex } from "viem";
-import { DeleteCommentResponseSchema } from "@/lib/schemas";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import type { Comment } from "@ecp.eth/shared/schemas";
-import { deletePriorNotApprovedCommentMutationFunction } from "../queries";
+import { sendDeleteCommentGaslesslyNotPreapproved } from "../queries/deleteComment";
+import { useConfig } from "wagmi";
+import { getWalletClient } from "@wagmi/core";
+import { chain } from "@/lib/clientWagmi";
 
 /**
- * Delete a comment that without prior approval, this will require user interaction for signature
+ * Deletes a comment that was previously approved, so not need for
+ * user approval for signature on each transaction
  */
 export function useDeletePriorNotApprovedCommentMutation({
   connectedAddress,
 }: {
   connectedAddress: Hex | undefined;
 }) {
-  return useGaslessTransaction({
-    async prepareSignTypedDataParams(comment: Comment) {
+  const wagmiConfig = useConfig();
+  return useMutation({
+    mutationFn: async (comment: Comment) => {
       if (!connectedAddress) {
-        throw new Error("No address found");
+        throw new Error("No connected address");
       }
 
-      const data = await deletePriorNotApprovedCommentMutationFunction({
-        address: connectedAddress,
-        commentId: comment.id,
-      });
+      const walletClient = await getWalletClient(wagmiConfig);
 
-      return {
-        signTypedDataParams: data.signTypedDataParams,
-        variables: data,
-      };
-    },
-    async sendSignedData({ signature, variables }) {
-      const response = await fetch("/api/delete-comment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const result = await sendDeleteCommentGaslesslyNotPreapproved({
+        requestPayload: {
+          chainId: chain.id,
+          commentId: comment.id,
+          author: connectedAddress,
         },
-        body: JSON.stringify(
-          {
-            ...variables,
-            authorSignature: signature,
-          },
-          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
-        ),
+        walletClient,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to post approval signature");
-      }
-
-      const data = DeleteCommentResponseSchema.parse(await response.json());
-
-      return data.txHash;
+      return result.txHash;
     },
   });
 }

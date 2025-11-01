@@ -4,11 +4,20 @@ import {
   SignEditCommentPayloadRequestSchema,
   SignEditCommentPayloadRequestSchemaType,
 } from "@/lib/schemas";
+// TODO: remove unused schemas from here and from shared package
+// import {
+//   SignCommentResponseClientSchema,
+//   SignEditCommentResponseClientSchema,
+//   type SignCommentResponseClientSchemaType,
+// } from "@ecp.eth/shared/schemas";
 import {
-  SignCommentResponseClientSchema,
-  SignEditCommentResponseClientSchema,
-  type SignCommentResponseClientSchemaType,
-} from "@ecp.eth/shared/schemas";
+  SignPostCommentRequestPayloadSchema,
+  SignPostCommentResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/post";
+import {
+  SignEditCommentRequestPayloadSchema,
+  SignEditCommentResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/edit";
 import { publicEnv } from "@/publicEnv";
 import {
   fetchAuthorData,
@@ -23,12 +32,15 @@ import {
 import { chain } from "@/lib/clientWagmi";
 import type {
   Comment,
+  CommentDataWithIdSchemaType,
   PendingEditCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import type { DistributiveOmit } from "@ecp.eth/shared/types";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import { getSignerURL } from "@/lib/utils";
+import z from "zod";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
@@ -45,7 +57,10 @@ type SubmitCommentParams = {
   zeroExSwap: IndexerAPICommentZeroExSwapSchemaType | null;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {
-    signCommentResponse: SignCommentResponseClientSchemaType;
+    signCommentResponse: {
+      signature: Hex;
+      data: CommentDataWithIdSchemaType;
+    };
     chainId: number;
   }) => Promise<Hex>;
   references: IndexerAPICommentReferencesSchemaType;
@@ -89,12 +104,15 @@ export async function submitCommentMutationFunction({
     throw new SubmitCommentMutationError("Failed to switch chain.");
   }
 
-  const response = await fetch("/api/sign-comment", {
+  const response = await fetch(getSignerURL("/api/post-comment/sign"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(commentData),
+    body: JSON.stringify({
+      ...commentData,
+      chainId: chain.id,
+    } satisfies z.input<typeof SignPostCommentRequestPayloadSchema>),
   });
 
   if (!response.ok) {
@@ -105,7 +123,7 @@ export async function submitCommentMutationFunction({
     );
   }
 
-  const signedCommentResult = SignCommentResponseClientSchema.safeParse(
+  const signedCommentResult = SignPostCommentResponseBodySchema.safeParse(
     await response.json(),
   );
 
@@ -197,12 +215,15 @@ export async function submitEditCommentMutationFunction({
     throw new SubmitEditCommentMutationError("Failed to switch chain.");
   }
 
-  const response = await fetch("/api/sign-edit-comment", {
+  const response = await fetch(getSignerURL("/api/edit-comment/sign"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(commentData),
+    body: JSON.stringify({
+      ...commentData,
+      chainId: chain.id,
+    } satisfies z.input<typeof SignEditCommentRequestPayloadSchema>),
   });
 
   if (!response.ok) {
@@ -213,7 +234,7 @@ export async function submitEditCommentMutationFunction({
     );
   }
 
-  const signedCommentResult = SignEditCommentResponseClientSchema.safeParse(
+  const signedCommentResult = SignEditCommentResponseBodySchema.safeParse(
     await response.json(),
   );
 
