@@ -10,6 +10,7 @@ import {
 import { CommentDataWithIdSchema } from "@ecp.eth/shared/schemas";
 import { z } from "zod";
 import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
+import { IndexerSIWEVerifyResponseBodySchema } from "@ecp.eth/shared/schemas/indexer-siwe-api/verify";
 
 export const GenerateUploadUrlResponseSchema = z.object({
   url: z.string().url(),
@@ -260,3 +261,8 @@ export const InternalServerErrorResponseSchema = z.object({
 export const ApproveResponseSchema = z.object({
   txHash: HexSchema,
 });
+
+export const SIWETokensSchema = IndexerSIWEVerifyResponseBodySchema.extend({
+  address: HexSchema,
+});
+export type SIWETokens = z.output<typeof SIWETokensSchema>;

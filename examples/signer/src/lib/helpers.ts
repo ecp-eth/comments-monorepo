@@ -149,12 +149,23 @@ export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
       throw new Error("Invalid chain ID");
     }
 
-    return {
-      ...val,
+    const chainConfigContainer = {
+      ...chainIdContainer,
       chainConfig:
         SUPPORTED_CHAINS[
           chainIdContainer.chainId as keyof typeof SUPPORTED_CHAINS
         ],
+    };
+
+    return {
+      ...val,
+      ...(key === undefined
+        ? chainConfigContainer
+        : {
+            [key]: {
+              ...chainConfigContainer,
+            },
+          }),
     };
   });
 
@@ -170,5 +181,5 @@ export function getPEMPublicKey(publicKey: string) {
     return publicKey;
   }
 
-  return `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
+  return `-----BEGIN PUBLIC KEY-----\n${publicKey.replace(/(.{64})/g, "$1\n")}\n-----END PUBLIC KEY-----`;
 }

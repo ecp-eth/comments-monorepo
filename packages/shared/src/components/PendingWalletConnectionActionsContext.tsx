@@ -83,15 +83,7 @@ export const PendingWalletConnectionActionsProvider = ({
       return;
     }
 
-    console.log(
-      "awaiting onAfterConnectResultPromise",
-      contextValue.current?.onAfterConnectResultPromise,
-    );
     await contextValue.current?.onAfterConnectResultPromise;
-    console.log(
-      "awaited onAfterConnectResultPromise",
-      contextValue.current?.onAfterConnectResultPromise,
-    );
 
     const actions = actionsRef.current;
     const handlers = handlersRef.current;

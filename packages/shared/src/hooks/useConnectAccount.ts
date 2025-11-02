@@ -107,10 +107,6 @@ export function useConnectAccount() {
 
     const onAfterConnectPromise =
       pendingWalletConnectionActionsContext.onAfterConnect?.();
-    console.log(
-      "called onAfterConnect, onAfterConnectPromise",
-      onAfterConnectPromise,
-    );
 
     // PendingWalletConnectionActionsContext will not await connectAccount to finish, so we need let it know the promise
     // so it awaits it before triggering the actions

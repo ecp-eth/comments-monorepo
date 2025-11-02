@@ -14,7 +14,7 @@ import { chain } from "@/lib/clientWagmi";
 import { getPublicClient, getWalletClient } from "@wagmi/core";
 import { useConfig } from "wagmi";
 import { sendEditCommentGaslessly } from "../queries/editComment";
-import { useSIWEFetch } from "./useSIWEFetch";
+import { useSIWEFetch } from "../../../../hooks/useSIWEFetch";
 
 type SubmitGaslessCommentVariables =
   | {

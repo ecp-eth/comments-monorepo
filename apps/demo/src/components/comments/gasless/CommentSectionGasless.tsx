@@ -46,8 +46,8 @@ import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
 import { LoadingScreen } from "../core/LoadingScreen";
 import { getSignerURL } from "@/lib/utils";
-import { SIWELoginProvider } from "./SIWELoginProvider";
-import { useSIWEFetch } from "./hooks/useSIWEFetch";
+import { useSIWEFetch } from "@/hooks/useSIWEFetch";
+import { SIWELoginProvider } from "@/components/comments/core/SIWELoginProvider";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;

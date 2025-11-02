@@ -2,7 +2,7 @@ import type { Hex } from "viem";
 import { useMutation } from "@tanstack/react-query";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { useConfig } from "wagmi";
-import { useSIWEFetch } from "./useSIWEFetch";
+import { useSIWEFetch } from "../../../../hooks/useSIWEFetch";
 import { getWalletClient } from "@wagmi/core";
 import { sendDeleteCommentGaslessly } from "../queries/deleteComment";
 import { chain } from "@/lib/clientWagmi";

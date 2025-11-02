@@ -54,7 +54,7 @@ export const throwKnownResponseCodeError = async (response: Response) => {
   }
 
   if (response.status === 400) {
-    throw new CommentFormSubmitError(await response.json());
+    throw new CommentFormSubmitError(JSON.stringify(await response.json()));
   }
 
   if (response.status === 413) {

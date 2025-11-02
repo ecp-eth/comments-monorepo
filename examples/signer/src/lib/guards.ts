@@ -76,15 +76,19 @@ export async function guardAuthorSignature({
     }
 
     const accessToken = authorizationHeader.replace(/^bearer\s+/i, "");
-    const publicKey = await jose.importPKCS8(
+    const publicKey = await jose.importSPKI(
       getPEMPublicKey(env.SIWE_ACCESS_TOKEN_PUBLIC_KEY),
       "RS256",
     );
-    const jwtResult = await jose.jwtVerify(accessToken, publicKey);
-    const { payload } = jwtResult;
-
-    // TODO: do we want to check `aud` and `iss`?
-    if (payload.address !== authorAddress) {
+    const verifyResult = await jose.jwtVerify(accessToken, publicKey);
+    if (
+      verifyResult.payload.sub?.toLowerCase() !== authorAddress.toLowerCase()
+    ) {
+      console.error(
+        "Invalid author address",
+        verifyResult.payload.sub,
+        authorAddress,
+      );
       throw new JSONResponse(
         ErrorResponseBodySchema,
         { error: "Invalid author address" },

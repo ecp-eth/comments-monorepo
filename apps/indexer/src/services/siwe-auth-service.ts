@@ -131,7 +131,8 @@ export class SiweAuthService implements ISiweAuthService {
         throw new SiweAuthService_JwtTokenInvalidAudienceError();
       }
 
-      const { id } = refreshTokenPayloadSchema.parse(decodedJWTToken);
+      const { id, sub: eoaAddress } =
+        refreshTokenPayloadSchema.parse(decodedJWTToken);
       const now = Math.floor(Date.now() / 1000);
       const refreshTokenExpiresAt = now + this.options.jwtRefreshTokenLifetime;
 
@@ -197,8 +198,13 @@ export class SiweAuthService implements ISiweAuthService {
           accessToken: await this.createAccessToken(
             newRefreshToken.userAuthSessionId,
             now,
+            eoaAddress,
           ),
-          refreshToken: await this.createRefreshToken(newRefreshToken.id, now),
+          refreshToken: await this.createRefreshToken(
+            newRefreshToken.id,
+            now,
+            eoaAddress,
+          ),
         };
       });
 
@@ -414,10 +420,11 @@ export class SiweAuthService implements ISiweAuthService {
         }
 
         return {
-          accessToken: await this.createAccessToken(session.id, now),
+          accessToken: await this.createAccessToken(session.id, now, address),
           refreshToken: await this.createRefreshToken(
             storedRefreshToken.id,
             now,
+            address,
           ),
         };
       });
@@ -432,6 +439,7 @@ export class SiweAuthService implements ISiweAuthService {
      * Current timestamp in seconds
      */
     now: number,
+    eoaAddress: Hex,
   ): Promise<{
     token: string;
     expiresAt: number;
@@ -446,6 +454,8 @@ export class SiweAuthService implements ISiweAuthService {
         iss: this.options.jwtAccessTokenIssuer,
         ...accessTokenPayloadSchema.parse({
           sessionId,
+          // adding the eoa to the subject (sub) claim so other projects can verify the ownership of the access token
+          sub: eoaAddress,
         }),
       },
       getPEMPrivateKey(this.options.jwtAccessTokenPrivateKey),
@@ -464,6 +474,7 @@ export class SiweAuthService implements ISiweAuthService {
      * Current timestamp in seconds
      */
     now: number,
+    eoaAddress: Hex,
   ): Promise<{
     token: string;
     expiresAt: number;
@@ -478,6 +489,7 @@ export class SiweAuthService implements ISiweAuthService {
         iss: this.options.jwtRefreshTokenIssuer,
         ...refreshTokenPayloadSchema.parse({
           id: refreshTokenId,
+          sub: eoaAddress,
         }),
       },
       getPEMPrivateKey(this.options.jwtRefreshTokenPrivateKey),
@@ -518,10 +530,12 @@ const nonceTokenPayloadSchema = z.object({
 
 const accessTokenPayloadSchema = z.object({
   sessionId: z.string().uuid(),
+  sub: HexSchema,
 });
 
 const refreshTokenPayloadSchema = z.object({
   id: z.string().uuid(),
+  sub: HexSchema,
 });
 
 export type SiweAuthService_GenerateNonceAndTokenResult = {
