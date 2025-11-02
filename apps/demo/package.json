@@ -44,6 +44,7 @@
     "pinata": "^2.5.0",
     "react": "~19.1.0",
     "react-dom": "~19.1.0",
+    "siwe": "^3.0.0",
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",

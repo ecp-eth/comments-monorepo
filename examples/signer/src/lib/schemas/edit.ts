@@ -10,6 +10,7 @@ import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 export const SignEditCommentRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SignEditCommentRequestPayloadSchema,
+    undefined,
   );
 
 /**
@@ -18,4 +19,5 @@ export const SignEditCommentRequestPayloadRestrictedSchema =
 export const SendEditCommentRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SendEditCommentRequestPayloadSchema,
+    "edit",
   );

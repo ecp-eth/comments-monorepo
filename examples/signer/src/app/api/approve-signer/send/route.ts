@@ -50,7 +50,6 @@ export async function POST(
 
     const chain = chainConfig.chain;
     const transport = http(getRpcUrl(chain.id));
-
     const publicClient = createPublicClient({
       chain,
       transport,
@@ -70,6 +69,7 @@ export async function POST(
       authorSignature,
       signTypedDataParams,
       authorAddress,
+      request: req,
     });
 
     const appSignerAccount = await getGaslessSigner();

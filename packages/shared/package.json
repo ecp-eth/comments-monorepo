@@ -73,6 +73,11 @@
       "import": "./dist/esm/schemas/signer-api/*.js",
       "default": "./dist/cjs/schemas/signer-api/*.cjs"
     },
+    "./schemas/indexer-siwe-api/*": {
+      "types": "./dist/esm/schemas/indexer-siwe-api/*.d.ts",
+      "import": "./dist/esm/schemas/indexer-siwe-api/*.js",
+      "default": "./dist/cjs/schemas/indexer-siwe-api/*.cjs"
+    },
     "./services/*": {
       "types": "./dist/esm/services/*.d.ts",
       "import": "./dist/esm/services/*.js",

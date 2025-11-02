@@ -16,6 +16,7 @@
     "@hpke/core": "^1.7.2",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.0",
+    "jose": "^6.1.0",
     "next": "^15.3.0",
     "react": "~19.1.0",
     "react-dom": "~19.1.0",

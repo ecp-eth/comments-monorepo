@@ -1,7 +1,9 @@
+import { cn } from "@ecp.eth/shared/helpers";
 import type {
   ZodArray,
   ZodDefault,
   ZodFirstPartyTypeKind,
+  ZodLiteral,
   ZodObject,
   ZodOptional,
   ZodSchema,
@@ -36,25 +38,31 @@ function renderZodSchema(
     case "ZodUnion": {
       const typedSchema = schema as ZodUnion<[ZodSchema]>;
       return (
-        <>
-          {typedSchema.options
-            .map((option) => renderZodSchema(option, hasArraySubfix))
-            .flatMap((x, i, arr) =>
-              i < arr.length - 1
-                ? [
-                    x,
-                    <>
-                      <br />
-                      <br />
-                      <span>Or: </span>
-                    </>,
-                  ]
-                : [x],
-            )
-            .map((x, i) => (
-              <div key={i}>{x}</div>
-            ))}
-        </>
+        <div
+          className={cn(
+            hasArraySubfix && "border-l-[1px] border-l-[#EFEFEF] pl-4",
+          )}
+        >
+          {hasArraySubfix && <span>(</span>}
+          <div className="border-l-[1px] border-l-[#EFEFEF] pl-4">
+            {typedSchema.options
+              .map((option) => renderZodSchema(option, false))
+              .flatMap((x, i, arr) =>
+                i < arr.length - 1
+                  ? [
+                      x,
+                      <span key={i} className="font-bold">
+                        Or:{" "}
+                      </span>,
+                    ]
+                  : [x],
+              )
+              .map((x, i) => (
+                <div key={i}>{x}</div>
+              ))}
+          </div>
+          {hasArraySubfix && <span>)[]</span>}
+        </div>
       );
     }
     case "ZodObject": {
@@ -62,7 +70,7 @@ function renderZodSchema(
       return (
         <>
           {"{"}
-          <div className="ml-4">
+          <div className="border-l-[1px] border-l-[#EFEFEF] pl-4">
             {Object.entries(typedSchema.shape).map(([key, value]) => (
               <div className="gap-2 flex" key={key}>
                 <div>
@@ -123,8 +131,21 @@ function renderZodSchema(
         </>
       );
     }
+    case "ZodLiteral": {
+      const typedSchema = schema as ZodLiteral<unknown>;
+      return (
+        <>
+          <span className="inline-block rounded-md px-1 py-0.5 bg-[#f0f0f0] text-[#666]">
+            {JSON.stringify(typedSchema.value) + (hasArraySubfix ? "[]" : "")}
+          </span>
+          {schema.description && (
+            <span className="text-[#999]">{" // " + schema.description}</span>
+          )}
+        </>
+      );
+    }
     default:
-      console.log(typeName);
+      console.log(`${typeName} should be supported by we did not implement it`);
       // typeName satisfies never;
       throw new Error(`Unsupported schema type: ${typeName}`);
   }

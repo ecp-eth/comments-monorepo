@@ -7,4 +7,5 @@ import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 export const SendApproveSignerRequestPayloadRestrictedSchema =
   augmentZodSchemaWithAllowedChainIdAndChainConfig(
     SendApproveSignerRequestPayloadSchema,
+    undefined,
   );

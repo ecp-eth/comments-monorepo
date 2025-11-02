@@ -1,22 +1,18 @@
 import { z } from "zod/v3";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { AuthorSignatureSchema } from "./shared";
 
 /**
  * Payload schema for deleting comment gaslessly
  */
 export const SendDeleteCommentRequestPayloadSchema = z.object({
-  commentId: HexSchema,
-  author: HexSchema,
-  chainId: z.coerce.number(),
-  authorSignature: HexSchema.describe(
-    "Signature of the author, required if the user has not approved our submitter address",
-  ),
-  deadline: z.coerce
-    .bigint()
-    .optional()
-    .describe(
-      "Deadline of the request, required if the user has not approved our submitter address",
-    ),
+  delete: z.object({
+    commentId: HexSchema,
+    author: HexSchema,
+    chainId: z.coerce.number(),
+  }),
+  authorSignature: AuthorSignatureSchema,
+  deadline: z.coerce.bigint().optional().describe("Deadline of the request"),
 });
 
 /**
