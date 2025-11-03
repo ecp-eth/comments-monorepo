@@ -48,7 +48,15 @@ export function SIWELoginProvider({ children }: PropsWithChildren) {
       return;
     }
 
-    const parseResult = SIWETokensSchema.safeParse(JSON.parse(tokens));
+    let jsonToken: unknown;
+    try {
+      jsonToken = JSON.parse(tokens);
+    } catch {
+      localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+      return;
+    }
+
+    const parseResult = SIWETokensSchema.safeParse(jsonToken);
     if (!parseResult.success) {
       localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
       return;
