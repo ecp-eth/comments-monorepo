@@ -130,7 +130,7 @@ function useSIWELogin(onSuccess: (tokens: SIWETokens) => void) {
         return;
       }
 
-      const walletClient = getWalletClient(wagmiConfig);
+      const walletClient = await getWalletClient(wagmiConfig);
       onSuccessRef.current(await getNewTokens(connectedAddress, walletClient));
     })().finally(() => {
       loginPromiseRef.current = undefined;
@@ -154,6 +154,10 @@ function useSIWELogin(onSuccess: (tokens: SIWETokens) => void) {
   useEffect(() => {
     pendingWalletConnectionActions.onAfterConnect = async () => {
       await handleSIWELogin();
+    };
+
+    return () => {
+      pendingWalletConnectionActions.onAfterConnect = undefined;
     };
   }, [handleSIWELogin, pendingWalletConnectionActions]);
 }
@@ -199,7 +203,7 @@ function areTokensActiveAndCurrent(tokens: SIWETokens, address: Hex): boolean {
 
 async function getNewTokens(
   address: Hex,
-  walletClient: ReturnType<typeof getWalletClient>,
+  walletClient: Awaited<ReturnType<typeof getWalletClient>>,
 ) {
   const nonceResponse = await fetch(getIndexerURL("/api/auth/siwe/nonce"));
 
@@ -226,9 +230,7 @@ async function getNewTokens(
     nonce,
   }).prepareMessage();
 
-  const signature = await (
-    await walletClient
-  ).signMessage({
+  const signature = await walletClient.signMessage({
     message,
   });
 
