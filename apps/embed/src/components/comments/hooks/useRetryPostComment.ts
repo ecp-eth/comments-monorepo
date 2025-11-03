@@ -59,12 +59,17 @@ export function useRetryPostComment({
         throw new Error("Only post comments can be retried");
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const pendingOperation = {
         ...(await submitPostComment({
-          author: connectedAddress,
-          postCommentRequest: {
+          requestPayload: {
+            author: connectedAddress,
             chainId: comment.pendingOperation.chainId,
             content: comment.content,
+            metadata: comment.metadata,
             ...(comment.parentId
               ? {
                   parentId: comment.parentId,

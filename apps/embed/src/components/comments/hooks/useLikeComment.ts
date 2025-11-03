@@ -54,6 +54,10 @@ export const useLikeComment = () => {
         );
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const walletClient = await getWalletClient(wagmiConfig);
 
       const { comment, queryKey, onBeforeStart, onFailed, onSuccess } = params;
@@ -73,13 +77,14 @@ export const useLikeComment = () => {
       try {
         pendingOperation = {
           ...(await submitPostComment({
-            author: connectedAddress,
-            postCommentRequest: {
+            requestPayload: {
+              author: connectedAddress,
               content: COMMENT_REACTION_LIKE_CONTENT,
               commentType: COMMENT_TYPE_REACTION,
               parentId: comment.id,
               chainId: comment.chainId,
               channelId,
+              metadata: [],
             },
             switchChainAsync(chainId) {
               return switchChainAsync({ chainId });

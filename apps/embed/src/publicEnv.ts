@@ -19,6 +19,7 @@ export const publicEnvSchema = z.object({
     .enum(["1", "0"])
     .default("0")
     .transform((val) => val === "1"),
+  NEXT_PUBLIC_SIGNER_API_URL: z.string().url(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -38,4 +39,5 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL:
     process.env.NEXT_PUBLIC_BLOCK_EXPLORER_TX_URL,
   NEXT_PUBLIC_ENABLE_GASLESS: process.env.NEXT_PUBLIC_ENABLE_GASLESS,
+  NEXT_PUBLIC_SIGNER_API_URL: process.env.NEXT_PUBLIC_SIGNER_API_URL,
 });

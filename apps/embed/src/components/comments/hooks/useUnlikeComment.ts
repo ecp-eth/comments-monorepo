@@ -76,8 +76,8 @@ export const useUnlikeComment = () => {
 
         const commentId = reaction.id;
         const { txHash } = await submitDeleteComment({
-          author: viewer,
-          deleteCommentRequest: {
+          requestPayload: {
+            author: viewer,
             commentId: commentId,
             chainId: config.chainId,
           },

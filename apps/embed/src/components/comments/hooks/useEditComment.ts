@@ -53,11 +53,12 @@ export function useEditComment() {
 
       const pendingOperation = {
         ...(await submitEditComment({
-          address: author,
-          comment,
-          editRequest: {
+          requestPayload: {
+            author,
+            commentId: comment.id,
             chainId,
             content,
+            metadata: comment.metadata,
           },
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });

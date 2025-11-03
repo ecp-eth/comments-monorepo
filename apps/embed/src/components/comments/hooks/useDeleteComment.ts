@@ -37,8 +37,8 @@ export function useDeleteComment(): OnCommentDelete {
         }
 
         const pendingOperation = await submitDeleteComment({
-          author: viewer,
-          deleteCommentRequest: {
+          requestPayload: {
+            author: viewer,
             commentId: params.commentId,
             chainId: config.chainId,
           },

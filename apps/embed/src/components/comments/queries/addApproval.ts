@@ -1,13 +1,15 @@
-import { AddApprovalStatusRequestBodySchemaType } from "@/lib/schemas";
-import { publicEnv } from "@/publicEnv";
+import z from "zod";
+import { SignTypedDataMutateAsync } from "wagmi/query";
 import {
   ContractReadFunctions,
   createApprovalTypedData,
   getNonce,
 } from "@ecp.eth/sdk/comments";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
+import { SendApproveSignerRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/approve";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import { SignTypedDataMutateAsync } from "wagmi/query";
+import { getSignerURL } from "@/lib/utils";
+import { publicEnv } from "@/publicEnv";
 
 export async function addApproval({
   author,
@@ -35,7 +37,7 @@ export async function addApproval({
 
   const authorSignature = await signTypedDataAsync(signTypedDataParams);
 
-  const response = await fetch("/api/add-approval", {
+  const response = await fetch(getSignerURL("/api/add-approval/send"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -46,7 +48,7 @@ export async function addApproval({
         authorSignature,
         authorAddress: author,
         chainId,
-      } satisfies AddApprovalStatusRequestBodySchemaType,
+      } satisfies z.input<typeof SendApproveSignerRequestPayloadSchema>,
       bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
     ),
   });
