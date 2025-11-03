@@ -217,7 +217,7 @@ export default function HomePage() {
           {/* Approve App Signer - Send (Gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">
+              <h3 id="api-approve-signer-send" className="text-lg font-medium">
                 POST /api/approve-signer/send
               </h3>
               <span
@@ -248,6 +248,92 @@ export default function HomePage() {
                 enable gasless signing.
               </div>
             )}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4">SIWE Authentication</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            For pre-approved gasless operations (allowing authors to comment
+            without repetitive signing), the signer service integrates with the
+            ECP Indexer&apos;s <strong>Sign-In with Ethereum (SIWE)</strong>{" "}
+            system to enable secure, wallet-based authentication.
+            <br />
+            <br />
+            To enable this feature, the client must request author&apos;s
+            approval for adding the gasless signer address to the approved
+            signers list, using the{" "}
+            <a href="#api-approve-signer-send" className="text-blue-600">
+              <code>/api/approve-signer/send</code>
+            </a>{" "}
+            endpoint.
+          </p>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">How It Works</h3>
+            <p>
+              A detailed API reference{" "}
+              <a
+                href="https://docs.ethcomments.xyz/indexer-reference/restful"
+                className="text-blue-600"
+              >
+                can be found here
+              </a>
+              . Below is a breakdown of the process:
+            </p>
+            <ol className="list-decimal list-inside space-y-2 ml-2">
+              <li>
+                <strong>Get Nonce:</strong> The client requests a nonce from the
+                indexer&apos;s <code>/api/auth/siwe/nonce</code> endpoint. The
+                indexer generates a random nonce and issues a short-lived JWT
+                nonce token signed with RS256.
+              </li>
+              <li>
+                <strong>Sign Message:</strong> The user signs a SIWE message
+                containing their wallet address, domain, chain ID, and the nonce
+                using their wallet.
+              </li>
+              <li>
+                <strong>Verify & Get Tokens:</strong> The client sends the
+                signed message and nonce token to{" "}
+                <code>/api/auth/siwe/verify</code>. The indexer verifies the
+                signature on-chain and issues two RS256-signed JWT tokens:
+                <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                  <li>
+                    <strong>Access Token:</strong> Short-lived (default 15
+                    minutes) for API authentication
+                  </li>
+                  <li>
+                    <strong>Refresh Token:</strong> Long-lived (default 30 days)
+                    for obtaining new access tokens
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <strong>Use Tokens:</strong> The access token is included in API
+                requests as a <code>Bearer</code> token in the{" "}
+                <code>Authorization</code> header. When `authorSignature` is not
+                provided, the `Send` endpoints in this service will verify the
+                SIWE access tokens using the indexer&apos;s public RSA keys.
+              </li>
+            </ol>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">
+              Token Storage and Management
+            </h3>
+            <ol className="list-decimal list-inside space-y-2 ml-2">
+              <li>
+                SIWE tokens are stored in the client, please ensure they are
+                stored securely and not shared with unauthorized parties.
+              </li>
+              <li>
+                The client should implement a mechanism to refresh the access
+                token when it is expired.
+              </li>
+            </ol>
           </div>
         </div>
       </div>
