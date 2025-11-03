@@ -6,6 +6,7 @@ import {
   useEffect,
   useCallback,
   useRef,
+  useMemo,
 } from "react";
 import { SIWETokens, SIWETokensSchema } from "@/lib/schemas";
 import { SiweMessage } from "siwe";
@@ -68,14 +69,17 @@ export function SIWELoginProvider({ children }: PropsWithChildren) {
     localStorage.setItem(SIWE_TOKENS_STORAGE_KEY, JSON.stringify(tokens));
   });
 
+  const value = useMemo(
+    () => ({
+      get tokens() {
+        return siweTokenSingleton.current;
+      },
+    }),
+    [],
+  );
+
   return (
-    <SIWELoginProviderContext.Provider
-      value={{
-        get tokens() {
-          return siweTokenSingleton.current;
-        },
-      }}
-    >
+    <SIWELoginProviderContext.Provider value={value}>
       {children}
     </SIWELoginProviderContext.Provider>
   );

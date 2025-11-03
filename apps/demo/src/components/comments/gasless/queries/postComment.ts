@@ -92,7 +92,7 @@ export async function sendPostCommentGaslessly({
   return {
     txHash: postCommentResult.data.txHash,
     response: postCommentResult.data,
-    type: "gasless-not-preapproved",
+    type: gasSponsorship,
     action: "post",
     state: { status: "pending" },
     chainId,

@@ -86,7 +86,7 @@ export async function sendDeleteCommentGaslessly({
 
   return {
     txHash: deleteCommentResult.data.txHash,
-    type: authorSignature ? "gasless-not-preapproved" : "gasless-preapproved",
+    type: gasSponsorship,
     action: "delete",
     state: { status: "pending" },
     chainId: requestPayload.chainId,
