@@ -80,15 +80,21 @@ export async function guardAuthorSignature({
       getPEMPublicKey(env.SIWE_ACCESS_TOKEN_PUBLIC_KEY),
       "RS256",
     );
-    const verifyResult = await jose.jwtVerify(accessToken, publicKey);
+    let verifyResult: jose.JWTVerifyResult;
+
+    try {
+      verifyResult = await jose.jwtVerify(accessToken, publicKey);
+    } catch {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        { error: "Invalid access token" },
+        { status: 401 },
+      );
+    }
+
     if (
       verifyResult.payload.sub?.toLowerCase() !== authorAddress.toLowerCase()
     ) {
-      console.error(
-        "Invalid author address",
-        verifyResult.payload.sub,
-        authorAddress,
-      );
       throw new JSONResponse(
         ErrorResponseBodySchema,
         { error: "Invalid author address" },

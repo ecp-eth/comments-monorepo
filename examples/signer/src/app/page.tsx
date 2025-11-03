@@ -231,7 +231,7 @@ export default function HomePage() {
               </span>
             </div>
             <p className="text-gray-600 mb-2">
-              Send gasless delete comment data.
+              Send gasless approval to add app signer authorization.
             </p>
             {gaslessAvailable ? (
               <div className="bg-gray-50 p-3 rounded text-sm font-mono">
