@@ -12,5 +12,5 @@ export const ErrorResponseBodySchema = z.object({
 });
 
 export const AuthorSignatureSchema = HexSchema.describe(
-  "Signature of the author, required if the user has not approved our submitter address. If not provided, a SIWE auth token must be provided in the headers.",
+  "The signature of the author, required if the submitter address is not approved. If the submitter address is approved, this field can be replaced by a SIWE access token in `Authorization` header to avoid repetitive signing by the author",
 ).optional();

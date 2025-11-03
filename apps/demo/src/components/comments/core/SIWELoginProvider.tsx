@@ -161,8 +161,8 @@ function useSIWELogin(onSuccess: (tokens: SIWETokens) => void) {
 function areTokensActiveAndCurrent(tokens: SIWETokens, address: Hex): boolean {
   if (
     tokens.address !== address ||
-    tokens.accessToken.expiresAt < Math.floor(Date.now()) ||
-    tokens.refreshToken.expiresAt < Math.floor(Date.now())
+    tokens.accessToken.expiresAt < Date.now() ||
+    tokens.refreshToken.expiresAt < Date.now()
   ) {
     return false;
   }
