@@ -24,7 +24,7 @@ describe("ERC20ByAddressResolver", () => {
     nock("https://api.sim.dune.com")
       .get("/v1/evm/token-info/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984")
       .query({
-        chain_ids: "all",
+        chain_ids: "1",
       })
       .reply(200, {
         contract_address: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
@@ -47,7 +47,7 @@ describe("ERC20ByAddressResolver", () => {
       });
 
     await expect(
-      resolver.load("0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"),
+      resolver.load(["0x1f9840a85d5af5bf1d1762f925bdaddc4201f984"]),
     ).resolves.toBe(null);
   });
 
@@ -55,7 +55,7 @@ describe("ERC20ByAddressResolver", () => {
     nock("https://api.sim.dune.com")
       .get("/v1/evm/token-info/0x43a8cab15d06d3a5fe5854d714c37e7e9246f170")
       .query({
-        chain_ids: "all",
+        chain_ids: "1",
       })
       .reply(200, {
         contract_address: "0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
@@ -109,7 +109,7 @@ describe("ERC20ByAddressResolver", () => {
       });
 
     await expect(
-      resolver.load("0x43a8cab15d06d3a5fe5854d714c37e7e9246f170"),
+      resolver.load(["0x43a8cab15d06d3a5fe5854d714c37e7e9246f170"]),
     ).resolves.toStrictEqual({
       address: "0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
       symbol: "ORBS",
@@ -134,16 +134,58 @@ describe("ERC20ByAddressResolver", () => {
     nock("https://api.sim.dune.com")
       .get("/v1/evm/token-info/0x43a8cab15d06d3a5fe5854d714c37e7e9246f170")
       .query({
-        chain_ids: "all",
+        chain_ids: "1",
       })
       .reply(500, {
         message: "Internal Server Error",
       });
 
     await expect(
-      resolver.load("0x43a8cab15d06d3a5fe5854d714c37e7e9246f170"),
+      resolver.load(["0x43a8cab15d06d3a5fe5854d714c37e7e9246f170"]),
     ).rejects.toThrow(
       "Failed to fetch token info for 0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
     );
+  });
+
+  it("should return a token with specified chain id", async () => {
+    nock("https://api.sim.dune.com")
+      .get("/v1/evm/token-info/0x43a8cab15d06d3a5fe5854d714c37e7e9246f170")
+      .query({
+        chain_ids: "250",
+      })
+      .reply(200, {
+        contract_address: "0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+        tokens: [
+          {
+            chain_id: 250,
+            chain: "fantom",
+            price_usd: 0.02343367809378654,
+            pool_size: 5100.310634115417,
+            total_supply: "1255890859758333153515180",
+            fully_diluted_value: 29430.142128505595,
+            symbol: "ORBS",
+            name: "Orbs",
+            decimals: 18,
+            logo: "https://api.dune.com/api/echo/beta/token/logo/250/0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+          },
+        ],
+      });
+
+    await expect(
+      resolver.load(["0x43a8cab15d06d3a5fe5854d714c37e7e9246f170", 250]),
+    ).resolves.toStrictEqual({
+      address: "0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+      symbol: "ORBS",
+      name: "Orbs",
+      decimals: 18,
+      logoURI:
+        "https://api.dune.com/api/echo/beta/token/logo/250/0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+      chains: [
+        {
+          caip: "eip155:250/erc20:0x43a8cab15d06d3a5fe5854d714c37e7e9246f170",
+          chainId: 250,
+        },
+      ],
+    });
   });
 });
