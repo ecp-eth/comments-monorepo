@@ -120,6 +120,10 @@ export function useCommentActions({
         );
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const chainId = await getChainId(wagmiConfig);
       const capabilities = await getCapabilities(wagmiConfig);
 
@@ -163,10 +167,10 @@ export function useCommentActions({
       };
 
       const pendingOperation = await submitCommentMutationFunction({
-        author: connectedAddress,
         zeroExSwap,
         references: comment.references,
-        commentRequest: {
+        requestPayload: {
+          author: connectedAddress,
           content: comment.content,
           metadata: [
             createMetadataEntry(
