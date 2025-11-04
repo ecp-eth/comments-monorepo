@@ -43,19 +43,12 @@ export async function POST(
       await req.json(),
     );
 
-    const {
-      content,
-      author,
-      chainId,
-      commentType,
-      channelId,
-      chainConfig,
-      authorSignature,
-      deadline,
-    } = parsedBodyData;
+    const { comment, authorSignature, deadline } = parsedBodyData;
+    const { content, author, channelId, commentType, chainConfig, chainId } =
+      comment;
 
     guardContentLength(content);
-    guardTargetUriMatchesRegex(parsedBodyData);
+    guardTargetUriMatchesRegex(comment);
     guardAPIDeadline(deadline);
     await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
@@ -74,12 +67,12 @@ export async function POST(
       commentType,
       deadline,
 
-      ...("parentId" in parsedBodyData
+      ...("parentId" in comment
         ? {
-            parentId: parsedBodyData.parentId,
+            parentId: comment.parentId,
           }
         : {
-            targetUri: parsedBodyData.targetUri,
+            targetUri: comment.targetUri,
           }),
     });
 
@@ -93,6 +86,7 @@ export async function POST(
       authorSignature,
       signTypedDataParams: typedCommentData,
       authorAddress: author,
+      request: req,
     });
 
     const submitterAccount = await getGaslessSubmitter();
