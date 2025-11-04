@@ -112,6 +112,7 @@ async function deleteCommentWithGaslessAndAuthorSig({
         deadline,
       } satisfies z.input<typeof SendDeleteCommentRequestPayloadSchema>,
       bigintReplacer,
+      authorSignature,
     ),
   });
 
