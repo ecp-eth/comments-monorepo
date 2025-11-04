@@ -18,9 +18,9 @@ import { useCommentActions } from "./CommentActionsContext";
 import { CommentEditForm, CommentForm } from "./CommentForm";
 import { ReplyItem } from "./ReplyItem";
 import {
-  createCommentRepliesQueryKey,
-  createRootCommentsQueryKey,
-} from "./queries";
+  createReplyItemsQueryKey,
+  createCommentItemsQueryKey,
+} from "./queryKeys";
 import { chain } from "@/lib/clientWagmi";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
@@ -49,11 +49,11 @@ export function CommentItem({ comment }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const rootQueryKey = useMemo(
-    () => createRootCommentsQueryKey(connectedAddress, window.location.href),
+    () => createCommentItemsQueryKey(connectedAddress, window.location.href),
     [connectedAddress],
   );
   const queryKey = useMemo(
-    () => createCommentRepliesQueryKey(connectedAddress, comment.id),
+    () => createReplyItemsQueryKey(connectedAddress, comment.id),
     [comment.id, connectedAddress],
   );
 

@@ -23,10 +23,7 @@ import {
 export async function POST(req: Request) {
   try {
     const {
-      commentId,
-      author,
-      chainId,
-      chainConfig,
+      delete: { commentId, author, chainId, chainConfig },
       authorSignature,
       deadline,
     } = guardRequestPayloadSchemaIsValid(
@@ -57,6 +54,7 @@ export async function POST(req: Request) {
       authorSignature,
       signTypedDataParams: typedDeleteData,
       authorAddress: author,
+      request: req,
     });
 
     const submitterAccount = await getGaslessSubmitter();

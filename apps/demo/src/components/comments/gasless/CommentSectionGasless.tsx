@@ -1,5 +1,6 @@
 "use client";
 
+import z from "zod";
 import { Button } from "@/components/ui/button";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2Icon, X } from "lucide-react";
@@ -12,9 +13,9 @@ import {
 } from "@ecp.eth/sdk/comments/react";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
-  ChangeApprovalStatusRequestBodySchemaType,
-  ChangeApprovalStatusResponseSchema,
-} from "@/lib/schemas";
+  SendApproveSignerRequestPayloadSchema,
+  SendApproveSignerResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/approve";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -37,13 +38,16 @@ import { CommentSectionWrapper } from "../core/CommentSectionWrapper";
 import { useGaslessCommentActions } from "./hooks/useGaslessCommentActions";
 import { CommentItem } from "../core/CommentItem";
 import { CommentForm } from "../core/CommentForm";
-import { createRootCommentsQueryKey } from "../core/queries";
+import { createCommentItemsQueryKey } from "../core/queryKeys";
 import { CommentActionsProvider } from "./context";
 import { toast } from "sonner";
 import { useConnectedAction } from "./hooks/useConnectedAction";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { Heading2 } from "../core/Heading2";
 import { LoadingScreen } from "../core/LoadingScreen";
+import { getSignerURL } from "@/lib/utils";
+import { useSIWEFetch } from "@/hooks/useSIWEFetch";
+import { SIWELoginProvider } from "@/components/comments/core/SIWELoginProvider";
 
 type CommentSectionGaslessProps = {
   disableApprovals?: boolean;
@@ -57,7 +61,7 @@ export function CommentSectionGasless({
   const isAccountStatusResolved = useIsAccountStatusResolved();
   const [currentUrl, setCurrentUrl] = useState<string>("");
   const queryKey = useMemo(
-    () => createRootCommentsQueryKey(viewer, currentUrl),
+    () => createCommentItemsQueryKey(viewer, currentUrl),
     [currentUrl, viewer],
   );
 
@@ -66,6 +70,7 @@ export function CommentSectionGasless({
     publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     chain,
   );
+  const fetch = useSIWEFetch();
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
@@ -99,7 +104,7 @@ export function CommentSectionGasless({
         throw new Error("No viewer address found");
       }
 
-      const response = await fetch("/api/approval", {
+      const response = await fetch(getSignerURL("/api/approve-signer/send"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +114,8 @@ export function CommentSectionGasless({
             signTypedDataParams,
             authorSignature: signature,
             authorAddress: viewer,
-          } satisfies ChangeApprovalStatusRequestBodySchemaType,
+            chainId: chain.id,
+          } satisfies z.infer<typeof SendApproveSignerRequestPayloadSchema>,
           bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
         ),
       });
@@ -120,7 +126,7 @@ export function CommentSectionGasless({
         );
       }
 
-      return ChangeApprovalStatusResponseSchema.parse(await response.json())
+      return SendApproveSignerResponseBodySchema.parse(await response.json())
         .txHash;
     },
   });
@@ -206,7 +212,10 @@ export function CommentSectionGasless({
 
   const gaslessCommentActions = useGaslessCommentActions({
     connectedAddress: viewer,
-    hasApproval: !disableApprovals && !!approvalStatus.data?.approved,
+    gasSponsorship:
+      !disableApprovals && !!approvalStatus.data?.approved
+        ? "gasless-preapproved"
+        : "gasless-not-preapproved",
   });
 
   useEffect(() => {
@@ -273,106 +282,108 @@ export function CommentSectionGasless({
   return (
     <CommentActionsProvider value={gaslessCommentActions}>
       <CommentGaslessProvider value={commentGaslessProviderValue}>
-        <CommentSectionWrapper>
-          <Heading2>Comments</Heading2>
+        <SIWELoginProvider>
+          <CommentSectionWrapper>
+            <Heading2>Comments</Heading2>
 
-          {!approvalStatus.data?.approved &&
-            commentGaslessProviderValue.areApprovalsEnabled && (
-              <div className="mb-4">
-                <Button
-                  onClick={async () => {
-                    if (!viewer) {
-                      await connectAccount();
-                      requestApprovalOnConnect();
-                      return;
-                    }
+            {!approvalStatus.data?.approved &&
+              commentGaslessProviderValue.areApprovalsEnabled && (
+                <div className="mb-4">
+                  <Button
+                    onClick={async () => {
+                      if (!viewer) {
+                        await connectAccount();
+                        requestApprovalOnConnect();
+                        return;
+                      }
 
-                    approveGaslessTransactionsMutation.mutate();
-                  }}
-                  disabled={isApprovalPending}
-                  variant="default"
-                >
-                  {isApprovalPending
-                    ? "Requesting Approval..."
-                    : "Allow this app to post on your behalf"}
-                </Button>
-              </div>
-            )}
-          {!!viewer &&
-            approvalStatus.data?.approved &&
-            commentGaslessProviderValue.areApprovalsEnabled && (
-              <div className="flex items-center gap-2">
-                <div className="text-sm text-gray-500">
-                  App has approval to post on your behalf.
+                      approveGaslessTransactionsMutation.mutate();
+                    }}
+                    disabled={isApprovalPending}
+                    variant="default"
+                  >
+                    {isApprovalPending
+                      ? "Requesting Approval..."
+                      : "Allow this app to post on your behalf"}
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  disabled={!approvalStatus.data || isRemovingApproval}
-                  onClick={() => {
-                    if (
-                      !approvalStatus.data ||
-                      !approvalStatus.data.approved ||
-                      !viewer
-                    ) {
-                      throw new Error("No data found");
-                    }
+              )}
+            {!!viewer &&
+              approvalStatus.data?.approved &&
+              commentGaslessProviderValue.areApprovalsEnabled && (
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-gray-500">
+                    App has approval to post on your behalf.
+                  </div>
+                  <Button
+                    variant="outline"
+                    disabled={!approvalStatus.data || isRemovingApproval}
+                    onClick={() => {
+                      if (
+                        !approvalStatus.data ||
+                        !approvalStatus.data.approved ||
+                        !viewer
+                      ) {
+                        throw new Error("No data found");
+                      }
 
-                    revokeApproval.mutateAsync({
-                      app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-                    });
-                  }}
-                >
-                  <X />
-                  <span>
-                    {isRemovingApproval ? "Removing..." : "Remove Approval"}
-                  </span>
-                </Button>
-              </div>
+                      revokeApproval.mutateAsync({
+                        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+                      });
+                    }}
+                  >
+                    <X />
+                    <span>
+                      {isRemovingApproval ? "Removing..." : "Remove Approval"}
+                    </span>
+                  </Button>
+                </div>
+              )}
+            <CommentForm queryKey={queryKey} />
+            {isPending && <LoadingScreen />}
+            {error && (
+              <div>Error loading comments: {(error as Error).message}</div>
             )}
-          <CommentForm queryKey={queryKey} />
-          {isPending && <LoadingScreen />}
-          {error && (
-            <div>Error loading comments: {(error as Error).message}</div>
-          )}
-          {isSuccess && (
-            <>
-              {hasNewComments && (
-                <Button
-                  className="mb-4"
-                  onClick={() => fetchNewComments()}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Load new comments
-                </Button>
-              )}
-              {results.map((comment) => (
-                <CommentItem
-                  key={`${comment.id}-${comment.deletedAt}`}
-                  comment={comment}
-                />
-              ))}
-              {hasNextPage && (
-                <Button
-                  className="gap-2"
-                  disabled={isFetchingNextPage}
-                  onClick={() => fetchNextPage()}
-                  variant="secondary"
-                  size="sm"
-                >
-                  {isFetchingNextPage ? (
-                    <>
-                      <Loader2Icon className="animate-spin h-4 w-4" />{" "}
-                      Loading...
-                    </>
-                  ) : (
-                    "Load More"
-                  )}
-                </Button>
-              )}
-            </>
-          )}
-        </CommentSectionWrapper>
+            {isSuccess && (
+              <>
+                {hasNewComments && (
+                  <Button
+                    className="mb-4"
+                    onClick={() => fetchNewComments()}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Load new comments
+                  </Button>
+                )}
+                {results.map((comment) => (
+                  <CommentItem
+                    key={`${comment.id}-${comment.deletedAt}`}
+                    comment={comment}
+                  />
+                ))}
+                {hasNextPage && (
+                  <Button
+                    className="gap-2"
+                    disabled={isFetchingNextPage}
+                    onClick={() => fetchNextPage()}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    {isFetchingNextPage ? (
+                      <>
+                        <Loader2Icon className="animate-spin h-4 w-4" />{" "}
+                        Loading...
+                      </>
+                    ) : (
+                      "Load More"
+                    )}
+                  </Button>
+                )}
+              </>
+            )}
+          </CommentSectionWrapper>
+        </SIWELoginProvider>
       </CommentGaslessProvider>
     </CommentActionsProvider>
   );

@@ -33,8 +33,8 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold mb-3">3. Fees & Payments</h2>
             <p className="mb-2">
               Use of the App may require you to pay blockchain transaction fees
-              ("gas") or protocol-related fees. These fees are determined by the
-              network and are not controlled by us.
+              (&quot;gas&quot;) or protocol-related fees. These fees are
+              determined by the network and are not controlled by us.
             </p>
             <p>All fees are final and non-refundable.</p>
           </section>
@@ -55,7 +55,9 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-6 mb-2">
               <li>illegal, infringing, abusive, or harmful;</li>
-              <li>sexually explicit, pornographic, or obscene ("NSFW");</li>
+              <li>
+                sexually explicit, pornographic, or obscene (&quot;NSFW&quot;);
+              </li>
               <li>
                 exploitative of minors or otherwise violates child protection
                 laws;
@@ -77,9 +79,9 @@ export default function TermsPage() {
               responsible for securing your wallet and private keys.
             </p>
             <p>
-              The App is provided "as is" without warranties of any kind. We do
-              not guarantee availability, accuracy, or reliability of the App or
-              underlying protocols.
+              The App is provided &quot;as is&quot; without warranties of any
+              kind. We do not guarantee availability, accuracy, or reliability
+              of the App or underlying protocols.
             </p>
           </section>
 

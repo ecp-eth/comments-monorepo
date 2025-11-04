@@ -1,3 +1,4 @@
+import * as jose from "jose";
 import { isMuted } from "@ecp.eth/sdk/indexer";
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import {
@@ -14,6 +15,7 @@ import { env } from "./env";
 import type { z, ZodSchema } from "zod";
 import { rateLimiter } from "@/instances";
 import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
+import { getPEMPublicKey } from "./helpers";
 
 export function guardAPIDeadline(deadline?: bigint) {
   if (deadline != null) {
@@ -40,6 +42,7 @@ export async function guardAuthorSignature({
   authorSignature,
   signTypedDataParams,
   authorAddress,
+  request,
 }: {
   // using type inferring here somehow cause excessive type inference errors, had to workaround it using any
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,13 +50,59 @@ export async function guardAuthorSignature({
   authorSignature?: Hex;
   signTypedDataParams: Omit<VerifyTypedDataParameters, "address" | "signature">;
   authorAddress: Address;
+  request: Request;
 }) {
   if (!authorSignature) {
-    throw new JSONResponse(
-      ErrorResponseBodySchema,
-      { error: "Author signature is required" },
-      { status: 400 },
+    // if author signature is not provided, we must verify the SIWE access token instead
+    const authorizationHeader = request.headers.get("Authorization");
+
+    if (!authorizationHeader) {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        {
+          error:
+            "Either author signature or SIWE authorization header is required",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!env.SIWE_ACCESS_TOKEN_PUBLIC_KEY) {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        { error: "SIWE access token public key is not set" },
+        { status: 500 },
+      );
+    }
+
+    const accessToken = authorizationHeader.replace(/^bearer\s+/i, "");
+    const publicKey = await jose.importSPKI(
+      getPEMPublicKey(env.SIWE_ACCESS_TOKEN_PUBLIC_KEY),
+      "RS256",
     );
+    let verifyResult: jose.JWTVerifyResult;
+
+    try {
+      verifyResult = await jose.jwtVerify(accessToken, publicKey);
+    } catch {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        { error: "Invalid access token" },
+        { status: 401 },
+      );
+    }
+
+    if (
+      verifyResult.payload.sub?.toLowerCase() !== authorAddress.toLowerCase()
+    ) {
+      throw new JSONResponse(
+        ErrorResponseBodySchema,
+        { error: "Invalid author address" },
+        { status: 400 },
+      );
+    }
+
+    return;
   }
 
   const verified = publicClient.verifyTypedData({

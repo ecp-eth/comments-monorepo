@@ -3,7 +3,7 @@ import type { Comment } from "@ecp.eth/shared/schemas";
 import type { QueryKey } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { useConfig, usePublicClient, useSwitchChain } from "wagmi";
-import { submitEditComment } from "../queries/submitEditComment";
+import { submitEditComment } from "../queries/editComment";
 import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";

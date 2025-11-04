@@ -17,7 +17,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
 } from "react";
 import { useAccount, useConnectorClient } from "wagmi";
@@ -50,6 +49,8 @@ type PendingWalletConnectionActionHandlerRecord = Record<
 >;
 
 type PendingWalletConnectionActionsContextType = {
+  onAfterConnect?: () => Promise<unknown>;
+  onAfterConnectResultPromise?: Promise<unknown>;
   addAction: (action: PendingWalletConnectionAction) => void;
   addHandler: (
     commentId: Hex,
@@ -82,6 +83,8 @@ export const PendingWalletConnectionActionsProvider = ({
       return;
     }
 
+    await contextValue.current?.onAfterConnectResultPromise;
+
     const actions = actionsRef.current;
     const handlers = handlersRef.current;
 
@@ -105,34 +108,35 @@ export const PendingWalletConnectionActionsProvider = ({
       await handler[action.type]();
     }
   }, [client, connectedAddress]);
+  const triggerActionsRef = useFreshRef(triggerActions);
 
   useEffect(() => {
     void triggerActions();
   }, [triggerActions]);
 
-  const value = useMemo(() => {
-    return {
-      addAction: (action: PendingWalletConnectionAction) => {
-        actionsRef.current.push(action);
+  const contextValue = useRef<PendingWalletConnectionActionsContextType>({
+    addAction: (action: PendingWalletConnectionAction) => {
+      actionsRef.current.push(action);
 
-        triggerActions();
-      },
-      addHandler: (
-        commentId: Hex,
-        handler: PendingWalletConnectionActionHandler,
-      ) => {
-        handlersRef.current[commentId] = handler;
+      triggerActionsRef.current();
+    },
+    addHandler: (
+      commentId: Hex,
+      handler: PendingWalletConnectionActionHandler,
+    ) => {
+      handlersRef.current[commentId] = handler;
 
-        triggerActions();
-      },
-      deleteHandler: (commentId: Hex) => {
-        delete handlersRef.current[commentId];
-      },
-    };
-  }, [triggerActions]);
+      triggerActionsRef.current();
+    },
+    deleteHandler: (commentId: Hex) => {
+      delete handlersRef.current[commentId];
+    },
+  });
 
   return (
-    <PendingWalletConnectionActionsContext.Provider value={value}>
+    <PendingWalletConnectionActionsContext.Provider
+      value={contextValue.current}
+    >
       {children}
     </PendingWalletConnectionActionsContext.Provider>
   );

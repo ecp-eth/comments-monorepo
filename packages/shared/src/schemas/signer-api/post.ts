@@ -3,11 +3,12 @@ import { MetadataArraySchema } from "@ecp.eth/sdk/comments/schemas";
 import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
 import { z } from "zod/v3";
 import { CommentDataWithIdSchema } from "../../schemas";
+import { AuthorSignatureSchema } from "./shared";
 
 /**
  * Shared request payload schema for actions related to posting comments
  */
-export const SharedCommentRequestPayloadSchema = z.object({
+const SharedCommentRequestPayloadSchema = z.object({
   author: HexSchema,
   content: z.string().trim().nonempty(),
   metadata: MetadataArraySchema,
@@ -16,7 +17,7 @@ export const SharedCommentRequestPayloadSchema = z.object({
   commentType: z.number().default(DEFAULT_COMMENT_TYPE),
 });
 
-export const CommentWithTargetURIRequestPayloadSchema =
+const CommentWithTargetURIRequestPayloadSchema =
   SharedCommentRequestPayloadSchema.extend({
     targetUri: z
       .string()
@@ -24,22 +25,20 @@ export const CommentWithTargetURIRequestPayloadSchema =
       .describe("The URI of the target resource, e.g. https://example.com"),
   });
 
-export const CommentWithParentIdRequestPayloadSchema =
+const CommentWithParentIdRequestPayloadSchema =
   SharedCommentRequestPayloadSchema.extend({
     parentId: HexSchema,
   });
 
-const SendPostCommentRequestPayloadBaseSchema = z.object({
-  authorSignature: HexSchema.describe(
-    "Signature of the author, required if the user has not approved our submitter address",
-  ),
-  deadline: z.coerce
-    .bigint()
-    .optional()
-    .describe(
-      "Deadline of the request, required if the user has not approved our submitter address",
-    ),
-});
+const SharedCommentUnionRequestPayloadSchema = z.union([
+  CommentWithTargetURIRequestPayloadSchema,
+  CommentWithParentIdRequestPayloadSchema,
+]);
+
+const DeadlineSchema = z.coerce
+  .bigint()
+  .optional()
+  .describe("Deadline of the request");
 
 /**
  * Shared response body schema for actions related to posting comments
@@ -53,10 +52,8 @@ const SharedPostCommentResponseBodySchema = z.object({
 /**
  * Request payload schema for signing comment to post
  */
-export const SignPostCommentRequestPayloadSchema = z.union([
-  CommentWithTargetURIRequestPayloadSchema,
-  CommentWithParentIdRequestPayloadSchema,
-]);
+export const SignPostCommentRequestPayloadSchema =
+  SharedCommentUnionRequestPayloadSchema;
 
 /**
  * Response body schema for signing comment to post
@@ -67,14 +64,11 @@ export const SignPostCommentResponseBodySchema =
 /**
  * Request payload schema for submitting comment to post
  */
-export const SendPostCommentRequestPayloadSchema = z.union([
-  SendPostCommentRequestPayloadBaseSchema.extend(
-    CommentWithTargetURIRequestPayloadSchema.shape,
-  ),
-  SendPostCommentRequestPayloadBaseSchema.extend(
-    CommentWithParentIdRequestPayloadSchema.shape,
-  ),
-]);
+export const SendPostCommentRequestPayloadSchema = z.object({
+  comment: SharedCommentUnionRequestPayloadSchema,
+  authorSignature: AuthorSignatureSchema,
+  deadline: DeadlineSchema,
+});
 
 /**
  * Response body schema for submitting comment to post

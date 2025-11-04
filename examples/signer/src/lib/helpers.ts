@@ -89,12 +89,13 @@ export async function createPrivyAccount(configuration: PrivyConfiguration) {
   });
 }
 
-type RawShapeOf<T> =
+type GetRawShapeOfZodObject<T> =
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   T extends z.ZodObject<infer S, any, any, any, any> ? S : never;
 
 export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
-  T extends
+  KeyType extends string | undefined,
+  ChainIdContainerType extends
     | z.ZodObject<{
         chainId: z.ZodNumber;
       }>
@@ -104,32 +105,81 @@ export function augmentZodSchemaWithAllowedChainIdAndChainConfig<
           z.ZodObject<{ chainId: z.ZodNumber }>,
         ]
       >,
+  ContaineredSchema extends z.ZodObject<{
+    [k in Exclude<KeyType, undefined>]: ChainIdContainerType;
+  }>,
   OutputZodObject extends z.ZodTypeAny = z.ZodObject<
-    RawShapeOf<T>,
+    GetRawShapeOfZodObject<ChainIdContainerType>,
     "strip",
     z.ZodTypeAny,
-    z.output<T> & { chainConfig: SupportedChainConfig },
-    z.input<T>
+    z.output<ChainIdContainerType> & { chainConfig: SupportedChainConfig },
+    z.input<ChainIdContainerType>
   >,
-  RetType = T extends z.ZodObject<{ chainId: z.ZodNumber }>
-    ? z.ZodEffects<OutputZodObject>
-    : z.ZodEffects<z.ZodUnion<[OutputZodObject, OutputZodObject]>>,
->(schema: T): RetType {
+  UpdatedChainIdContainerType extends
+    | OutputZodObject
+    | z.ZodUnion<
+        readonly [OutputZodObject, OutputZodObject]
+      > = ChainIdContainerType extends z.ZodObject<{
+    chainId: z.ZodNumber;
+  }>
+    ? OutputZodObject
+    : z.ZodUnion<readonly [OutputZodObject, OutputZodObject]>,
+  RetType = KeyType extends undefined
+    ? z.ZodEffects<UpdatedChainIdContainerType>
+    : z.ZodEffects<
+        z.ZodObject<
+          GetRawShapeOfZodObject<ContaineredSchema> & {
+            [k in Exclude<KeyType, undefined>]: UpdatedChainIdContainerType;
+          }
+        >
+      >,
+>(
+  schema: KeyType extends undefined ? ChainIdContainerType : ContaineredSchema,
+  key: KeyType,
+): RetType {
   const ret = schema.transform((val) => {
+    const chainIdContainer = (
+      key !== undefined ? val[key as keyof typeof val] : val
+    ) as { chainId: number };
     const isAllowedChainId = env.ENABLED_CHAINS.includes(
-      val.chainId as keyof typeof SUPPORTED_CHAINS,
+      chainIdContainer.chainId as keyof typeof SUPPORTED_CHAINS,
     );
 
     if (!isAllowedChainId) {
       throw new Error("Invalid chain ID");
     }
 
+    const chainConfigContainer = {
+      ...chainIdContainer,
+      chainConfig:
+        SUPPORTED_CHAINS[
+          chainIdContainer.chainId as keyof typeof SUPPORTED_CHAINS
+        ],
+    };
+
     return {
       ...val,
-      chainConfig:
-        SUPPORTED_CHAINS[val.chainId as keyof typeof SUPPORTED_CHAINS],
+      ...(key === undefined
+        ? chainConfigContainer
+        : {
+            [key]: {
+              ...chainConfigContainer,
+            },
+          }),
     };
   });
 
   return ret as unknown as RetType;
+}
+
+export function never(message: string = "Unreachable code"): never {
+  throw new Error(message);
+}
+
+export function getPEMPublicKey(publicKey: string) {
+  if (publicKey.startsWith("-----BEGIN PUBLIC KEY-----")) {
+    return publicKey;
+  }
+
+  return `-----BEGIN PUBLIC KEY-----\n${publicKey.replace(/(.{64})/g, "$1\n")}\n-----END PUBLIC KEY-----`;
 }

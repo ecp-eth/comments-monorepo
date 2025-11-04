@@ -7,8 +7,9 @@ import {
   SendPostCommentRequestPayloadRestrictedSchema,
   SignPostCommentRequestPayloadRestrictedSchema,
 } from "@/lib/schemas/post";
-import { ZodSchemaRenderer } from "./components/ZodSchemaRenderer";
 import { SendDeleteCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/delete";
+import { SendApproveSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/approve";
+import { ZodSchemaRenderer } from "./components/ZodSchemaRenderer";
 
 const gaslessAvailable =
   env.GASLESS_METHOD === "private-key" || env.GASLESS_METHOD === "privy";
@@ -30,7 +31,7 @@ export default function HomePage() {
         <h2 className="text-2xl font-semibold mb-4">Available Endpoints</h2>
 
         <div className="space-y-6">
-          {/* Post Comment - Standard Sign Endpoint */}
+          {/* Post Comment - Sign (Non-gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -67,7 +68,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Edit Comment - Standard Sign Endpoint */}
+          {/* Edit Comment - Sign (Non-gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -103,7 +104,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Post Comment - Send Gasless Endpoint */}
+          {/* Post Comment - Send (Gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -140,7 +141,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Edit Comment - Gasless Endpoint */}
+          {/* Edit Comment - Send (Gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -177,7 +178,7 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Delete Comment - Gasless  Endpoint */}
+          {/* Delete Comment - Send (Gasless) Endpoint */}
           <div className="border rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-medium">
@@ -202,6 +203,42 @@ export default function HomePage() {
                   Request:{" "}
                   <ZodSchemaRenderer
                     schema={SendDeleteCommentRequestPayloadRestrictedSchema}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="bg-yellow-50 p-3 rounded text-sm">
+                Configure GASLESS_METHOD and related environment variables to
+                enable gasless signing.
+              </div>
+            )}
+          </div>
+
+          {/* Approve App Signer - Send (Gasless) Endpoint */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-medium">
+                POST /api/approve-signer/send
+              </h3>
+              <span
+                className={`px-2 py-1 rounded-full text-sm ${
+                  gaslessAvailable
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                }`}
+              >
+                {gaslessAvailable ? "Available" : "Not Configured"}
+              </span>
+            </div>
+            <p className="text-gray-600 mb-2">
+              Send gasless approval to add app signer authorization.
+            </p>
+            {gaslessAvailable ? (
+              <div className="bg-gray-50 p-3 rounded text-sm font-mono">
+                <div>
+                  Request:{" "}
+                  <ZodSchemaRenderer
+                    schema={SendApproveSignerRequestPayloadRestrictedSchema}
                   />
                 </div>
               </div>
