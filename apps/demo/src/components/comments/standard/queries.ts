@@ -60,11 +60,11 @@ export async function submitCommentMutationFunction({
     ...requestPayload,
   });
 
-  const { author } = requestPayload;
-
   if (!parseResult.success) {
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
+
+  const { author } = parseResult.data;
 
   // ignore errors here, we don't want to block the comment submission
   const resolvedAuthor = await fetchAuthorData({

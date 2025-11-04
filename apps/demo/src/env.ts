@@ -18,23 +18,6 @@ ${JSON.stringify(this.validationError.flatten(), null, 2)}
   }
 }
 
-export const PrivySubmitterEnvSchema = z.object({
-  PRIVY_WALLET_ADDRESS: HexSchema,
-  PRIVY_WALLET_ID: z.string(),
-  PRIVY_AUTHORIZATION_KEY: z.string(),
-  PRIVY_APP_ID: z.string(),
-  PRIVY_SECRET: z.string(),
-});
-
-export const EthSubmitterEnvSchema = z.object({
-  SUBMITTER_PRIVATE_KEY: HexSchema,
-});
-
-export const SubmitterEnvSchema = z.union([
-  PrivySubmitterEnvSchema,
-  EthSubmitterEnvSchema,
-]);
-
 const EnableSwappingSchema = z.discriminatedUnion(
   "NEXT_PUBLIC_ENABLE_SWAPPING",
   [
@@ -65,15 +48,7 @@ const EnvSchema = z
     COMMENT_CONTENT_LENGTH_LIMIT: z.coerce.number().default(1024 * 10),
   })
   .merge(publicEnvSchema)
-  .merge(EthSubmitterEnvSchema.partial())
-  .merge(PrivySubmitterEnvSchema.partial())
   .refine((data) => {
-    const submitterResult = SubmitterEnvSchema.safeParse(data);
-
-    if (!submitterResult.success) {
-      throw submitterResult.error;
-    }
-
     const swapResult = EnableSwappingSchema.safeParse(data);
 
     if (!swapResult.success) {
