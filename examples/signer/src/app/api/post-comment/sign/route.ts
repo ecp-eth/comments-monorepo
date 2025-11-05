@@ -19,6 +19,7 @@ import {
   guardRequestPayloadSchemaIsValid,
   guardTargetUriMatchesRegex,
 } from "@/lib/guards";
+import { nonceManager } from "@/instances";
 
 /**
  * Signs a comment to be sent by the author.
@@ -46,7 +47,9 @@ export async function POST(
     await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
-    const app = privateKeyToAccount(appSignerPrivateKey);
+    const app = privateKeyToAccount(appSignerPrivateKey, {
+      nonceManager,
+    });
     const commentData = createCommentData({
       content,
       metadata,

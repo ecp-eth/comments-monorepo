@@ -21,6 +21,7 @@ import {
   guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
+import { nonceManager } from "@/instances";
 
 /**
  * Signs an edit comment to be sent by the author.
@@ -53,7 +54,9 @@ export async function POST(
     await guardRateLimitNotExceeded(author);
     await guardAuthorIsNotMuted(author);
 
-    const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY);
+    const app = privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY, {
+      nonceManager,
+    });
     const publicClient = createPublicClient({
       chain: chainConfig.chain,
       transport: http(getRpcUrl(chainConfig.chain.id)),
