@@ -31,15 +31,7 @@ const SIM_TOKEN_INFO_URL = "https://api.sim.dune.com/v1/evm/token-info/";
 
 // this array contains all supported chain ids + ethereum mainnet
 // this is the chains we want to check for token info IF CHAIN ID IS NOT PROVIDED by the caller
-const chainsIdToSearch = Object.keys(
-  SUPPORTED_CHAIN_IDS.concat([1]).reduce(
-    (acc, chanId) => {
-      acc[chanId] = true;
-      return acc;
-    },
-    {} as Record<number, true>,
-  ),
-).map(Number);
+const chainsIdToSearch = Array.from(new Set([1, ...SUPPORTED_CHAIN_IDS]));
 
 export class SimApiError extends Error {
   constructor(
@@ -76,7 +68,6 @@ export function createERC20ByAddressResolver({
       return Promise.all(
         addressAndChainIds.map(
           async ([address, chainId]): Promise<ResolvedERC20Data | null> => {
-            console.log("chainId", chainId, chainsIdToSearch);
             const tokensInfos: TokenInfo[] = await getTokenInfo(
               address,
               chainId ? [chainId] : chainsIdToSearch,
