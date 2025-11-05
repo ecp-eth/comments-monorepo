@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import {
   type IndexerAPICommentReferencesSchemaType,
   type IndexerAPICommentReferenceENSSchemaType,
@@ -241,6 +242,12 @@ export async function resolveCommentReferences(
         references.push(result.value);
       }
     } else {
+      console.error(result.reason);
+      Sentry.captureException(result.reason, {
+        extra: {
+          content,
+        },
+      });
       failed++;
     }
   }
@@ -357,7 +364,9 @@ async function resolveERC20TokenEthAddress(
   position: ResolveCommentReferencePosition,
   { erc20ByAddressResolver }: ResolveCommentReferencesOptions,
 ): Promise<IndexerAPICommentReferenceERC20SchemaType | null> {
-  const result = await erc20ByAddressResolver.load(address);
+  const result = await erc20ByAddressResolver.load(
+    chainId ? [address, chainId] : [address],
+  );
 
   if (result) {
     return (

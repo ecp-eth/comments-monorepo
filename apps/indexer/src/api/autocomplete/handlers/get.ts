@@ -51,7 +51,7 @@ export async function getAutocompleteHandler({
         };
       }
 
-      const token = await erc20ByAddressResolverService.load(query);
+      const token = await erc20ByAddressResolverService.load([query]);
 
       if (token) {
         return {
@@ -119,8 +119,11 @@ export async function getAutocompleteHandler({
   }
 
   if (isERC20CAIP19(query)) {
-    const { address } = extractERC20CAIP19(query);
-    const token = await erc20ByAddressResolverService.load(address as Hex);
+    const { address, chainId } = extractERC20CAIP19(query);
+    const token = await erc20ByAddressResolverService.load([
+      address as Hex,
+      chainId,
+    ]);
 
     if (token) {
       return {
