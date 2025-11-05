@@ -45,13 +45,18 @@ export class SimApiError extends Error {
 
 export type ERC20ByAddressResolver = DataLoader<
   ERC20ByAddressResolverKey,
-  ResolvedERC20Data | null
+  ResolvedERC20Data | null,
+  string
 >;
 
 export type ERC20ByAddressResolverOptions = {
   simApiKey: string;
 } & Omit<
-  DataLoader.Options<ERC20ByAddressResolverKey, ResolvedERC20Data | null>,
+  DataLoader.Options<
+    ERC20ByAddressResolverKey,
+    ResolvedERC20Data | null,
+    string
+  >,
   "batchLoadFn" | "maxBatchSize" | "cacheKeyFn"
 >;
 
@@ -59,7 +64,11 @@ export function createERC20ByAddressResolver({
   simApiKey,
   ...dataLoaderOptions
 }: ERC20ByAddressResolverOptions): ERC20ByAddressResolver {
-  return new DataLoader<ERC20ByAddressResolverKey, ResolvedERC20Data | null>(
+  return new DataLoader<
+    ERC20ByAddressResolverKey,
+    ResolvedERC20Data | null,
+    string
+  >(
     async (addressAndChainIds) => {
       if (!addressAndChainIds.length) {
         return [];
@@ -104,11 +113,11 @@ export function createERC20ByAddressResolver({
     {
       ...dataLoaderOptions,
       cacheKeyFn([address, chainId]) {
-        if (chainId) {
-          return [address.toLowerCase() as Hex, chainId];
-        }
-
-        return [address.toLowerCase() as Hex];
+        return (
+          chainId
+            ? [address.toLowerCase() as Hex, chainId]
+            : [address.toLowerCase() as Hex]
+        ).join(":");
       },
     },
   );
