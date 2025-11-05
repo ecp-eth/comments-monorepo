@@ -1,15 +1,4 @@
-import {
-  type SignCommentPayloadRequestSchemaType,
-  SignCommentPayloadRequestSchema,
-  SignEditCommentPayloadRequestSchema,
-  SignEditCommentPayloadRequestSchemaType,
-} from "@/lib/schemas";
-// TODO: remove unused schemas from here and from shared package
-// import {
-//   SignCommentResponseClientSchema,
-//   SignEditCommentResponseClientSchema,
-//   type SignCommentResponseClientSchemaType,
-// } from "@ecp.eth/shared/schemas";
+import { z } from "zod";
 import {
   SignPostCommentRequestPayloadSchema,
   SignPostCommentResponseBodySchema,
@@ -31,28 +20,22 @@ import {
 } from "@ecp.eth/shared/errors";
 import { chain } from "@/lib/clientWagmi";
 import type {
-  Comment,
   CommentDataWithIdSchemaType,
   PendingEditCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
   SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
-import type { DistributiveOmit } from "@ecp.eth/shared/types";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
-import z from "zod";
+import { DistributiveOmit } from "@ecp.eth/shared/types";
 
 export class SubmitCommentMutationError extends Error {}
 export class SubmitEditCommentMutationError extends Error {}
 
 type SubmitCommentParams = {
-  /**
-   * The address of the wallet that is submitting the comment.
-   */
-  author: Hex | undefined;
-  commentRequest: DistributiveOmit<
-    SignCommentPayloadRequestSchemaType,
-    "author"
+  requestPayload: DistributiveOmit<
+    z.input<typeof SignPostCommentRequestPayloadSchema>,
+    "chainId"
   >;
   zeroExSwap: IndexerAPICommentZeroExSwapSchemaType | null;
   switchChainAsync: (chainId: number) => Promise<Chain>;
@@ -67,16 +50,21 @@ type SubmitCommentParams = {
 };
 
 export async function submitCommentMutationFunction({
-  author,
-  commentRequest,
+  requestPayload,
   switchChainAsync,
   writeContractAsync,
   zeroExSwap,
   references,
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
-  if (!author) {
-    throw new SubmitCommentMutationError("Wallet not connected.");
+  const parseResult = SignPostCommentRequestPayloadSchema.safeParse({
+    ...requestPayload,
+  });
+
+  if (!parseResult.success) {
+    throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
+
+  const { author } = parseResult.data;
 
   // ignore errors here, we don't want to block the comment submission
   const resolvedAuthor = await fetchAuthorData({
@@ -86,17 +74,6 @@ export async function submitCommentMutationFunction({
     console.error(e);
     return undefined;
   });
-
-  const parseResult = SignCommentPayloadRequestSchema.safeParse({
-    ...commentRequest,
-    author: author,
-  });
-
-  if (!parseResult.success) {
-    throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
-  }
-
-  const commentData = parseResult.data;
 
   const switchedChain = await switchChainAsync(chain.id);
 
@@ -110,7 +87,7 @@ export async function submitCommentMutationFunction({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ...commentData,
+      ...parseResult.data,
       chainId: chain.id,
     } satisfies z.input<typeof SignPostCommentRequestPayloadSchema>),
   });
@@ -170,11 +147,9 @@ export async function submitCommentMutationFunction({
 }
 
 type SubmitEditCommentParams = {
-  address: Hex | undefined;
-  comment: Comment;
-  editRequest: Omit<
-    SignEditCommentPayloadRequestSchemaType,
-    "author" | "metadata" | "commentId"
+  requestPayload: DistributiveOmit<
+    z.input<typeof SignEditCommentRequestPayloadSchema>,
+    "chainId"
   >;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {
@@ -184,30 +159,18 @@ type SubmitEditCommentParams = {
 };
 
 export async function submitEditCommentMutationFunction({
-  address,
-  comment,
-  editRequest,
+  requestPayload,
   switchChainAsync,
   writeContractAsync,
 }: SubmitEditCommentParams): Promise<
   Omit<PendingEditCommentOperationSchemaType, "references">
 > {
-  if (!address) {
-    throw new SubmitEditCommentMutationError("Wallet not connected.");
-  }
-
-  const parseResult = SignEditCommentPayloadRequestSchema.safeParse({
-    author: address,
-    commentId: comment.id,
-    content: editRequest.content,
-    metadata: comment.metadata,
-  });
+  const parseResult =
+    SignEditCommentRequestPayloadSchema.safeParse(requestPayload);
 
   if (!parseResult.success) {
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
-
-  const commentData = parseResult.data;
 
   const switchedChain = await switchChainAsync(chain.id);
 
@@ -221,7 +184,7 @@ export async function submitEditCommentMutationFunction({
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ...commentData,
+      ...parseResult.data,
       chainId: chain.id,
     } satisfies z.input<typeof SignEditCommentRequestPayloadSchema>),
   });

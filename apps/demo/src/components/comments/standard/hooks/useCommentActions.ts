@@ -125,11 +125,15 @@ export function useCommentActions({
         throw new Error("Only post comments can be retried");
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const pendingOperation = await submitCommentMutationFunction({
-        author: connectedAddress,
         zeroExSwap: null,
         references: comment.references,
-        commentRequest: {
+        requestPayload: {
+          author: connectedAddress,
           content: comment.content,
           metadata: comment.metadata,
           ...(comment.parentId
@@ -199,11 +203,15 @@ export function useCommentActions({
     async (params) => {
       const { comment } = params;
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const pendingOperation = await submitCommentMutationFunction({
-        author: connectedAddress,
         zeroExSwap: null,
         references: comment.references,
-        commentRequest: {
+        requestPayload: {
+          author: connectedAddress,
           content: comment.content,
           metadata: comment.metadata ?? [],
           ...("parentId" in comment
@@ -274,11 +282,22 @@ export function useCommentActions({
     async (params) => {
       const { comment, edit, address } = params;
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
+      if (address !== connectedAddress) {
+        throw new Error("Address does not match connected address");
+      }
+
       const pendingOperation = {
         ...(await submitEditCommentMutationFunction({
-          address,
-          editRequest: edit,
-          comment,
+          requestPayload: {
+            author: connectedAddress,
+            commentId: comment.id,
+            content: edit.content,
+            metadata: edit.metadata,
+          },
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
@@ -327,7 +346,13 @@ export function useCommentActions({
         throw e;
       }
     },
-    [commentEdition, editCommentMutation, switchChainAsync, wagmiConfig],
+    [
+      commentEdition,
+      connectedAddress,
+      editCommentMutation,
+      switchChainAsync,
+      wagmiConfig,
+    ],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -346,11 +371,17 @@ export function useCommentActions({
         throw new Error("Only edit comments can be retried");
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const pendingOperation = {
         ...(await submitEditCommentMutationFunction({
-          address: connectedAddress,
-          editRequest: comment.pendingOperation.response.data,
-          comment,
+          requestPayload: {
+            ...comment.pendingOperation.response.data,
+            author: connectedAddress,
+            commentId: comment.id,
+          },
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });
           },
@@ -418,6 +449,10 @@ export function useCommentActions({
         throw new Error("Comment already liked");
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       onBeforeStart?.();
 
       let pendingOperation: PendingPostCommentOperationSchemaType | undefined =
@@ -425,9 +460,9 @@ export function useCommentActions({
 
       try {
         pendingOperation = await submitCommentMutationFunction({
-          author: connectedAddress,
           zeroExSwap: null,
-          commentRequest: {
+          requestPayload: {
+            author: connectedAddress,
             content: COMMENT_REACTION_LIKE_CONTENT,
             metadata: [],
             commentType: COMMENT_TYPE_REACTION,
