@@ -44,7 +44,7 @@ async function waitURLToBeReady(
       if (response.ok) {
         return;
       }
-      throw new Error("URL is not ready");
+      throw new Error(`IPFS pinned URL is not ready: ${url}`);
     },
     {
       retries: retryCount,

@@ -10,6 +10,7 @@ import type {
   CommentReferenceResolutionResultsSelectType,
   CommentReportSelectType,
 } from "../../schema.offchain.ts";
+import z from "zod";
 
 export type LowercasedHex = Hex;
 
@@ -397,3 +398,25 @@ export interface ICommentReferencesCacheService {
     params: CommentReferencesCacheServiceUpdateReferenceResolutionResultParams,
   ): Promise<void>;
 }
+
+export interface ISIMAPIService {
+  getTokenInfo(
+    address: Hex,
+    chainIds: number[],
+  ): Promise<SIMAPITokenInfoSchemaType[]>;
+}
+
+export const SIMAPITokenInfoSchema = z.object({
+  chain_id: z.number().int().positive(),
+  chain: z.string(),
+  price_usd: z.number().nullish(),
+  pool_size: z.number(),
+  total_supply: z.coerce.bigint().nullish(),
+  fully_diluted_value: z.number().nullish(),
+  symbol: z.string(),
+  name: z.string().nullable(),
+  decimals: z.number().int().positive(),
+  logo: z.string().url().nullable(),
+});
+
+export type SIMAPITokenInfoSchemaType = z.infer<typeof SIMAPITokenInfoSchema>;

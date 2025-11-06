@@ -186,7 +186,11 @@ async function resolveWebPage(
     };
   }
 
-  title = title?.trim() ?? opengraph?.title ?? null;
+  title =
+    title?.trim() ??
+    opengraph?.title ??
+    ogDescription?.substring(0, 100) ??
+    null;
   description = description?.trim() ?? opengraph?.description ?? null;
 
   if (!title) {
