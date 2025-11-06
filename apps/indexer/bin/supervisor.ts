@@ -11,6 +11,7 @@ import { type ChildProcess, spawn } from "node:child_process";
 import { type Readable } from "node:stream";
 import readline from "node:readline";
 import cron from "node-cron";
+import * as Sentry from "@sentry/node";
 
 const GRACE_SHUTDOWN_DELAY_MS = 5000;
 const INDEXER_URL =
@@ -125,16 +126,22 @@ function spawnProcess(spec: (typeof PROCESSES)[number], killAllOnExit = false) {
   });
 
   prefixLogs(child.stdout, spec.name);
-  prefixLogs(child.stderr, spec.name);
+  prefixLogs(child.stderr, spec.name, true);
 
   child.on("exit", (code, signal) => {
     if (shuttingDown) {
       return;
     }
 
-    console.log(
-      `[supervisor] ${spec.name} exited with code ${code}, signal ${signal}`,
-    );
+    const logMessage = `${spec.name} exited with code ${code}, signal ${signal}`;
+    const logMessagePrefixed = `[supervisor] ${logMessage}`;
+
+    if (code && code > 0) {
+      Sentry.captureException(new Error(logMessage));
+      console.error(logMessagePrefixed);
+    } else {
+      console.log(logMessagePrefixed);
+    }
 
     if (killAllOnExit) {
       void shutdownAll(code ?? 1);

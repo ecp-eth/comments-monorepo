@@ -12,7 +12,7 @@
     "prestart": "NODE_ENV=production pnpm db:migrate:up",
     "start": "NODE_ENV=production ponder start",
     "prestart:supervisor": "NODE_ENV=production pnpm db:migrate:up",
-    "start:supervisor": "node --experimental-transform-types ./bin/supervisor.ts",
+    "start:supervisor": "tsx ./bin/supervisor.ts",
     "db": "ponder db",
     "codegen": "ponder codegen",
     "serve": "ponder serve",
@@ -23,11 +23,11 @@
     "drizzle-kit": "dotenvx run --convention nextjs -- drizzle-kit",
     "db:migrate:generate": "pnpm drizzle-kit generate",
     "db:migrate:up": "pnpm drizzle-kit migrate",
-    "worker:event-fan-out": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/event-fan-out-worker.ts",
-    "worker:notification-fan-out": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/notification-fan-out-worker.ts",
-    "worker:webhook-event-delivery": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/webhook-event-delivery-worker.ts",
-    "cron:comment-references-refresher": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/comment-references-refresher-worker.ts",
-    "cron:delete-users": "dotenvx run --convention nextjs -- node --experimental-transform-types ./bin/delete-users-worker.ts"
+    "worker:event-fan-out": "dotenvx run --convention nextjs -- tsx ./bin/event-fan-out-worker.ts",
+    "worker:notification-fan-out": "dotenvx run --convention nextjs -- tsx ./bin/notification-fan-out-worker.ts",
+    "worker:webhook-event-delivery": "dotenvx run --convention nextjs -- tsx ./bin/webhook-event-delivery-worker.ts",
+    "cron:comment-references-refresher": "dotenvx run --convention nextjs -- tsx ./bin/comment-references-refresher-worker.ts",
+    "cron:delete-users": "dotenvx run --convention nextjs -- tsx ./bin/delete-users-worker.ts"
   },
   "dependencies": {
     "@0x/0x-parser": "2.10.3",
@@ -67,6 +67,7 @@
     "ponder": "0.12.21",
     "promise-deferred": "^2.0.4",
     "telegraf": "^4.16.3",
+    "tsx": "^4.19.4",
     "type-fest": "^5.0.1",
     "uuid": "^11.1.0",
     "viem": "^2.29.2",
