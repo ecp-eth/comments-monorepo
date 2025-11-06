@@ -67,7 +67,10 @@ export type RenderOptions<
   };
 };
 
-type RenderResult<
+/**
+ * Result type for render
+ */
+export type RenderResult<
   TNode,
   TAllowedReferences extends IndexerAPICommentReferenceSchemaType,
 > = {
@@ -76,6 +79,12 @@ type RenderResult<
   isTruncated: boolean;
 };
 
+/**
+ * Renders the content and references as an array of nodes.
+ *
+ * @param options - The options for the renderer
+ * @returns The rendered node, media references and if the content was truncated
+ */
 export function render<
   TNode,
   TAllowedReferences extends IndexerAPICommentReferenceSchemaType,
@@ -275,60 +284,69 @@ export function render<
   };
 }
 
-const reactReferenceRenderers: Partial<ReferenceRenderers<React.ReactElement>> =
-  {
-    ens: {
-      length(reference) {
-        return `@${reference.name}`.length;
-      },
-      render(reference) {
-        return (
-          <a
-            className="text-blue-500"
-            href={reference.url}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            @{reference.name}
-          </a>
-        );
-      },
+/**
+ * Reference renderers for React
+ */
+export const reactReferenceRenderers: Partial<
+  ReferenceRenderers<React.ReactElement>
+> = {
+  ens: {
+    length(reference) {
+      return `@${reference.name}`.length;
     },
-    farcaster: {
-      length(reference) {
-        return `@${reference.fname}`.length;
-      },
-      render(reference) {
-        return (
-          <a
-            className="text-blue-500"
-            href={reference.url}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            @{reference.fname}
-          </a>
-        );
-      },
+    render(reference) {
+      return (
+        <a
+          className="text-blue-500"
+          href={reference.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          @{reference.name}
+        </a>
+      );
     },
-    erc20: {
-      length(reference) {
-        return `$${reference.symbol}`.length;
-      },
-      render(reference) {
-        return (
-          <span
-            className="text-blue-500"
-            title={reference.name || reference.address}
-          >
-            ${reference.symbol}
-          </span>
-        );
-      },
+  },
+  farcaster: {
+    length(reference) {
+      return `@${reference.fname}`.length;
     },
-  };
+    render(reference) {
+      return (
+        <a
+          className="text-blue-500"
+          href={reference.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          @{reference.fname}
+        </a>
+      );
+    },
+  },
+  erc20: {
+    length(reference) {
+      return `$${reference.symbol}`.length;
+    },
+    render(reference) {
+      return (
+        <span
+          className="text-blue-500"
+          title={reference.name || reference.address}
+        >
+          ${reference.symbol}
+        </span>
+      );
+    },
+  },
+};
 
-function hashKey(str: string) {
+/**
+ * Helper function to hash a string
+ * @param str - The string to hash
+ * @returns The hashed string
+ */
+export function hashKey(str: string) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -337,7 +355,12 @@ function hashKey(str: string) {
   return (hash >>> 0).toString(36); // unsigned
 }
 
-function generateKey(
+/**
+ * Helper function to generate a key for a React element
+ * @param element - The element to generate a key for
+ * @returns The key for the element
+ */
+export function generateKey(
   element:
     | React.ReactElement<unknown, string | React.JSXElementConstructor<unknown>>
     | string,
@@ -381,6 +404,9 @@ function generateKey(
   return;
 }
 
+/**
+ * Element renderers for React
+ */
 const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   paragraph(children) {
     const key = children
@@ -413,6 +439,9 @@ const reactElementRenderers: ElementRenderers<React.ReactElement> = {
   },
 };
 
+/**
+ * Result type for renderToReact
+ */
 export type RenderToReactResult = Omit<
   RenderResult<React.ReactElement, AllowedMediaReferences>,
   "result"
@@ -449,7 +478,10 @@ export function renderToReact(
   };
 }
 
-const markdownReferenceRenderers: Partial<ReferenceRenderers<string>> = {
+/**
+ * Reference renderers for markdown
+ */
+export const markdownReferenceRenderers: Partial<ReferenceRenderers<string>> = {
   ens: {
     length(reference) {
       return `@${reference.name}`.length;
@@ -508,7 +540,10 @@ const markdownReferenceRenderers: Partial<ReferenceRenderers<string>> = {
   },
 };
 
-const markdownElementRenderers: ElementRenderers<string> = {
+/**
+ * Element renderers for markdown
+ */
+export const markdownElementRenderers: ElementRenderers<string> = {
   paragraph(children) {
     return children.join("").trim() + "\n\n";
   },
@@ -520,13 +555,19 @@ const markdownElementRenderers: ElementRenderers<string> = {
   },
 };
 
-type RenderToMarkdownResult = Omit<
+export type RenderToMarkdownResult = Omit<
   RenderResult<string, IndexerAPICommentReferenceSchemaType>,
   "result"
 > & {
   result: string;
 };
 
+/**
+ * Renders the content to a markdown string
+ *
+ * @param options - The options for the renderer
+ * @returns The rendered markdown string, media references and if the content was truncated
+ */
 export function renderToMarkdown(
   options: Omit<
     RenderOptions<string, IndexerAPICommentReferenceSchemaType>,
@@ -565,7 +606,7 @@ export function renderToMarkdown(
   };
 }
 
-type ProcessMediaReferencesResult = {
+export type ProcessMediaReferencesResult = {
   mediaReferences: AllowedMediaReferences[];
   /**
    * Content without media references
@@ -573,7 +614,16 @@ type ProcessMediaReferencesResult = {
   content: string;
 };
 
-function processMediaReferences(
+/**
+ * Helper function to process media references from the content.
+ *
+ * The resultig content will be stripped of any media references that are at the end of the content.
+ *
+ * @param content - The content to process
+ * @param references - The references to process
+ * @returns The processed content and media references
+ */
+export function processMediaReferences(
   content: string,
   references: IndexerAPICommentReferenceSchemaType[],
 ): ProcessMediaReferencesResult {
