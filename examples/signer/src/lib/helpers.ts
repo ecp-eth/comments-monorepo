@@ -5,6 +5,7 @@ import { env } from "./env";
 import type { Hex } from "@ecp.eth/sdk/core";
 import type { z } from "zod";
 import { SUPPORTED_CHAINS, type SupportedChainConfig } from "@ecp.eth/sdk";
+import { nonceManager } from "@/instances";
 
 export class GaslessNotAvailableError extends Error {
   constructor() {
@@ -59,7 +60,9 @@ export async function getGaslessSigner() {
   const configuration = getGaslessConfiguration();
 
   if (configuration.type === "eth" && configuration.signerPrivateKey) {
-    return privateKeyToAccount(configuration.signerPrivateKey);
+    return privateKeyToAccount(configuration.signerPrivateKey, {
+      nonceManager,
+    });
   }
 
   return createPrivyAccount(configuration);
@@ -69,7 +72,9 @@ export async function getGaslessSubmitter() {
   const configuration = getGaslessConfiguration();
 
   if (configuration.type === "eth") {
-    return privateKeyToAccount(configuration.submitterPrivateKey);
+    return privateKeyToAccount(configuration.submitterPrivateKey, {
+      nonceManager,
+    });
   }
 
   return createPrivyAccount(configuration);
