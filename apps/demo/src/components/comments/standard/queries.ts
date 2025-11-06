@@ -58,9 +58,15 @@ export async function submitCommentMutationFunction({
 }: SubmitCommentParams): Promise<PendingPostCommentOperationSchemaType> {
   const parseResult = SignPostCommentRequestPayloadSchema.safeParse({
     ...requestPayload,
+    chainId: chain.id,
   });
 
   if (!parseResult.success) {
+    console.error(
+      "Failed to parse sign post comment",
+      requestPayload,
+      parseResult.error,
+    );
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
 
@@ -165,8 +171,10 @@ export async function submitEditCommentMutationFunction({
 }: SubmitEditCommentParams): Promise<
   Omit<PendingEditCommentOperationSchemaType, "references">
 > {
-  const parseResult =
-    SignEditCommentRequestPayloadSchema.safeParse(requestPayload);
+  const parseResult = SignEditCommentRequestPayloadSchema.safeParse({
+    ...requestPayload,
+    chainId: chain.id,
+  });
 
   if (!parseResult.success) {
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
