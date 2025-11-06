@@ -1,5 +1,13 @@
 # @ecp.eth/shared
 
+## 0.0.15
+
+### Patch Changes
+
+- 21e49d4: feat(shared): export functions and types for custom renderers
+- Updated dependencies [15c2cd6]
+  - @ecp.eth/sdk@0.0.33
+
 ## 0.0.14
 
 ### Patch Changes

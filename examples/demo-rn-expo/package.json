@@ -14,8 +14,8 @@
     "api:schema:sync": "scripts/sync-api-schemas.sh"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "~0.0.32",
-    "@ecp.eth/shared": "~0.0.14",
+    "@ecp.eth/sdk": "~0.0.33",
+    "@ecp.eth/shared": "~0.0.15",
     "@expo/vector-icons": "^14.1.0",
     "@formatjs/intl-getcanonicallocales": "^2.5.4",
     "@formatjs/intl-locale": "^4.2.10",

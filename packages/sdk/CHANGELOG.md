@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.33
+
+### Patch Changes
+
+- 15c2cd6: feat(sdk): export all webhook events
+
 ## 0.0.32
 
 ### Patch Changes
