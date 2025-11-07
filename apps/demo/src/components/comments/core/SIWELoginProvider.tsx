@@ -34,22 +34,18 @@ export const siweTokenSingleton: {
   current?: SIWETokens;
 } = {};
 
+export const setTokens = (tokens: SIWETokens) => {
+  siweTokenSingleton.current = tokens;
+  localStorage.setItem(SIWE_TOKENS_STORAGE_KEY, JSON.stringify(tokens));
+};
+
+const clearTokens = () => {
+  siweTokenSingleton.current = undefined;
+  localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+};
+
 export function SIWELoginProvider({ children }: PropsWithChildren) {
   const { address: connectedAddress } = useAccount();
-  const scheduledRefreshTokensRef = useRef<NodeJS.Timeout | undefined>(
-    undefined,
-  );
-  const firstMountTokenRefreshedRef = useRef<boolean>(false);
-
-  const setTokens = (tokens: SIWETokens) => {
-    siweTokenSingleton.current = tokens;
-    localStorage.setItem(SIWE_TOKENS_STORAGE_KEY, JSON.stringify(tokens));
-  };
-
-  const clearTokens = () => {
-    siweTokenSingleton.current = undefined;
-    localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
-  };
 
   useEffect(() => {
     if (!connectedAddress) {
@@ -86,64 +82,8 @@ export function SIWELoginProvider({ children }: PropsWithChildren) {
     siweTokenSingleton.current = siweTokens;
   }, [connectedAddress]);
 
-  const scheduleRefreshTokens = useCallback(() => {
-    const tokens = siweTokenSingleton.current;
-
-    if (scheduledRefreshTokensRef.current) {
-      // no need to schedule if already done
-      return;
-    }
-
-    if (!tokens) {
-      return;
-    }
-
-    // 2 minutes before expiration
-    const timeout = tokens.accessToken.expiresAt - Date.now() - 1000 * 60 * 2;
-
-    if (timeout <= 0) {
-      return;
-    }
-
-    scheduledRefreshTokensRef.current = setTimeout(async () => {
-      // retrieve tokens again to avoid user logged out
-      const tokens = siweTokenSingleton.current;
-
-      if (!tokens) {
-        return;
-      }
-
-      const refreshedTokens = await refreshTokens(tokens);
-      setTokens(refreshedTokens);
-      scheduleRefreshTokens();
-    }, timeout);
-  }, []);
-
-  // refresh tokens + schedule refresh upon mounting the component
-  useEffect(() => {
-    // only need to run this once per component mount
-    if (firstMountTokenRefreshedRef.current) {
-      return;
-    }
-
-    firstMountTokenRefreshedRef.current = true;
-
-    if (
-      !connectedAddress ||
-      !siweTokenSingleton.current ||
-      !areTokensActiveAndCurrent(siweTokenSingleton.current, connectedAddress)
-    ) {
-      return;
-    }
-
-    refreshTokens(siweTokenSingleton.current)
-      .then(setTokens)
-      .then(scheduleRefreshTokens);
-  }, [connectedAddress, scheduleRefreshTokens]);
-
   useSIWELogin((tokens) => {
     setTokens(tokens);
-    scheduleRefreshTokens();
   });
 
   const value = useMemo(
