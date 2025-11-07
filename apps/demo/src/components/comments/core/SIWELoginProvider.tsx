@@ -18,7 +18,7 @@ import {
   IndexerSIWEVerifyRequestPayloadSchema,
   IndexerSIWEVerifyResponseBodySchema,
 } from "@ecp.eth/shared/schemas/indexer-siwe-api/verify";
-// import { IndexerSIWERefreshResponseBodySchema } from "@ecp.eth/shared/schemas/indexer-siwe-api/refresh";
+import { IndexerSIWERefreshResponseBodySchema } from "@ecp.eth/shared/schemas/indexer-siwe-api/refresh";
 import { getWalletClient } from "@wagmi/core";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentGaslessContext } from "@/components/comments/gasless/CommentGaslessProvider";
@@ -36,6 +36,20 @@ export const siweTokenSingleton: {
 
 export function SIWELoginProvider({ children }: PropsWithChildren) {
   const { address: connectedAddress } = useAccount();
+  const scheduledRefreshTokensRef = useRef<NodeJS.Timeout | undefined>(
+    undefined,
+  );
+  const firstMountTokenRefreshedRef = useRef<boolean>(false);
+
+  const setTokens = (tokens: SIWETokens) => {
+    siweTokenSingleton.current = tokens;
+    localStorage.setItem(SIWE_TOKENS_STORAGE_KEY, JSON.stringify(tokens));
+  };
+
+  const clearTokens = () => {
+    siweTokenSingleton.current = undefined;
+    localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+  };
 
   useEffect(() => {
     if (!connectedAddress) {
@@ -52,29 +66,84 @@ export function SIWELoginProvider({ children }: PropsWithChildren) {
     try {
       jsonToken = JSON.parse(tokens);
     } catch {
-      localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+      clearTokens();
       return;
     }
 
     const parseResult = SIWETokensSchema.safeParse(jsonToken);
     if (!parseResult.success) {
-      localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+      clearTokens();
       return;
     }
 
     const siweTokens = parseResult.data;
 
     if (!areTokensActiveAndCurrent(siweTokens, connectedAddress)) {
-      localStorage.removeItem(SIWE_TOKENS_STORAGE_KEY);
+      clearTokens();
       return;
     }
 
     siweTokenSingleton.current = siweTokens;
   }, [connectedAddress]);
 
+  const scheduleRefreshTokens = useCallback(() => {
+    const tokens = siweTokenSingleton.current;
+
+    if (scheduledRefreshTokensRef.current) {
+      // no need to schedule if already done
+      return;
+    }
+
+    if (!tokens) {
+      return;
+    }
+
+    // 2 minutes before expiration
+    const timeout = tokens.accessToken.expiresAt - Date.now() - 1000 * 60 * 2;
+
+    if (timeout <= 0) {
+      return;
+    }
+
+    scheduledRefreshTokensRef.current = setTimeout(async () => {
+      // retrieve tokens again to avoid user logged out
+      const tokens = siweTokenSingleton.current;
+
+      if (!tokens) {
+        return;
+      }
+
+      const refreshedTokens = await refreshTokens(tokens);
+      setTokens(refreshedTokens);
+      scheduleRefreshTokens();
+    }, timeout);
+  }, []);
+
+  // refresh tokens + schedule refresh upon mounting the component
+  useEffect(() => {
+    // only need to run this once per component mount
+    if (firstMountTokenRefreshedRef.current) {
+      return;
+    }
+
+    firstMountTokenRefreshedRef.current = true;
+
+    if (
+      !connectedAddress ||
+      !siweTokenSingleton.current ||
+      !areTokensActiveAndCurrent(siweTokenSingleton.current, connectedAddress)
+    ) {
+      return;
+    }
+
+    refreshTokens(siweTokenSingleton.current)
+      .then(setTokens)
+      .then(scheduleRefreshTokens);
+  }, [connectedAddress, scheduleRefreshTokens]);
+
   useSIWELogin((tokens) => {
-    siweTokenSingleton.current = tokens;
-    localStorage.setItem(SIWE_TOKENS_STORAGE_KEY, JSON.stringify(tokens));
+    setTokens(tokens);
+    scheduleRefreshTokens();
   });
 
   const value = useMemo(
@@ -182,32 +251,29 @@ function areTokensActiveAndCurrent(tokens: SIWETokens, address: Hex): boolean {
   return true;
 }
 
-// async function refreshTokens(
-//   tokens: SIWETokens,
-//   onSuccess: (tokens: SIWETokens) => void,
-// ) {
-//   const refreshResponse = await fetch(getIndexerURL("/api/auth/siwe/refresh"), {
-//     method: "POST",
-//     headers: {
-//       Authorization: `${tokens.refreshToken.token}`,
-//     },
-//   });
+async function refreshTokens(tokens: SIWETokens) {
+  const refreshResponse = await fetch(getIndexerURL("/api/auth/siwe/refresh"), {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${tokens.refreshToken.token}`,
+    },
+  });
 
-//   if (!refreshResponse.ok) {
-//     throw new Error("Failed to refresh tokens");
-//   }
+  if (!refreshResponse.ok) {
+    throw new Error("Failed to refresh tokens");
+  }
 
-//   const refreshResponseData = await refreshResponse.json();
+  const refreshResponseData = await refreshResponse.json();
 
-//   const { accessToken, refreshToken } =
-//     IndexerSIWERefreshResponseBodySchema.parse(refreshResponseData);
+  const { accessToken, refreshToken } =
+    IndexerSIWERefreshResponseBodySchema.parse(refreshResponseData);
 
-//   onSuccess({
-//     address: tokens.address,
-//     accessToken,
-//     refreshToken,
-//   });
-// }
+  return {
+    address: tokens.address,
+    accessToken,
+    refreshToken,
+  };
+}
 
 async function getNewTokens(
   address: Hex,
