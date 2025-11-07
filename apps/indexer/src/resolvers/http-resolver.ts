@@ -43,11 +43,18 @@ async function resolveHTTP(
   timeout: number,
 ): Promise<ResolvedHTTP | null> {
   const abortController = new AbortController();
+  const urlObject = new URL(url);
   const response = await fetch(url, {
     signal: AbortSignal.any([
       abortController.signal,
       AbortSignal.timeout(timeout),
     ]),
+    headers: {
+      // some websites such as x.com will not generate proper og tags if the user agent is not a bot
+      ...(urlObject.hostname.endsWith("x.com")
+        ? { "User-Agent": "DiscourseBot/1.0" }
+        : undefined),
+    },
   });
   const contentType =
     normalizeContentType(response.headers.get("content-type")) ||
