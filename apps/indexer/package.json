@@ -62,6 +62,7 @@
     "node-cron": "^4.2.1",
     "node-html-parser": "^7.0.1",
     "normalize-url": "^8.0.1",
+    "p-queue": "^9.0.0",
     "pg": "8.16.0",
     "pinata": "^2.5.0",
     "ponder": "0.12.21",
