@@ -27,12 +27,19 @@ const SIMResponseSchema = z.object({
 });
 
 export class SIMAPIService implements ISIMAPIService {
+  private readonly queue: PQueue;
   constructor(
     private readonly simApiKey: string,
     private readonly maxConcurrency: number = 5,
     private readonly intervalCap: number = 5,
     private readonly interval: number = 1000,
-  ) {}
+  ) {
+    this.queue = new PQueue({
+      concurrency: this.maxConcurrency,
+      intervalCap: this.intervalCap,
+      interval: this.interval,
+    });
+  }
   async getTokenInfo(
     address: Hex,
     chainIds: ChainID[],
@@ -80,13 +87,7 @@ export class SIMAPIService implements ISIMAPIService {
   }
 
   private throttledFetchTokenInfo(...args: Parameters<typeof fetch>) {
-    const queue = new PQueue({
-      concurrency: this.maxConcurrency,
-      intervalCap: this.intervalCap,
-      interval: this.interval,
-    });
-
-    return queue.add(async function unthrottledFetch() {
+    return this.queue.add(async function unthrottledFetch() {
       const response = await fetch(...args);
 
       if (response.status === 429) {
