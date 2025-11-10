@@ -1,4 +1,3 @@
-import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import {
@@ -34,6 +33,7 @@ import {
   SendPostCommentRequestPayloadSchema,
   SendPostCommentResponseBodySchema,
   SignPostCommentRequestPayloadSchema,
+  SignPostCommentResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/post";
 import z from "zod";
 
@@ -216,7 +216,7 @@ async function postCommentWithoutGasless({
     );
   }
 
-  const signedCommentResult = SignCommentResponseClientSchema.safeParse(
+  const signedCommentResult = SignPostCommentResponseBodySchema.safeParse(
     await response.json(),
   );
 

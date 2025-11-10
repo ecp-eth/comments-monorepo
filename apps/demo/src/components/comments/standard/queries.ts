@@ -23,7 +23,6 @@ import type {
   CommentDataWithIdSchemaType,
   PendingEditCommentOperationSchemaType,
   PendingPostCommentOperationSchemaType,
-  SignEditCommentResponseClientSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
@@ -159,7 +158,7 @@ type SubmitEditCommentParams = {
   >;
   switchChainAsync: (chainId: number) => Promise<Chain>;
   writeContractAsync: (params: {
-    signEditCommentResponse: SignEditCommentResponseClientSchemaType;
+    signEditCommentResponse: z.infer<typeof SignEditCommentResponseBodySchema>;
     chainId: number;
   }) => Promise<Hex>;
 };
