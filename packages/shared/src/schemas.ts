@@ -13,10 +13,11 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   CommentInputData,
   CreateCommentDataSchema,
-  EditCommentDataSchema,
   MetadataEntrySchema,
 } from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod/v3";
+import { SignEditCommentResponseBodySchema } from "./schemas/signer-api/edit";
+import { SignPostCommentResponseBodySchema } from "./schemas/signer-api/post";
 
 export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
   id: HexSchema,
@@ -29,32 +30,6 @@ export type CommentDataWithIdSchemaType = z.infer<
 
 // this is just for type checking
 ({}) as CommentDataWithIdSchemaType satisfies CommentInputData;
-
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: CommentDataWithIdSchema,
-});
-
-export type SignCommentResponseClientSchemaType = z.infer<
-  typeof SignCommentResponseClientSchema
->;
-
-/**
- * Parses response from API endpoint for usage in client
- */
-export const SignEditCommentResponseClientSchema = z.object({
-  signature: HexSchema,
-  hash: HexSchema,
-  data: EditCommentDataSchema,
-});
-
-export type SignEditCommentResponseClientSchemaType = z.infer<
-  typeof SignEditCommentResponseClientSchema
->;
 
 export const PendingOperationTypeSchema = z.enum([
   "gasless-not-preapproved",
@@ -71,7 +46,7 @@ export const PendingPostCommentOperationSchema = z.object({
   action: z.literal("post"),
   txHash: HexSchema,
   chainId: z.number().positive().int(),
-  response: SignCommentResponseClientSchema,
+  response: SignPostCommentResponseBodySchema,
   resolvedAuthor: IndexerAPIAuthorDataSchema.optional(),
   zeroExSwap: IndexerAPICommentZeroExSwapSchema.optional(),
   state: z.discriminatedUnion("status", [
@@ -98,7 +73,7 @@ export const PendingEditCommentOperationSchema = z.object({
   action: z.literal("edit"),
   txHash: HexSchema,
   chainId: z.number().positive().int(),
-  response: SignEditCommentResponseClientSchema,
+  response: SignEditCommentResponseBodySchema,
   state: z.discriminatedUnion("status", [
     z.object({
       status: z.literal("pending"),

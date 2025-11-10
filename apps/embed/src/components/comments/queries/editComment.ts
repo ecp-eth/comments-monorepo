@@ -1,5 +1,4 @@
 import z from "zod";
-import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import {
   Account,
@@ -22,7 +21,6 @@ import {
   getComment,
   getNonce,
 } from "@ecp.eth/sdk/comments";
-
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
 import {
   createEstimateChannelPostOrEditCommentFeeData,
@@ -30,11 +28,11 @@ import {
 } from "@ecp.eth/sdk/channel-manager";
 import { prepareContractAssetForTransfer } from "./prepareContractAssetForTransfer";
 import { getSignerURL } from "@/lib/utils";
-
 import {
   SendEditCommentRequestPayloadSchema,
   SendEditCommentResponseBodySchema,
   SignEditCommentRequestPayloadSchema,
+  SignEditCommentResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/edit";
 
 class SubmitEditCommentMutationError extends Error {}
@@ -200,7 +198,7 @@ async function editCommentWithoutGasless({
     );
   }
 
-  const signedCommentResult = SignEditCommentResponseClientSchema.safeParse(
+  const signedCommentResult = SignEditCommentResponseBodySchema.safeParse(
     await response.json(),
   );
 
