@@ -1,7 +1,7 @@
 import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { getApprovalAndNonce } from "@ecp.eth/shared/helpers/getApprovalAndNonce";
-import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
+import { revokeApprovalWithSig } from "@ecp.eth/sdk/comments";
 import {
   guardAPIDeadline,
   guardAuthorIsNotMuted,
@@ -10,25 +10,25 @@ import {
 } from "@/lib/guards";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
 import { getRpcUrl } from "@/lib/env";
-import { SendApproveSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/approve";
+import { SendRevokeSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/revoke";
 import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SendApproveSignerResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/approve";
+import { SendRevokeSignerResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/revoke";
 
 export async function POST(
   req: Request,
 ): Promise<
   JSONResponse<
-    | typeof SendApproveSignerResponseBodySchema
+    | typeof SendRevokeSignerResponseBodySchema
     | typeof BadRequestResponseBodySchema
     | typeof ErrorResponseBodySchema
   >
 > {
   try {
     const parsedBodyResult =
-      SendApproveSignerRequestPayloadRestrictedSchema.safeParse(
+      SendRevokeSignerRequestPayloadRestrictedSchema.safeParse(
         await req.json(),
       );
 
@@ -85,10 +85,10 @@ export async function POST(
         chain,
       );
 
-    if (isApproved) {
+    if (!isApproved) {
       return new JSONResponse(
         BadRequestResponseBodySchema,
-        { signTypedDataParams: ["Already approved"] },
+        { signTypedDataParams: ["No need to revoke approval"] },
         {
           status: 400,
         },
@@ -124,13 +124,13 @@ export async function POST(
       transport,
     });
 
-    const { txHash } = await addApprovalWithSig({
+    const { txHash } = await revokeApprovalWithSig({
       signature: authorSignature,
       typedData: signTypedDataParams,
       writeContract: walletClient.writeContract,
     });
 
-    return new JSONResponse(SendApproveSignerResponseBodySchema, { txHash });
+    return new JSONResponse(SendRevokeSignerResponseBodySchema, { txHash });
   } catch (error) {
     if (error instanceof JSONResponse) {
       return error;
@@ -140,7 +140,7 @@ export async function POST(
 
     return new JSONResponse(
       ErrorResponseBodySchema,
-      { error: "Failed to add approval" },
+      { error: "Failed to revoke approval" },
       { status: 500 },
     );
   }
