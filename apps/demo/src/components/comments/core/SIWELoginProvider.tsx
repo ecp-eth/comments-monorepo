@@ -18,7 +18,6 @@ import {
   IndexerSIWEVerifyRequestPayloadSchema,
   IndexerSIWEVerifyResponseBodySchema,
 } from "@ecp.eth/shared/schemas/indexer-siwe-api/verify";
-import { IndexerSIWERefreshResponseBodySchema } from "@ecp.eth/shared/schemas/indexer-siwe-api/refresh";
 import { getWalletClient } from "@wagmi/core";
 import { useFreshRef } from "@ecp.eth/shared/hooks";
 import { useCommentGaslessContext } from "@/components/comments/gasless/CommentGaslessProvider";
@@ -189,30 +188,6 @@ function areTokensActiveAndCurrent(tokens: SIWETokens, address: Hex): boolean {
   }
 
   return true;
-}
-
-async function refreshTokens(tokens: SIWETokens) {
-  const refreshResponse = await fetch(getIndexerURL("/api/auth/siwe/refresh"), {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${tokens.refreshToken.token}`,
-    },
-  });
-
-  if (!refreshResponse.ok) {
-    throw new Error("Failed to refresh tokens");
-  }
-
-  const refreshResponseData = await refreshResponse.json();
-
-  const { accessToken, refreshToken } =
-    IndexerSIWERefreshResponseBodySchema.parse(refreshResponseData);
-
-  return {
-    address: tokens.address,
-    accessToken,
-    refreshToken,
-  };
 }
 
 async function getNewTokens(

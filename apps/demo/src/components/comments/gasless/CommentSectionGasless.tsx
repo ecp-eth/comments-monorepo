@@ -277,7 +277,6 @@ export function CommentSectionGasless({
   });
 
   const gaslessCommentActions = useGaslessCommentActions({
-    connectedAddress: viewer,
     gasSponsorship:
       !disableApprovals && !!approvalStatus.data?.approved
         ? "gasless-preapproved"
