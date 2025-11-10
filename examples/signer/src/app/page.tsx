@@ -10,10 +10,19 @@ import {
 import { SendDeleteCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/delete";
 import { SendApproveSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/approve";
 import { ZodSchemaRenderer } from "./components/ZodSchemaRenderer";
+import { privateKeyToAccount } from "viem/accounts";
 
 const gaslessAvailable =
   env.GASLESS_METHOD === "private-key" || env.GASLESS_METHOD === "privy";
 const signerAvailable = !!env.APP_SIGNER_PRIVATE_KEY;
+
+const signerAddress = env.APP_SIGNER_PRIVATE_KEY
+  ? privateKeyToAccount(env.APP_SIGNER_PRIVATE_KEY).address
+  : undefined;
+const gaslessSignerAddress =
+  env.GASLESS_METHOD === "private-key" && env.GASLESS_APP_SIGNER_PRIVATE_KEY
+    ? privateKeyToAccount(env.GASLESS_APP_SIGNER_PRIVATE_KEY).address
+    : undefined;
 
 export default function HomePage() {
   return (
@@ -25,6 +34,18 @@ export default function HomePage() {
         <p className="text-xl text-gray-600">
           API service for signing ECP comments
         </p>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Configurations</h2>
+        <ul>
+          <li>
+            <strong>Signer Address:</strong> {signerAddress}
+          </li>
+          <li>
+            <strong>Gasless Signer Address:</strong> {gaslessSignerAddress}
+          </li>
+        </ul>
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
