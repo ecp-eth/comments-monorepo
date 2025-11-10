@@ -6,16 +6,20 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Loader2Icon, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
-import { createApprovalTypedData } from "@ecp.eth/sdk/comments";
 import {
-  useGaslessTransaction,
-  useRevokeApproval,
-} from "@ecp.eth/sdk/comments/react";
+  createApprovalTypedData,
+  createRemoveApprovalTypedData,
+} from "@ecp.eth/sdk/comments";
+import { useGaslessTransaction } from "@ecp.eth/sdk/comments/react";
 import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
   SendApproveSignerRequestPayloadSchema,
   SendApproveSignerResponseBodySchema,
 } from "@ecp.eth/shared/schemas/signer-api/approve";
+import {
+  SendRevokeSignerRequestPayloadSchema,
+  SendRevokeSignerResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/revoke";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import {
@@ -65,12 +69,70 @@ export function CommentSectionGasless({
     [currentUrl, viewer],
   );
 
-  const revokeApproval = useRevokeApproval();
   const approvalStatus = useApprovalStatus(
     publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     chain,
   );
   const fetch = useSIWEFetch();
+
+  const revokeGaslessTransactionsMutation = useGaslessTransaction({
+    async prepareSignTypedDataParams() {
+      const approvalStatusData = approvalStatus.data;
+
+      if (!approvalStatusData || !viewer) {
+        throw new Error("No approval data found");
+      }
+
+      if (!approvalStatusData.approved) {
+        throw new Error("No need to revoke approval");
+      }
+
+      const signTypedDataParams = createRemoveApprovalTypedData({
+        author: viewer,
+        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
+        chainId: chain.id,
+        nonce: approvalStatusData.nonce,
+      });
+
+      return {
+        signTypedDataParams: {
+          ...signTypedDataParams,
+          account: viewer,
+        },
+        variables: approvalStatusData,
+      };
+    },
+    async sendSignedData({ signature, signTypedDataParams }) {
+      if (!viewer) {
+        throw new Error("No viewer address found");
+      }
+
+      const response = await fetch(getSignerURL("/api/revoke-signer/send"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          {
+            signTypedDataParams,
+            authorSignature: signature,
+            authorAddress: viewer,
+            chainId: chain.id,
+          } satisfies z.infer<typeof SendRevokeSignerRequestPayloadSchema>,
+          bigintReplacer, // because typed data contains a bigint when parsed using our zod schemas
+        ),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          "Failed to post approval signature, the service is temporarily unavailable, please try again later",
+        );
+      }
+
+      return SendRevokeSignerResponseBodySchema.parse(await response.json())
+        .txHash;
+    },
+  });
 
   const approveGaslessTransactionsMutation = useGaslessTransaction({
     async prepareSignTypedDataParams() {
@@ -139,8 +201,12 @@ export function CommentSectionGasless({
     hash: approveGaslessTransactionsMutation.data,
   });
 
+  const { request: requestRevokeApprovalOnConnect } = useConnectedAction(() => {
+    revokeGaslessTransactionsMutation.mutate();
+  });
+
   const removeApprovalContractReceipt = useWaitForTransactionReceipt({
-    hash: revokeApproval.data?.txHash,
+    hash: revokeGaslessTransactionsMutation.data,
   });
 
   const {
@@ -222,26 +288,26 @@ export function CommentSectionGasless({
     if (approveContractReceipt.data?.status === "success") {
       approvalStatus.refetch();
       approveGaslessTransactionsMutation.reset();
-      revokeApproval.reset();
+      revokeGaslessTransactionsMutation.reset();
     }
   }, [
     approvalStatus,
     approveContractReceipt.data?.status,
     approveGaslessTransactionsMutation,
-    revokeApproval,
+    revokeGaslessTransactionsMutation,
   ]);
 
   useEffect(() => {
     if (removeApprovalContractReceipt.data?.status === "success") {
       approvalStatus.refetch();
       approveGaslessTransactionsMutation.reset();
-      revokeApproval.reset();
+      revokeGaslessTransactionsMutation.reset();
     }
   }, [
     approvalStatus,
     removeApprovalContractReceipt.data?.status,
     approveGaslessTransactionsMutation,
-    revokeApproval,
+    revokeGaslessTransactionsMutation,
   ]);
 
   useEffect(() => {
@@ -273,7 +339,9 @@ export function CommentSectionGasless({
     !!viewer;
 
   const isRemovingApproval =
-    revokeApproval.isPending || removeApprovalContractReceipt.isLoading;
+    (removeApprovalContractReceipt.isLoading ||
+      revokeGaslessTransactionsMutation.isPending) &&
+    !!viewer;
 
   const results = useMemo(() => {
     return data?.pages.flatMap((page) => page.results) ?? [];
@@ -318,18 +386,21 @@ export function CommentSectionGasless({
                   <Button
                     variant="outline"
                     disabled={!approvalStatus.data || isRemovingApproval}
-                    onClick={() => {
+                    onClick={async () => {
+                      if (!viewer) {
+                        await connectAccount();
+                        requestRevokeApprovalOnConnect();
+                        return;
+                      }
+
                       if (
                         !approvalStatus.data ||
-                        !approvalStatus.data.approved ||
-                        !viewer
+                        !approvalStatus.data.approved
                       ) {
                         throw new Error("No data found");
                       }
 
-                      revokeApproval.mutateAsync({
-                        app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
-                      });
+                      revokeGaslessTransactionsMutation.mutate();
                     }}
                   >
                     <X />
