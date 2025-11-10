@@ -8,6 +8,7 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import {
   FetchCommentInfinityQuerySchema,
+  IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies,
   PendingCommentOperationSchemaType,
   PendingOperationSchema,
   PendingOperationSchemaType,
@@ -185,8 +186,10 @@ function insertPendingCommentOperationToCache(
 function getParentStructureForInserting(
   arrayOfIndexerAPICommentReplies: IndexerAPIListCommentRepliesSchemaType[],
   parentId: Hex,
-): IndexerAPIListCommentRepliesSchemaType {
-  let parentStructure: IndexerAPIListCommentRepliesSchemaType | undefined;
+): IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies {
+  let parentStructure:
+    | IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies
+    | undefined;
 
   arrayOfIndexerAPICommentReplies.forEach((indexerAPICommentReplies) => {
     everyIndexerAPIListComments(
@@ -245,6 +248,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
         limit: 0,
         hasNext: false,
         hasPrevious: false,
+        count: 0,
       },
       extra: { moderationEnabled: false, moderationKnownReactions: [] },
     },
@@ -263,7 +267,7 @@ function createIndexerAPICommentDataFromPendingCommentOperation(
  * @param cachedIndexAPIListComments
  */
 function popOutOfLimitItemsFromList(
-  cachedIndexAPIListComments: IndexerAPIListCommentRepliesSchemaType,
+  cachedIndexAPIListComments: IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies,
 ) {
   const itemsToPop =
     cachedIndexAPIListComments.results.length -

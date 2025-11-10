@@ -23,6 +23,8 @@ import { useKeyboardRemainingheight } from "../hooks/useKeyboardRemainingHeight"
 import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import useWaitConnected from "../hooks/useWaitConnected";
+import { SignPostCommentRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/post";
+import z from "zod";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;
@@ -141,8 +143,9 @@ export function CommentForm({
               ? {
                   content: text,
                   author: address,
-                  parentId: replyingComment?.id,
+                  parentId: replyingComment.id,
                   metadata: [],
+                  chainId: chainId,
                 }
               : {
                   content: text,
@@ -150,6 +153,7 @@ export function CommentForm({
                   targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
                   author: address,
                   metadata: [],
+                  chainId: chainId,
                 };
 
             console.log("posting comment: ", commentToPost);

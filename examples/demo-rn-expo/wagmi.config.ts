@@ -20,7 +20,7 @@ export const transport = http(publicEnv.EXPO_PUBLIC_RPC_URL, {
   fetchOptions: {
     headers: {
       // the RPC URL used by api might has restricted origin
-      Origin: publicEnv.EXPO_PUBLIC_API_URL,
+      Origin: publicEnv.EXPO_PUBLIC_SIGNER_API_URL,
     },
   },
 });

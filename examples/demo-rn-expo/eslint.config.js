@@ -1,4 +1,4 @@
-import { config } from "../../packages/eslint-config/react-internal";
+import { config } from "../../packages/eslint-config/react-internal.js";
 import globals from "globals";
 
 /** @type {import("eslint").Linter.Config} */
