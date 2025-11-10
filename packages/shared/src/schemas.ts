@@ -10,26 +10,13 @@ import {
   type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import {
-  CommentInputData,
-  CreateCommentDataSchema,
-  MetadataEntrySchema,
-} from "@ecp.eth/sdk/comments/schemas";
 import { z } from "zod/v3";
 import { SignEditCommentResponseBodySchema } from "./schemas/signer-api/edit";
 import { SignPostCommentResponseBodySchema } from "./schemas/signer-api/post";
-
-export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
-  id: HexSchema,
-  metadata: MetadataEntrySchema.array(),
-});
-
-export type CommentDataWithIdSchemaType = z.infer<
-  typeof CommentDataWithIdSchema
->;
-
-// this is just for type checking
-({}) as CommentDataWithIdSchemaType satisfies CommentInputData;
+export {
+  CommentDataWithIdSchema,
+  type CommentDataWithIdSchemaType,
+} from "./schemas/signer-api/shared";
 
 export const PendingOperationTypeSchema = z.enum([
   "gasless-not-preapproved",

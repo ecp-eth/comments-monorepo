@@ -2,8 +2,7 @@ import { z } from "zod/v3";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { MetadataArraySchema } from "@ecp.eth/sdk/comments/schemas";
 import { DEFAULT_COMMENT_TYPE } from "@ecp.eth/sdk";
-import { CommentDataWithIdSchema } from "../../schemas";
-import { AuthorSignatureSchema } from "./shared";
+import { AuthorSignatureSchema, CommentDataWithIdSchema } from "./shared";
 
 /**
  * Shared request payload schema for actions related to posting comments

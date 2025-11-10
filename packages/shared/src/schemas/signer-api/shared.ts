@@ -1,5 +1,22 @@
+import {
+  CommentInputData,
+  CreateCommentDataSchema,
+  MetadataEntrySchema,
+} from "@ecp.eth/sdk/comments";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { z } from "zod/v3";
+
+export const CommentDataWithIdSchema = CreateCommentDataSchema.extend({
+  id: HexSchema,
+  metadata: MetadataEntrySchema.array(),
+});
+
+export type CommentDataWithIdSchemaType = z.infer<
+  typeof CommentDataWithIdSchema
+>;
+
+// this is just for type checking
+({}) as CommentDataWithIdSchemaType satisfies CommentInputData;
 
 // Error response schemas
 export const BadRequestResponseBodySchema = z.record(
