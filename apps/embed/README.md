@@ -47,13 +47,7 @@ pnpm dlx turbo build:dev
 
 ### Environment Variables
 
-Copy `.env.example` to `.env` and configure the following required environment variables:
-
-| Variable                    | Description                                                        |
-| --------------------------- | ------------------------------------------------------------------ |
-| `APP_SIGNER_PRIVATE_KEY`    | App identity signer private key (generate using `cast wallet new`) |
-| `NEXT_PUBLIC_WC_PROJECT_ID` | WalletConnect project ID (obtain from https://cloud.reown.com)     |
-| `COMMENTS_INDEXER_URL`      | The URL of the comments indexer (default: http://localhost:42069)  |
+Copy `.env.example` to `.env` and configure the required environment variables.
 
 ### Build
 
