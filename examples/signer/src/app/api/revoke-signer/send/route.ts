@@ -105,6 +105,16 @@ export async function POST(
       );
     }
 
+    if (appSignerAccount.address !== signTypedDataParams.message.app) {
+      return new JSONResponse(
+        BadRequestResponseBodySchema,
+        { signTypedDataParams: ["app address not allowed"] },
+        {
+          status: 400,
+        },
+      );
+    }
+
     // Can be any account with funds for gas on desired chain
     const submitterAccount = await getGaslessSubmitter();
 
@@ -130,7 +140,7 @@ export async function POST(
 
     return new JSONResponse(
       ErrorResponseBodySchema,
-      { error: "Failed to add approval" },
+      { error: "Failed to revoke approval" },
       { status: 500 },
     );
   }
