@@ -195,7 +195,7 @@ async function postCommentWithoutGasless({
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
 }): Promise<SubmitPostCommentMutationResult> {
   const { chainId, channelId, author } = requestPayload;
-  const response = await fetch("/api/sign-comment", {
+  const response = await fetch(getSignerURL("/api/post-comment/sign"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
