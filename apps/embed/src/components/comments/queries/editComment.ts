@@ -1,17 +1,10 @@
-import {
-  EditCommentPayloadInputSchema,
-  EditCommentPayloadInputSchemaType,
-  SignEditCommentPayloadRequestSchemaType,
-  EditCommentPayloadRequestSchemaType,
-  EditCommentResponseSchema,
-} from "@/lib/schemas";
+import z from "zod";
 import { SignEditCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
 import { publicEnv } from "@/publicEnv";
 import {
   Account,
   type Chain,
   ContractFunctionExecutionError,
-  type Hex,
   PublicClient,
   Transport,
   WalletClient,
@@ -20,10 +13,7 @@ import {
   InvalidCommentError,
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
-import type {
-  Comment,
-  PendingEditCommentOperationSchemaType,
-} from "@ecp.eth/shared/schemas";
+import type { PendingEditCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   createEditCommentData,
@@ -39,17 +29,18 @@ import {
   estimateChannelEditCommentFee,
 } from "@ecp.eth/sdk/channel-manager";
 import { prepareContractAssetForTransfer } from "./prepareContractAssetForTransfer";
+import { getSignerURL } from "@/lib/utils";
+
+import {
+  SendEditCommentRequestPayloadSchema,
+  SendEditCommentResponseBodySchema,
+  SignEditCommentRequestPayloadSchema,
+} from "@ecp.eth/shared/schemas/signer-api/edit";
 
 class SubmitEditCommentMutationError extends Error {}
 
-type EditCommentRequestType = Omit<
-  SignEditCommentPayloadRequestSchemaType,
-  "author" | "metadata" | "commentId"
->;
 type SubmitEditCommentParams = {
-  address: Hex | undefined;
-  comment: Comment;
-  editRequest: EditCommentRequestType;
+  requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   switchChainAsync: (chainId: number) => Promise<Chain>;
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
@@ -61,49 +52,36 @@ type PendingEditCommentOperationSchemaTypeWithoutReferences = Omit<
 >;
 
 export async function submitEditComment({
-  address,
-  comment,
-  editRequest,
+  requestPayload,
   switchChainAsync,
   publicClient,
   walletClient,
   gasSponsorship,
 }: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
-  if (!address) {
-    throw new SubmitEditCommentMutationError("Wallet not connected.");
-  }
-
-  const parseResult = EditCommentPayloadInputSchema.safeParse({
-    author: address,
-    commentId: comment.id,
-    content: editRequest.content,
-    metadata: comment.metadata,
-    chainId: editRequest.chainId,
-  });
+  const parseResult =
+    SendEditCommentRequestPayloadSchema.shape.edit.safeParse(requestPayload);
 
   if (!parseResult.success) {
     throw new InvalidCommentError(parseResult.error.flatten().fieldErrors);
   }
 
-  const editCommentPayloadRequest = parseResult.data;
+  const { chainId } = parseResult.data;
+  const switchedChain = await switchChainAsync(chainId);
 
-  const switchedChain = await switchChainAsync(editRequest.chainId);
-
-  if (switchedChain.id !== editRequest.chainId) {
+  if (switchedChain.id !== chainId) {
     throw new SubmitEditCommentMutationError("Failed to switch chain.");
   }
 
   switch (gasSponsorship) {
     case "not-gasless":
       return await editCommentWithoutGasless({
-        editCommentPayloadRequest,
+        requestPayload,
         publicClient,
         walletClient,
-        editRequest,
       });
     case "gasless-not-preapproved":
       return await editCommentWithGaslessAndAuthorSig({
-        editCommentPayloadRequest,
+        requestPayload,
         publicClient,
         walletClient,
       });
@@ -118,15 +96,15 @@ export async function submitEditComment({
 }
 
 async function editCommentWithGaslessAndAuthorSig({
-  editCommentPayloadRequest,
+  requestPayload,
   publicClient,
   walletClient,
 }: {
-  editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
+  requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
-  const { commentId, content, author } = editCommentPayloadRequest;
+  const { commentId, content, author, metadata, chainId } = requestPayload;
   const nonce = await getNonce({
     author,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
@@ -137,10 +115,9 @@ async function editCommentWithGaslessAndAuthorSig({
     content,
     app: publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS,
     nonce,
-    metadata: editCommentPayloadRequest.metadata,
+    metadata,
   });
 
-  const chainId = editCommentPayloadRequest.chainId;
   const typedCommentData = createEditCommentTypedData({
     author,
     edit: editCommentData,
@@ -150,17 +127,17 @@ async function editCommentWithGaslessAndAuthorSig({
   const deadline = editCommentData.deadline;
   const authorSignature = await walletClient.signTypedData(typedCommentData);
 
-  const response = await fetch("/api/edit-comment", {
+  const response = await fetch(getSignerURL("/api/edit-comment/send"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(
       {
-        comment: editCommentPayloadRequest,
+        edit: requestPayload,
         authorSignature,
         deadline,
-      } satisfies EditCommentPayloadRequestSchemaType,
+      } satisfies z.input<typeof SendEditCommentRequestPayloadSchema>,
       bigintReplacer,
     ),
   });
@@ -173,7 +150,7 @@ async function editCommentWithGaslessAndAuthorSig({
     );
   }
 
-  const editCommentResult = EditCommentResponseSchema.safeParse(
+  const editCommentResult = SendEditCommentResponseBodySchema.safeParse(
     await response.json(),
   );
 
@@ -189,28 +166,30 @@ async function editCommentWithGaslessAndAuthorSig({
     type: "gasless-not-preapproved",
     action: "edit",
     state: { status: "pending" },
-    chainId: editCommentPayloadRequest.chainId,
+    chainId,
   };
 }
 
 async function editCommentWithoutGasless({
-  editCommentPayloadRequest,
+  requestPayload,
   publicClient,
   walletClient,
-  editRequest,
 }: {
-  editCommentPayloadRequest: EditCommentPayloadInputSchemaType;
+  requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
-  editRequest: EditCommentRequestType;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
-  const { author } = editCommentPayloadRequest;
-  const response = await fetch("/api/sign-edit-comment", {
+  const { author, commentId, chainId } = requestPayload;
+  const response = await fetch(getSignerURL("/api/edit-comment/sign"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(editCommentPayloadRequest),
+    body: JSON.stringify(
+      requestPayload satisfies z.input<
+        typeof SignEditCommentRequestPayloadSchema
+      >,
+    ),
   });
 
   if (!response.ok) {
@@ -234,7 +213,7 @@ async function editCommentWithoutGasless({
   try {
     const { comment: existingComment } = await getComment({
       readContract: publicClient.readContract,
-      commentId: editCommentPayloadRequest.commentId,
+      commentId,
     });
 
     let fee:
@@ -282,7 +261,7 @@ async function editCommentWithoutGasless({
       type: "non-gasless",
       action: "edit",
       state: { status: "pending" },
-      chainId: editRequest.chainId,
+      chainId,
     };
   } catch (e) {
     if (e instanceof ContractFunctionExecutionError) {

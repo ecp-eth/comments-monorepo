@@ -60,13 +60,18 @@ export function useRetryEditComment({
         throw new Error("Only edit comments can be retried");
       }
 
+      if (!connectedAddress) {
+        throw new Error("Wallet not connected");
+      }
+
       const pendingOperation = {
         ...(await submitEditComment({
-          address: connectedAddress,
-          comment,
-          editRequest: {
-            ...comment.pendingOperation.response.data,
+          requestPayload: {
             chainId: comment.pendingOperation.chainId,
+            author: connectedAddress,
+            commentId: comment.id,
+            content: comment.content,
+            metadata: comment.metadata,
           },
           switchChainAsync(chainId) {
             return switchChainAsync({ chainId });

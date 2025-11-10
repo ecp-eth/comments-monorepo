@@ -26,3 +26,8 @@ export function getAppSignerAddress(
       ? undefined
       : app;
 }
+
+export function getSignerURL(path: string) {
+  const url = new URL(path, publicEnv.NEXT_PUBLIC_SIGNER_API_URL);
+  return url.toString();
+}

@@ -43,11 +43,12 @@ export function usePostComment() {
       const walletClient = await getWalletClient(wagmiConfig);
       const pendingOperation = {
         ...(await submitPostComment({
-          author: author,
-          postCommentRequest: {
+          requestPayload: {
+            author,
             chainId,
             content,
             channelId,
+            metadata: [],
             ...("parentId" in targetUriOrParentId
               ? { parentId: targetUriOrParentId.parentId }
               : { targetUri: targetUriOrParentId.targetUri }),
