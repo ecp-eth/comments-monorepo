@@ -110,9 +110,9 @@ async function deleteCommentWithGaslessAndAuthorSig({
           ...requestPayload,
         },
         deadline,
+        authorSignature,
       } satisfies z.input<typeof SendDeleteCommentRequestPayloadSchema>,
       bigintReplacer,
-      authorSignature,
     ),
   });
 
