@@ -141,8 +141,9 @@ export function CommentForm({
               ? {
                   content: text,
                   author: address,
-                  parentId: replyingComment?.id,
+                  parentId: replyingComment.id,
                   metadata: [],
+                  chainId: chainId,
                 }
               : {
                   content: text,
@@ -150,6 +151,7 @@ export function CommentForm({
                   targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
                   author: address,
                   metadata: [],
+                  chainId: chainId,
                 };
 
             console.log("posting comment: ", commentToPost);

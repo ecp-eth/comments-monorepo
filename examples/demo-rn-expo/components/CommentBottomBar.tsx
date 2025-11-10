@@ -55,7 +55,7 @@ export function CommentBottomBar({
 
         {onReply && (
           <TouchableOpacity onPress={() => onReply(comment)} hitSlop={15}>
-            <AntDesign name="message1" size={20} color="black" />
+            <AntDesign name="message" size={20} color="black" />
           </TouchableOpacity>
         )}
       </View>

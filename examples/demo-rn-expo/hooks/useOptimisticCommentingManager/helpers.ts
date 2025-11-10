@@ -2,8 +2,9 @@ import {
   IndexerAPICommentSchemaType,
   IndexerAPICommentWithRepliesSchema,
   IndexerAPICommentWithRepliesSchemaType,
-  IndexerAPIListCommentRepliesSchemaType,
+  IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies } from "./schemas";
 
 /**
  * tree traverse over comments returned from indexer api, include the ones in replies
@@ -12,17 +13,16 @@ import {
  * @returns true if the callback returns `true | undefined` for all comments
  */
 export function everyIndexerAPIListComments(
-  indexerAPIListCommentResult: IndexerAPIListCommentRepliesSchemaType,
+  indexerAPIListComments: IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies,
   callback: (
     indexerAPIComment: IndexerAPICommentSchemaType,
-    parentStructure: IndexerAPIListCommentRepliesSchemaType,
+    parentStructure: IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies,
   ) => boolean | undefined,
 ) {
-  const comments = indexerAPIListCommentResult.results;
+  const comments = indexerAPIListComments.results;
 
   return comments.every((indexerAPIComment): boolean => {
-    const abort =
-      callback(indexerAPIComment, indexerAPIListCommentResult) === false;
+    const abort = callback(indexerAPIComment, indexerAPIListComments) === false;
 
     if (abort) {
       return false;

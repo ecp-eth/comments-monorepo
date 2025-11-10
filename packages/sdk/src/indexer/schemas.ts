@@ -508,6 +508,9 @@ export type IndexerAPIListCommentsOutputSchemaType = z.infer<
   typeof IndexerAPIListCommentsOutputSchema
 >;
 
+/**
+ * @deprecated Use IndexerAPIListCommentsSchema instead
+ */
 export const IndexerAPIListCommentRepliesSchema = z.object({
   results: z.array(IndexerAPICommentWithRepliesSchema),
   pagination: IndexerAPICursorPaginationSchema,
