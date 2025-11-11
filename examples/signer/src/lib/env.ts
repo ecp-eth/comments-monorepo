@@ -78,6 +78,7 @@ const BaseEnvSchema = z.object({
   KV_REST_API_TOKEN: z.string().optional(),
   RATE_LIMITER_NAMESPACE: z.string().optional(),
 
+  NEXT_PUBLIC_ACCESS_CONTROL_ALLOW_ORIGIN: z.string().default("*"),
   SIWE_ACCESS_TOKEN_PUBLIC_KEY: z.string().nonempty().optional(),
 });
 

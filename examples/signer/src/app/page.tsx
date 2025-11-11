@@ -45,6 +45,10 @@ export default function HomePage() {
           <li>
             <strong>Gasless Signer Address:</strong> {gaslessSignerAddress}
           </li>
+          <li>
+            <strong>Allowed origin:</strong>{" "}
+            {env.NEXT_PUBLIC_ACCESS_CONTROL_ALLOW_ORIGIN}
+          </li>
         </ul>
       </div>
 
