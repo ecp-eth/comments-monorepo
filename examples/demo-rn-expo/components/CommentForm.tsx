@@ -23,8 +23,6 @@ import { useKeyboardRemainingheight } from "../hooks/useKeyboardRemainingHeight"
 import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import useWaitConnected from "../hooks/useWaitConnected";
-import { SignPostCommentRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/post";
-import z from "zod";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;

@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, View, Text } from "react-native";
 import { useAccount } from "wagmi";
-import { useAppKit } from "@reown/appkit-wagmi-react-native";
+import { useAppKit } from "@reown/appkit-react-native";
 import { Hex, isHex } from "viem";
 import { CurrentNetwork } from "../components/CurrentNetwork";
 import { AuthorBox } from "./AuthorBox";
