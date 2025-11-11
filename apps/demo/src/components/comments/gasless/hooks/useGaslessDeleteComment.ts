@@ -1,4 +1,3 @@
-import type { Hex } from "viem";
 import { useMutation } from "@tanstack/react-query";
 import type { Comment } from "@ecp.eth/shared/schemas";
 import { useConfig } from "wagmi";
@@ -6,14 +5,12 @@ import { useSIWEFetch } from "../../../../hooks/useSIWEFetch";
 import { getWalletClient } from "@wagmi/core";
 import { sendDeleteCommentGaslessly } from "../queries/deleteComment";
 import { chain } from "@/lib/clientWagmi";
+import { useConnectAccount } from "@ecp.eth/shared/hooks";
 
-export function useGaslessDeleteComment({
-  connectedAddress,
-}: {
-  connectedAddress: Hex | undefined;
-}) {
+export function useGaslessDeleteComment() {
   const wagmiConfig = useConfig();
   const fetch = useSIWEFetch();
+  const connectAccount = useConnectAccount();
 
   return useMutation({
     mutationFn: async ({
@@ -23,9 +20,7 @@ export function useGaslessDeleteComment({
       comment: Comment;
       gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
     }) => {
-      if (!connectedAddress) {
-        throw new Error("No connected address");
-      }
+      const connectedAddress = await connectAccount();
 
       const walletClient = await getWalletClient(wagmiConfig);
       const result = await sendDeleteCommentGaslessly({

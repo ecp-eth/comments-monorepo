@@ -1,9 +1,9 @@
+import { z } from "zod/v3";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   EditCommentDataSchema,
   MetadataArraySchema,
 } from "@ecp.eth/sdk/comments/schemas";
-import { z } from "zod/v3";
 import { AuthorSignatureSchema } from "./shared";
 
 const SharedEditCommentRequestPayloadSchema = z.object({

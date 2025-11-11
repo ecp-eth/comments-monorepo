@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: envForConfig.ACCESS_CONTROL_ALLOW_ORIGIN,
+            value: envForConfig.NEXT_PUBLIC_ACCESS_CONTROL_ALLOW_ORIGIN,
           },
           {
             key: "Access-Control-Allow-Methods",

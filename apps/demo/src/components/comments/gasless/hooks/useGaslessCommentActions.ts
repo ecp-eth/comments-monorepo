@@ -9,7 +9,6 @@ import type {
   OnRetryPostComment,
   OnUnlikeComment,
 } from "../../core/CommentActionsContext";
-import type { Hex } from "viem";
 import { waitForTransactionReceipt, getChainId } from "@wagmi/core";
 import { useConfig } from "wagmi";
 import {
@@ -18,6 +17,7 @@ import {
   useCommentRetryEdition,
   useCommentRetrySubmission,
   useCommentSubmission,
+  useConnectAccount,
   useReactionRemoval,
   useReactionSubmission,
 } from "@ecp.eth/shared/hooks";
@@ -35,18 +35,14 @@ import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { COMMENT_REACTION_LIKE_CONTENT } from "@ecp.eth/shared/constants";
 
 type UseGaslessCommentActionsProps = {
-  connectedAddress: Hex | undefined;
   gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
 };
 
 export function useGaslessCommentActions({
-  connectedAddress,
   gasSponsorship,
 }: UseGaslessCommentActionsProps): CommentActionsContextType {
   const wagmiConfig = useConfig();
-  const deleteCommentMutation = useGaslessDeleteComment({
-    connectedAddress,
-  });
+  const deleteCommentMutation = useGaslessDeleteComment();
   const postCommentMutation = useGaslessPostComment();
   const { mutateAsync: sendPostComment } = postCommentMutation;
   const commentDeletion = useCommentDeletion();
@@ -60,10 +56,12 @@ export function useGaslessCommentActions({
     COMMENT_REACTION_LIKE_CONTENT,
   );
   const likeReactionRemoval = useReactionRemoval(COMMENT_REACTION_LIKE_CONTENT);
+  const connectAccount = useConnectAccount();
 
   const deleteComment = useCallback<OnDeleteComment>(
     async (params) => {
       try {
+        await connectAccount();
         const txHash = await deleteCommentMutation.mutateAsync({
           comment: params.comment,
           gasSponsorship,
@@ -110,7 +108,13 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [deleteCommentMutation, wagmiConfig, gasSponsorship, commentDeletion],
+    [
+      connectAccount,
+      deleteCommentMutation,
+      gasSponsorship,
+      wagmiConfig,
+      commentDeletion,
+    ],
   );
 
   const retryPostComment = useCallback<OnRetryPostComment>(
@@ -129,6 +133,7 @@ export function useGaslessCommentActions({
         throw new Error("Only post comments can be retried");
       }
 
+      await connectAccount();
       const pendingOperation = await sendPostComment({
         content: comment.content,
         gasSponsorship: comment.pendingOperation.type,
@@ -169,11 +174,12 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [wagmiConfig, sendPostComment, commentRetrySubmission],
+    [connectAccount, sendPostComment, commentRetrySubmission, wagmiConfig],
   );
 
   const postComment = useCallback<OnPostComment>(
     async (params) => {
+      await connectAccount();
       const pendingOperation = await sendPostComment({
         content: params.comment.content,
         references: params.comment.references,
@@ -219,11 +225,18 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [sendPostComment, gasSponsorship, commentSubmission, wagmiConfig],
+    [
+      connectAccount,
+      sendPostComment,
+      gasSponsorship,
+      commentSubmission,
+      wagmiConfig,
+    ],
   );
 
   const editComment = useCallback<OnEditComment>(
     async (params) => {
+      await connectAccount();
       const pendingOperation = {
         ...(await sendEditComment({
           gasSponsorship,
@@ -263,7 +276,13 @@ export function useGaslessCommentActions({
         });
       }
     },
-    [sendEditComment, gasSponsorship, commentEdition, wagmiConfig],
+    [
+      connectAccount,
+      sendEditComment,
+      gasSponsorship,
+      commentEdition,
+      wagmiConfig,
+    ],
   );
 
   const retryEditComment = useCallback<OnRetryEditComment>(
@@ -282,6 +301,7 @@ export function useGaslessCommentActions({
         throw new Error("Only edit comments can be retried");
       }
 
+      await connectAccount();
       const pendingOperation = {
         ...(await sendEditComment({
           gasSponsorship: comment.pendingOperation.type,
@@ -323,7 +343,7 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [sendEditComment, commentRetryEdition, wagmiConfig],
+    [connectAccount, sendEditComment, commentRetryEdition, wagmiConfig],
   );
 
   const likeComment = useCallback<OnLikeComment>(
@@ -335,6 +355,7 @@ export function useGaslessCommentActions({
         onFailed,
         onSuccess,
       } = params;
+      await connectAccount();
 
       onBeforeStart?.();
 
@@ -387,7 +408,13 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [gasSponsorship, likeReactionSubmission, sendPostComment, wagmiConfig],
+    [
+      connectAccount,
+      gasSponsorship,
+      likeReactionSubmission,
+      sendPostComment,
+      wagmiConfig,
+    ],
   );
 
   const unlikeComment = useCallback<OnUnlikeComment>(
@@ -398,6 +425,8 @@ export function useGaslessCommentActions({
         onBeforeStart,
         onFailed,
       } = params;
+
+      await connectAccount();
 
       const reactions =
         comment.viewerReactions?.[COMMENT_REACTION_LIKE_CONTENT] ?? [];
@@ -443,7 +472,13 @@ export function useGaslessCommentActions({
         throw e;
       }
     },
-    [deleteCommentMutation, gasSponsorship, likeReactionRemoval, wagmiConfig],
+    [
+      connectAccount,
+      deleteCommentMutation,
+      gasSponsorship,
+      likeReactionRemoval,
+      wagmiConfig,
+    ],
   );
 
   return useMemo(
