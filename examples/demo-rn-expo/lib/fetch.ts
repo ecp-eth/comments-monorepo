@@ -28,6 +28,8 @@ export const fetchAPI = async <T extends ZodSchema>(
       throw new RateLimitError();
     }
 
+    console.error("response error", res.status, await res.clone().text());
+
     await throwResponseError(res);
   }
 

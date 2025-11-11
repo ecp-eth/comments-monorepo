@@ -2,7 +2,7 @@ import { useCallback, useRef } from "react";
 import { useAccount, useAccountEffect } from "wagmi";
 import Deferred from "promise-deferred";
 import { Hex } from "viem";
-import { useAppKit } from "@reown/appkit-wagmi-react-native";
+import { useAppKit } from "@reown/appkit-react-native";
 import { useAppStateEffect } from "./useAppStateEffect";
 
 export default function useWaitConnected() {

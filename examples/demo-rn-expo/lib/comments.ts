@@ -22,7 +22,7 @@ const chainId = chain.id;
 
 // for local testing we will have to manually set the comment manager address
 const commentManagerAddress =
-  config.chains[0].name === "Anvil" ? LOCAL_COMMENT_ADDRESS_MANAGER : undefined;
+  chain.name === "Anvil" ? LOCAL_COMMENT_ADDRESS_MANAGER : undefined;
 
 type PostCommentResponse = {
   receipt: TransactionReceipt;
