@@ -15,11 +15,11 @@ import { fetchComments } from "@ecp.eth/sdk/indexer";
 import {
   SendApproveSignerRequestPayloadSchema,
   SendApproveSignerResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/approve";
+} from "@ecp.eth/shared-signer/schemas/signer-api/approve";
 import {
   SendRevokeSignerRequestPayloadSchema,
   SendRevokeSignerResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/revoke";
+} from "@ecp.eth/shared-signer/schemas/signer-api/revoke";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { publicEnv } from "@/publicEnv";
 import {

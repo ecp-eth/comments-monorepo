@@ -2,11 +2,11 @@ import { z } from "zod";
 import {
   SignPostCommentRequestPayloadSchema,
   SignPostCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/post";
+} from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import {
   SignEditCommentRequestPayloadSchema,
   SignEditCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/edit";
+} from "@ecp.eth/shared-signer/schemas/signer-api/edit";
 import { publicEnv } from "@/publicEnv";
 import {
   fetchAuthorData,

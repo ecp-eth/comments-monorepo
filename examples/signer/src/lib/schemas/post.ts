@@ -1,7 +1,7 @@
 import {
   SendPostCommentRequestPayloadSchema,
   SignPostCommentRequestPayloadSchema,
-} from "@ecp.eth/shared/schemas/signer-api/post";
+} from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 
 /**

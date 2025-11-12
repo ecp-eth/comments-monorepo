@@ -1,4 +1,4 @@
-import { cn } from "@ecp.eth/shared/helpers";
+import { cn } from "@ecp.eth/shared-signer/helpers/tailwind";
 import type {
   ZodArray,
   ZodDefault,

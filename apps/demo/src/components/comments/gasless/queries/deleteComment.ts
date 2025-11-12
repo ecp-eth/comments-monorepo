@@ -7,7 +7,7 @@ import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   SendDeleteCommentRequestPayloadSchema,
   SendDeleteCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/delete";
+} from "@ecp.eth/shared-signer/schemas/signer-api/delete";
 import { createDeleteCommentTypedData } from "@ecp.eth/sdk/comments";
 import { getSignerURL } from "@/lib/utils";
 import { Hex } from "@ecp.eth/sdk/core/schemas";

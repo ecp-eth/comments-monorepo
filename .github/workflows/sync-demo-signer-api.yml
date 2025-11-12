@@ -68,10 +68,12 @@ jobs:
         run: |
           git subtree split --prefix examples/signer -b template-signer-api
 
-      - name: test install and build with npm
+      - name: test install and build with pnpm and npm (generate lockfiles)
         run: |
           git checkout template-signer-api
           rm -rf node_modules
+          npm install
+          npm run build
           pnpm install
           pnpm run build
           git add -A

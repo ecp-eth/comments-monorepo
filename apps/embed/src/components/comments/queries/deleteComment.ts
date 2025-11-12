@@ -21,7 +21,7 @@ import z from "zod";
 import {
   SendDeleteCommentRequestPayloadSchema,
   SendDeleteCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/delete";
+} from "@ecp.eth/shared-signer/schemas/signer-api/delete";
 
 class SubmitDeleteCommentMutationError extends Error {}
 

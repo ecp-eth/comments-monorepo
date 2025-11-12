@@ -1,0 +1,56 @@
+{
+  "name": "@ecp.eth/shared-signer",
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./helpers/*": {
+      "types": "./dist/esm/helpers/*.d.ts",
+      "import": "./dist/esm/helpers/*.js",
+      "default": "./dist/cjs/helpers/*.cjs"
+    },
+    "./schemas/signer-api/*": {
+      "types": "./dist/esm/schemas/signer-api/*.d.ts",
+      "import": "./dist/esm/schemas/signer-api/*.js",
+      "default": "./dist/cjs/schemas/signer-api/*.cjs"
+    },
+    "./services/*": {
+      "types": "./dist/esm/services/*.d.ts",
+      "import": "./dist/esm/services/*.js",
+      "default": "./dist/cjs/services/*.cjs"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "dev": "tsup --format esm --out-dir dist/esm --watch",
+    "build:cjs": "tsup --format cjs --out-dir dist/cjs",
+    "build:esm": "tsup --format esm --out-dir dist/esm",
+    "build:all": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build:dev": "export NODE_ENV=development && pnpm run build:all",
+    "build": "export NODE_ENV=production && pnpm run build:all",
+    "lint": "eslint \"./src/**/*.ts\"",
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@ecp.eth/build-tools": "workspace:^",
+    "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/typescript-config": "workspace:*",
+    "@upstash/ratelimit": "^2.0.5",
+    "@upstash/redis": "^1.34.5",
+    "clsx": "^2.1.1",
+    "eslint": "^9.19.0",
+    "nock": "^14.0.5",
+    "tailwind-merge": "^3.0.1",
+    "viem": "^2.29.2",
+    "vitest": "^3.1.4",
+    "zod": "^3.25.76"
+  },
+  "peerDependencies": {
+    "@ecp.eth/sdk": ">=0.0.33",
+    "viem": "^2.29.2",
+    "zod": "^3.25.76 || ^4.0.0"
+  }
+}

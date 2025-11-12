@@ -1,6 +1,6 @@
-import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { getApprovalAndNonce } from "@ecp.eth/shared/helpers/getApprovalAndNonce";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { getApprovalAndNonce } from "@ecp.eth/shared-signer/helpers/ecp";
 import { revokeApprovalWithSig } from "@ecp.eth/sdk/comments";
 import {
   guardAPIDeadline,
@@ -14,8 +14,8 @@ import { SendRevokeSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/re
 import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SendRevokeSignerResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/revoke";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SendRevokeSignerResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/revoke";
 
 export async function POST(
   req: Request,

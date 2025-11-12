@@ -1,16 +1,17 @@
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
-import { SignPostCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/post";
+import { hashTypedData } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import {
   createCommentData,
   createCommentTypedData,
 } from "@ecp.eth/sdk/comments";
-import { SignPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { bigintReplacer } from "@ecp.eth/shared-signer/helpers/json";
+import { SignPostCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import {
   type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { hashTypedData } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SignPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
 import {
   guardAppSignerPrivateKey,
   guardAuthorIsNotMuted,
