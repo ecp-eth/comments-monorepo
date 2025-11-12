@@ -12,6 +12,7 @@ on:
       - "examples/signer/**"
       # privy patch is used in the signer template as well so we need to retrigger this workflow when it changes
       - "patches/**"
+  workflow_dispatch:
 
 jobs:
   sync:
