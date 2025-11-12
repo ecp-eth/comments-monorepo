@@ -1,5 +1,11 @@
 # @ecp.eth/signer
 
+## 0.1.6
+
+### Patch Changes
+
+- e23f9fe: refactor(shared, shared-signer): avoid reference to shared package in signer
+
 ## 0.1.5
 
 ### Patch Changes

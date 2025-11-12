@@ -1,5 +1,12 @@
 # @ecp.eth/indexer
 
+## 0.0.28
+
+### Patch Changes
+
+- Updated dependencies [e23f9fe]
+  - @ecp.eth/shared@0.0.16
+
 ## 0.0.27
 
 ### Patch Changes
