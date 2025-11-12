@@ -4,7 +4,7 @@ import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import {
   SignPostCommentRequestPayloadSchema,
   SignPostCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/post";
+} from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import { QueryClient } from "@tanstack/react-query";
 import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import {

@@ -5,14 +5,14 @@ import {
   IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
-import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
+import { SignPostCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import { z } from "zod";
 
 export const PendingCommentOperationSchema = z
   .object({
     txHash: HexSchema,
     chainId: z.number().positive().int(),
-    response: SignCommentResponseClientSchema,
+    response: SignPostCommentResponseBodySchema,
   })
   .describe(
     "Contains information about pending operation so we can show that in comment list",

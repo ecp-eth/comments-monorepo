@@ -3,7 +3,7 @@ import { defaultWagmiConfig } from "@reown/appkit-wagmi-react-native";
 import { publicEnv } from "./env";
 import { http } from "wagmi";
 
-const metadata = {
+export const metadata = {
   name: "Ethereum Comments Protocol - React Native Demo",
   description: "A demo of the Ethereum Comments Protocol on React Native",
   url: "https://demo.ethcomments.xyz",

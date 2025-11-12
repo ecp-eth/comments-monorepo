@@ -2,7 +2,6 @@ import {
   IndexerAPICommentSchemaType,
   IndexerAPICommentWithRepliesSchema,
   IndexerAPICommentWithRepliesSchemaType,
-  IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies } from "./schemas";
 

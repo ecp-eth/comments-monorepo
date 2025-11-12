@@ -12,8 +12,11 @@ importers:
         specifier: ~0.0.33
         version: 0.0.33(eeb939508d51bc91cf78be5c8ba9ce88)
       '@ecp.eth/shared':
-        specifier: ~0.0.15
-        version: 0.0.15(3053a153b634e70f2005621b1cf9ca6c)
+        specifier: ~0.0.16
+        version: 0.0.16(3053a153b634e70f2005621b1cf9ca6c)
+      '@ecp.eth/shared-signer':
+        specifier: ~0.0.2
+        version: 0.0.2(@ecp.eth/sdk@0.0.33(eeb939508d51bc91cf78be5c8ba9ce88))(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
       '@expo/vector-icons':
         specifier: ^15.0.3
         version: 15.0.3(expo-font@14.0.9(expo@54.0.23(@babel/core@7.26.10)(bufferutil@4.0.9)(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(utf-8-validate@5.0.10))(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0))(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
@@ -724,8 +727,15 @@ packages:
       wagmi: ^2.15.2
       zod: ^3.25.76 || ^4.0.0
 
-  '@ecp.eth/shared@0.0.15':
-    resolution: {integrity: sha512-l5lrlnNKMYZ8bUMlt97tTHy1pZbtqzzgzBH6wOOXuNXLFakm8m94pUM0j/Ck59tWKtQ9QbCC2zrdmBMDNaKtEQ==}
+  '@ecp.eth/shared-signer@0.0.2':
+    resolution: {integrity: sha512-RLttLrBk75gvIs+3uJAnUdyy9wUA1xDqhLqgE7IsBLOBlg3JBhM6Oomz4ka01zUz3GELtB/3l2AvrhrEn3zxiw==}
+    peerDependencies:
+      '@ecp.eth/sdk': '>=0.0.33'
+      viem: ^2.29.2
+      zod: ^3.25.76 || ^4.0.0
+
+  '@ecp.eth/shared@0.0.16':
+    resolution: {integrity: sha512-eN3vsXL5K1xAeC3I4urMgiVvrVZDsVTDEdTdppsMZd0wTQV3VHxgONicjJPm1sOW3lNvBGKBXQq9HpSK+S+mHg==}
     peerDependencies:
       '@ecp.eth/sdk': '>=0.0.33'
       '@neynar/nodejs-sdk': ^2.13.1
@@ -6955,7 +6965,13 @@ snapshots:
       wagmi: 2.19.3(@react-native-async-storage/async-storage@2.2.0(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@tanstack/query-core@5.83.0)(@tanstack/react-query@5.83.0(react@19.1.0))(@types/react@19.1.17)(@upstash/redis@1.35.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.25.76)
       zod: 3.25.76
 
-  '@ecp.eth/shared@0.0.15(3053a153b634e70f2005621b1cf9ca6c)':
+  '@ecp.eth/shared-signer@0.0.2(@ecp.eth/sdk@0.0.33(eeb939508d51bc91cf78be5c8ba9ce88))(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)':
+    dependencies:
+      '@ecp.eth/sdk': 0.0.33(eeb939508d51bc91cf78be5c8ba9ce88)
+      viem: 2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      zod: 3.25.76
+
+  '@ecp.eth/shared@0.0.16(3053a153b634e70f2005621b1cf9ca6c)':
     dependencies:
       '@ecp.eth/sdk': 0.0.33(eeb939508d51bc91cf78be5c8ba9ce88)
       '@neynar/nodejs-sdk': 2.46.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
