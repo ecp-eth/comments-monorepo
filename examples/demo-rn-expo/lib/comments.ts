@@ -25,7 +25,7 @@ const commentManagerAddress =
   config.chains[0].name === "Anvil" ? LOCAL_COMMENT_ADDRESS_MANAGER : undefined;
 
 type PostCommentResponse = {
-  receipt: TransactionReceipt;
+  wait: () => Promise<TransactionReceipt>;
   txHash: Hex;
   commentData: CreateCommentData;
   appSignature: Hex;
@@ -66,13 +66,12 @@ export const postComment = async (
     writeContract: (opts) => writeContract(config, opts),
   });
 
-  const receipt = await waitForTransactionReceipt(config, {
-    hash: txHash,
-    chainId,
-  });
-
   return {
-    receipt,
+    wait: () =>
+      waitForTransactionReceipt(config, {
+        hash: txHash,
+        chainId,
+      }),
     txHash,
     commentData,
     appSignature,
