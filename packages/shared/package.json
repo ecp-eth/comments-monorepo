@@ -68,11 +68,6 @@
       "import": "./dist/esm/schemas.js",
       "default": "./dist/cjs/schemas.cjs"
     },
-    "./schemas/signer-api/*": {
-      "types": "./dist/esm/schemas/signer-api/*.d.ts",
-      "import": "./dist/esm/schemas/signer-api/*.js",
-      "default": "./dist/cjs/schemas/signer-api/*.cjs"
-    },
     "./schemas/indexer-siwe-api/*": {
       "types": "./dist/esm/schemas/indexer-siwe-api/*.d.ts",
       "import": "./dist/esm/schemas/indexer-siwe-api/*.js",
@@ -106,6 +101,7 @@
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/shared-signer": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.5",

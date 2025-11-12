@@ -44,6 +44,9 @@
     "packages/shared/helpers/getApprovalAndNonce/*": true,
     "packages/shared/helpers/*": true,
     "packages/shared/schemas/signer-api/*": true,
-    "packages/shared/schemas/indexer-siwe-api/*": true
+    "packages/shared/schemas/indexer-siwe-api/*": true,
+    "packages/shared-signer/helpers/*": true,
+    "packages/shared-signer/schemas/signer-api/*": true,
+    "packages/shared-signer/services/*": true
   }
 }

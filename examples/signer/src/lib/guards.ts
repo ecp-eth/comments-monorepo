@@ -1,10 +1,10 @@
 import * as jose from "jose";
 import { isMuted } from "@ecp.eth/sdk/indexer";
-import { JSONResponse } from "@ecp.eth/shared/helpers";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
 import {
   BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
 import type {
   Hex,
   VerifyTypedDataParameters,

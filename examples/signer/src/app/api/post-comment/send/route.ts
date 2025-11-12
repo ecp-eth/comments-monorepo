@@ -18,12 +18,13 @@ import {
   createCommentTypedData,
   postCommentWithSig,
 } from "@ecp.eth/sdk/comments";
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { bigintReplacer } from "@ecp.eth/shared-signer/helpers/json";
 import {
   type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SendPostCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/post";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SendPostCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import { SendPostCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/post";
 import { getRpcUrl } from "@/lib/env";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";

@@ -19,7 +19,7 @@ import {
 import {
   SendEditCommentRequestPayloadSchema,
   SendEditCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/edit";
+} from "@ecp.eth/shared-signer/schemas/signer-api/edit";
 import { getSignerURL } from "@/lib/utils";
 import { FetchFn } from "./types";
 

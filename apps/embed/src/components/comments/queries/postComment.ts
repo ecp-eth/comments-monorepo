@@ -34,7 +34,7 @@ import {
   SendPostCommentResponseBodySchema,
   SignPostCommentRequestPayloadSchema,
   SignPostCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/post";
+} from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import z from "zod";
 
 class SubmitPostCommentMutationError extends Error {}

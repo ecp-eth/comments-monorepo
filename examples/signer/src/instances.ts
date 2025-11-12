@@ -1,4 +1,4 @@
-import { RateLimiter } from "@ecp.eth/shared/services/rate-limiter";
+import { RateLimiter } from "@ecp.eth/shared-signer/services/rate-limiter";
 import { env } from "@/lib/env";
 import { createNonceManager } from "viem";
 import { jsonRpc } from "viem/nonce";

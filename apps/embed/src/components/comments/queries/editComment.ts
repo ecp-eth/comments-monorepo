@@ -33,7 +33,7 @@ import {
   SendEditCommentResponseBodySchema,
   SignEditCommentRequestPayloadSchema,
   SignEditCommentResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/edit";
+} from "@ecp.eth/shared-signer/schemas/signer-api/edit";
 
 class SubmitEditCommentMutationError extends Error {}
 

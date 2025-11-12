@@ -80,3 +80,6 @@ packages/sdk/indexer/webhooks/schemas
 packages/shared/helpers/*
 packages/shared/schemas/signer-api/*
 packages/shared/schemas/indexer-siwe-api/*
+packages/shared-signer/helpers/*
+packages/shared-signer/schemas/signer-api/*
+packages/shared-signer/services/*

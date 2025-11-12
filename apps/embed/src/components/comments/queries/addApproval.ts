@@ -6,7 +6,7 @@ import {
   getNonce,
 } from "@ecp.eth/sdk/comments";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
-import { SendApproveSignerRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/approve";
+import { SendApproveSignerRequestPayloadSchema } from "@ecp.eth/shared-signer/schemas/signer-api/approve";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
 import { getSignerURL } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";

@@ -1,7 +1,12 @@
-import { JSONResponse } from "@ecp.eth/shared/helpers";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { getApprovalAndNonce } from "@ecp.eth/shared/helpers/getApprovalAndNonce";
 import { addApprovalWithSig } from "@ecp.eth/sdk/comments";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { getApprovalAndNonce } from "@ecp.eth/shared-signer/helpers/ecp";
+import {
+  BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SendApproveSignerResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/approve";
 import {
   guardAPIDeadline,
   guardAuthorIsNotMuted,
@@ -11,11 +16,6 @@ import {
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
 import { getRpcUrl } from "@/lib/env";
 import { SendApproveSignerRequestPayloadRestrictedSchema } from "@/lib/schemas/approve";
-import {
-  BadRequestResponseBodySchema,
-  ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SendApproveSignerResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/approve";
 
 export async function POST(
   req: Request,
