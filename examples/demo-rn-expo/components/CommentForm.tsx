@@ -23,6 +23,7 @@ import { useKeyboardRemainingheight } from "../hooks/useKeyboardRemainingHeight"
 import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import useWaitConnected from "../hooks/useWaitConnected";
+import { Hex } from "viem";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;
@@ -55,6 +56,7 @@ export function CommentForm({
       ? HAS_REPLY_TEXT_TEXTAREA_PERCENTAGE
       : TOTAL_COMMENT_AREA_PERCENTAGE,
   );
+  const txHashRef = useRef<Hex | undefined>(undefined);
 
   const {
     mutateAsync: postComment,
@@ -71,8 +73,8 @@ export function CommentForm({
 
   useAppStateEffect({
     foregrounded: useCallback(() => {
-      if (isPostingComment || !error) {
-        // user returned without error and is still posting (could bew still signing)
+      if (isPostingComment && !error && !txHashRef.current) {
+        // user returned without error and is still posting (could bew still signing) and no tx hash generated
         // probably the wallet hangs we reset state to allow they to try again
         reset();
         setIsProcessing(false);
@@ -119,6 +121,7 @@ export function CommentForm({
           }
 
           setIsProcessing(true);
+          txHashRef.current = undefined;
 
           try {
             console.log("connecting async...");
@@ -141,8 +144,9 @@ export function CommentForm({
               ? {
                   content: text,
                   author: address,
-                  parentId: replyingComment?.id,
+                  parentId: replyingComment.id,
                   metadata: [],
+                  chainId: chainId,
                 }
               : {
                   content: text,
@@ -150,12 +154,15 @@ export function CommentForm({
                   targetUri: publicEnv.EXPO_PUBLIC_TARGET_URI,
                   author: address,
                   metadata: [],
+                  chainId: chainId,
                 };
 
             console.log("posting comment: ", commentToPost);
 
             const { txHash, commentData, appSignature, commentId } =
               await postComment(commentToPost);
+            txHashRef.current = txHash;
+
             setText("");
 
             insertPendingOperations({

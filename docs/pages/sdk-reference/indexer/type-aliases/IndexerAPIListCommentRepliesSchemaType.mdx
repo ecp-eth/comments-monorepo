@@ -4,7 +4,7 @@
 
 [@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPIListCommentRepliesSchemaType
 
-# Type Alias: IndexerAPIListCommentRepliesSchemaType
+# Type Alias: ~~IndexerAPIListCommentRepliesSchemaType~~
 
 ```ts
 type IndexerAPIListCommentRepliesSchemaType = {
@@ -558,11 +558,11 @@ type IndexerAPIListCommentRepliesSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:517](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L517)
+Defined in: [packages/sdk/src/indexer/schemas.ts:520](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L520)
 
 ## Type declaration
 
-### extra
+### ~~extra~~
 
 ```ts
 extra: {
@@ -583,7 +583,7 @@ moderationEnabled: boolean;
 moderationKnownReactions: string[];
 ```
 
-### pagination
+### ~~pagination~~
 
 ```ts
 pagination: {
@@ -625,7 +625,7 @@ limit: number;
 optional startCursor: `0x${string}`;
 ```
 
-### results
+### ~~results~~
 
 ```ts
 results: {
@@ -1165,3 +1165,7 @@ results: {
    };
 }[];
 ```
+
+## Deprecated
+
+Use IndexerAPIListCommentsSchema instead

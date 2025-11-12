@@ -17,7 +17,7 @@ export const fetchAPI = async <T extends ZodSchema>(
   options: RequestInit,
   jsonSchema: T,
 ): Promise<z.infer<T>> => {
-  const url = new URL(pathname, publicEnv.EXPO_PUBLIC_API_URL);
+  const url = new URL(pathname, publicEnv.EXPO_PUBLIC_SIGNER_API_URL);
   console.log("fetching", url.toString());
   const res = await fetch(url, options);
 

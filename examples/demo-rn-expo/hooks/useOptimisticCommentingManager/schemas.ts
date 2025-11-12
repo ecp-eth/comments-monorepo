@@ -2,6 +2,7 @@ import {
   IndexerAPICommentWithRepliesSchema,
   IndexerAPIListCommentRepliesSchema,
   IndexerAPIListCommentsSchema,
+  IndexerAPIListCommentsSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
@@ -71,3 +72,16 @@ export const FetchCommentInfinityQuerySchema = z.object({
 export type FetchCommentInfinityQuerySchemaType = z.infer<
   typeof FetchCommentInfinityQuerySchema
 >;
+
+type Optionalize<T, K extends keyof T> = Omit<T, K> & {
+  [P in K]?: T[P];
+};
+
+type ResultsType = IndexerAPIListCommentsSchemaType["results"];
+type ResultType = ResultsType[number];
+export type IndexerAPIListCommentsSchemaTypeWithOptionalResultsReplies = Omit<
+  IndexerAPIListCommentsSchemaType,
+  "results"
+> & {
+  results: Optionalize<ResultType, "replies">[];
+};

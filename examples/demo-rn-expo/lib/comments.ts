@@ -1,7 +1,10 @@
 import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
 import { Hex, TransactionReceipt } from "viem";
 import { bigintReplacer } from "@ecp.eth/shared/helpers";
-import { SignCommentResponseClientSchema } from "@ecp.eth/shared/schemas";
+import {
+  SignPostCommentRequestPayloadSchema,
+  SignPostCommentResponseBodySchema,
+} from "@ecp.eth/shared/schemas/signer-api/post";
 import { QueryClient } from "@tanstack/react-query";
 import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer";
 import {
@@ -9,11 +12,11 @@ import {
   deleteComment as deleteCommentFromSDK,
 } from "@ecp.eth/sdk/comments";
 import { fetchAPI } from "./fetch";
-import { SignCommentPayloadRequestSchemaType } from "./generated/schemas";
 import { chain, config } from "../wagmi.config";
 import { FetchCommentInfinityQuerySchema } from "../hooks/useOptimisticCommentingManager/schemas";
 import type { CreateCommentData } from "@ecp.eth/sdk/comments/schemas";
 import { LOCAL_COMMENT_ADDRESS_MANAGER } from "./generated/contract-addresses";
+import type { z } from "zod";
 
 const chainId = chain.id;
 
@@ -22,7 +25,7 @@ const commentManagerAddress =
   config.chains[0].name === "Anvil" ? LOCAL_COMMENT_ADDRESS_MANAGER : undefined;
 
 type PostCommentResponse = {
-  receipt: TransactionReceipt;
+  wait: () => Promise<TransactionReceipt>;
   txHash: Hex;
   commentData: CreateCommentData;
   appSignature: Hex;
@@ -30,18 +33,24 @@ type PostCommentResponse = {
 };
 
 export const postComment = async (
-  comment: SignCommentPayloadRequestSchemaType,
+  comment: z.input<typeof SignPostCommentRequestPayloadSchema>,
 ): Promise<PostCommentResponse> => {
   const signed = await fetchAPI(
-    "/api/sign-comment",
+    "/api/post-comment/sign",
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(comment, bigintReplacer),
+      body: JSON.stringify(
+        {
+          ...comment,
+          chainId: chain.id,
+        } satisfies z.input<typeof SignPostCommentRequestPayloadSchema>,
+        bigintReplacer,
+      ),
     },
-    SignCommentResponseClientSchema,
+    SignPostCommentResponseBodySchema,
   );
 
   const {
@@ -57,13 +66,12 @@ export const postComment = async (
     writeContract: (opts) => writeContract(config, opts),
   });
 
-  const receipt = await waitForTransactionReceipt(config, {
-    hash: txHash,
-    chainId,
-  });
-
   return {
-    receipt,
+    wait: () =>
+      waitForTransactionReceipt(config, {
+        hash: txHash,
+        chainId,
+      }),
     txHash,
     commentData,
     appSignature,

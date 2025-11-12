@@ -26,7 +26,7 @@ export default function useWaitConnected() {
     },
   });
 
-  return useCallback(async () => {
+  return useCallback(async (): Promise<Hex> => {
     if (address) {
       return address;
     }
