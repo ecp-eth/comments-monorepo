@@ -3,12 +3,13 @@ import {
   createEditCommentTypedData,
   getNonce,
 } from "@ecp.eth/sdk/comments";
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { bigintReplacer } from "@ecp.eth/shared-signer/helpers/json";
 import {
   type BadRequestResponseBodySchema,
   ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SignEditCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/edit";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SignEditCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/edit";
 import { env } from "@/lib/env";
 import { hashTypedData } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

@@ -1,4 +1,4 @@
-import { SendRevokeSignerRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/revoke";
+import { SendRevokeSignerRequestPayloadSchema } from "@ecp.eth/shared-signer/schemas/signer-api/revoke";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 
 /**

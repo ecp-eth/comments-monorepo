@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@ecp.eth/sdk": "workspace:*",
-    "@ecp.eth/shared": "workspace:*",
+    "@ecp.eth/shared-signer": "workspace:*",
     "@privy-io/server-auth": "^1.30.0",
     "@types/node": "^20",
     "@types/react": "~19.1.0",

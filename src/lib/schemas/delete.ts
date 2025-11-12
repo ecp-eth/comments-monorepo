@@ -1,4 +1,4 @@
-import { SendDeleteCommentRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/delete";
+import { SendDeleteCommentRequestPayloadSchema } from "@ecp.eth/shared-signer/schemas/signer-api/delete";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 
 /**

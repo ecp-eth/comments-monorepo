@@ -1,4 +1,4 @@
-import { SendApproveSignerRequestPayloadSchema } from "@ecp.eth/shared/schemas/signer-api/approve";
+import { SendApproveSignerRequestPayloadSchema } from "@ecp.eth/shared-signer/schemas/signer-api/approve";
 import { augmentZodSchemaWithAllowedChainIdAndChainConfig } from "../helpers";
 
 /**

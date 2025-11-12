@@ -1,4 +1,22 @@
-import { getRpcUrl } from "@/lib/env";
+import {
+  createPublicClient,
+  createWalletClient,
+  hashTypedData,
+  http,
+} from "viem";
+import {
+  createEditCommentData,
+  createEditCommentTypedData,
+  editCommentWithSig,
+  getNonce,
+} from "@ecp.eth/sdk/comments";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { bigintReplacer } from "@ecp.eth/shared-signer/helpers/json";
+import {
+  type BadRequestResponseBodySchema,
+  ErrorResponseBodySchema,
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
+import { SendEditCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/edit";
 import {
   guardAPIDeadline,
   guardAuthorIsNotMuted,
@@ -7,24 +25,7 @@ import {
   guardRateLimitNotExceeded,
   guardRequestPayloadSchemaIsValid,
 } from "@/lib/guards";
-import {
-  createEditCommentData,
-  createEditCommentTypedData,
-  editCommentWithSig,
-  getNonce,
-} from "@ecp.eth/sdk/comments";
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
-import {
-  type BadRequestResponseBodySchema,
-  ErrorResponseBodySchema,
-} from "@ecp.eth/shared/schemas/signer-api/shared";
-import { SendEditCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/edit";
-import {
-  createPublicClient,
-  createWalletClient,
-  hashTypedData,
-  http,
-} from "viem";
+import { getRpcUrl } from "@/lib/env";
 import { getGaslessSigner, getGaslessSubmitter } from "@/lib/helpers";
 import { SendEditCommentRequestPayloadRestrictedSchema } from "@/lib/schemas/edit";
 

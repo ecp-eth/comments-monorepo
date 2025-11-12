@@ -11,8 +11,9 @@ import {
   createDeleteCommentTypedData,
   deleteCommentWithSig,
 } from "@ecp.eth/sdk/comments";
-import { SendDeleteCommentResponseBodySchema } from "@ecp.eth/shared/schemas/signer-api/delete";
-import { bigintReplacer, JSONResponse } from "@ecp.eth/shared/helpers";
+import { SendDeleteCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/delete";
+import { JSONResponse } from "@ecp.eth/shared-signer/helpers/response";
+import { bigintReplacer } from "@ecp.eth/shared-signer/helpers/json";
 import {
   createPublicClient,
   createWalletClient,
