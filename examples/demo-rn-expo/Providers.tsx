@@ -6,7 +6,7 @@ import { anvil } from "@wagmi/core/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppKit, AppKit } from "@reown/appkit-wagmi-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { projectId, config as wagmiConfig } from "./wagmi.config";
+import { metadata, projectId, config as wagmiConfig } from "./wagmi.config";
 import ErrorBoundary from "./ErrorBoundary";
 
 const queryClient = new QueryClient();
@@ -24,6 +24,7 @@ createAppKit({
   wagmiConfig,
   defaultChain: anvil,
   enableAnalytics: true,
+  metadata,
 });
 
 export default function Providers({ children }: PropsWithChildren) {
