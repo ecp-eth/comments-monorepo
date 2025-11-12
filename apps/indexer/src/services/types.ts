@@ -1,4 +1,4 @@
-import type { Hex } from "@ecp.eth/sdk/core";
+import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
 import type { WebhookCallbackData } from "../utils/webhook.ts";
 import type { CommentSelectType } from "../../ponder.schema.ts";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
@@ -406,17 +406,22 @@ export interface ISIMAPIService {
   ): Promise<SIMAPITokenInfoSchemaType[]>;
 }
 
+export const SIMAPIResponseBodySchema = z.object({
+  contract_address: HexSchema,
+  tokens: z.array(z.record(z.string(), z.unknown())),
+});
+
 export const SIMAPITokenInfoSchema = z.object({
   chain_id: z.number().int().positive(),
   chain: z.string(),
-  price_usd: z.number().nullish(),
+  price_usd: z.number().optional(),
   pool_size: z.number(),
-  total_supply: z.coerce.bigint().nullish(),
-  fully_diluted_value: z.number().nullish(),
+  total_supply: z.coerce.bigint().optional(),
+  fully_diluted_value: z.number().optional(),
   symbol: z.string(),
-  name: z.string().nullable(),
+  name: z.string().optional(),
   decimals: z.number().int().positive(),
-  logo: z.string().url().nullable(),
+  logo: z.string().url().optional(),
 });
 
 export type SIMAPITokenInfoSchemaType = z.infer<typeof SIMAPITokenInfoSchema>;

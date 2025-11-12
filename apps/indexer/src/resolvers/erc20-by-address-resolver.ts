@@ -77,7 +77,7 @@ export function createERC20ByAddressResolver({
 
             return {
               address,
-              logoURI: firstTokenInfo.logo,
+              logoURI: firstTokenInfo.logo ?? null,
               symbol: firstTokenInfo.symbol,
               name: firstTokenInfo.name || firstTokenInfo.symbol,
               decimals: firstTokenInfo.decimals,

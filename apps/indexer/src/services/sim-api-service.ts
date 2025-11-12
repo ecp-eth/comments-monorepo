@@ -1,13 +1,14 @@
-import z from "zod";
-import { HexSchema, type Hex } from "@ecp.eth/sdk/core";
+import { type Hex } from "@ecp.eth/sdk/core";
 import { type ChainID } from "../resolvers";
 import {
   type ISIMAPIService,
   type SIMAPITokenInfoSchemaType,
+  SIMAPIResponseBodySchema,
   SIMAPITokenInfoSchema,
 } from "./types";
 import PQueue from "p-queue";
 import { env } from "../env";
+import * as Sentry from "@sentry/node";
 
 const SIM_TOKEN_INFO_URL = "https://api.sim.dune.com/v1/evm/token-info/";
 
@@ -21,10 +22,15 @@ export class SIMAPIError extends Error {
   }
 }
 
-const SIMResponseSchema = z.object({
-  contract_address: HexSchema,
-  tokens: z.array(z.record(z.string(), z.unknown())),
-});
+export class SIMAPIParseError extends Error {
+  constructor(
+    message: string,
+    readonly extra: Record<string, unknown>,
+  ) {
+    super(message);
+    this.name = "SIMAPIParseError";
+  }
+}
 
 export class SIMAPIService implements ISIMAPIService {
   private readonly queue: PQueue;
@@ -64,7 +70,9 @@ export class SIMAPIService implements ISIMAPIService {
           );
         }
 
-        const parseResult = SIMResponseSchema.safeParse(await response.json());
+        const parseResult = SIMAPIResponseBodySchema.safeParse(
+          await response.json(),
+        );
 
         if (!parseResult.success) {
           // should throw an error if it happens so it can be marked as failed and retried
@@ -75,6 +83,23 @@ export class SIMAPIService implements ISIMAPIService {
           const tokenInfoResult = SIMAPITokenInfoSchema.safeParse(token);
 
           if (!tokenInfoResult.success) {
+            console.warn(
+              "Failed to parse SIM token info, we might want to adjust the schema",
+              {
+                token,
+                errors: JSON.stringify(tokenInfoResult.error.errors, null, 2),
+              },
+            );
+            Sentry.captureMessage(
+              "Failed to parse SIM token info, we might want to adjust the schema",
+              {
+                level: "warning",
+                extra: {
+                  token,
+                  errors: JSON.stringify(tokenInfoResult.error.errors, null, 2),
+                },
+              },
+            );
             continue;
           }
 
