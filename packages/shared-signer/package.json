@@ -29,9 +29,7 @@
     "build:dev": "export NODE_ENV=development && pnpm run build:all",
     "build": "export NODE_ENV=production && pnpm run build:all",
     "lint": "eslint \"./src/**/*.ts\"",
-    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "gen:token-list": "node --experimental-strip-types scripts/token-list.ts"
   },
   "devDependencies": {
     "@ecp.eth/build-tools": "workspace:^",
