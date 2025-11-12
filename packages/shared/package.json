@@ -101,6 +101,7 @@
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
     "@ecp.eth/sdk": "workspace:*",
+    "@ecp.eth/shared-signer": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.5",

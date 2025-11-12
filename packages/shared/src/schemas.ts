@@ -11,12 +11,12 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod/v3";
-import { SignEditCommentResponseBodySchema } from "./schemas/signer-api/edit";
-import { SignPostCommentResponseBodySchema } from "./schemas/signer-api/post";
+import { SignEditCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/edit";
+import { SignPostCommentResponseBodySchema } from "@ecp.eth/shared-signer/schemas/signer-api/post";
 export {
   CommentDataWithIdSchema,
   type CommentDataWithIdSchemaType,
-} from "./schemas/signer-api/shared";
+} from "@ecp.eth/shared-signer/schemas/signer-api/shared";
 
 export const PendingOperationTypeSchema = z.enum([
   "gasless-not-preapproved",

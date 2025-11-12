@@ -1504,6 +1504,9 @@ importers:
       '@ecp.eth/sdk':
         specifier: workspace:*
         version: link:../sdk
+      '@ecp.eth/shared-signer':
+        specifier: workspace:*
+        version: link:../shared-signer
       '@ecp.eth/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
