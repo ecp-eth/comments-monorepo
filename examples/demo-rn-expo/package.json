@@ -14,7 +14,7 @@
     "api:schema:sync": "scripts/sync-api-schemas.sh"
   },
   "dependencies": {
-    "@ecp.eth/sdk": "~0.0.34",
+    "@ecp.eth/sdk": "~0.0.35",
     "@ecp.eth/shared": "~0.0.16",
     "@ecp.eth/shared-signer": "~0.0.2",
     "@expo/vector-icons": "^15.0.3",
