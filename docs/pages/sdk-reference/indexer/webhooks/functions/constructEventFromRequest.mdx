@@ -468,6 +468,124 @@ function constructEventFromRequest(options): Promise<
   version: 1;
 }
   | {
+  data: {
+     comment: {
+        id: `0x${string}`;
+        references: (
+           | {
+           address: `0x${string}`;
+           avatarUrl: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "ens";
+           url: string;
+         }
+           | {
+           address: `0x${string}`;
+           displayName: null | string;
+           fid: number;
+           fname: string;
+           pfpUrl: null | string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "farcaster";
+           url: string;
+           username: string;
+         }
+           | {
+           address: `0x${string}`;
+           chainId: null | number;
+           chains: {
+              caip: string;
+              chainId: number;
+           }[];
+           decimals: number;
+           logoURI: null | string;
+           name: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           symbol: string;
+           type: "erc20";
+         }
+           | {
+           description: null | string;
+           favicon: null | string;
+           mediaType: string;
+           opengraph:   | null
+              | {
+              description: ... | ...;
+              image: string;
+              title: string;
+              url: string;
+            };
+           position: {
+              end: number;
+              start: number;
+           };
+           title: string;
+           type: "webpage";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "file";
+           url: string;
+         }
+           | {
+           dimension?: {
+              height: number;
+              width: number;
+           };
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "image";
+           url: string;
+         }
+           | {
+           mediaType: string;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "video";
+           url: string;
+           videoTracks?: {
+              codec?: ...;
+              dimension: ...;
+           }[];
+         }
+           | {
+           chainId: number;
+           id: `0x${string}`;
+           position: {
+              end: number;
+              start: number;
+           };
+           type: "quoted_comment";
+        })[];
+        referencesResolutionStatus: "pending" | "partial" | "success" | "failed";
+        referencesResolutionStatusChangedAt: Date;
+     };
+  };
+  event: "comment:references:updated";
+  uid: string;
+  version: 1;
+}
+  | {
   blockNumber: bigint;
   chainId: number;
   data: {
@@ -628,7 +746,7 @@ function constructEventFromRequest(options): Promise<
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/utils.ts#L184)
+Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:152](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/utils.ts#L152)
 
 Constructs an event from a request.
 
@@ -1107,6 +1225,124 @@ The request to construct the event from.
      \};
   \};
   `event`: `"comment:reactions:updated"`;
+  `uid`: `string`;
+  `version`: `1`;
+\}
+  \| \{
+  `data`: \{
+     `comment`: \{
+        `id`: `` `0x${string}` ``;
+        `references`: (
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `avatarUrl`: `null` \| `string`;
+           `name`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"ens"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `displayName`: `null` \| `string`;
+           `fid`: `number`;
+           `fname`: `string`;
+           `pfpUrl`: `null` \| `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"farcaster"`;
+           `url`: `string`;
+           `username`: `string`;
+         \}
+           \| \{
+           `address`: `` `0x${string}` ``;
+           `chainId`: `null` \| `number`;
+           `chains`: \{
+              `caip`: `string`;
+              `chainId`: `number`;
+           \}[];
+           `decimals`: `number`;
+           `logoURI`: `null` \| `string`;
+           `name`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `symbol`: `string`;
+           `type`: `"erc20"`;
+         \}
+           \| \{
+           `description`: `null` \| `string`;
+           `favicon`: `null` \| `string`;
+           `mediaType`: `string`;
+           `opengraph`:   \| `null`
+              \| \{
+              `description`: ... \| ...;
+              `image`: `string`;
+              `title`: `string`;
+              `url`: `string`;
+            \};
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `title`: `string`;
+           `type`: `"webpage"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"file"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `dimension?`: \{
+              `height`: `number`;
+              `width`: `number`;
+           \};
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"image"`;
+           `url`: `string`;
+         \}
+           \| \{
+           `mediaType`: `string`;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"video"`;
+           `url`: `string`;
+           `videoTracks?`: \{
+              `codec?`: ...;
+              `dimension`: ...;
+           \}[];
+         \}
+           \| \{
+           `chainId`: `number`;
+           `id`: `` `0x${string}` ``;
+           `position`: \{
+              `end`: `number`;
+              `start`: `number`;
+           \};
+           `type`: `"quoted_comment"`;
+        \})[];
+        `referencesResolutionStatus`: `"pending"` \| `"partial"` \| `"success"` \| `"failed"`;
+        `referencesResolutionStatusChangedAt`: `Date`;
+     \};
+  \};
+  `event`: `"comment:references:updated"`;
   `uid`: `string`;
   `version`: `1`;
 \}

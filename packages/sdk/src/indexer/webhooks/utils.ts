@@ -1,40 +1,8 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod/v3";
-import {
-  ApprovalAddedEventSchema,
-  ApprovalRemovedEventSchema,
-  ChannelCreatedEventSchema,
-  ChannelUpdatedEventSchema,
-  ChannelHookStatusUpdatedEventSchema,
-  ChannelMetadataSetEventSchema,
-  ChannelTransferredEventSchema,
-  CommentAddedEventSchema,
-  CommentHookMetadataSetEventSchema,
-  CommentDeletedEventSchema,
-  CommentEditedEventSchema,
-  CommentModerationStatusUpdatedEventSchema,
-  CommentReactionsUpdatedEventSchema,
-  TestEventSchema,
-} from "./schemas/index.js";
+import { AllEventsSchema } from "./schemas/index.js";
 
-const EventsSchema = z.discriminatedUnion("event", [
-  ApprovalAddedEventSchema,
-  ApprovalRemovedEventSchema,
-  ChannelCreatedEventSchema,
-  ChannelUpdatedEventSchema,
-  ChannelHookStatusUpdatedEventSchema,
-  ChannelMetadataSetEventSchema,
-  ChannelTransferredEventSchema,
-  CommentAddedEventSchema,
-  CommentHookMetadataSetEventSchema,
-  CommentDeletedEventSchema,
-  CommentEditedEventSchema,
-  CommentModerationStatusUpdatedEventSchema,
-  CommentReactionsUpdatedEventSchema,
-  TestEventSchema,
-]);
-
-export type ConstructEventResult = z.infer<typeof EventsSchema>;
+export type ConstructEventResult = z.infer<typeof AllEventsSchema>;
 
 const ConstructEventOptionsSchema = z.object({
   /**
@@ -140,7 +108,7 @@ export function constructEvent(
     throw new InvalidRequestBodyError(parseBodyResult.error.issues);
   }
 
-  const eventParseResult = EventsSchema.safeParse(parseBodyResult.data);
+  const eventParseResult = AllEventsSchema.safeParse(parseBodyResult.data);
 
   if (!eventParseResult.success) {
     throw new InvalidEventError(eventParseResult.error.issues);
