@@ -73,8 +73,6 @@ jobs:
         run: |
           git checkout template-signer-api
           rm -rf node_modules
-          npm install
-          npm run build
           pnpm install
           pnpm run build
           git add -A
