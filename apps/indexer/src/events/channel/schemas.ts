@@ -17,6 +17,7 @@ import z from "zod";
 import {
   bigintToStringSchema,
   dateToIsoStringSchema,
+  EventFromChainDbToOpenApiSchema,
   EventFromChainSchema,
   MetadataSetOperationSchema,
 } from "../shared/schemas.ts";
@@ -52,11 +53,40 @@ export const ChannelCreatedEventSchema = z
   })
   .merge(EventFromChainSchema);
 
+export const ChannelCreatedEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_CHANNEL_CREATED),
+    uid: z.string(),
+    version: z.literal(1),
+    data: z.object({
+      channel: z.object({
+        id: z.string(),
+        createdAt: z.string().datetime(),
+        updatedAt: z.string().datetime(),
+        owner: HexSchema,
+        name: z.string(),
+        description: z.string(),
+        hook: HexSchema.nullable(),
+        metadata: MetadataArraySchema,
+        chainId: z.number().int(),
+      }),
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
 export type ChannelCreatedEventInput = z.input<
   typeof ChannelCreatedEventSchema
 >;
 
 export type ChannelCreatedEvent = z.infer<typeof ChannelCreatedEventSchema>;
+
+({}) as unknown as z.input<
+  typeof ChannelCreatedEventDbToOpenApiSchema
+> satisfies ChannelCreatedEvent;
+
+({}) as unknown as z.infer<
+  typeof ChannelCreatedEventDbToOpenApiSchema
+> satisfies ChannelCreatedEvent;
 
 export const ChannelUpdatedEventSchema = z
   .object({
@@ -75,11 +105,36 @@ export const ChannelUpdatedEventSchema = z
   })
   .merge(EventFromChainSchema);
 
+export const ChannelUpdatedEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_CHANNEL_UPDATED),
+    uid: z.string(),
+    version: z.literal(1),
+    data: z.object({
+      channel: z.object({
+        id: z.string(),
+        updatedAt: z.string().datetime(),
+        name: z.string(),
+        description: z.string(),
+        metadata: MetadataArraySchema,
+      }),
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
 export type ChannelUpdatedEventInput = z.input<
   typeof ChannelUpdatedEventSchema
 >;
 
 export type ChannelUpdatedEvent = z.infer<typeof ChannelUpdatedEventSchema>;
+
+({}) as unknown as z.input<
+  typeof ChannelUpdatedEventDbToOpenApiSchema
+> satisfies ChannelUpdatedEvent;
+
+({}) as unknown as z.infer<
+  typeof ChannelUpdatedEventDbToOpenApiSchema
+> satisfies ChannelUpdatedEvent;
 
 export const ChannelHookStatusUpdatedEventSchema = z
   .object({
@@ -100,6 +155,25 @@ export const ChannelHookStatusUpdatedEventSchema = z
   })
   .merge(EventFromChainSchema);
 
+export const ChannelHookStatusUpdatedEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_CHANNEL_HOOK_STATUS_UPDATED),
+    uid: z.string(),
+    version: z.literal(1),
+    data: z.object({
+      channel: z.object({
+        id: z.string(),
+        hook: HexSchema.nullable(),
+        updatedAt: z.string().datetime(),
+      }),
+      hook: z.object({
+        address: HexSchema,
+        enabled: z.boolean(),
+      }),
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
 export type ChannelHookStatusUpdatedEventInput = z.input<
   typeof ChannelHookStatusUpdatedEventSchema
 >;
@@ -107,6 +181,14 @@ export type ChannelHookStatusUpdatedEventInput = z.input<
 export type ChannelHookStatusUpdatedEvent = z.infer<
   typeof ChannelHookStatusUpdatedEventSchema
 >;
+
+({}) as unknown as z.input<
+  typeof ChannelHookStatusUpdatedEventDbToOpenApiSchema
+> satisfies ChannelHookStatusUpdatedEvent;
+
+({}) as unknown as z.infer<
+  typeof ChannelHookStatusUpdatedEventDbToOpenApiSchema
+> satisfies ChannelHookStatusUpdatedEvent;
 
 export const ChannelMetadataSetEventSchema = z
   .object({
@@ -124,6 +206,22 @@ export const ChannelMetadataSetEventSchema = z
   })
   .merge(EventFromChainSchema);
 
+export const ChannelMetadataSetEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_CHANNEL_METADATA_SET),
+    uid: z.string(),
+    version: z.literal(1),
+    data: z.object({
+      channel: z.object({
+        id: z.string(),
+        metadata: MetadataArraySchema,
+        updatedAt: z.string().datetime(),
+      }),
+      metadataOperation: MetadataSetOperationSchema,
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
 export type ChannelMetadataSetEventInput = z.input<
   typeof ChannelMetadataSetEventSchema
 >;
@@ -131,6 +229,14 @@ export type ChannelMetadataSetEventInput = z.input<
 export type ChannelMetadataSetEvent = z.infer<
   typeof ChannelMetadataSetEventSchema
 >;
+
+({}) as unknown as z.input<
+  typeof ChannelMetadataSetEventDbToOpenApiSchema
+> satisfies ChannelMetadataSetEvent;
+
+({}) as unknown as z.infer<
+  typeof ChannelMetadataSetEventDbToOpenApiSchema
+> satisfies ChannelMetadataSetEvent;
 
 export const ChannelTransferEventSchema = z
   .object({
@@ -149,11 +255,36 @@ export const ChannelTransferEventSchema = z
   })
   .merge(EventFromChainSchema);
 
+export const ChannelTransferEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_CHANNEL_TRANSFERRED),
+    uid: z.string(),
+    version: z.literal(1),
+    data: z.object({
+      channel: z.object({
+        id: z.string(),
+        owner: HexSchema,
+        updatedAt: z.string().datetime(),
+      }),
+      from: HexSchema,
+      to: HexSchema,
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
 export type ChannelTransferEventInput = z.input<
   typeof ChannelTransferEventSchema
 >;
 
 export type ChannelTransferEvent = z.infer<typeof ChannelTransferEventSchema>;
+
+({}) as unknown as z.input<
+  typeof ChannelTransferEventDbToOpenApiSchema
+> satisfies ChannelTransferEvent;
+
+({}) as unknown as z.infer<
+  typeof ChannelTransferEventDbToOpenApiSchema
+> satisfies ChannelTransferEvent;
 
 // assert that the schema output is the same as input to sdk
 ({}) as unknown as ChannelCreatedEvent satisfies z.input<

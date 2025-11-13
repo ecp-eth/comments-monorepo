@@ -28,6 +28,16 @@ export const EventFromChainSchema = z.object({
   txHash: HexSchema,
 });
 
+/**
+ * For events stored as JSON in the database and returned from the API
+ */
+export const EventFromChainDbToOpenApiSchema = z.object({
+  chainId: z.number().int(),
+  blockNumber: z.string(),
+  logIndex: z.number().int(),
+  txHash: HexSchema,
+});
+
 export const MetadataSetOperationSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("delete"),
