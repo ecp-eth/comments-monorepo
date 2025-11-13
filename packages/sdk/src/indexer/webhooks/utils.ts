@@ -221,7 +221,11 @@ export class InvalidRequestBodyError extends Error {
   public readonly details: z.ZodIssue[];
 
   constructor(details: z.ZodIssue[]) {
-    super("Body is not valid JSON object", { cause: details });
+    super(
+      "Body is not valid JSON object\n\nDetails:\n" +
+        JSON.stringify(details, null, 2),
+      { cause: details },
+    );
 
     this.details = details;
   }
@@ -234,7 +238,11 @@ export class InvalidEventError extends Error {
   public readonly details: z.ZodIssue[];
 
   constructor(details: z.ZodIssue[]) {
-    super("Invalid event has been received", { cause: details });
+    super(
+      "Invalid event has been received\n\nDetails:\n" +
+        JSON.stringify(details, null, 2),
+      { cause: details },
+    );
 
     this.details = details;
   }
