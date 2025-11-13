@@ -1,5 +1,15 @@
 # @ecp.eth/embed
 
+## 0.0.34
+
+### Patch Changes
+
+- Updated dependencies [ac7f843]
+  - @ecp.eth/sdk@0.0.34
+  - @ecp.eth/react-editor@0.0.15
+  - @ecp.eth/shared@0.0.16
+  - @ecp.eth/shared-signer@0.0.2
+
 ## 0.0.33
 
 ### Patch Changes

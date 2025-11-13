@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.34
+
+### Patch Changes
+
+- ac7f843: feat(sdk): improve webhook error messages
+
 ## 0.0.33
 
 ### Patch Changes
