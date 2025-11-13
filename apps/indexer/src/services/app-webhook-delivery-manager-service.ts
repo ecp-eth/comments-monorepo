@@ -15,6 +15,34 @@ export class AppWebhookDeliveryManager implements IAppWebhookDeliveryManager {
     this.db = options.db;
   }
 
+  async getAppWebhookDelivery(
+    params: IAppWebhookDeliveryManager_GetAppWebhookDeliveryParams,
+  ) {
+    const { deliveryId, appId, webhookId } =
+      GetAppWebhookDeliveryParamsSchema.parse(params);
+
+    const delivery = await this.db.query.appWebhookDelivery.findFirst({
+      where(fields, operators) {
+        return operators.and(
+          eq(fields.id, deliveryId),
+          eq(fields.appId, appId),
+          eq(fields.appWebhookId, webhookId),
+        );
+      },
+      with: {
+        event: true,
+      },
+    });
+
+    if (!delivery) {
+      throw new AppWebhookDeliveryManagerDeliveryNotFoundError();
+    }
+
+    return {
+      appWebhookDelivery: delivery,
+    };
+  }
+
   async retryDelivery(params: IAppWebhookDeliveryManager_RetryDeliveryParams) {
     const { deliveryId, appId, webhookId } =
       RetryDeliveryParamsSchema.parse(params);
@@ -82,7 +110,24 @@ type IAppWebhookDeliveryManager_RetryDeliveryResult = {
   appWebhookDelivery: AppWebhookDeliverySelectType;
 };
 
+const GetAppWebhookDeliveryParamsSchema = z.object({
+  appId: z.string().uuid(),
+  webhookId: z.string().uuid(),
+  deliveryId: z.bigint(),
+});
+
+type IAppWebhookDeliveryManager_GetAppWebhookDeliveryParams = z.infer<
+  typeof GetAppWebhookDeliveryParamsSchema
+>;
+
+type IAppWebhookDeliveryManager_GetAppWebhookDeliveryResult = {
+  appWebhookDelivery: AppWebhookDeliverySelectType;
+};
+
 export interface IAppWebhookDeliveryManager {
+  getAppWebhookDelivery(
+    params: IAppWebhookDeliveryManager_GetAppWebhookDeliveryParams,
+  ): Promise<IAppWebhookDeliveryManager_GetAppWebhookDeliveryResult>;
   retryDelivery(
     params: IAppWebhookDeliveryManager_RetryDeliveryParams,
   ): Promise<IAppWebhookDeliveryManager_RetryDeliveryResult>;
