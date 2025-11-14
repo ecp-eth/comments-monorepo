@@ -12369,6 +12369,179 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
+  /api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts:
+    get:
+      tags:
+        - apps
+        - webhooks
+        - deliveries
+      description: Get a list of delivery attempts for a webhook
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: before
+          in: query
+        - schema:
+            type: object
+            properties:
+              id:
+                type: string
+                pattern: ^d+$
+            required:
+              - id
+          required: false
+          name: after
+          in: query
+        - schema:
+            type: integer
+            exclusiveMinimum: 0
+            maximum: 100
+            default: 10
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: A bigint ID of the webhook delivery as string
+          required: false
+          name: webhookDeliveryId
+          in: query
+      responses:
+        '200':
+          description: Paginated list of delivery attempts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cursor:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                          required:
+                            - id
+                        item:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: A bigint string
+                            attemptedAt:
+                              type: string
+                              description: A date string in ISO 8601 format
+                            attemptNumber:
+                              type: number
+                            responseStatus:
+                              type: number
+                            responseMs:
+                              type: number
+                            error:
+                              type:
+                                - string
+                                - 'null'
+                            delivery:
+                              type: object
+                              properties:
+                                event:
+                                  type: object
+                                  properties:
+                                    eventType:
+                                      type: string
+                                  required:
+                                    - eventType
+                              required:
+                                - event
+                          required:
+                            - id
+                            - attemptedAt
+                            - attemptNumber
+                            - responseStatus
+                            - responseMs
+                            - error
+                            - delivery
+                      required:
+                        - cursor
+                        - item
+                  pageInfo:
+                    type: object
+                    properties:
+                      hasPreviousPage:
+                        type: boolean
+                      hasNextPage:
+                        type: boolean
+                      startCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                      endCursor:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: A bigint string
+                        required:
+                          - id
+                    required:
+                      - hasPreviousPage
+                      - hasNextPage
+                required:
+                  - results
+                  - pageInfo
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIBadRequestResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '404':
+          description: Webhook or app not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
   /api/apps/{appId}/webhooks/{webhookId}/deliveries/{deliveryId}:
     get:
       tags:
@@ -15020,179 +15193,6 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
         '404':
           description: Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-  /api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts:
-    get:
-      tags:
-        - apps
-        - webhooks
-        - deliveries
-      description: Get a list of delivery attempts for a webhook
-      parameters:
-        - schema:
-            type: string
-            format: uuid
-          required: true
-          name: appId
-          in: path
-        - schema:
-            type: string
-            format: uuid
-          required: true
-          name: webhookId
-          in: path
-        - schema:
-            type: object
-            properties:
-              id:
-                type: string
-                pattern: ^d+$
-            required:
-              - id
-          required: false
-          name: before
-          in: query
-        - schema:
-            type: object
-            properties:
-              id:
-                type: string
-                pattern: ^d+$
-            required:
-              - id
-          required: false
-          name: after
-          in: query
-        - schema:
-            type: integer
-            exclusiveMinimum: 0
-            maximum: 100
-            default: 10
-          required: false
-          name: limit
-          in: query
-        - schema:
-            type: string
-            pattern: ^\d+$
-            description: A bigint ID of the webhook delivery as string
-          required: false
-          name: webhookDeliveryId
-          in: query
-      responses:
-        '200':
-          description: Paginated list of delivery attempts
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  results:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        cursor:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              description: A bigint string
-                          required:
-                            - id
-                        item:
-                          type: object
-                          properties:
-                            id:
-                              type: string
-                              description: A bigint string
-                            attemptedAt:
-                              type: string
-                              description: A date string in ISO 8601 format
-                            attemptNumber:
-                              type: number
-                            responseStatus:
-                              type: number
-                            responseMs:
-                              type: number
-                            error:
-                              type:
-                                - string
-                                - 'null'
-                            delivery:
-                              type: object
-                              properties:
-                                event:
-                                  type: object
-                                  properties:
-                                    eventType:
-                                      type: string
-                                  required:
-                                    - eventType
-                              required:
-                                - event
-                          required:
-                            - id
-                            - attemptedAt
-                            - attemptNumber
-                            - responseStatus
-                            - responseMs
-                            - error
-                            - delivery
-                      required:
-                        - cursor
-                        - item
-                  pageInfo:
-                    type: object
-                    properties:
-                      hasPreviousPage:
-                        type: boolean
-                      hasNextPage:
-                        type: boolean
-                      startCursor:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            description: A bigint string
-                        required:
-                          - id
-                      endCursor:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                            description: A bigint string
-                        required:
-                          - id
-                    required:
-                      - hasPreviousPage
-                      - hasNextPage
-                required:
-                  - results
-                  - pageInfo
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIBadRequestResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/APIErrorResponse'
-        '404':
-          description: Webhook or app not found
           content:
             application/json:
               schema:
