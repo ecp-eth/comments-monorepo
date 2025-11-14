@@ -249,6 +249,8 @@ export const AppWebhookDeliverySchema = z.object({
   attemptsCount: z.number().int().nonnegative(),
   status: z.enum(["pending", "processing", "failed", "success"]),
   event: z.object({
+    eventType: z.string(),
+    eventUid: z.string(),
     // we don't care about the shape because we are rendering it using JSON.stringify()
     payload: z.record(z.any()),
   }),

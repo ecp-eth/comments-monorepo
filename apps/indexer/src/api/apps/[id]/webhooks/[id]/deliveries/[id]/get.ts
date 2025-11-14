@@ -31,6 +31,8 @@ export const AppWebhookDeliveryGetResponseSchema = z.object({
   lastError: z.string().nullable(),
   retryNumber: z.number().int().nonnegative(),
   event: z.object({
+    eventType: z.string(),
+    eventUid: z.string(),
     payload: AllEventsDbToOpenApiSchema,
   }),
 });
