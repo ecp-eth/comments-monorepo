@@ -3,6 +3,7 @@ import {
   EditorContent,
   type JSONContent,
   useEditor,
+  type EditorEvents,
 } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
 import { Paragraph } from "@tiptap/extension-paragraph";
@@ -63,7 +64,9 @@ export type EditorProps = {
    */
   autoFocus?: boolean;
   ref?: React.Ref<EditorRef>;
-  onBlur?: () => void;
+  onCreate?: (props: EditorEvents["create"]) => void;
+  onUpdate?: (props: EditorEvents["update"]) => void;
+  onBlur?: (props: EditorEvents["blur"]) => void;
   onEscapePress?: () => void;
   suggestions: EditorSuggestionsService;
   suggestionsTheme?: MentionsExtensionTheme;
@@ -89,6 +92,8 @@ export function Editor({
   placeholder,
   autoFocus = false,
   ref,
+  onCreate,
+  onUpdate,
   onBlur,
   onEscapePress,
   defaultValue,
@@ -111,6 +116,8 @@ export function Editor({
     immediatelyRender: false,
     autofocus: autoFocus,
     editable: !disabled,
+    onCreate,
+    onUpdate,
     onBlur,
     extensions: [
       Document,
