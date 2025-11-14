@@ -25,7 +25,7 @@ export const AppWebhookDeliveryGetRequestParamsSchema = z.object({
 export const AppWebhookDeliveryGetResponseSchema = z.object({
   id: OpenAPIBigintStringSchema,
   createdAt: OpenAPIDateStringSchema,
-  nextAttemptAt: OpenAPIDateStringSchema.nullable(),
+  nextAttemptAt: OpenAPIDateStringSchema,
   status: AppWebhookDeliveryStatusSchema,
   attemptsCount: z.number().int().nonnegative(),
   lastError: z.string().nullable(),
