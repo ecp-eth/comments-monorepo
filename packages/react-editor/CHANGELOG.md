@@ -1,5 +1,11 @@
 # @ecp.eth/react-editor
 
+## 0.0.17
+
+### Patch Changes
+
+- 715fc71: feat(react-editor): expose onCreate and onUpdate from tiptap
+
 ## 0.0.16
 
 ### Patch Changes
