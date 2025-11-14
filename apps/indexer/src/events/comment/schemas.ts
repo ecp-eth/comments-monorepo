@@ -285,20 +285,18 @@ export const CommentModerationStatusUpdatedEventSchema = z.object({
   }),
 });
 
-export const CommentModerationStatusUpdatedEventDbToOpenApiSchema = z
-  .object({
-    event: z.literal(EVENT_COMMENT_MODERATION_STATUS_UPDATED),
-    uid: z.string(),
-    version: z.literal(1),
-    data: z.object({
-      comment: z.object({
-        id: HexSchema,
-        moderationStatus: CommentModerationStatusSchema,
-        moderationStatusChangedAt: z.string().datetime(),
-      }),
+export const CommentModerationStatusUpdatedEventDbToOpenApiSchema = z.object({
+  event: z.literal(EVENT_COMMENT_MODERATION_STATUS_UPDATED),
+  uid: z.string(),
+  version: z.literal(1),
+  data: z.object({
+    comment: z.object({
+      id: HexSchema,
+      moderationStatus: CommentModerationStatusSchema,
+      moderationStatusChangedAt: z.string().datetime(),
     }),
-  })
-  .merge(EventFromChainDbToOpenApiSchema);
+  }),
+});
 
 export type CommentModerationStatusUpdatedEventInput = z.input<
   typeof CommentModerationStatusUpdatedEventSchema
@@ -366,26 +364,24 @@ export const CommentReferencesUpdatedEventSchema = z.object({
   }),
 });
 
-export const CommentReferencesUpdatedEventDbToOpenApiSchema = z
-  .object({
-    event: z.literal(EVENT_COMMENT_REFERENCES_UPDATED),
-    uid: z.string(),
-    version: z.literal(1),
-    data: z.object({
-      comment: z.object({
-        id: HexSchema,
-        references: IndexerAPICommentReferencesSchema,
-        referencesResolutionStatus: z.enum([
-          "pending",
-          "success",
-          "failed",
-          "partial",
-        ]),
-        referencesResolutionStatusChangedAt: z.string().datetime(),
-      }),
+export const CommentReferencesUpdatedEventDbToOpenApiSchema = z.object({
+  event: z.literal(EVENT_COMMENT_REFERENCES_UPDATED),
+  uid: z.string(),
+  version: z.literal(1),
+  data: z.object({
+    comment: z.object({
+      id: HexSchema,
+      references: IndexerAPICommentReferencesSchema,
+      referencesResolutionStatus: z.enum([
+        "pending",
+        "success",
+        "failed",
+        "partial",
+      ]),
+      referencesResolutionStatusChangedAt: z.string().datetime(),
     }),
-  })
-  .merge(EventFromChainDbToOpenApiSchema);
+  }),
+});
 
 export type CommentReferencesUpdatedEventInput = z.input<
   typeof CommentReferencesUpdatedEventSchema
@@ -426,3 +422,17 @@ export type CommentReferencesUpdatedEvent = z.infer<
 ({}) as unknown as CommentReferencesUpdatedEvent satisfies z.input<
   typeof OutputCommentReferencesUpdatedEventSchema
 >;
+
+/**
+ * This is a list of all the comment events that are supported by the database to openapi schema converter.
+ * It is used to convert the database to openapi schema.
+ */
+export const CommentEventsFromDbToOpenApiSchema = [
+  CommentAddedEventDbToOpenApiSchema,
+  CommentHookMetadataSetEventDbToOpenApiSchema,
+  CommentDeletedEventDbToOpenApiSchema,
+  CommentEditedEventDbToOpenApiSchema,
+  CommentModerationStatusUpdatedEventDbToOpenApiSchema,
+  CommentReactionsUpdatedEventDbToOpenApiSchema,
+  CommentReferencesUpdatedEventDbToOpenApiSchema,
+] as const;

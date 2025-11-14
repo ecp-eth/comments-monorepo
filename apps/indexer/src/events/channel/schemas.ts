@@ -80,10 +80,14 @@ export type ChannelCreatedEventInput = z.input<
 
 export type ChannelCreatedEvent = z.infer<typeof ChannelCreatedEventSchema>;
 
+// make sure the input to database schema is the same as output of the schema
+// used to serialize event for database
 ({}) as unknown as z.input<
   typeof ChannelCreatedEventDbToOpenApiSchema
 > satisfies ChannelCreatedEvent;
 
+// make sure the output of the schema from database is the same as input to sdk
+// used to deserialize event from database
 ({}) as unknown as z.infer<
   typeof ChannelCreatedEventDbToOpenApiSchema
 > satisfies ChannelCreatedEvent;
@@ -303,3 +307,15 @@ export type ChannelTransferEvent = z.infer<typeof ChannelTransferEventSchema>;
   typeof OutputChannelTransferredEventSchema
 >;
 ({}) as unknown as typeof SDKChannelEvents satisfies typeof ChannelEvents;
+
+/**
+ * This is a list of all the channel events that are supported by the database to openapi schema converter.
+ * It is used to convert the database to openapi schema.
+ */
+export const ChannelEventsFromDbToOpenApiSchema = [
+  ChannelCreatedEventDbToOpenApiSchema,
+  ChannelUpdatedEventDbToOpenApiSchema,
+  ChannelHookStatusUpdatedEventDbToOpenApiSchema,
+  ChannelMetadataSetEventDbToOpenApiSchema,
+  ChannelTransferEventDbToOpenApiSchema,
+] as const;

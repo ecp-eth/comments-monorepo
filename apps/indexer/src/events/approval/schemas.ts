@@ -114,3 +114,12 @@ export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
   typeof OutputApprovalRemovedEventSchema
 >;
 ({}) as unknown as typeof SDKApprovalEvents satisfies typeof ApprovalEvents;
+
+/**
+ * This is a list of all the approval events that are supported by the database to openapi schema converter.
+ * It is used to convert the database to openapi schema.
+ */
+export const ApprovalEventsFromDbToOpenApiSchema = [
+  ApprovalAddedEventDbToOpenApiSchema,
+  ApprovalRemovedEventDbToOpenApiSchema,
+] as const;
