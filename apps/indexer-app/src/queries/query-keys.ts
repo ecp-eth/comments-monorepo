@@ -53,6 +53,19 @@ export function createWebhookDeliveriesQueryKey(params: {
   ] as const;
 }
 
+export function createWebhookDeliveryQueryKey(params: {
+  appId: string;
+  webhookId: string;
+  deliveryId: string;
+}) {
+  return [
+    "webhook-delivery",
+    params.appId,
+    params.webhookId,
+    params.deliveryId,
+  ] as const;
+}
+
 export function createWebhookDeliveryAttemptsQueryKey(params: {
   appId: string;
   webhookId: string;

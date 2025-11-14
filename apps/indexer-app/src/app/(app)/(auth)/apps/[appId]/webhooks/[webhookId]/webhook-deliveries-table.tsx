@@ -31,6 +31,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { DeliveryDetailSheet } from "@/components/webhook-deliveries-table/delivery-detail-sheet";
 
 export function WebhookDeliveriesTable({
   appId,
@@ -45,6 +46,8 @@ export function WebhookDeliveriesTable({
     retryDeliveryDialogOpenForDeliveryId,
     setRetryDeliveryDialogOpenForDeliveryId,
   ] = useState<string | null>(null);
+  const [viewDeliveryDetailForDeliveryId, setViewDeliveryDetailForDeliveryId] =
+    useState<string | null>(null);
   const [paginationParams, setPaginationParams] = useState<
     | {
         direction: "previous" | "next";
@@ -69,6 +72,7 @@ export function WebhookDeliveriesTable({
       createWebhookDeliveryAttemptsDataTableColumns({
         onRetryDelivery: setRetryDeliveryDialogOpenForDeliveryId,
         onViewDeliveryAttempts,
+        onViewDeliveryDetail: setViewDeliveryDetailForDeliveryId,
       }),
     [onViewDeliveryAttempts],
   );
@@ -166,6 +170,14 @@ export function WebhookDeliveriesTable({
               isOpen: false,
             })}
       />
+      {viewDeliveryDetailForDeliveryId && (
+        <DeliveryDetailSheet
+          appId={appId}
+          webhookId={webhookId}
+          deliveryId={viewDeliveryDetailForDeliveryId}
+          onOpenChange={() => setViewDeliveryDetailForDeliveryId(null)}
+        />
+      )}
     </>
   );
 }
@@ -173,9 +185,11 @@ export function WebhookDeliveriesTable({
 function createWebhookDeliveryAttemptsDataTableColumns({
   onRetryDelivery,
   onViewDeliveryAttempts,
+  onViewDeliveryDetail,
 }: {
   onRetryDelivery: (deliveryId: string) => void;
   onViewDeliveryAttempts: (deliveryId: string) => void;
+  onViewDeliveryDetail: (deliveryId: string) => void;
 }): ColumnDef<AppWebhookListDeliveriesResponseSchemaType["results"][number]>[] {
   return [
     {
@@ -295,6 +309,14 @@ function createWebhookDeliveryAttemptsDataTableColumns({
                   <EyeIcon className="h-4 w-4" />
                   <span>View attempts</span>
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    onViewDeliveryDetail(row.original.item.id.toString())
+                  }
+                >
+                  <EyeIcon className="h-4 w-4" />
+                  <span>View detail</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -320,6 +342,18 @@ function createWebhookDeliveryAttemptsDataTableColumns({
             >
               <EyeIcon className="h-4 w-4" />
               <span>View attempts</span>
+            </Button>
+
+            <Button
+              className="gap-2 hidden md:inline-flex"
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                onViewDeliveryDetail(row.original.item.id.toString())
+              }
+            >
+              <EyeIcon className="h-4 w-4" />
+              <span>View detail</span>
             </Button>
           </span>
         );

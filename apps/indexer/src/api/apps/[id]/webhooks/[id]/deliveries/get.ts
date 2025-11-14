@@ -8,6 +8,7 @@ import {
 import {
   APIBadRequestResponseSchema,
   APIErrorResponseSchema,
+  AppWebhookDeliveryStatusSchema,
   OpenAPIBigintStringSchema,
   OpenAPIDateStringSchema,
 } from "../../../../../../lib/schemas";
@@ -37,26 +38,19 @@ const AppWebhookDeliveriesGetRequestQueryCursorSchema = z.preprocess(
   }),
 );
 
-const AppWebhookDeliveriesStatusSchema = z.enum([
-  "pending",
-  "processing",
-  "failed",
-  "success",
-]);
-
 export const AppWebhookDeliveriesGetRequestQuerySchema = z
   .object({
     before: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
     after: AppWebhookDeliveriesGetRequestQueryCursorSchema.optional(),
     limit: z.coerce.number().int().positive().max(100).default(10),
-    status: AppWebhookDeliveriesStatusSchema.or(
-      AppWebhookDeliveriesStatusSchema.array(),
+    status: AppWebhookDeliveryStatusSchema.or(
+      AppWebhookDeliveryStatusSchema.array(),
     )
       .or(
         z.string().transform((val, ctx) => {
           const statuses = val.split(",").map((item) => item.trim());
           const parsed =
-            AppWebhookDeliveriesStatusSchema.array().safeParse(statuses);
+            AppWebhookDeliveryStatusSchema.array().safeParse(statuses);
 
           if (!parsed.success) {
             ctx.addIssue({
@@ -118,7 +112,7 @@ export const AppWebhookDeliverySchema = z.object({
   createdAt: OpenAPIDateStringSchema,
   nextAttemptAt: OpenAPIDateStringSchema,
   attemptsCount: z.number().int().nonnegative(),
-  status: z.enum(["pending", "processing", "failed", "success"]),
+  status: AppWebhookDeliveryStatusSchema,
   event: z.object({
     eventType: z.string(),
   }),

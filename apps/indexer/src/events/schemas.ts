@@ -1,8 +1,24 @@
 import z from "zod";
-import { ApprovalEvents } from "./approval/schemas.ts";
-import { ChannelEvents } from "./channel/schemas.ts";
-import { CommentEvents } from "./comment/schemas.ts";
-import { TestEvents } from "./test/schemas.ts";
+import {
+  ApprovalEvents,
+  ApprovalEventsFromDbToOpenApiSchema,
+} from "./approval/schemas.ts";
+import {
+  ChannelEvents,
+  ChannelEventsFromDbToOpenApiSchema,
+} from "./channel/schemas.ts";
+import {
+  CommentEvents,
+  CommentEventsFromDbToOpenApiSchema,
+} from "./comment/schemas.ts";
+import { TestEvents, TestEventDbToOpenApiSchema } from "./test/schemas.ts";
+
+export const AllEventsDbToOpenApiSchema = z.discriminatedUnion("event", [
+  ...ApprovalEventsFromDbToOpenApiSchema,
+  ...ChannelEventsFromDbToOpenApiSchema,
+  ...CommentEventsFromDbToOpenApiSchema,
+  TestEventDbToOpenApiSchema,
+] as const);
 
 export const EventNames = [
   ...ApprovalEvents,

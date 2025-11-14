@@ -27627,6 +27627,3123 @@ paths:
                     description: The error message
                 required:
                   - message
+  /api/apps/{appId}/webhooks/{webhookId}/deliveries/{deliveryId}:
+    get:
+      tags:
+        - apps
+        - webhooks
+        - deliveries
+      description: Get a delivery by ID
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: appId
+          in: path
+        - schema:
+            type: string
+            format: uuid
+          required: true
+          name: webhookId
+          in: path
+        - schema:
+            type: string
+            pattern: ^d+$
+          required: true
+          name: deliveryId
+          in: path
+      responses:
+        '200':
+          description: Delivery details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: A bigint string
+                  createdAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  nextAttemptAt:
+                    type: string
+                    description: A date string in ISO 8601 format
+                  status:
+                    type: string
+                    enum: &ref_9
+                      - pending
+                      - processing
+                      - failed
+                      - success
+                  attemptsCount:
+                    type: integer
+                    minimum: 0
+                  lastError:
+                    type:
+                      - string
+                      - 'null'
+                  retryNumber:
+                    type: integer
+                    minimum: 0
+                  event:
+                    type: object
+                    properties:
+                      eventType:
+                        type: string
+                      eventUid:
+                        type: string
+                      payload:
+                        oneOf:
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - approval:added
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  approval:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      createdAt:
+                                        type: string
+                                        format: date-time
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      author:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      app:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                    required:
+                                      - id
+                                      - createdAt
+                                      - updatedAt
+                                      - author
+                                      - app
+                                required:
+                                  - approval
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - approval:removed
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  approval:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                    required:
+                                      - id
+                                required:
+                                  - approval
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - channel:created
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  channel:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      createdAt:
+                                        type: string
+                                        format: date-time
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      owner:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      name:
+                                        type: string
+                                      description:
+                                        type: string
+                                      hook:
+                                        type:
+                                          - string
+                                          - 'null'
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      metadata:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            key:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                            value:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                          required:
+                                            - key
+                                            - value
+                                      chainId:
+                                        type: integer
+                                    required:
+                                      - id
+                                      - createdAt
+                                      - updatedAt
+                                      - owner
+                                      - name
+                                      - description
+                                      - hook
+                                      - metadata
+                                      - chainId
+                                required:
+                                  - channel
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - channel:updated
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  channel:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      name:
+                                        type: string
+                                      description:
+                                        type: string
+                                      metadata:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            key:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                            value:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                          required:
+                                            - key
+                                            - value
+                                    required:
+                                      - id
+                                      - updatedAt
+                                      - name
+                                      - description
+                                      - metadata
+                                required:
+                                  - channel
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - channel:hook:status:updated
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  channel:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      hook:
+                                        type:
+                                          - string
+                                          - 'null'
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - hook
+                                      - updatedAt
+                                  hook:
+                                    type: object
+                                    properties:
+                                      address:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      enabled:
+                                        type: boolean
+                                    required:
+                                      - address
+                                      - enabled
+                                required:
+                                  - channel
+                                  - hook
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - channel:metadata:set
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  channel:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      metadata:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            key:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                            value:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                          required:
+                                            - key
+                                            - value
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - metadata
+                                      - updatedAt
+                                  metadataOperation:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - delete
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - create
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          value:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                          - value
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - update
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          value:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                          - value
+                                required:
+                                  - channel
+                                  - metadataOperation
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - channel:transferred
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  channel:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      owner:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - owner
+                                      - updatedAt
+                                  from:
+                                    type: string
+                                    description: >-
+                                      Hex format string, e.g.
+                                      `0x1234567890abcdef`
+                                  to:
+                                    type: string
+                                    description: >-
+                                      Hex format string, e.g.
+                                      `0x1234567890abcdef`
+                                required:
+                                  - channel
+                                  - from
+                                  - to
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:added
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          createdAt:
+                                            type: string
+                                            format: date-time
+                                          updatedAt:
+                                            type: string
+                                            format: date-time
+                                          channelId:
+                                            type: string
+                                          author:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          app:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          content:
+                                            type: string
+                                          commentType:
+                                            type: integer
+                                          metadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                value:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                              required:
+                                                - key
+                                                - value
+                                          moderationStatus:
+                                            type: string
+                                            enum: &ref_8
+                                              - pending
+                                              - approved
+                                              - rejected
+                                          references:
+                                            type: array
+                                            items:
+                                              anyOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ens
+                                                    avatarUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - avatarUrl
+                                                    - name
+                                                    - address
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - erc20
+                                                    symbol:
+                                                      type: string
+                                                    logoURI:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    decimals:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    chainId:
+                                                      type:
+                                                        - integer
+                                                        - 'null'
+                                                      exclusiveMinimum: 0
+                                                    chains:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          caip:
+                                                            type: string
+                                                          chainId:
+                                                            type: integer
+                                                            exclusiveMinimum: 0
+                                                        required:
+                                                          - caip
+                                                          - chainId
+                                                  required:
+                                                    - type
+                                                    - symbol
+                                                    - logoURI
+                                                    - name
+                                                    - address
+                                                    - decimals
+                                                    - position
+                                                    - chainId
+                                                    - chains
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - farcaster
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    fid:
+                                                      type: integer
+                                                    fname:
+                                                      type: string
+                                                    username:
+                                                      type: string
+                                                    displayName:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    pfpUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - address
+                                                    - fid
+                                                    - fname
+                                                    - username
+                                                    - displayName
+                                                    - pfpUrl
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - webpage
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    favicon:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                      format: uri
+                                                    opengraph:
+                                                      type:
+                                                        - object
+                                                        - 'null'
+                                                      properties:
+                                                        title:
+                                                          type: string
+                                                        description:
+                                                          type:
+                                                            - string
+                                                            - 'null'
+                                                        image:
+                                                          type: string
+                                                          format: uri
+                                                        url:
+                                                          type: string
+                                                          format: uri
+                                                      required:
+                                                        - title
+                                                        - description
+                                                        - image
+                                                        - url
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - title
+                                                    - description
+                                                    - favicon
+                                                    - opengraph
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - file
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - image
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                    dimension:
+                                                      type: object
+                                                      properties:
+                                                        width:
+                                                          type: integer
+                                                          minimum: 0
+                                                        height:
+                                                          type: integer
+                                                          minimum: 0
+                                                      required:
+                                                        - width
+                                                        - height
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - video
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                    videoTracks:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          dimension:
+                                                            type: object
+                                                            properties:
+                                                              width:
+                                                                type: integer
+                                                                minimum: 0
+                                                              height:
+                                                                type: integer
+                                                                minimum: 0
+                                                            required:
+                                                              - width
+                                                              - height
+                                                          codec:
+                                                            type: string
+                                                        required:
+                                                          - dimension
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - quoted_comment
+                                                    id:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    chainId:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                  required:
+                                                    - type
+                                                    - id
+                                                    - chainId
+                                                    - position
+                                                - {}
+                                                - type: 'null'
+                                          type:
+                                            type: string
+                                            enum:
+                                              - root
+                                          targetUri:
+                                            type: string
+                                        required:
+                                          - id
+                                          - createdAt
+                                          - updatedAt
+                                          - channelId
+                                          - author
+                                          - app
+                                          - content
+                                          - commentType
+                                          - metadata
+                                          - moderationStatus
+                                          - references
+                                          - type
+                                          - targetUri
+                                      - type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          createdAt:
+                                            type: string
+                                            format: date-time
+                                          updatedAt:
+                                            type: string
+                                            format: date-time
+                                          channelId:
+                                            type: string
+                                          author:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          app:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          content:
+                                            type: string
+                                          commentType:
+                                            type: integer
+                                          metadata:
+                                            type: array
+                                            items:
+                                              type: object
+                                              properties:
+                                                key:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                value:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                              required:
+                                                - key
+                                                - value
+                                          moderationStatus:
+                                            type: string
+                                            enum: *ref_8
+                                          references:
+                                            type: array
+                                            items:
+                                              anyOf:
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - ens
+                                                    avatarUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - avatarUrl
+                                                    - name
+                                                    - address
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - erc20
+                                                    symbol:
+                                                      type: string
+                                                    logoURI:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    name:
+                                                      type: string
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    decimals:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    chainId:
+                                                      type:
+                                                        - integer
+                                                        - 'null'
+                                                      exclusiveMinimum: 0
+                                                    chains:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          caip:
+                                                            type: string
+                                                          chainId:
+                                                            type: integer
+                                                            exclusiveMinimum: 0
+                                                        required:
+                                                          - caip
+                                                          - chainId
+                                                  required:
+                                                    - type
+                                                    - symbol
+                                                    - logoURI
+                                                    - name
+                                                    - address
+                                                    - decimals
+                                                    - position
+                                                    - chainId
+                                                    - chains
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - farcaster
+                                                    address:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    fid:
+                                                      type: integer
+                                                    fname:
+                                                      type: string
+                                                    username:
+                                                      type: string
+                                                    displayName:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    pfpUrl:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - type
+                                                    - address
+                                                    - fid
+                                                    - fname
+                                                    - username
+                                                    - displayName
+                                                    - pfpUrl
+                                                    - position
+                                                    - url
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - webpage
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    favicon:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                      format: uri
+                                                    opengraph:
+                                                      type:
+                                                        - object
+                                                        - 'null'
+                                                      properties:
+                                                        title:
+                                                          type: string
+                                                        description:
+                                                          type:
+                                                            - string
+                                                            - 'null'
+                                                        image:
+                                                          type: string
+                                                          format: uri
+                                                        url:
+                                                          type: string
+                                                          format: uri
+                                                      required:
+                                                        - title
+                                                        - description
+                                                        - image
+                                                        - url
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - title
+                                                    - description
+                                                    - favicon
+                                                    - opengraph
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - file
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - image
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                    dimension:
+                                                      type: object
+                                                      properties:
+                                                        width:
+                                                          type: integer
+                                                          minimum: 0
+                                                        height:
+                                                          type: integer
+                                                          minimum: 0
+                                                      required:
+                                                        - width
+                                                        - height
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - video
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                    mediaType:
+                                                      type: string
+                                                    videoTracks:
+                                                      type: array
+                                                      items:
+                                                        type: object
+                                                        properties:
+                                                          dimension:
+                                                            type: object
+                                                            properties:
+                                                              width:
+                                                                type: integer
+                                                                minimum: 0
+                                                              height:
+                                                                type: integer
+                                                                minimum: 0
+                                                            required:
+                                                              - width
+                                                              - height
+                                                          codec:
+                                                            type: string
+                                                        required:
+                                                          - dimension
+                                                  required:
+                                                    - type
+                                                    - url
+                                                    - position
+                                                    - mediaType
+                                                - type: object
+                                                  properties:
+                                                    type:
+                                                      type: string
+                                                      enum:
+                                                        - quoted_comment
+                                                    id:
+                                                      type: string
+                                                      description: >-
+                                                        Hex format string, e.g.
+                                                        `0x1234567890abcdef`
+                                                    chainId:
+                                                      type: integer
+                                                    position:
+                                                      type: object
+                                                      properties:
+                                                        start:
+                                                          type: integer
+                                                        end:
+                                                          type: integer
+                                                      required:
+                                                        - start
+                                                        - end
+                                                  required:
+                                                    - type
+                                                    - id
+                                                    - chainId
+                                                    - position
+                                                - {}
+                                                - type: 'null'
+                                          type:
+                                            type: string
+                                            enum:
+                                              - reply
+                                          parentId:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - id
+                                          - createdAt
+                                          - updatedAt
+                                          - channelId
+                                          - author
+                                          - app
+                                          - content
+                                          - commentType
+                                          - metadata
+                                          - moderationStatus
+                                          - references
+                                          - type
+                                          - parentId
+                                  zeroExSwap:
+                                    type:
+                                      - object
+                                      - 'null'
+                                    properties:
+                                      from:
+                                        type: object
+                                        properties:
+                                          address:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          amount:
+                                            type: string
+                                            pattern: ^\d+(\.\d+)?$
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                      to:
+                                        type: object
+                                        properties:
+                                          address:
+                                            anyOf:
+                                              - type: string
+                                                description: >-
+                                                  Hex format string, e.g.
+                                                  `0x1234567890abcdef`
+                                              - type: string
+                                                enum:
+                                                  - ''
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          amount:
+                                            anyOf:
+                                              - type: string
+                                                pattern: ^\d+(\.\d+)?$
+                                              - type: string
+                                                enum:
+                                                  - ''
+                                          symbol:
+                                            type: string
+                                        required:
+                                          - address
+                                          - amount
+                                          - symbol
+                                    required:
+                                      - from
+                                      - to
+                                required:
+                                  - comment
+                                  - zeroExSwap
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:hook:metadata:set
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      hookMetadata:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            key:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                            value:
+                                              type: string
+                                              description: >-
+                                                Hex format string, e.g.
+                                                `0x1234567890abcdef`
+                                          required:
+                                            - key
+                                            - value
+                                    required:
+                                      - id
+                                      - updatedAt
+                                      - hookMetadata
+                                  hookMetadataOperation:
+                                    oneOf:
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - delete
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - create
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          value:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                          - value
+                                      - type: object
+                                        properties:
+                                          type:
+                                            type: string
+                                            enum:
+                                              - update
+                                          key:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          value:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - type
+                                          - key
+                                          - value
+                                required:
+                                  - comment
+                                  - hookMetadataOperation
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:deleted
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      deletedAt:
+                                        type: string
+                                        format: date-time
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - deletedAt
+                                      - updatedAt
+                                required:
+                                  - comment
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:edited
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      content:
+                                        type: string
+                                      references:
+                                        type: array
+                                        items:
+                                          anyOf:
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - ens
+                                                avatarUrl:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                name:
+                                                  type: string
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - type
+                                                - avatarUrl
+                                                - name
+                                                - address
+                                                - position
+                                                - url
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - erc20
+                                                symbol:
+                                                  type: string
+                                                logoURI:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                name:
+                                                  type: string
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                decimals:
+                                                  type: integer
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                chainId:
+                                                  type:
+                                                    - integer
+                                                    - 'null'
+                                                  exclusiveMinimum: 0
+                                                chains:
+                                                  type: array
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      caip:
+                                                        type: string
+                                                      chainId:
+                                                        type: integer
+                                                        exclusiveMinimum: 0
+                                                    required:
+                                                      - caip
+                                                      - chainId
+                                              required:
+                                                - type
+                                                - symbol
+                                                - logoURI
+                                                - name
+                                                - address
+                                                - decimals
+                                                - position
+                                                - chainId
+                                                - chains
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - farcaster
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                fid:
+                                                  type: integer
+                                                fname:
+                                                  type: string
+                                                username:
+                                                  type: string
+                                                displayName:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                pfpUrl:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - type
+                                                - address
+                                                - fid
+                                                - fname
+                                                - username
+                                                - displayName
+                                                - pfpUrl
+                                                - position
+                                                - url
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - webpage
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                title:
+                                                  type: string
+                                                description:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                favicon:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                  format: uri
+                                                opengraph:
+                                                  type:
+                                                    - object
+                                                    - 'null'
+                                                  properties:
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    image:
+                                                      type: string
+                                                      format: uri
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - title
+                                                    - description
+                                                    - image
+                                                    - url
+                                                mediaType:
+                                                  type: string
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - title
+                                                - description
+                                                - favicon
+                                                - opengraph
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - file
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - image
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                                dimension:
+                                                  type: object
+                                                  properties:
+                                                    width:
+                                                      type: integer
+                                                      minimum: 0
+                                                    height:
+                                                      type: integer
+                                                      minimum: 0
+                                                  required:
+                                                    - width
+                                                    - height
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - video
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                                videoTracks:
+                                                  type: array
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      dimension:
+                                                        type: object
+                                                        properties:
+                                                          width:
+                                                            type: integer
+                                                            minimum: 0
+                                                          height:
+                                                            type: integer
+                                                            minimum: 0
+                                                        required:
+                                                          - width
+                                                          - height
+                                                      codec:
+                                                        type: string
+                                                    required:
+                                                      - dimension
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - quoted_comment
+                                                id:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                chainId:
+                                                  type: integer
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                              required:
+                                                - type
+                                                - id
+                                                - chainId
+                                                - position
+                                            - {}
+                                            - type: 'null'
+                                      moderationStatus:
+                                        type: string
+                                        enum: *ref_8
+                                    required:
+                                      - id
+                                      - updatedAt
+                                      - content
+                                      - references
+                                      - moderationStatus
+                                required:
+                                  - comment
+                              chainId:
+                                type: integer
+                              blockNumber:
+                                type: string
+                              logIndex:
+                                type: integer
+                              txHash:
+                                type: string
+                                description: Hex format string, e.g. `0x1234567890abcdef`
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                              - chainId
+                              - blockNumber
+                              - logIndex
+                              - txHash
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:moderation:status:updated
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      moderationStatus:
+                                        type: string
+                                        enum: *ref_8
+                                      moderationStatusChangedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - moderationStatus
+                                      - moderationStatusChangedAt
+                                required:
+                                  - comment
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:reactions:updated
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      reactionCounts:
+                                        type: object
+                                        additionalProperties:
+                                          type: number
+                                    required:
+                                      - id
+                                      - reactionCounts
+                                required:
+                                  - comment
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - comment:references:updated
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              data:
+                                type: object
+                                properties:
+                                  comment:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      references:
+                                        type: array
+                                        items:
+                                          anyOf:
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - ens
+                                                avatarUrl:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                name:
+                                                  type: string
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - type
+                                                - avatarUrl
+                                                - name
+                                                - address
+                                                - position
+                                                - url
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - erc20
+                                                symbol:
+                                                  type: string
+                                                logoURI:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                name:
+                                                  type: string
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                decimals:
+                                                  type: integer
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                chainId:
+                                                  type:
+                                                    - integer
+                                                    - 'null'
+                                                  exclusiveMinimum: 0
+                                                chains:
+                                                  type: array
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      caip:
+                                                        type: string
+                                                      chainId:
+                                                        type: integer
+                                                        exclusiveMinimum: 0
+                                                    required:
+                                                      - caip
+                                                      - chainId
+                                              required:
+                                                - type
+                                                - symbol
+                                                - logoURI
+                                                - name
+                                                - address
+                                                - decimals
+                                                - position
+                                                - chainId
+                                                - chains
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - farcaster
+                                                address:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                fid:
+                                                  type: integer
+                                                fname:
+                                                  type: string
+                                                username:
+                                                  type: string
+                                                displayName:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                pfpUrl:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                              required:
+                                                - type
+                                                - address
+                                                - fid
+                                                - fname
+                                                - username
+                                                - displayName
+                                                - pfpUrl
+                                                - position
+                                                - url
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - webpage
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                title:
+                                                  type: string
+                                                description:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                favicon:
+                                                  type:
+                                                    - string
+                                                    - 'null'
+                                                  format: uri
+                                                opengraph:
+                                                  type:
+                                                    - object
+                                                    - 'null'
+                                                  properties:
+                                                    title:
+                                                      type: string
+                                                    description:
+                                                      type:
+                                                        - string
+                                                        - 'null'
+                                                    image:
+                                                      type: string
+                                                      format: uri
+                                                    url:
+                                                      type: string
+                                                      format: uri
+                                                  required:
+                                                    - title
+                                                    - description
+                                                    - image
+                                                    - url
+                                                mediaType:
+                                                  type: string
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - title
+                                                - description
+                                                - favicon
+                                                - opengraph
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - file
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - image
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                                dimension:
+                                                  type: object
+                                                  properties:
+                                                    width:
+                                                      type: integer
+                                                      minimum: 0
+                                                    height:
+                                                      type: integer
+                                                      minimum: 0
+                                                  required:
+                                                    - width
+                                                    - height
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - video
+                                                url:
+                                                  type: string
+                                                  format: uri
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                                mediaType:
+                                                  type: string
+                                                videoTracks:
+                                                  type: array
+                                                  items:
+                                                    type: object
+                                                    properties:
+                                                      dimension:
+                                                        type: object
+                                                        properties:
+                                                          width:
+                                                            type: integer
+                                                            minimum: 0
+                                                          height:
+                                                            type: integer
+                                                            minimum: 0
+                                                        required:
+                                                          - width
+                                                          - height
+                                                      codec:
+                                                        type: string
+                                                    required:
+                                                      - dimension
+                                              required:
+                                                - type
+                                                - url
+                                                - position
+                                                - mediaType
+                                            - type: object
+                                              properties:
+                                                type:
+                                                  type: string
+                                                  enum:
+                                                    - quoted_comment
+                                                id:
+                                                  type: string
+                                                  description: >-
+                                                    Hex format string, e.g.
+                                                    `0x1234567890abcdef`
+                                                chainId:
+                                                  type: integer
+                                                position:
+                                                  type: object
+                                                  properties:
+                                                    start:
+                                                      type: integer
+                                                    end:
+                                                      type: integer
+                                                  required:
+                                                    - start
+                                                    - end
+                                              required:
+                                                - type
+                                                - id
+                                                - chainId
+                                                - position
+                                            - {}
+                                            - type: 'null'
+                                      referencesResolutionStatus:
+                                        type: string
+                                        enum:
+                                          - pending
+                                          - success
+                                          - failed
+                                          - partial
+                                      referencesResolutionStatusChangedAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - references
+                                      - referencesResolutionStatus
+                                      - referencesResolutionStatusChangedAt
+                                required:
+                                  - comment
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - data
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - test
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                              appId:
+                                type: string
+                                format: uuid
+                              webhookId:
+                                type: string
+                                format: uuid
+                              data:
+                                type: object
+                                properties:
+                                  message:
+                                    type: string
+                                required:
+                                  - message
+                            required:
+                              - event
+                              - uid
+                              - version
+                              - appId
+                              - webhookId
+                              - data
+                    required:
+                      - eventType
+                      - eventUid
+                      - payload
+                required:
+                  - id
+                  - createdAt
+                  - nextAttemptAt
+                  - status
+                  - attemptsCount
+                  - lastError
+                  - retryNumber
+                  - event
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        enum:
+                          - false
+                      error:
+                        type: object
+                        properties:
+                          issues:
+                            type: array
+                            items:
+                              oneOf:
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_type
+                                    expected:
+                                      type: string
+                                    received:
+                                      type: string
+                                  required:
+                                    - path
+                                    - code
+                                    - expected
+                                    - received
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_literal
+                                    expected: {}
+                                    received: {}
+                                  required:
+                                    - path
+                                    - code
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - unrecognized_keys
+                                    keys:
+                                      type: array
+                                      items:
+                                        type: string
+                                  required:
+                                    - path
+                                    - code
+                                    - keys
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_union
+                                    unionErrors:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties: *ref_0
+                                  required:
+                                    - path
+                                    - code
+                                    - unionErrors
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_union_discriminator
+                                    options:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                          - type: string
+                                            pattern: ^d+$
+                                          - type: boolean
+                                          - type: string
+                                            description: A symbol
+                                          - type: 'null'
+                                          - type: 'null'
+                                  required:
+                                    - path
+                                    - code
+                                    - options
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_enum_value
+                                    options:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                  required:
+                                    - path
+                                    - code
+                                    - options
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_arguments
+                                    argumentsError:
+                                      type: object
+                                      properties: *ref_1
+                                  required:
+                                    - path
+                                    - code
+                                    - argumentsError
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_return_type
+                                    returnTypeError:
+                                      type: object
+                                      properties: *ref_2
+                                  required:
+                                    - path
+                                    - code
+                                    - returnTypeError
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_date
+                                  required:
+                                    - path
+                                    - code
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_string
+                                    validation:
+                                      anyOf:
+                                        - type: string
+                                        - type: object
+                                          properties:
+                                            includes:
+                                              type: string
+                                            position:
+                                              type: number
+                                          required:
+                                            - includes
+                                        - type: object
+                                          properties:
+                                            startsWith:
+                                              type: string
+                                          required:
+                                            - startsWith
+                                        - type: object
+                                          properties:
+                                            endsWith:
+                                              type: string
+                                          required:
+                                            - endsWith
+                                  required:
+                                    - path
+                                    - code
+                                    - validation
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - too_small
+                                    minimum:
+                                      anyOf:
+                                        - type: number
+                                        - type: string
+                                          pattern: ^d+$
+                                    inclusive:
+                                      type: boolean
+                                    exact:
+                                      type: boolean
+                                    type:
+                                      type: string
+                                  required:
+                                    - path
+                                    - code
+                                    - minimum
+                                    - inclusive
+                                    - type
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - too_big
+                                    maximum:
+                                      anyOf:
+                                        - type: number
+                                        - type: string
+                                          pattern: ^d+$
+                                    inclusive:
+                                      type: boolean
+                                    exact:
+                                      type: boolean
+                                    type:
+                                      type: string
+                                  required:
+                                    - path
+                                    - code
+                                    - maximum
+                                    - inclusive
+                                    - type
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - invalid_intersection_types
+                                  required:
+                                    - path
+                                    - code
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - not_multiple_of
+                                    multipleOf:
+                                      anyOf:
+                                        - type: number
+                                        - type: string
+                                          pattern: ^d+$
+                                  required:
+                                    - path
+                                    - code
+                                    - multipleOf
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - not_finite
+                                  required:
+                                    - path
+                                    - code
+                                - type: object
+                                  properties:
+                                    fatal:
+                                      type: boolean
+                                    message:
+                                      type: string
+                                    path:
+                                      type: array
+                                      items:
+                                        anyOf:
+                                          - type: string
+                                          - type: number
+                                    code:
+                                      type: string
+                                      enum:
+                                        - custom
+                                    params:
+                                      type: object
+                                      additionalProperties: {}
+                                  required:
+                                    - path
+                                    - code
+                        required:
+                          - issues
+                    required:
+                      - success
+                      - error
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        description: The error message
+                    required:
+                      - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message
+                required:
+                  - message
   /api/apps/{appId}/webhooks/{webhookId}/deliveries/attempts:
     get:
       tags:
@@ -28857,15 +31974,11 @@ paths:
         - schema:
             anyOf:
               - type: string
-                enum: &ref_8
-                  - pending
-                  - processing
-                  - failed
-                  - success
+                enum: *ref_9
               - type: array
                 items:
                   type: string
-                  enum: *ref_8
+                  enum: *ref_9
               - type: string
             default: []
             description: >-
@@ -28930,11 +32043,7 @@ paths:
                               minimum: 0
                             status:
                               type: string
-                              enum:
-                                - pending
-                                - processing
-                                - failed
-                                - success
+                              enum: *ref_9
                             event:
                               type: object
                               properties:
@@ -32583,7 +35692,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: &ref_9
+            enum: &ref_10
               - hour
               - day
               - week
@@ -33158,7 +36267,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_9
+            enum: *ref_10
             default: day
           required: false
           name: bucket
@@ -33717,7 +36826,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_9
+            enum: *ref_10
             default: day
           required: false
           name: bucket
@@ -34272,7 +37381,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_9
+            enum: *ref_10
             default: day
           required: false
           name: bucket
@@ -34838,7 +37947,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_9
+            enum: *ref_10
             default: day
           required: false
           name: bucket
@@ -35408,7 +38517,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_9
+            enum: *ref_10
             default: day
           required: false
           name: bucket
@@ -35962,7 +39071,7 @@ paths:
                 type:
                   anyOf:
                     - type: string
-                      enum: &ref_10
+                      enum: &ref_11
                         - reply
                         - mention
                         - reaction
@@ -35970,7 +39079,7 @@ paths:
                     - type: array
                       items:
                         type: string
-                        enum: *ref_10
+                        enum: *ref_11
                   default: []
                   description: >-
                     The type of notification to mark as seen, if omitted or
@@ -36499,9 +39608,9 @@ paths:
               description: Hex format string, e.g. `0x1234567890abcdef`
               pattern: ^0x[a-fA-F0-9]+$
             maxItems: 20
-            default: &ref_12 []
+            default: &ref_13 []
             description: Return only notifications created by this app signers
-            oneOf: &ref_13
+            oneOf: &ref_14
               - type: array
                 items:
                   type: string
@@ -36558,16 +39667,16 @@ paths:
             type: array
             items:
               type: string
-              enum: *ref_10
-            default: &ref_14 []
+              enum: *ref_11
+            default: &ref_15 []
             description: Return only notifications of this type
-            oneOf: &ref_15
+            oneOf: &ref_16
               - type: array
                 items:
                   type: string
-                  enum: *ref_10
+                  enum: *ref_11
               - type: string
-                enum: *ref_10
+                enum: *ref_11
               - type: string
                 description: Comma separated list of notification types
                 example: reply,mention,reaction,quote
@@ -36587,7 +39696,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: &ref_16
+            enum: &ref_17
               - 'true'
               - 'false'
               - '1'
@@ -36752,7 +39861,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: &ref_11
+                                      enum: &ref_12
                                         - approved
                                         - rejected
                                         - pending
@@ -37386,7 +40495,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -38073,7 +41182,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -38673,7 +41782,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -39304,7 +42413,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -39904,7 +43013,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -40535,7 +43644,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -41524,9 +44633,9 @@ paths:
               description: Hex format string, e.g. `0x1234567890abcdef`
               pattern: ^0x[a-fA-F0-9]+$
             maxItems: 20
-            default: *ref_12
+            default: *ref_13
             description: Return only notifications created by this app signers
-            oneOf: *ref_13
+            oneOf: *ref_14
           required: false
           name: app
           in: query
@@ -41575,10 +44684,10 @@ paths:
             type: array
             items:
               type: string
-              enum: *ref_10
-            default: *ref_14
+              enum: *ref_11
+            default: *ref_15
             description: Return only notifications of this type
-            oneOf: *ref_15
+            oneOf: *ref_16
           required: false
           name: type
           in: query
@@ -41595,7 +44704,7 @@ paths:
           in: query
         - schema:
             type: string
-            enum: *ref_16
+            enum: *ref_17
             description: >-
               Whether to include only seen or unseen notifications, if omitted
               or empty all notifications will be included
@@ -41632,7 +44741,7 @@ paths:
                           properties:
                             notificationType:
                               type: string
-                              enum: *ref_10
+                              enum: *ref_11
                             parent:
                               type: object
                               properties:
@@ -41765,7 +44874,7 @@ paths:
                                         `0x1234567890abcdef`
                                     moderationStatus:
                                       type: string
-                                      enum: *ref_11
+                                      enum: *ref_12
                                     moderationStatusChangedAt:
                                       type:
                                         - string
@@ -42376,7 +45485,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -43009,7 +46118,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -43698,7 +46807,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -44298,7 +47407,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -44931,7 +48040,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -45531,7 +48640,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string
@@ -46164,7 +49273,7 @@ paths:
                                                   `0x1234567890abcdef`
                                               moderationStatus:
                                                 type: string
-                                                enum: *ref_11
+                                                enum: *ref_12
                                               moderationStatusChangedAt:
                                                 type:
                                                   - string

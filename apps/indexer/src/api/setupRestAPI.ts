@@ -39,6 +39,7 @@ import { setupAppWebhookTest } from "./apps/[id]/webhooks/[id]/test/post";
 import { setupAppUpdate } from "./apps/[id]/patch";
 import { setupAppWebhookDeliveryAttemptsGet } from "./apps/[id]/webhooks/[id]/deliveries/attempts/get";
 import { setupAppWebhookDeliveryRetry } from "./apps/[id]/webhooks/[id]/deliveries/[id]/retry/post";
+import { setupAppWebhookDeliveryGet } from "./apps/[id]/webhooks/[id]/deliveries/[id]/get";
 import { setupAppWebhookDeliveriesGet } from "./apps/[id]/webhooks/[id]/deliveries/get";
 import { setupNotificationsSeenPost } from "./notifications/seen/post";
 import { setupNotificationsGet } from "./notifications/get";
@@ -95,6 +96,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppWebhookGet(app);
   setupAppWebhookPatch(app);
   setupAppWebhookTest(app);
+  setupAppWebhookDeliveryGet(app);
   setupAppWebhookDeliveryAttemptsGet(app);
   setupAppWebhookDeliveryRetry(app);
   setupAppWebhookDeliveriesGet(app);

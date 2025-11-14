@@ -820,3 +820,10 @@ export const OpenAPIMaskedAppSecretSchema = z
     description: "Masked app secret",
     type: "string",
   });
+
+export const AppWebhookDeliveryStatusSchema = z.enum([
+  "pending",
+  "processing",
+  "failed",
+  "success",
+]);

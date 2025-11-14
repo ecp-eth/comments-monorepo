@@ -208,7 +208,7 @@ export type AppWebhookListDeliveryAttemptsResponseSchemaType = z.infer<
   typeof AppWebhookListDeliveryAttemptsResponseSchema
 >;
 
-export const AppWebhookDeliverySchema = z.object({
+export const AppWebhookListDeliveriesDeliveryItemSchema = z.object({
   id: z.coerce.bigint(),
   createdAt: z.coerce.date(),
   nextAttemptAt: z.coerce.date(),
@@ -219,15 +219,15 @@ export const AppWebhookDeliverySchema = z.object({
   }),
 });
 
-export type AppWebhookDeliverySchemaType = z.infer<
-  typeof AppWebhookDeliverySchema
+export type AppWebhookListDeliveriesDeliveryItemSchemaType = z.infer<
+  typeof AppWebhookListDeliveriesDeliveryItemSchema
 >;
 
 export const AppWebhookListDeliveriesResponseSchema = z.object({
   results: z.array(
     z.object({
       cursor: z.string(),
-      item: AppWebhookDeliverySchema,
+      item: AppWebhookListDeliveriesDeliveryItemSchema,
     }),
   ),
   pageInfo: z.object({
@@ -240,4 +240,22 @@ export const AppWebhookListDeliveriesResponseSchema = z.object({
 
 export type AppWebhookListDeliveriesResponseSchemaType = z.infer<
   typeof AppWebhookListDeliveriesResponseSchema
+>;
+
+export const AppWebhookDeliverySchema = z.object({
+  id: z.coerce.bigint(),
+  createdAt: z.coerce.date(),
+  nextAttemptAt: z.coerce.date(),
+  attemptsCount: z.number().int().nonnegative(),
+  status: z.enum(["pending", "processing", "failed", "success"]),
+  event: z.object({
+    eventType: z.string(),
+    eventUid: z.string(),
+    // we don't care about the shape because we are rendering it using JSON.stringify()
+    payload: z.record(z.any()),
+  }),
+});
+
+export type AppWebhookDeliverySchemaType = z.infer<
+  typeof AppWebhookDeliverySchema
 >;
