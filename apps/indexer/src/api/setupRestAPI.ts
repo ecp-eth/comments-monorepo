@@ -96,8 +96,8 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppWebhookGet(app);
   setupAppWebhookPatch(app);
   setupAppWebhookTest(app);
-  setupAppWebhookDeliveryGet(app);
   setupAppWebhookDeliveryAttemptsGet(app);
+  setupAppWebhookDeliveryGet(app);
   setupAppWebhookDeliveryRetry(app);
   setupAppWebhookDeliveriesGet(app);
   setupAnalyticsKpiDeliveriesGet(app);
