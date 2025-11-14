@@ -122,11 +122,13 @@ export const DeleteCommentParamSchema = z.object({
 /**
  * Response schema for an API error.
  */
-export const APIErrorResponseSchema = z.object({
-  message: z.string().openapi({
-    description: "The error message",
-  }),
-});
+export const APIErrorResponseSchema = z
+  .object({
+    message: z.string().openapi({
+      description: "The error message",
+    }),
+  })
+  .openapi("APIErrorResponse");
 
 /**
  * Shared schema for all API bad request response issues.
@@ -170,8 +172,9 @@ const APIBadRequestResponseIssueInvalidUnionSchema =
           properties: {
             issues: {
               type: "array",
-              description:
-                "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+              items: {
+                $ref: "#/components/schemas/APIBadRequestValidationErrorResponse",
+              },
             },
           },
         }),
@@ -209,8 +212,9 @@ const APIBadRequestResponseIssueInvalidArgumentsSchema =
         properties: {
           issues: {
             type: "array",
-            description:
-              "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+            items: {
+              $ref: "#/components/schemas/APIBadRequestValidationErrorResponse",
+            },
           },
         },
       }),
@@ -226,8 +230,9 @@ const APIBadRequestResponseIssueInvalidReturnTypeSchema =
         properties: {
           issues: {
             type: "array",
-            description:
-              "Same shape as the issues in APIBadRequestResponeSchema.error.issues",
+            items: {
+              $ref: "#/components/schemas/APIBadRequestValidationErrorResponse",
+            },
           },
         },
       }),
@@ -322,9 +327,11 @@ const APIBadRequestResponseIssueSchema = z.discriminatedUnion("code", [
 
 const APIBadRequestZodErrorSchema: z.ZodType<{
   issues: z.output<typeof APIBadRequestResponseIssueSchema>[];
-}> = z.object({
-  issues: z.array(APIBadRequestResponseIssueSchema),
-});
+}> = z
+  .object({
+    issues: z.array(APIBadRequestResponseIssueSchema),
+  })
+  .openapi("APIBadRequestValidationErrorResponse");
 
 /**
  * Response schema for a bad request.
@@ -334,7 +341,8 @@ export const APIBadRequestResponseSchema = z
     success: z.literal(false),
     error: APIBadRequestZodErrorSchema,
   })
-  .or(APIErrorResponseSchema);
+  .or(APIErrorResponseSchema)
+  .openapi("APIBadRequestResponse");
 
 const CommentCursorSchema = z.object({
   createdAt: z.coerce.date(),
