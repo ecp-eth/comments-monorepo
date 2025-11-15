@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useCallback, useRef } from "react";
-import { useAccount } from "wagmi";
+import React, { useCallback, useRef, useState } from "react";
+import { useAccount, usePublicClient } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
+import { useChannelFee } from "@ecp.eth/shared/hooks/useChannelFee";
 import { useAccountModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
@@ -94,7 +95,7 @@ type BaseCommentFormProps = {
    * @default "Cancel"
    */
   cancelLabel?: string;
-};
+} & ({ parentId: Hex } | { targetUri: string });
 
 function BaseCommentForm({
   autoFocus,
@@ -107,8 +108,10 @@ function BaseCommentForm({
   submitPendingLabel = "Please check your wallet to sign",
   onCancel,
   cancelLabel = "Cancel",
+  ...targetUriOrParentIdContainer
 }: BaseCommentFormProps) {
   const { address } = useAccount();
+  const config = useEmbedConfig();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +120,7 @@ function BaseCommentForm({
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
+  const publicClient = usePublicClient();
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
     maxFileSize: MAX_UPLOAD_FILE_SIZE,
@@ -137,6 +141,18 @@ function BaseCommentForm({
 
       return url;
     },
+  });
+  const [content, setContent] = useState("");
+  const { nativeTokenFeeText, erc20TokenFeeText } = useChannelFee({
+    channelId: config.channelId,
+    address,
+    content,
+    publicClient,
+    app:
+      config.app === "embed" || config.app === "all"
+        ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
+        : config.app,
+    ...targetUriOrParentIdContainer,
   });
 
   const submitMutation = useMutation({
@@ -252,12 +268,9 @@ function BaseCommentForm({
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-
   const isSubmitting = submitMutation.isPending;
-
-  const ButtonWrapper = publicEnv.NEXT_PUBLIC_ENABLE_GASLESS
-    ? GaslessIndicator
-    : React.Fragment;
+  const ButtonWrapper =
+    config.gasSponsorship !== "not-gasless" ? GaslessIndicator : React.Fragment;
 
   return (
     <form
@@ -296,6 +309,13 @@ function BaseCommentForm({
         suggestions={suggestions}
         suggestionsTheme={suggestionsTheme}
         uploads={uploads}
+        onUpdate={() => {
+          setContent(
+            editorRef.current?.editor?.getText({
+              blockSeparator: "\n",
+            }) ?? "",
+          );
+        }}
         onEscapePress={() => {
           if (isSubmitting) {
             return;
@@ -331,6 +351,9 @@ function BaseCommentForm({
           <ButtonWrapper>
             <Button type="submit" disabled={isSubmitting || disabled} size="sm">
               {isSubmitting ? submitPendingLabel : submitIdleLabel}
+              {nativeTokenFeeText || erc20TokenFeeText
+                ? ` at ${[nativeTokenFeeText, erc20TokenFeeText].filter(Boolean).join(" and ")}`
+                : ""}
             </Button>
           </ButtonWrapper>
           {onCancel && (
@@ -379,6 +402,7 @@ export function CommentForm({
   return (
     <BaseCommentForm
       {...props}
+      {...(parentId ? { parentId } : { targetUri })}
       onSubmit={({ author, content, references }) =>
         submitCommentMutation({
           queryKey,
@@ -470,6 +494,7 @@ export function CommentEditForm({
   return (
     <BaseCommentForm
       {...props}
+      parentId={comment.id}
       defaultContent={{
         content: comment.content,
         references: comment.references,

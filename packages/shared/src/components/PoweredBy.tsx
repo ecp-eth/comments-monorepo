@@ -8,15 +8,15 @@ type PoweredByProps = {
 
 export function PoweredBy({ className }: PoweredByProps) {
   return (
-    <Link
+    <div
       className={cn(
         "flex items-center gap-2 opacity-50 hover:opacity-100 text-sm",
         className,
       )}
-      href="https://docs.ethcomments.xyz"
-      target="_blank"
     >
-      <Logo className="w-4 h-4" /> Comments powered by ECP
-    </Link>
+      <Link href="https://docs.ethcomments.xyz" target="_blank">
+        <Logo className="w-4 h-4" /> Comments powered by ECP
+      </Link>
+    </div>
   );
 }
