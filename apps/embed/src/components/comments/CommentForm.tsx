@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useRef } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
@@ -45,6 +45,7 @@ import { suggestionsTheme } from "./editorTheme";
 import { GaslessIndicator } from "./GaslessIndicator";
 import { usePostComment } from "./hooks/usePostComment";
 import { useEditComment } from "./hooks/useEditComment";
+import { useChannelFee } from "./hooks/useChannelFee";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -94,7 +95,7 @@ type BaseCommentFormProps = {
    * @default "Cancel"
    */
   cancelLabel?: string;
-};
+} & ({ parentId: Hex } | { targetUri: string });
 
 function BaseCommentForm({
   autoFocus,
@@ -107,8 +108,10 @@ function BaseCommentForm({
   submitPendingLabel = "Please check your wallet to sign",
   onCancel,
   cancelLabel = "Cancel",
+  ...targetUriOrParentIdContainer
 }: BaseCommentFormProps) {
   const { address } = useAccount();
+  const config = useEmbedConfig();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +120,7 @@ function BaseCommentForm({
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
+  const publicClient = usePublicClient();
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
     maxFileSize: MAX_UPLOAD_FILE_SIZE,
@@ -137,6 +141,18 @@ function BaseCommentForm({
 
       return url;
     },
+  });
+
+  const channelFee = useChannelFee({
+    channelId: config.channelId,
+    address,
+    editorRef,
+    publicClient,
+    app:
+      config.app === "embed" || config.app === "all"
+        ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
+        : config.app,
+    ...targetUriOrParentIdContainer,
   });
 
   const submitMutation = useMutation({
@@ -379,6 +395,7 @@ export function CommentForm({
   return (
     <BaseCommentForm
       {...props}
+      {...(parentId ? { parentId } : { targetUri })}
       onSubmit={({ author, content, references }) =>
         submitCommentMutation({
           queryKey,
@@ -470,6 +487,7 @@ export function CommentEditForm({
   return (
     <BaseCommentForm
       {...props}
+      parentId={comment.id}
       defaultContent={{
         content: comment.content,
         references: comment.references,
