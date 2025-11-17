@@ -633,7 +633,7 @@ function fetchComment(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:109](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L109)
+Defined in: [packages/sdk/src/indexer/api.ts:111](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L111)
 
 Fetch one single comment from the Indexer API
 
@@ -1271,3 +1271,7 @@ Fetch one single comment from the Indexer API
 \}\>
 
 A promise that resolves the comment fetched from the Indexer API
+
+## Throws
+
+If the comment is not available on given chain(s) or there is some request failure.

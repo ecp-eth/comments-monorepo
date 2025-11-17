@@ -55,7 +55,7 @@ export type FetchCommentOptions = {
    */
   commentId: Hex;
   /**
-   * Filter comments by chain ID(s)
+   * Filter comment and replies by chain ID(s). If the comment is not available on given chain(s) the function will throw a ResponseError.
    */
   chainId: number | number[];
   /**
@@ -63,8 +63,9 @@ export type FetchCommentOptions = {
    */
   viewer?: Hex;
   /**
-   * The mode to fetch comments in by default it returns only the first level of comments.
-   * If flat is used it will return all comments sorted by timestamp in descending order.
+   * The mode to fetch replies, by default it returns only the first level of replies.
+   * - "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
+   * - "nested" mode returns only the first level of replies sorted by timestamp in descending order.
    *
    * @default "nested"
    */
@@ -75,7 +76,7 @@ export type FetchCommentOptions = {
    */
   isReplyDeleted?: boolean;
   /**
-   * Filter comments by comment type
+   * Filter replies by comment type
    */
   commentType?: number;
   /**
@@ -105,6 +106,7 @@ void ({} as FetchCommentOptions satisfies z.input<
  * Fetch one single comment from the Indexer API
  *
  * @returns A promise that resolves the comment fetched from the Indexer API
+ * @throws {ResponseError} If the comment is not available on given chain(s) or there is some request failure.
  */
 export async function fetchComment(
   options: FetchCommentOptions,
@@ -243,8 +245,9 @@ export type FetchCommentsOptions = {
    */
   sort?: IndexerAPISortSchemaType;
   /**
-   * The mode to fetch comments in by default it returns only the first level of comments.
-   * If flat is used it will return all comments sorted by timestamp in descending order.
+   * The mode to fetch replies, by default it returns only the first level of replies.
+   * - "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
+   * - "nested" mode returns only the first level of replies sorted by timestamp in descending order.
    *
    * @default "nested"
    */
@@ -308,6 +311,7 @@ const FetchCommentsOptionsSchema = z.object({
  * Fetch comments from the Indexer API
  *
  * @returns A promise that resolves comments fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchComments(
   options: FetchCommentsOptions,
@@ -474,8 +478,9 @@ export type FetchCommentRepliesOptions = {
    */
   sort?: IndexerAPISortSchemaType;
   /**
-   * The mode to fetch replies in by default it returns only the first level of replies.
-   * If flat is used it will return all replies sorted by timestamp in descending order.
+   * The mode to fetch replies, by default it returns only the first level of replies.
+   * - "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
+   * - "nested" mode returns only the first level of replies sorted by timestamp in descending order.
    *
    * @default "nested"
    */
@@ -555,6 +560,7 @@ void ({} as FetchCommentRepliesOptions satisfies z.input<
  * Fetch replies for a comment from the Indexer API
  *
  * @returns A promise that resolves replies fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchCommentReplies(
   options: FetchCommentRepliesOptions,
@@ -705,6 +711,7 @@ void ({} as FetchAuthorDataOptions satisfies z.input<
  * Fetch author data from the Indexer API
  *
  * @returns A promise that resolves author data fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchAuthorData(
   options: FetchAuthorDataOptions,
@@ -784,6 +791,7 @@ void ({} as IsMutedOptions satisfies z.input<typeof isMutedOptionsSchema>);
  *
  * @param options - The options for checking if an address is muted
  * @returns A promise that resolves to `true` if the address is marked as muted, `false` otherwise
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function isMuted(options: IsMutedOptions): Promise<boolean> {
   const { address, apiUrl, retries, signal } =
@@ -879,6 +887,7 @@ void ({} as FetchChannelsOptions satisfies z.input<
  * Fetch channels from the Indexer API
  *
  * @returns A promise that resolves channels fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchChannels(
   options: FetchChannelsOptions,
@@ -970,6 +979,7 @@ void ({} as FetchChannelOptions satisfies z.input<
  * Fetch a single channel by ID from the Indexer API
  *
  * @returns A promise that resolves to the channel data fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchChannel(
   options: FetchChannelOptions,
@@ -1050,6 +1060,7 @@ void ({} as FetchAutocompleteOptions satisfies z.input<
  * Fetch autocomplete suggestions from the Indexer API
  *
  * @returns A promise that resolves to autocomplete suggestions fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchAutocomplete(
   options: FetchAutocompleteOptions,
@@ -1147,6 +1158,7 @@ void ({} as ReportCommentOptions satisfies z.input<
  * Report a comment to the Indexer API
  *
  * @returns A promise that resolves when the comment is reported successfully
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function reportComment(
   options: ReportCommentOptions,
@@ -1292,6 +1304,7 @@ void ({} as FetchNotificationsOptions satisfies z.input<
  * Fetch notifications from the Indexer API
  *
  * @returns A promise that resolves to notifications fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchNotifications(
   options: FetchNotificationsOptions,
@@ -1455,6 +1468,7 @@ void ({} as FetchGroupedNotificationsOptions satisfies z.input<
  * Fetch grouped notifications from the Indexer API
  *
  * @returns A promise that resolves to grouped notifications fetched from the Indexer API
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function fetchGroupedNotifications(
   options: FetchGroupedNotificationsOptions,
@@ -1593,6 +1607,7 @@ void ({} as MarkNotificationsAsSeenOptions satisfies z.input<
  * Mark notifications as seen
  *
  * @returns A promise that resolves to the number of notifications marked as seen
+ * @throws {ResponseError} If there is some request failure.
  */
 export async function markNotificationsAsSeen(
   options: MarkNotificationsAsSeenOptions,

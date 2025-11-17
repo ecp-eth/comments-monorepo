@@ -10,7 +10,7 @@
 function isMuted(options): Promise<boolean>;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:788](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L788)
+Defined in: [packages/sdk/src/indexer/api.ts:796](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L796)
 
 Checks if an address is marked as muted on the indexer of your choice.
 
@@ -27,3 +27,7 @@ The options for checking if an address is muted
 `Promise`\<`boolean`\>
 
 A promise that resolves to `true` if the address is marked as muted, `false` otherwise
+
+## Throws
+
+If there is some request failure.
