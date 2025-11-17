@@ -40,12 +40,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, CoinsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 import { GaslessIndicator } from "./GaslessIndicator";
 import { usePostComment } from "./hooks/usePostComment";
 import { useEditComment } from "./hooks/useEditComment";
+import { Label } from "@/components/ui/label";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -143,17 +144,18 @@ function BaseCommentForm({
     },
   });
   const [content, setContent] = useState("");
-  const { nativeTokenFeeText, erc20TokenFeeText } = useChannelFee({
-    channelId: config.channelId,
-    address,
-    content,
-    publicClient,
-    app:
-      config.app === "embed" || config.app === "all"
-        ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
-        : config.app,
-    ...targetUriOrParentIdContainer,
-  });
+  const { nativeTokenCostInEthText, nativeTokenCostInUSDText, erc20CostText } =
+    useChannelFee({
+      channelId: config.channelId,
+      address,
+      content,
+      publicClient,
+      app:
+        config.app === "embed" || config.app === "all"
+          ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
+          : config.app,
+      ...targetUriOrParentIdContainer,
+    });
 
   const submitMutation = useMutation({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -348,12 +350,27 @@ function BaseCommentForm({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          {(nativeTokenCostInEthText || erc20CostText) && (
+            <Label
+              className="h-8 text-[0.8em] flex flex-row items-center gap-2 border-b-amber-500 border-b-2"
+              aria-label="Cost of posting"
+            >
+              <CoinsIcon className="w-3 h-3" />
+              Cost:{" "}
+              {[
+                nativeTokenCostInEthText +
+                  (nativeTokenCostInUSDText
+                    ? ` (≈ ${nativeTokenCostInUSDText})`
+                    : ""),
+                erc20CostText,
+              ]
+                .filter(Boolean)
+                .join(" and ")}{" "}
+            </Label>
+          )}
           <ButtonWrapper>
             <Button type="submit" disabled={isSubmitting || disabled} size="sm">
               {isSubmitting ? submitPendingLabel : submitIdleLabel}
-              {nativeTokenFeeText || erc20TokenFeeText
-                ? ` at ${[nativeTokenFeeText, erc20TokenFeeText].filter(Boolean).join(" and ")}`
-                : ""}
             </Button>
           </ButtonWrapper>
           {onCancel && (

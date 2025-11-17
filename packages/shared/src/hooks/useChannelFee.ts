@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { Decimal } from "decimal.js";
 import {
   createEstimateChannelPostOrEditCommentFeeData,
+  estimateChannelEditCommentFee,
   estimateChannelPostCommentFee,
   TotalFeeEstimation,
 } from "@ecp.eth/sdk/channel-manager";
 import { PublicClient, Transport, Chain } from "viem";
 import { never } from "../helpers";
+import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
 export function useChannelFee(
   params: {
@@ -40,13 +42,18 @@ export function useChannelFee(
   const parentId = "parentId" in params ? params.parentId : undefined;
   const [fee, setFee] = useState<TotalFeeEstimation>();
   const [debouncedContent] = useDebounce(content, 700);
-  const [nativeTokenFeeText, setNativeTokenFeeText] = useState<string>();
-  const [erc20TokenFeeText, setErc20TokenFeeText] = useState<string>();
+  const [nativeTokenCostInEthText, setNativeTokenCostInEthText] =
+    useState<string>();
+  const [nativeTokenCostInUSDText, setNativeTokenCostInUSDText] =
+    useState<string>();
+  const [erc20CostText, setERC20CostText] = useState<string>();
+  const [usdPerEth, setUsdPerEth] = useState<Decimal>(new Decimal(0));
 
   const reset = () => {
     setFee(undefined);
-    setNativeTokenFeeText(undefined);
-    setErc20TokenFeeText(undefined);
+    setNativeTokenCostInEthText(undefined);
+    setERC20CostText(undefined);
+    setUsdPerEth(new Decimal(0));
   };
 
   useEffect(() => {
@@ -85,7 +92,9 @@ export function useChannelFee(
       },
     );
 
-    estimateChannelPostCommentFee({
+    (parentId !== EMPTY_PARENT_ID && parentId != null
+      ? estimateChannelEditCommentFee
+      : estimateChannelPostCommentFee)({
       commentData: estimationCommentData,
       metadata: [],
       msgSender: author,
@@ -109,9 +118,19 @@ export function useChannelFee(
       return;
     }
 
-    void getNativeTokenCost(fee, toSignificantDigits).then(
-      setNativeTokenFeeText,
+    const nativeTokenCostInEth = new Decimal(
+      fee.baseToken.amount.toString(),
+    ).div(new Decimal(10).pow(18));
+
+    setNativeTokenCostInEthText(
+      `${nativeTokenCostInEth.toSignificantDigits(toSignificantDigits)} ETH`,
     );
+
+    void getNativeTokenCostInUSD(nativeTokenCostInEth).then(
+      setNativeTokenCostInUSDText,
+    );
+
+    void getETHPrice().then(setUsdPerEth);
 
     const contractAsset = fee.contractAsset;
 
@@ -127,37 +146,31 @@ export function useChannelFee(
           if (!symbol) {
             return;
           }
-          setErc20TokenFeeText(contractAsset.amount.toString() + " " + symbol);
+          setERC20CostText(contractAsset.amount.toString() + " " + symbol);
         });
     }
   }, [fee, publicClient, toSignificantDigits]);
 
   return {
     fee,
-    nativeTokenFeeText,
-    erc20TokenFeeText,
+    nativeTokenCostInEthText,
+    nativeTokenCostInUSDText,
+    erc20CostText,
+    usdPerEth,
   };
 }
 
-async function getNativeTokenCost(
-  fee: TotalFeeEstimation,
-  toSignificantDigits: number,
+async function getNativeTokenCostInUSD(
+  nativeTokenCostInEth: Decimal,
 ): Promise<string> {
-  const nativeTokenCost = new Decimal(fee.baseToken.amount.toString()).div(
-    new Decimal(10).pow(18),
-  );
-
   const usdPerEth = await getETHPrice();
-  const usdCost = nativeTokenCost.mul(usdPerEth);
+  const usdCost = nativeTokenCostInEth.mul(usdPerEth);
   const formattedUsdCost = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   }).format(usdCost.toNumber());
 
-  return (
-    `${nativeTokenCost.toSignificantDigits(toSignificantDigits)} ETH` +
-    (usdCost.gt(0) ? ` (${formattedUsdCost})` : "")
-  );
+  return usdCost.gt(0) ? formattedUsdCost : "";
 }
 
 const coinGeckoResponseBodySchema = z.object({
@@ -166,27 +179,33 @@ const coinGeckoResponseBodySchema = z.object({
   }),
 });
 
-let cachedETHPrice: Decimal | undefined;
+let getETHPricePromise: Promise<Decimal> | undefined;
 async function getETHPrice(): Promise<Decimal> {
-  if (cachedETHPrice) {
-    return cachedETHPrice;
+  if (getETHPricePromise) {
+    return getETHPricePromise;
   }
 
-  const response = await fetch(
-    "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
-  );
+  getETHPricePromise = (async () => {
+    try {
+      const response = await fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd",
+      );
 
-  if (!response.ok) {
-    return new Decimal(0);
-  }
+      if (!response.ok) {
+        return new Decimal(0);
+      }
 
-  const data = await response.json();
-  const parseResult = coinGeckoResponseBodySchema.safeParse(data);
+      const data = await response.json();
+      const parseResult = coinGeckoResponseBodySchema.safeParse(data);
 
-  if (!parseResult.success) {
-    return new Decimal(0);
-  }
+      if (!parseResult.success) {
+        return new Decimal(0);
+      }
 
-  cachedETHPrice = new Decimal(parseResult.data.ethereum.usd);
-  return cachedETHPrice;
+      return new Decimal(parseResult.data.ethereum.usd);
+    } catch {
+      return new Decimal(0);
+    }
+  })();
+  return getETHPricePromise;
 }
