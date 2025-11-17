@@ -30,7 +30,7 @@ type FetchCommentsOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:178](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L178)
+Defined in: [packages/sdk/src/indexer/api.ts:180](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L180)
 
 The options for `fetchComments()`
 
@@ -42,7 +42,7 @@ The options for `fetchComments()`
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:200](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L200)
+Defined in: [packages/sdk/src/indexer/api.ts:202](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L202)
 
 URL on which /api/comments endpoint will be called
 
@@ -60,7 +60,7 @@ URL on which /api/comments endpoint will be called
 optional app: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:204](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L204)
+Defined in: [packages/sdk/src/indexer/api.ts:206](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L206)
 
 Filter comments sent using this app signer key.
 
@@ -72,7 +72,7 @@ Filter comments sent using this app signer key.
 optional author: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:186](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L186)
+Defined in: [packages/sdk/src/indexer/api.ts:188](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L188)
 
 Filter comments by author
 
@@ -84,7 +84,7 @@ Filter comments by author
 chainId: number | number[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:190](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L190)
+Defined in: [packages/sdk/src/indexer/api.ts:192](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L192)
 
 Filter comments by chain ID(s)
 
@@ -96,7 +96,7 @@ Filter comments by chain ID(s)
 optional channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:208](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L208)
+Defined in: [packages/sdk/src/indexer/api.ts:210](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L210)
 
 Filter comments by channel ID
 
@@ -108,7 +108,7 @@ Filter comments by channel ID
 optional commentType: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:212](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L212)
+Defined in: [packages/sdk/src/indexer/api.ts:214](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L214)
 
 Filter comments by comment type
 
@@ -120,7 +120,7 @@ Filter comments by comment type
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L238)
+Defined in: [packages/sdk/src/indexer/api.ts:240](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L240)
 
 The cursor to fetch comments from
 
@@ -132,7 +132,7 @@ The cursor to fetch comments from
 optional excludeByModerationLabels: IndexerAPIModerationClassificationLabelSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:267](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L267)
+Defined in: [packages/sdk/src/indexer/api.ts:270](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L270)
 
 Filter comments by moderation labels.
 
@@ -148,7 +148,7 @@ if the premoderation is enabled.
 optional isDeleted: boolean;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:217](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L217)
+Defined in: [packages/sdk/src/indexer/api.ts:219](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L219)
 
 Whether to return only deleted comments or only undeleted comments.
 If omitted it will return both deleted and undeleted comments.
@@ -161,7 +161,7 @@ If omitted it will return both deleted and undeleted comments.
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:273](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L273)
+Defined in: [packages/sdk/src/indexer/api.ts:276](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L276)
 
 The number of comments to fetch
 
@@ -179,10 +179,11 @@ The number of comments to fetch
 optional mode: IndexerAPICommentListModeSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:251](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L251)
+Defined in: [packages/sdk/src/indexer/api.ts:254](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L254)
 
-The mode to fetch comments in by default it returns only the first level of comments.
-If flat is used it will return all comments sorted by timestamp in descending order.
+The mode to fetch replies, by default it returns only the first level of replies.
+- "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
+- "nested" mode returns only the first level of replies sorted by timestamp in descending order.
 
 #### Default
 
@@ -198,7 +199,7 @@ If flat is used it will return all comments sorted by timestamp in descending or
 optional moderationScore: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:259](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L259)
+Defined in: [packages/sdk/src/indexer/api.ts:262](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L262)
 
 Filter comments by moderation score.
 
@@ -216,7 +217,7 @@ optional moderationStatus:
   | IndexerAPICommentModerationStatusSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:226](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L226)
+Defined in: [packages/sdk/src/indexer/api.ts:228](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L228)
 
 Filter comments by moderation status.
 
@@ -233,7 +234,7 @@ If moderation is disabled, this parameter is ignored.
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:234](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L234)
+Defined in: [packages/sdk/src/indexer/api.ts:236](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L236)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -251,7 +252,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:274](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L274)
+Defined in: [packages/sdk/src/indexer/api.ts:277](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L277)
 
 ***
 
@@ -261,7 +262,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:274](https://github.com/ecp-eth/com
 optional sort: IndexerAPISortSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L244)
+Defined in: [packages/sdk/src/indexer/api.ts:246](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L246)
 
 The sort order, either `asc` or `desc`
 
@@ -279,7 +280,7 @@ The sort order, either `asc` or `desc`
 optional targetUri: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:182](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L182)
+Defined in: [packages/sdk/src/indexer/api.ts:184](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L184)
 
 The target URI to fetch comments for
 
@@ -291,6 +292,6 @@ The target URI to fetch comments for
 optional viewer: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:194](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L194)
+Defined in: [packages/sdk/src/indexer/api.ts:196](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L196)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.
