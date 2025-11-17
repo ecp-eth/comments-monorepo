@@ -11,7 +11,6 @@ import {
 } from "@ecp.eth/sdk/channel-manager";
 import { PublicClient, Transport, Chain } from "viem";
 import { never } from "../helpers";
-import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
 type ChannelFeeResult = {
   fee: TotalFeeEstimation;
@@ -138,6 +137,7 @@ export function useChannelFee(
     targetUri,
     parentId,
     toSignificantDigits,
+    action,
   ]);
 
   return { data, error, pending };
