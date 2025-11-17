@@ -50,16 +50,22 @@ export function useChannelFee(
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
   const [debouncedContent] = useDebounce(content, 700);
-  const [result, setResult] = useState<{
-    data?: ChannelFeeResult;
-    error?: unknown;
-    pending: boolean;
-  }>();
+  const [result, setResult] = useState<
+    | {
+        data: ChannelFeeResult | undefined;
+        pending: false;
+      }
+    | {
+        error: unknown;
+        pending: false;
+      }
+    | {
+        pending: true;
+      }
+  >();
 
   useEffect(() => {
     setResult({
-      data: undefined,
-      error: undefined,
       pending: true,
     });
 
@@ -121,13 +127,11 @@ export function useChannelFee(
       .then((newResult) => {
         setResult({
           data: newResult,
-          error: undefined,
           pending: false,
         });
       })
       .catch((error) => {
         setResult({
-          data: undefined,
           error,
           pending: false,
         });
