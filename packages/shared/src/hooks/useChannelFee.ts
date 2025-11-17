@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod/v3";
 import { useDebounce } from "use-debounce";
-import { erc20Abi, Hex } from "viem";
+import { erc20Abi, formatUnits, Hex } from "viem";
 import { Decimal } from "decimal.js";
 import {
   createEstimateChannelPostOrEditCommentFeeData,
@@ -22,13 +22,13 @@ type ChannelFeeResult = {
 
 export function useChannelFee(
   params: {
+    action: "post" | "edit";
     channelId: bigint | string | undefined;
     address: Hex | undefined;
     content: string;
-    publicClient?: PublicClient<Transport, Chain, undefined>;
     app: Hex;
+    publicClient?: PublicClient<Transport, Chain, undefined>;
     toSignificantDigits?: number;
-    action: "post" | "edit";
   } & (
     | {
         targetUri: string;
@@ -50,30 +50,25 @@ export function useChannelFee(
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
   const [debouncedContent] = useDebounce(content, 700);
-  const [data, setData] = useState<ChannelFeeResult>();
-  const [error, setError] = useState<unknown>(undefined);
-  const [pending, setPending] = useState(false);
+  const [result, setResult] = useState<{
+    data?: ChannelFeeResult;
+    error?: unknown;
+    pending: boolean;
+  }>();
 
   useEffect(() => {
-    setPending(true);
+    setResult({
+      data: undefined,
+      error: undefined,
+      pending: true,
+    });
+
     (async () => {
       if (!publicClient || !channelId) {
         return;
       }
 
-      let channelIdBigInt: bigint | undefined;
-
-      try {
-        channelIdBigInt = BigInt(channelId);
-      } catch (error) {
-        setError(error);
-        return;
-      }
-
-      if (channelIdBigInt == null) {
-        return;
-      }
-
+      const channelIdBigInt = BigInt(channelId);
       // use a mock address if no address is provided to fetch a estimated fee
       const author = address ?? "0x0000000000000000000000000000000000000000";
       const estimationCommentData =
@@ -123,10 +118,19 @@ export function useChannelFee(
         erc20CostText,
       };
     })()
-      .then(setData)
-      .catch(setError)
-      .finally(() => {
-        setPending(false);
+      .then((newResult) => {
+        setResult({
+          data: newResult,
+          error: undefined,
+          pending: false,
+        });
+      })
+      .catch((error) => {
+        setResult({
+          data: undefined,
+          error,
+          pending: false,
+        });
       });
   }, [
     publicClient,
@@ -140,7 +144,7 @@ export function useChannelFee(
     action,
   ]);
 
-  return { data, error, pending };
+  return result;
 }
 
 function getNativeTokenCostInUSD(
@@ -166,18 +170,26 @@ async function getERC20CostText(
     return;
   }
 
-  const symbol = await publicClient?.readContract({
-    address: contractAsset.address,
-    abi: erc20Abi,
-    functionName: "symbol",
-    args: [],
-  });
+  const [symbol, decimals] = await Promise.all([
+    publicClient.readContract({
+      address: contractAsset.address,
+      abi: erc20Abi,
+      functionName: "symbol",
+      args: [],
+    }),
+    publicClient.readContract({
+      address: contractAsset.address,
+      abi: erc20Abi,
+      functionName: "decimals",
+      args: [],
+    }),
+  ]);
 
-  if (!symbol) {
+  if (!symbol || !decimals) {
     return;
   }
 
-  return contractAsset.amount.toString() + " " + symbol;
+  return formatUnits(contractAsset.amount, decimals) + " " + symbol;
 }
 
 const coinGeckoResponseBodySchema = z.object({
