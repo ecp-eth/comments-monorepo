@@ -67,7 +67,7 @@ export function useChannelFee(
     try {
       channelIdBigInt = BigInt(channelId);
     } catch {
-      /* ignore conversion error as it means fee not rquired */
+      /* ignore conversion error as it means fee not required */
     }
 
     if (channelIdBigInt == null) {

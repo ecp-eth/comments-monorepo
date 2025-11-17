@@ -3,4 +3,4 @@
 "@ecp.eth/embed": patch
 ---
 
-feat(shared): add useChannel hook
+feat(shared): add `useChannelFee` hook
