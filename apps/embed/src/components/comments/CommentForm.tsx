@@ -144,18 +144,23 @@ function BaseCommentForm({
     },
   });
   const [content, setContent] = useState("");
-  const { nativeTokenCostInEthText, nativeTokenCostInUSDText, erc20CostText } =
-    useChannelFee({
-      channelId: config.channelId,
-      address,
-      content,
-      publicClient,
-      app:
-        config.app === "embed" || config.app === "all"
-          ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
-          : config.app,
-      ...targetUriOrParentIdContainer,
-    });
+  const {
+    data: {
+      nativeTokenCostInEthText,
+      nativeTokenCostInUSDText,
+      erc20CostText,
+    } = {},
+  } = useChannelFee({
+    channelId: config.channelId,
+    address,
+    content,
+    publicClient,
+    app:
+      config.app === "embed" || config.app === "all"
+        ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
+        : config.app,
+    ...targetUriOrParentIdContainer,
+  });
 
   const submitMutation = useMutation({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

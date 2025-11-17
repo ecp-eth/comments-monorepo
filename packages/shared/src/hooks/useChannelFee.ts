@@ -14,9 +14,9 @@ import { never } from "../helpers";
 import { EMPTY_PARENT_ID } from "@ecp.eth/sdk";
 
 type ChannelFeeResult = {
-  fee?: TotalFeeEstimation;
+  fee: TotalFeeEstimation;
   usdPerEth?: Decimal;
-  nativeTokenCostInEthText?: string;
+  nativeTokenCostInEthText: string;
   nativeTokenCostInUSDText?: string;
   erc20CostText?: string;
 };
@@ -49,9 +49,12 @@ export function useChannelFee(
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
   const [debouncedContent] = useDebounce(content, 700);
-  const [result, setResult] = useState<ChannelFeeResult>({});
+  const [data, setData] = useState<ChannelFeeResult>();
+  const [error, setError] = useState<unknown>(undefined);
+  const [pending, setPending] = useState(false);
 
   useEffect(() => {
+    setPending(true);
     (async () => {
       if (!publicClient || !channelId) {
         return;
@@ -61,8 +64,9 @@ export function useChannelFee(
 
       try {
         channelIdBigInt = BigInt(channelId);
-      } catch {
-        /* ignore conversion error as it means fee not required */
+      } catch (error) {
+        setError(error);
+        return;
       }
 
       if (channelIdBigInt == null) {
@@ -118,9 +122,12 @@ export function useChannelFee(
         nativeTokenCostInUSDText,
         erc20CostText,
       };
-    })().then((value) => {
-      setResult(value ?? {});
-    });
+    })()
+      .then(setData)
+      .catch(setError)
+      .finally(() => {
+        setPending(false);
+      });
   }, [
     publicClient,
     channelId,
@@ -132,7 +139,7 @@ export function useChannelFee(
     toSignificantDigits,
   ]);
 
-  return result;
+  return { data, error, pending };
 }
 
 function getNativeTokenCostInUSD(
