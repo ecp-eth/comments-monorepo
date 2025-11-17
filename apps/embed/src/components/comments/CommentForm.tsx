@@ -157,7 +157,6 @@ function BaseCommentForm({
     channelId: config.channelId,
     address,
     content,
-    publicClient,
     app:
       config.app === "embed" || config.app === "all"
         ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS

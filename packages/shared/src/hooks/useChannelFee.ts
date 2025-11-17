@@ -11,6 +11,7 @@ import {
 } from "@ecp.eth/sdk/channel-manager";
 import { PublicClient, Transport, Chain } from "viem";
 import { never } from "../helpers";
+import { usePublicClient } from "wagmi";
 
 type ChannelFeeData = {
   fee: TotalFeeEstimation;
@@ -44,7 +45,6 @@ export function useChannelFee(
     address: Hex | undefined;
     content: string;
     app: Hex;
-    publicClient?: PublicClient<Transport, Chain, undefined>;
     toSignificantDigits?: number;
   } & (
     | {
@@ -59,7 +59,6 @@ export function useChannelFee(
     channelId,
     address,
     content,
-    publicClient,
     app,
     toSignificantDigits = 2,
     action,
@@ -72,6 +71,7 @@ export function useChannelFee(
     error: undefined,
     pending: false,
   });
+  const publicClient = usePublicClient();
 
   useEffect(() => {
     setResult({
