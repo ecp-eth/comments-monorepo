@@ -29,6 +29,7 @@ export function useChannelFee(
     publicClient?: PublicClient<Transport, Chain, undefined>;
     app: Hex;
     toSignificantDigits?: number;
+    action: "post" | "edit";
   } & (
     | {
         targetUri: string;
@@ -45,6 +46,7 @@ export function useChannelFee(
     publicClient,
     app,
     toSignificantDigits = 2,
+    action,
   } = params;
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
@@ -75,7 +77,6 @@ export function useChannelFee(
 
       // use a mock address if no address is provided to fetch a estimated fee
       const author = address ?? "0x0000000000000000000000000000000000000000";
-
       const estimationCommentData =
         createEstimateChannelPostOrEditCommentFeeData({
           channelId: channelIdBigInt,
@@ -90,7 +91,7 @@ export function useChannelFee(
         });
 
       const fee = await (
-        parentId !== EMPTY_PARENT_ID && parentId != null
+        action === "edit"
           ? estimateChannelEditCommentFee
           : estimateChannelPostCommentFee
       )({

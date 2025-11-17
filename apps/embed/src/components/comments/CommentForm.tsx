@@ -96,6 +96,7 @@ type BaseCommentFormProps = {
    * @default "Cancel"
    */
   cancelLabel?: string;
+  isEdit: boolean;
 } & ({ parentId: Hex } | { targetUri: string });
 
 function BaseCommentForm({
@@ -109,6 +110,7 @@ function BaseCommentForm({
   submitPendingLabel = "Please check your wallet to sign",
   onCancel,
   cancelLabel = "Cancel",
+  isEdit,
   ...targetUriOrParentIdContainer
 }: BaseCommentFormProps) {
   const { address } = useAccount();
@@ -151,6 +153,7 @@ function BaseCommentForm({
       erc20CostText,
     } = {},
   } = useChannelFee({
+    action: isEdit ? "edit" : "post",
     channelId: config.channelId,
     address,
     content,
@@ -401,7 +404,7 @@ function BaseCommentForm({
   );
 }
 
-type CommentFormProps = Omit<BaseCommentFormProps, "onSubmit"> & {
+type CommentFormProps = Omit<BaseCommentFormProps, "onSubmit" | "isEdit"> & {
   /**
    * Called when user starts submitting the comment
    * and transaction is created
@@ -425,6 +428,7 @@ export function CommentForm({
     <BaseCommentForm
       {...props}
       {...(parentId ? { parentId } : { targetUri })}
+      isEdit={false}
       onSubmit={({ author, content, references }) =>
         submitCommentMutation({
           queryKey,
@@ -487,7 +491,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
 
 type CommentEditFormProps = Omit<
   BaseCommentFormProps,
-  "defaultContent" | "onSubmit"
+  "defaultContent" | "onSubmit" | "isEdit"
 > & {
   /**
    * Comment to edit
@@ -512,11 +516,13 @@ export function CommentEditForm({
 }: CommentEditFormProps) {
   const onSubmitStartRef = useFreshRef(onSubmitStart);
   const submitCommentMutation = useEditComment();
+  const { parentId, targetUri } = comment;
 
   return (
     <BaseCommentForm
       {...props}
-      parentId={comment.id}
+      {...(parentId ? { parentId } : { targetUri })}
+      isEdit={true}
       defaultContent={{
         content: comment.content,
         references: comment.references,
