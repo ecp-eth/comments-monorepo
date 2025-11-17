@@ -12,13 +12,30 @@ import {
 import { PublicClient, Transport, Chain } from "viem";
 import { never } from "../helpers";
 
-type ChannelFeeResult = {
+type ChannelFeeData = {
   fee: TotalFeeEstimation;
   usdPerEth?: Decimal;
   nativeTokenCostInEthText: string;
   nativeTokenCostInUSDText?: string;
   erc20CostText?: string;
 };
+
+type ChannelFeeResult =
+  | {
+      data: ChannelFeeData | undefined;
+      error: undefined;
+      pending: false;
+    }
+  | {
+      data: undefined;
+      error: unknown;
+      pending: false;
+    }
+  | {
+      data: undefined;
+      error: undefined;
+      pending: true;
+    };
 
 export function useChannelFee(
   params: {
@@ -50,22 +67,16 @@ export function useChannelFee(
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
   const [debouncedContent] = useDebounce(content, 700);
-  const [result, setResult] = useState<
-    | {
-        data: ChannelFeeResult | undefined;
-        pending: false;
-      }
-    | {
-        error: unknown;
-        pending: false;
-      }
-    | {
-        pending: true;
-      }
-  >();
+  const [result, setResult] = useState<ChannelFeeResult>({
+    data: undefined,
+    error: undefined,
+    pending: false,
+  });
 
   useEffect(() => {
     setResult({
+      data: undefined,
+      error: undefined,
       pending: true,
     });
 
@@ -127,11 +138,13 @@ export function useChannelFee(
       .then((newResult) => {
         setResult({
           data: newResult,
+          error: undefined,
           pending: false,
         });
       })
       .catch((error) => {
         setResult({
+          data: undefined,
           error,
           pending: false,
         });
