@@ -1,5 +1,11 @@
 # @ecp.eth/docs
 
+## 0.0.34
+
+### Patch Changes
+
+- @ecp.eth/react-editor@0.0.19
+
 ## 0.0.33
 
 ### Patch Changes

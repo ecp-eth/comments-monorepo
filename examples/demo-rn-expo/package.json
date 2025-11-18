@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "~0.0.36",
-    "@ecp.eth/shared": "~0.0.17",
+    "@ecp.eth/shared": "~0.0.18",
     "@ecp.eth/shared-signer": "~0.0.2",
     "@expo/vector-icons": "^15.0.3",
     "@formatjs/intl-getcanonicallocales": "^2.5.4",

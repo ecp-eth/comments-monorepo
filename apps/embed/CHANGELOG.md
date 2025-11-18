@@ -1,5 +1,14 @@
 # @ecp.eth/embed
 
+## 0.0.38
+
+### Patch Changes
+
+- 27f903b: feat(shared): allow customize channel manager address for useChannelFee hook
+- Updated dependencies [27f903b]
+  - @ecp.eth/shared@0.0.18
+  - @ecp.eth/react-editor@0.0.19
+
 ## 0.0.37
 
 ### Patch Changes

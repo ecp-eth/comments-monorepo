@@ -1,5 +1,13 @@
 # @ecp.eth/broadcast-app
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [27f903b]
+  - @ecp.eth/shared@0.0.18
+  - @ecp.eth/react-editor@0.0.19
+
 ## 0.0.12
 
 ### Patch Changes
