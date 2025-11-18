@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useRef, useState } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
@@ -123,7 +123,6 @@ function BaseCommentForm({
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
-  const publicClient = usePublicClient();
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
     maxFileSize: MAX_UPLOAD_FILE_SIZE,
@@ -359,7 +358,7 @@ function BaseCommentForm({
           </TooltipProvider>
           {(nativeTokenCostInEthText || erc20CostText) && (
             <Label
-              className="h-8 text-[0.8em] flex flex-row items-center gap-2 border-b-amber-500 border-b-2"
+              className="h-8 text-[0.8em] flex flex-row items-center gap-2"
               aria-label="Cost of posting"
             >
               <CoinsIcon className="w-3 h-3" />

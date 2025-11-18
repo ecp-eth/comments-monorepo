@@ -46,6 +46,7 @@ export function useChannelFee(
     content: string;
     app: Hex;
     toSignificantDigits?: number;
+    channelManagerAddress?: Hex;
   } & (
     | {
         targetUri: string;
@@ -62,6 +63,7 @@ export function useChannelFee(
     app,
     toSignificantDigits = 2,
     action,
+    channelManagerAddress,
   } = params;
   const targetUri = "targetUri" in params ? params.targetUri : undefined;
   const parentId = "parentId" in params ? params.parentId : undefined;
@@ -111,6 +113,7 @@ export function useChannelFee(
         msgSender: author,
         readContract: publicClient.readContract,
         channelId: channelIdBigInt,
+        channelManagerAddress,
       });
 
       const nativeTokenCostInEth = new Decimal(
@@ -159,6 +162,7 @@ export function useChannelFee(
     parentId,
     toSignificantDigits,
     action,
+    channelManagerAddress,
   ]);
 
   return result;
