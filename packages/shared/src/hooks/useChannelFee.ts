@@ -33,7 +33,7 @@ type ChannelFeeResult =
       pending: false;
     }
   | {
-      data: undefined;
+      data: ChannelFeeData | undefined;
       error: undefined;
       pending: true;
     };
@@ -77,7 +77,7 @@ export function useChannelFee(
 
   useEffect(() => {
     setResult({
-      data: undefined,
+      data: result.data,
       error: undefined,
       pending: true,
     });
