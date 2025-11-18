@@ -1,5 +1,16 @@
 # @ecp.eth/demo
 
+## 0.1.39
+
+### Patch Changes
+
+- Updated dependencies [6e77a3d]
+- Updated dependencies [417759a]
+  - @ecp.eth/sdk@0.0.36
+  - @ecp.eth/shared@0.0.17
+  - @ecp.eth/react-editor@0.0.18
+  - @ecp.eth/shared-signer@0.0.2
+
 ## 0.1.38
 
 ### Patch Changes

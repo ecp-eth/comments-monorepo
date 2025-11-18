@@ -1,5 +1,13 @@
 # @ecp.eth/docs
 
+## 0.0.33
+
+### Patch Changes
+
+- Updated dependencies [6e77a3d]
+  - @ecp.eth/sdk@0.0.36
+  - @ecp.eth/react-editor@0.0.18
+
 ## 0.0.32
 
 ### Patch Changes

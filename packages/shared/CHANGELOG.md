@@ -1,5 +1,13 @@
 # @ecp.eth/shared
 
+## 0.0.17
+
+### Patch Changes
+
+- 417759a: feat(shared): add `useChannelFee` hook
+- Updated dependencies [6e77a3d]
+  - @ecp.eth/sdk@0.0.36
+
 ## 0.0.16
 
 ### Patch Changes
