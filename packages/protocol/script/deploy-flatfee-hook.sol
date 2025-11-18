@@ -21,7 +21,7 @@ contract DeployFlatFeeHook is Script {
     vm.startBroadcast(deployerPrivateKey);
 
     flatFeeHook = new FlatFeeHook{ salt: bytes32(salt) }(deployerAddress);
-    flatFeeHook.setShouldChargeOnEdit(true);
+    flatFeeHook.setShouldChargeOnEdit(false);
 
     // Deploy DummyERC20 with:
     // - Name: "Dummy Token"

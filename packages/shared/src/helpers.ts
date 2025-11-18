@@ -704,3 +704,7 @@ export function formatContractFunctionExecutionError(
 
   return error.shortMessage;
 }
+
+export function never(message: string = "should never happen"): never {
+  throw new Error(message);
+}

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useCallback, useRef } from "react";
-import { useAccount } from "wagmi";
+import React, { useCallback, useRef, useState } from "react";
+import { useAccount, usePublicClient } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
 import {
@@ -18,6 +18,7 @@ import {
 } from "@/lib/constants";
 import { CommentAuthorAvatar } from "./CommentAuthorAvatar";
 import { getCommentAuthorNameOrAddress } from "@ecp.eth/shared/helpers";
+import { useChannelFee } from "@ecp.eth/shared/hooks/useChannelFee";
 import { useAccountModal, useChainModal } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/publicEnv";
 import { CommentFormErrors } from "@ecp.eth/shared/components/CommentFormErrors";
@@ -39,12 +40,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, CoinsIcon } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 import { GaslessIndicator } from "./GaslessIndicator";
 import { usePostComment } from "./hooks/usePostComment";
 import { useEditComment } from "./hooks/useEditComment";
+import { Label } from "@/components/ui/label";
 
 type OnSubmitFunction = (params: {
   author: Hex;
@@ -94,7 +96,8 @@ type BaseCommentFormProps = {
    * @default "Cancel"
    */
   cancelLabel?: string;
-};
+  isEdit: boolean;
+} & ({ parentId: Hex } | { targetUri: string });
 
 function BaseCommentForm({
   autoFocus,
@@ -107,8 +110,11 @@ function BaseCommentForm({
   submitPendingLabel = "Please check your wallet to sign",
   onCancel,
   cancelLabel = "Cancel",
+  isEdit,
+  ...targetUriOrParentIdContainer
 }: BaseCommentFormProps) {
   const { address } = useAccount();
+  const config = useEmbedConfig();
   const connectAccount = useConnectAccount();
   const editorRef = useRef<EditorRef>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -117,6 +123,7 @@ function BaseCommentForm({
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
+  const publicClient = usePublicClient();
   const uploads = usePinataUploadFiles({
     allowedMimeTypes: ALLOWED_UPLOAD_MIME_TYPES,
     maxFileSize: MAX_UPLOAD_FILE_SIZE,
@@ -137,6 +144,24 @@ function BaseCommentForm({
 
       return url;
     },
+  });
+  const [content, setContent] = useState("");
+  const {
+    data: {
+      nativeTokenCostInEthText,
+      nativeTokenCostInUSDText,
+      erc20CostText,
+    } = {},
+  } = useChannelFee({
+    action: isEdit ? "edit" : "post",
+    channelId: config.channelId,
+    address,
+    content,
+    app:
+      config.app === "embed" || config.app === "all"
+        ? publicEnv.NEXT_PUBLIC_APP_SIGNER_ADDRESS
+        : config.app,
+    ...targetUriOrParentIdContainer,
   });
 
   const submitMutation = useMutation({
@@ -252,12 +277,9 @@ function BaseCommentForm({
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-
   const isSubmitting = submitMutation.isPending;
-
-  const ButtonWrapper = publicEnv.NEXT_PUBLIC_ENABLE_GASLESS
-    ? GaslessIndicator
-    : React.Fragment;
+  const ButtonWrapper =
+    config.gasSponsorship !== "not-gasless" ? GaslessIndicator : React.Fragment;
 
   return (
     <form
@@ -296,6 +318,13 @@ function BaseCommentForm({
         suggestions={suggestions}
         suggestionsTheme={suggestionsTheme}
         uploads={uploads}
+        onUpdate={() => {
+          setContent(
+            editorRef.current?.editor?.getText({
+              blockSeparator: "\n",
+            }) ?? "",
+          );
+        }}
         onEscapePress={() => {
           if (isSubmitting) {
             return;
@@ -328,6 +357,24 @@ function BaseCommentForm({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          {(nativeTokenCostInEthText || erc20CostText) && (
+            <Label
+              className="h-8 text-[0.8em] flex flex-row items-center gap-2 border-b-amber-500 border-b-2"
+              aria-label="Cost of posting"
+            >
+              <CoinsIcon className="w-3 h-3" />
+              Cost:{" "}
+              {[
+                nativeTokenCostInEthText +
+                  (nativeTokenCostInUSDText
+                    ? ` (≈ ${nativeTokenCostInUSDText})`
+                    : ""),
+                erc20CostText,
+              ]
+                .filter(Boolean)
+                .join(" and ")}{" "}
+            </Label>
+          )}
           <ButtonWrapper>
             <Button type="submit" disabled={isSubmitting || disabled} size="sm">
               {isSubmitting ? submitPendingLabel : submitIdleLabel}
@@ -356,7 +403,7 @@ function BaseCommentForm({
   );
 }
 
-type CommentFormProps = Omit<BaseCommentFormProps, "onSubmit"> & {
+type CommentFormProps = Omit<BaseCommentFormProps, "onSubmit" | "isEdit"> & {
   /**
    * Called when user starts submitting the comment
    * and transaction is created
@@ -379,6 +426,8 @@ export function CommentForm({
   return (
     <BaseCommentForm
       {...props}
+      {...(parentId ? { parentId } : { targetUri })}
+      isEdit={false}
       onSubmit={({ author, content, references }) =>
         submitCommentMutation({
           queryKey,
@@ -441,7 +490,7 @@ function CommentFormAuthor({ address }: { address: Hex }) {
 
 type CommentEditFormProps = Omit<
   BaseCommentFormProps,
-  "defaultContent" | "onSubmit"
+  "defaultContent" | "onSubmit" | "isEdit"
 > & {
   /**
    * Comment to edit
@@ -466,10 +515,13 @@ export function CommentEditForm({
 }: CommentEditFormProps) {
   const onSubmitStartRef = useFreshRef(onSubmitStart);
   const submitCommentMutation = useEditComment();
+  const { parentId, targetUri } = comment;
 
   return (
     <BaseCommentForm
       {...props}
+      {...(parentId ? { parentId } : { targetUri })}
+      isEdit={true}
       defaultContent={{
         content: comment.content,
         references: comment.references,
