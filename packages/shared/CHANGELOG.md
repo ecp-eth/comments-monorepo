@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.18
+
+### Patch Changes
+
+- 27f903b: feat(shared): allow customize channel manager address for useChannelFee hook
+
 ## 0.0.17
 
 ### Patch Changes
