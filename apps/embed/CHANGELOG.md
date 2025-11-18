@@ -1,5 +1,17 @@
 # @ecp.eth/embed
 
+## 0.0.37
+
+### Patch Changes
+
+- 417759a: feat(shared): add `useChannelFee` hook
+- Updated dependencies [6e77a3d]
+- Updated dependencies [417759a]
+  - @ecp.eth/sdk@0.0.36
+  - @ecp.eth/shared@0.0.17
+  - @ecp.eth/react-editor@0.0.18
+  - @ecp.eth/shared-signer@0.0.2
+
 ## 0.0.36
 
 ### Patch Changes

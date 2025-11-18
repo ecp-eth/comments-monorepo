@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.36
+
+### Patch Changes
+
+- 6e77a3d: chore(sdk): update function definitions and error handling in SDK reference
+
 ## 0.0.35
 
 ### Patch Changes
