@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.19
+
+### Patch Changes
+
+- 54b200e: fix(shared): useChannelFee should not clear out data on new request
+
 ## 0.0.18
 
 ### Patch Changes
