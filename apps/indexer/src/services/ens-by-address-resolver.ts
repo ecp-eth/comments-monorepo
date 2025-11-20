@@ -6,6 +6,7 @@ import {
   type ResolvedENSData,
 } from "../resolvers/index.ts";
 import { ensByQueryResolverService } from "./ens-by-query-resolver.ts";
+import { metrics } from "./metrics.ts";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
@@ -18,4 +19,5 @@ export const ensByAddressResolverService = createENSByAddressResolver({
   chainRpcUrl: env.ENS_RPC_URL,
   cacheMap,
   ensByQueryResolver: ensByQueryResolverService,
+  metrics,
 });
