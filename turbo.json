@@ -87,7 +87,8 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": ["build:dev"]
     },
     "test": {},
     "test:watch": {
