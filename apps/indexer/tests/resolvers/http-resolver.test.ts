@@ -2,13 +2,14 @@ import { describe, it, expect, beforeEach } from "vitest";
 import nock from "nock";
 import fs from "fs";
 import path from "path";
-import { createHTTPResolver } from "../../src/resolvers/http-resolver";
+import { createHTTPResolver } from "../../src/resolvers/http-resolver.ts";
+import { metrics } from "../../src/services/metrics.ts";
 import { Readable } from "stream";
 
 nock.disableNetConnect();
 
 describe("url loader", () => {
-  const httpResolver = createHTTPResolver();
+  const httpResolver = createHTTPResolver({ metrics });
   const jpgBuffer = fs.readFileSync(
     path.join(__dirname, "fixtures", "example-image.jpg"),
   );
@@ -398,7 +399,7 @@ describe("url loader", () => {
   });
 
   it("respects timeout", async () => {
-    const resolver = createHTTPResolver({ timeout: 200 });
+    const resolver = createHTTPResolver({ timeout: 200, metrics });
 
     nock("https://example.com").get("/").delay(300).reply(200, "");
 

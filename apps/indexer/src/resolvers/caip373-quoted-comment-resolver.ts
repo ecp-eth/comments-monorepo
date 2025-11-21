@@ -1,11 +1,11 @@
 import * as Sentry from "@sentry/node";
 import { CommentManagerABI } from "@ecp.eth/sdk";
 import { type Hex } from "@ecp.eth/sdk/core";
-import DataLoader from "dataloader";
 import { decodeFunctionData } from "viem";
 import type config from "../../ponder.config.ts";
 import { isSameHex } from "@ecp.eth/shared/helpers";
 import type { CommentByIdResolver } from "./comment-by-id-resolver.ts";
+import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
 
 export type CAIP373QuotedCommentResolverKey = {
   functionCallData: Hex;
@@ -28,12 +28,12 @@ export type CAIP373QuotedCommentResolverOptions = {
   chains: typeof config.chains;
   commentByIdResolver: CommentByIdResolver;
 } & Omit<
-  DataLoader.Options<
+  DataLoaderOptions<
     CAIP373QuotedCommentResolverKey,
     CAIP373QuotedCommentResolverResult | null,
     string
   >,
-  "batchLoadFn" | "cacheKeyFn"
+  "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
 export function createCAIP373QuotedCommentResolver({
@@ -132,6 +132,7 @@ export function createCAIP373QuotedCommentResolver({
           commentManagerAddress: key.commentManagerAddress.toLowerCase(),
         });
       },
+      name: "CAIP373QuotedCommentResolver",
     },
   );
 }

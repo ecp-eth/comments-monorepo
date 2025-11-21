@@ -1,11 +1,10 @@
 import { type Hex } from "viem";
 import { LRUCache } from "lru-cache";
 
-import { env } from "../env.ts";
-import {
-  createFarcasterByAddressResolver,
-  type ResolvedFarcasterData,
-} from "../resolvers/index.ts";
+import { env } from "../env";
+import { createFarcasterByAddressResolver } from "../resolvers/farcaster-by-address-resolver";
+import { metrics } from "./metrics";
+import type { ResolvedFarcasterData } from "../resolvers";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({
@@ -18,4 +17,5 @@ export const farcasterByAddressResolverService =
   createFarcasterByAddressResolver({
     neynarApiKey: env.NEYNAR_API_KEY,
     cacheMap,
+    metrics,
   });

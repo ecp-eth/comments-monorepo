@@ -1,10 +1,11 @@
 import { LRUCache } from "lru-cache";
-import { env } from "../env.ts";
+import { env } from "../env";
 import {
   createENSByQueryResolver,
   type ENSByQueryResolverKey,
-  type ResolvedENSData,
-} from "../resolvers/index.ts";
+} from "../resolvers/ens-by-query-resolver";
+import type { ResolvedENSData } from "../resolvers";
+import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<
   ENSByQueryResolverKey,
@@ -18,4 +19,5 @@ const cacheMap = new LRUCache<
 export const ensByQueryResolverService = createENSByQueryResolver({
   subgraphUrl: env.ENSNODE_SUBGRAPH_URL,
   cacheMap,
+  metrics,
 });

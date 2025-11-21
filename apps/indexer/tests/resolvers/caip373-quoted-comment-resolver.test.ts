@@ -7,6 +7,7 @@ import { createPublicClient, encodeFunctionData, http, toHex } from "viem";
 import { anvil } from "viem/chains";
 import { randomBytes } from "crypto";
 import { commentByIdResolverService } from "../../src/services/comment-by-id-resolver.ts";
+import { metrics } from "../../src/services/metrics.ts";
 
 vi.mock("../../src/services/comment-by-id-resolver.ts", () => {
   return {
@@ -36,6 +37,7 @@ describe("CAIP373QuotedCommentResolver", () => {
       },
     },
     commentByIdResolver: commentByIdResolverService,
+    metrics,
   });
 
   beforeEach(() => {

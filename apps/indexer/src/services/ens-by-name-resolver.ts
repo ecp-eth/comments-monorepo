@@ -1,10 +1,9 @@
 import { type Hex } from "viem";
 import { LRUCache } from "lru-cache";
-import { env } from "../env.ts";
-import {
-  createENSByNameResolver,
-  type ResolvedENSData,
-} from "../resolvers/index.ts";
+import { env } from "../env";
+import { createENSByNameResolver } from "../resolvers/ens-by-name-resolver";
+import type { ResolvedENSData } from "../resolvers";
+import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
   max: 10000,
@@ -15,4 +14,5 @@ const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
 export const ensByNameResolverService = createENSByNameResolver({
   chainRpcUrl: env.ENS_RPC_URL,
   cacheMap,
+  metrics,
 });

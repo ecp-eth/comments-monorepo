@@ -1,10 +1,12 @@
 import nock from "nock";
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from "vitest";
-import { createFarcasterByNameResolver } from "../../src/resolvers/farcaster-by-name-resolver";
+import { createFarcasterByNameResolver } from "../../src/resolvers/farcaster-by-name-resolver.ts";
+import { metrics } from "../../src/services/metrics.ts";
 
 describe("farcaster-by-name-resolver", () => {
   const resolver = createFarcasterByNameResolver({
     neynarApiKey: "some-api-key",
+    metrics,
   });
 
   beforeAll(() => {

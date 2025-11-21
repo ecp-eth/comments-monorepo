@@ -1,10 +1,10 @@
 import * as Sentry from "@sentry/node";
 import { z } from "zod";
-import DataLoader from "dataloader";
 import DeferredCtor, { type Deferred } from "promise-deferred";
 import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types.ts";
+import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;
@@ -21,7 +21,10 @@ export type ENSByQueryResolverOptions = {
    * If not provided, the resolver will return null for all queries
    */
   subgraphUrl: string | null | undefined;
-} & DataLoader.Options<ENSByQueryResolverKey, ResolvedENSData[] | null>;
+} & Omit<
+  DataLoaderOptions<ENSByQueryResolverKey, ResolvedENSData[] | null>,
+  "name"
+>;
 
 /**
  * Creates a resolver that uses ENSNode.io subgraph to resolve ENS data
@@ -88,6 +91,7 @@ export function createENSByQueryResolver({
     },
     {
       maxBatchSize: MAX_BATCH_SIZE,
+      name: "ENSByQueryResolver",
       ...dataLoaderOptions,
     },
   );

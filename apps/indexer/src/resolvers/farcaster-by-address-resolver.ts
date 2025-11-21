@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import { type Address, getAddress, type Hex } from "viem";
 import {
   NeynarAPIClient,
@@ -11,6 +10,7 @@ import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
 } from "@ecp.eth/sdk/indexer";
+import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
 import type { ResolvedFarcasterData } from "./farcaster.types.ts";
 
 export type FarcasterByAddressResolver = DataLoader<
@@ -25,8 +25,8 @@ export type FarcasterByAddressResolverOptions = {
    */
   generateProfileUrl?: (user: IndexerAPIFarcasterDataSchemaType) => string;
 } & Omit<
-  DataLoader.Options<Hex, ResolvedFarcasterData | null>,
-  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn"
+  DataLoaderOptions<Hex, ResolvedFarcasterData | null>,
+  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn" | "name"
 >;
 
 export function createFarcasterByAddressResolver({
@@ -98,6 +98,7 @@ export function createFarcasterByAddressResolver({
       cacheKeyFn(key) {
         return key.toLowerCase() as Hex;
       },
+      name: "FarcasterByAddressResolver",
     },
   );
 }

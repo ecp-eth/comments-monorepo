@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import type { DB } from "../services/db";
 import { type Hex } from "@ecp.eth/sdk/core";
 import {
@@ -18,6 +17,7 @@ import {
   type CommentModerationLabel,
   type ModerationStatus,
 } from "../services/types";
+import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
 
 export type ReplyCountsByParentIdResolverKey = {
   parentId: Hex;
@@ -39,8 +39,8 @@ export type ReplyCountsByParentIdResolver = DataLoader<
 export type ReplyCountsByParentIdResolverOptions = {
   db: DB;
 } & Omit<
-  DataLoader.Options<ReplyCountsByParentIdResolverKey, number, string>,
-  "batchLoadFn" | "cacheKeyFn"
+  DataLoaderOptions<ReplyCountsByParentIdResolverKey, number, string>,
+  "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
 function keyToString(key: ReplyCountsByParentIdResolverKey): string {
@@ -122,6 +122,7 @@ export function createReplyCountsByParentIdResolver({
     {
       ...options,
       cacheKeyFn: keyToString,
+      name: "ReplyCountsByParentIdResolver",
     },
   );
 }

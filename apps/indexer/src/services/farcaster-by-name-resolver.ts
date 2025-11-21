@@ -1,10 +1,8 @@
 import { LRUCache } from "lru-cache";
-import {
-  createFarcasterByNameResolver,
-  type FarcasterName,
-  type ResolvedFarcasterData,
-} from "../resolvers/index.ts";
-import { env } from "../env.ts";
+import { createFarcasterByNameResolver } from "../resolvers/farcaster-by-name-resolver";
+import { env } from "../env";
+import { metrics } from "./metrics";
+import type { FarcasterName, ResolvedFarcasterData } from "../resolvers";
 
 // could also use redis
 const cacheMap = new LRUCache<
@@ -19,4 +17,5 @@ const cacheMap = new LRUCache<
 export const farcasterByNameResolverService = createFarcasterByNameResolver({
   neynarApiKey: env.NEYNAR_API_KEY,
   cacheMap,
+  metrics,
 });

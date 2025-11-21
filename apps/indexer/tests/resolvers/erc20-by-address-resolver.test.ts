@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import nock from "nock";
-import { createERC20ByAddressResolver } from "../../src/resolvers/erc20-by-address-resolver";
-import { SIMAPIService } from "../../src/services/sim-api-service";
+import { createERC20ByAddressResolver } from "../../src/resolvers/erc20-by-address-resolver.ts";
+import { SIMAPIService } from "../../src/services/sim-api-service.ts";
+import { metrics } from "../../src/services/metrics.ts";
 
 describe("ERC20ByAddressResolver", () => {
   const resolver = createERC20ByAddressResolver({
     simAPIService: new SIMAPIService("test", 5, 5, 1000),
+    metrics,
   });
 
   beforeAll(() => {
