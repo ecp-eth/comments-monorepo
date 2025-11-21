@@ -1,19 +1,23 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Dimensions,
   ScrollView,
 } from "react-native";
+import { Hex } from "viem";
 import { useSwitchChain } from "wagmi";
-import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import TextArea from "../ui/TextArea";
+import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
+import { Editor, EditorRef } from "@ecp.eth/react-editor/editor.native";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
+import { css as editorCssText } from "@ecp.eth/react-editor/editor.css.js";
 import Button from "../ui/Button";
 import { publicEnv } from "../env";
-import { useState } from "react";
 import { usePostComment } from "../hooks/usePostComment";
 import { chain } from "../wagmi.config";
 import { useOptimisticCommentingManager } from "../hooks/useOptimisticCommentingManager";
@@ -23,7 +27,7 @@ import { useKeyboardRemainingheight } from "../hooks/useKeyboardRemainingHeight"
 import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import useWaitConnected from "../hooks/useWaitConnected";
-import { Hex } from "viem";
+import { GenerateUploadUrlResponseSchema } from "../lib/generated/schemas";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;
@@ -47,7 +51,7 @@ export function CommentForm({
   const isReplying = !!replyingComment;
 
   const waitConnected = useWaitConnected();
-  const textAreaRef = useRef<TextInput>(null);
+  const editorRef = useRef<EditorRef>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [text, setText] = useState("");
   const { switchChainAsync } = useSwitchChain();
@@ -90,8 +94,41 @@ export function CommentForm({
     if (!replyingComment) {
       return;
     }
-    textAreaRef.current?.focus();
+    editorRef.current?.focus();
   }, [replyingComment, justViewingReplies]);
+
+  const uploads = usePinataUploadFiles({
+    allowedMimeTypes: ["image/jpeg"],
+    maxFileSize: 3000,
+    pinataGatewayUrl: publicEnv.EXPO_PUBLIC_PINATA_HOST,
+    generateUploadUrl: async (filename) => {
+      const uploadAPIURL = new URL(
+        "/api/generate-upload-url",
+        publicEnv.EXPO_PUBLIC_DEMO_API_URL,
+      );
+      const response = await fetch(uploadAPIURL, {
+        method: "POST",
+        body: JSON.stringify({ filename }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { url } = GenerateUploadUrlResponseSchema.parse(
+        await response.json(),
+      );
+
+      return url;
+    },
+  });
+
+  const suggestions = useIndexerSuggestions({
+    indexerApiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
+    debounceMs: 700,
+  });
+
+  const editable = !isProcessing;
 
   return (
     <View style={{ gap: 20 }}>
@@ -99,17 +136,39 @@ export function CommentForm({
         <ReplyToComment comment={replyingComment} onClose={onCancelReply} />
       )}
 
-      <TextArea
-        editable={!isProcessing}
-        value={text}
+      <Editor
+        ref={editorRef}
+        disabled={!editable}
+        autoFocus={false}
         placeholder={
           replyingComment ? "Write a reply here..." : "Write a comment here..."
         }
-        onChangeText={setText}
-        style={{
-          maxHeight: keyboardRemainingHeight,
+        uploads={uploads}
+        suggestions={suggestions}
+        theme={{
+          styleSheetText:
+            editorCssText +
+            `
+          .editor {
+            border-width: 1px;
+            border-radius: 8px;
+            padding: 3px 10px;
+            min-height: 80px;
+            border-color: ${error ? theme.colors.border.error : theme.colors.border.default};
+            color: ${editable ? theme.colors.text.default : theme.colors.text.nonEditable};
+            background-color: ${editable ? theme.colors.background.default : theme.colors.background.nonEditable};
+            max-height: ${keyboardRemainingHeight}px;
+          }
+          `,
+          editor: {
+            classNames:
+              "editor placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
+          },
         }}
-        ref={textAreaRef}
+        onUpdate={async () => {
+          const text = await editorRef.current?.getText();
+          setText(text ?? "");
+        }}
       />
 
       <Button

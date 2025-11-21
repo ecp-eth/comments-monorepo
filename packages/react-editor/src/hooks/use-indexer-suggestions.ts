@@ -34,7 +34,7 @@ export function useIndexerSuggestions({
 }: UseIndexerSuggestionsOptions = {}): EditorSuggestionsService {
   const client = useQueryClient();
   const previousQuery = useRef<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | number | null>(null);
 
   const fetchSuggestions = useCallback<SearchSuggestionsFunction>(
     async (query, char) => {

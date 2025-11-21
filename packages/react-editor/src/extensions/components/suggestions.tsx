@@ -12,9 +12,9 @@ import * as chains from "viem/chains";
 import type { Hex } from "viem";
 import type { MentionItem, MentionsExtensionTheme } from "../types.js";
 import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
+import { MINIMUM_QUERY_LENGTH } from "../../constants.js";
 
 export type SuggestionsProps = SuggestionProps<MentionItem> & {
-  minimumQueryLength: number;
   theme?: MentionsExtensionTheme;
 };
 
@@ -23,7 +23,7 @@ export type SuggestionsRef = {
 };
 
 export const Suggestions = forwardRef(function Suggestions(
-  { command, items, query, minimumQueryLength, theme }: SuggestionsProps,
+  { command, items, query, theme }: SuggestionsProps,
   ref: React.Ref<SuggestionsRef>,
 ) {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -80,7 +80,7 @@ export const Suggestions = forwardRef(function Suggestions(
 
   let children = null;
 
-  if (!isValidQuery(query, minimumQueryLength)) {
+  if (!isValidQuery(query, MINIMUM_QUERY_LENGTH)) {
     return null;
   } else if (items.length === 0) {
     children = (

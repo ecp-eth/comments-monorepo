@@ -5,6 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler"
   },
-  "include": ["src"],
+
+  "include": ["src", "postcss.config.js", "tailwind.config.js"],
   "exclude": ["node_modules", "dist"]
 }

@@ -145,7 +145,8 @@ function BaseCommentForm({
           throw new Error("Editor is not initialized");
         }
 
-        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+        const filesToUpload = await (editorRef.current?.getFilesForUpload() ||
+          []);
 
         await uploads.uploadFiles(filesToUpload, {
           onSuccess(uploadedFile) {
@@ -273,13 +274,6 @@ function BaseCommentForm({
       />
       <Editor
         autoFocus={autoFocus}
-        className={cn(
-          "w-full p-2 border border-gray-300 rounded",
-          disabled && "opacity-50",
-          submitMutation.error &&
-            submitMutation.error instanceof InvalidCommentError &&
-            "border-destructive focus-visible:border-destructive",
-        )}
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
         defaultValue={defaultContent}
@@ -292,6 +286,19 @@ function BaseCommentForm({
           }
 
           onCancel?.();
+        }}
+        theme={{
+          editor: {
+            classNames: cn(
+              "w-full p-2 border border-gray-300 rounded",
+              submitMutation.error &&
+                submitMutation.error instanceof InvalidCommentError &&
+                "border-destructive focus-visible:border-destructive",
+            ),
+          },
+          editor_disabled: {
+            classNames: cn(disabled && "opacity-50"),
+          },
         }}
       />
       <div className="flex gap-2 justify-between">
