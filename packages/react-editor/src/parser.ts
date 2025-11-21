@@ -1,6 +1,7 @@
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type { JSONContent } from "@tiptap/core";
 import type { LinkAttributes, MentionItem } from "./extensions/types.js";
+import { EditorTheme } from "./editor.type.js";
 
 const URL_REGEX = /^(https?:\/\/[^\s<>[\]{}|\\^]+)/u;
 
@@ -14,6 +15,7 @@ const URL_REGEX = /^(https?:\/\/[^\s<>[\]{}|\\^]+)/u;
 export function parse(
   content: string,
   references: IndexerAPICommentReferencesSchemaType,
+  theme?: EditorTheme,
 ): JSONContent {
   if (!content) {
     return {
@@ -180,7 +182,7 @@ export function parse(
           {
             type: "link",
             attrs: {
-              class: "underline cursor-pointer",
+              class: theme?.link?.classNames ?? "",
               href: urlMatch[0],
               target: "_blank",
               rel: "noopener noreferrer",

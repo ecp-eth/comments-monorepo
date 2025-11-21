@@ -3,8 +3,10 @@ import { View } from "react-native";
 import Link from "../ui/Link";
 import { SideBarItem } from "./SideBarItem";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useLayoutConfigContext } from "./LayoutConfigProvider";
 
 export function SideBar() {
+  const layoutConfig = useLayoutConfigContext();
   return (
     <View
       style={{
@@ -30,6 +32,15 @@ export function SideBar() {
           </SideBarItem>
           <SideBarItem>
             <Link href="https://t.me/davidfurlong">Contact</Link>
+          </SideBarItem>
+          <SideBarItem>
+            <Link
+              onPress={() => {
+                layoutConfig.toggle();
+              }}
+            >
+              Toggle Form Location
+            </Link>
           </SideBarItem>
         </View>
       </SafeAreaView>

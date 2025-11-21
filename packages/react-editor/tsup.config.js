@@ -19,7 +19,7 @@ const entry = files
       return;
     }
 
-    if (filePath.match(/(\/test\/|\.test\.tsx?)/)) {
+    if (filePath.match(/(\/test\/|\.test\.tsx|\.d\.ts|\.html|\.css?)/)) {
       return;
     }
 
@@ -27,14 +27,24 @@ const entry = files
   })
   .filter(Boolean);
 
-export default defineConfig({
-  entry,
-  splitting: false,
-  dts: true,
-  clean: true,
-  sourcemap: false,
-  minify: false,
-  define: {
-    __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),
-  },
+export default defineConfig((options) => {
+  globalThis._tsupOpts = options;
+
+  return {
+    entry,
+    // split should not be set to false, when it is false it will generate
+    // a single chunk file with all the dependencies, which will cause react
+    // context to be duplicated
+    splitting: true,
+    dts: true,
+    clean: true,
+    sourcemap: false,
+    minify: false,
+    define: {
+      __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),
+    },
+    loader: {
+      ".html": "text",
+    },
+  };
 });

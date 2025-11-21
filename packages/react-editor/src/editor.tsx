@@ -1,16 +1,15 @@
-import {
-  type Editor as TipTapEditor,
-  EditorContent,
-  type JSONContent,
-  useEditor,
-  type EditorEvents,
-} from "@tiptap/react";
+// in order to make tsup builds the css, we need to import it
+import "./editor.css";
+import { useImperativeHandle, useState } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
 import { Link } from "@tiptap/extension-link";
 import { Placeholder } from "@tiptap/extension-placeholder";
-import { useImperativeHandle, useState } from "react";
+import { HardBreak } from "@tiptap/extension-hard-break";
+import { MentionOptions } from "@tiptap/extension-mention";
+import { cn } from "@ecp.eth/shared/helpers";
 import { MentionExtension } from "./extensions/mention-extension.js";
 import {
   type UploadTrackerUploadedFile,
@@ -19,75 +18,25 @@ import {
   UPLOAD_TRACKER_NODE_NAME,
   UploadTracker,
 } from "./extensions/upload-tracker.js";
-import { HardBreak } from "@tiptap/extension-hard-break";
-import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { useHandleDefaultEditorValue } from "./hooks/use-handle-default-editor-value.js";
-import type {
-  LinkAttributes,
-  MentionsExtensionTheme,
-  UploadTrackerFileComponent,
-  UploadTrackerImageComponent,
-  UploadTrackerVideoComponent,
-} from "./extensions/types.js";
-import { cn } from "@ecp.eth/shared/helpers";
-import type { EditorSuggestionsService, UploadFilesService } from "./types.js";
 import { CommentEditorMediaImage } from "./components/CommentEditorMediaImage.js";
 import { CommentEditorMediaVideo } from "./components/CommentEditorMediaVideo.js";
 import { CommentEditorMediaFile } from "./components/CommentEditorMediaFile.js";
+import { EditorProps } from "./editor.type.js";
+import { defaultTheme } from "./default-theme.js";
+import { useThemeStylesheetText } from "./hooks/use-theme-stylesheet-text.js";
+import { MentionItem } from "./types.js";
 
-export type EditorRef = {
-  focus: () => void;
-  /**
-   * Clears the editor content
-   */
-  clear: () => void;
-  editor: TipTapEditor | null;
-  getDefaultContent: () => JSONContent;
-  getUploadedFiles: () => UploadTrackerUploadedFile[];
-  getFilesForUpload: () => UploadTrackerFileToUpload[];
-  setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
-  setFileUploadAsFailed: (fileId: string) => void;
-  addFiles: (files: File[]) => void;
-};
+export type { EditorProps, EditorRef } from "./editor.type.js";
 
-export type EditorProps = {
-  className?: string;
-  wrapperClassName?: string;
-  disabled?: boolean;
-  defaultValue?: {
-    content: string;
-    references: IndexerAPICommentReferencesSchemaType;
-  };
-  placeholder: string;
-  /**
-   * @default false
-   */
-  autoFocus?: boolean;
-  ref?: React.Ref<EditorRef>;
-  onCreate?: (props: EditorEvents["create"]) => void;
-  onUpdate?: (props: EditorEvents["update"]) => void;
-  onBlur?: (props: EditorEvents["blur"]) => void;
-  onEscapePress?: () => void;
-  suggestions: EditorSuggestionsService;
-  suggestionsTheme?: MentionsExtensionTheme;
-  uploads: UploadFilesService;
-  /**
-   * @default CommentMediaImage
-   */
-  imageComponent?: UploadTrackerImageComponent;
-  /**
-   * @default CommentMediaVideo
-   */
-  videoComponent?: UploadTrackerVideoComponent;
-  /**
-   * @default CommentMediaFile
-   */
-  fileComponent?: UploadTrackerFileComponent;
+type EditorWebProps = {
+  mentionSuggestionRenderer?: () => MentionOptions<
+    MentionItem,
+    MentionItem
+  >["suggestion"]["render"];
 };
 
 export function Editor({
-  className,
-  wrapperClassName,
   disabled = false,
   placeholder,
   autoFocus = false,
@@ -103,11 +52,15 @@ export function Editor({
   imageComponent = CommentEditorMediaImage,
   videoComponent = CommentEditorMediaVideo,
   fileComponent = CommentEditorMediaFile,
-}: EditorProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  theme,
+  mentionSuggestionRenderer,
+}: EditorProps & EditorWebProps) {
+  useThemeStylesheetText(theme);
+  const [isDropping, setIsDropping] = useState(false);
   const content = useHandleDefaultEditorValue(
     defaultValue?.content,
     defaultValue?.references,
+    theme,
   );
 
   const editor = useEditor({
@@ -126,13 +79,13 @@ export function Editor({
       HardBreak,
       Link.configure({
         HTMLAttributes: {
-          class: "underline cursor-pointer" satisfies LinkAttributes["class"],
+          class: theme?.link?.classNames ?? defaultTheme.link.classNames,
         },
       }),
       Placeholder.configure({
         placeholder,
         emptyEditorClass:
-          "is-editor-empty before:text-muted-foreground before:content-[attr(data-placeholder)] before:float-left before:h-0 before:pointer-events-none",
+          theme?.placeholder?.classNames ?? defaultTheme.placeholder.classNames,
       }),
       // ens, farcaster, erc20, address mentions
       MentionExtension.configure({
@@ -141,6 +94,7 @@ export function Editor({
           char: "@",
         },
         theme: suggestionsTheme,
+        mentionSuggestionRenderer,
       }),
       UploadTracker.configure({
         imageComponent,
@@ -151,9 +105,10 @@ export function Editor({
     editorProps: {
       attributes: {
         class: cn(
-          "flex flex-col min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
-          disabled && "cursor-not-allowed opacity-50",
-          className,
+          theme?.editor?.classNames ?? defaultTheme.editor.classNames,
+          disabled &&
+            (theme?.editor_disabled?.classNames ??
+              defaultTheme.editor_disabled.classNames),
         ),
       },
       handleKeyPress(view, event) {
@@ -171,6 +126,9 @@ export function Editor({
   useImperativeHandle(
     ref,
     () => ({
+      getText: async () => {
+        return editor?.getText() ?? "";
+      },
       clear: () => {
         editor?.view.dispatch(
           editor.view.state.tr
@@ -198,7 +156,7 @@ export function Editor({
       setFileUploadAsFailed: (fileId: string) => {
         editor?.commands.removeUploadedFile(fileId);
       },
-      getUploadedFiles: () => {
+      getUploadedFiles: async () => {
         const node = editor?.state.doc.lastChild;
 
         if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
@@ -213,7 +171,7 @@ export function Editor({
 
         return [];
       },
-      getFilesForUpload: () => {
+      getFilesForUpload: async () => {
         const node = editor?.state.doc.lastChild;
 
         if (node?.type.name === UPLOAD_TRACKER_NODE_NAME) {
@@ -228,7 +186,7 @@ export function Editor({
 
         return [];
       },
-      getDefaultContent() {
+      async getDefaultContent() {
         return content;
       },
     }),
@@ -250,20 +208,20 @@ export function Editor({
 
     if (!isAllowed) {
       e.dataTransfer.dropEffect = "none";
-      setIsDragging(false);
+      setIsDropping(false);
     } else {
       e.dataTransfer.dropEffect = "copy";
-      setIsDragging(true);
+      setIsDropping(true);
     }
   };
 
   const handleDragLeave = () => {
-    setIsDragging(false);
+    setIsDropping(false);
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
+    setIsDropping(false);
 
     const files = Array.from(e.dataTransfer.files);
 
@@ -299,10 +257,11 @@ export function Editor({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        "relative",
-        isDragging &&
-          "after:absolute after:inset-0 after:bg-primary/10 after:border-2 after:border-dashed after:border-primary",
-        wrapperClassName,
+        theme?.editorContainer?.classNames ??
+          defaultTheme.editorContainer.classNames,
+        isDropping &&
+          (theme?.editorContainer_dropTarget?.classNames ??
+            defaultTheme.editorContainer_dropTarget.classNames),
       )}
     >
       <EditorContent editor={editor} />

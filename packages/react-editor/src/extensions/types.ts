@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ComponentType, CSSProperties } from "react";
 import type { Attribute } from "@tiptap/core";
 import type {
   IndexerAPIAutocompleteERC20SchemaType,
@@ -32,10 +32,11 @@ export type UploadTrackerAttributes = {
 };
 
 export type LinkAttributes = {
-  class: "underline cursor-pointer";
+  class: string;
   href: string;
   rel: "noopener noreferrer";
   target: "_blank";
+  style?: CSSProperties;
 };
 
 export type MentionItem = IndexerAPIAutocompleteSchemaType;

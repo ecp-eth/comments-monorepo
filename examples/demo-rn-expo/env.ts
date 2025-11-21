@@ -9,8 +9,10 @@ export const publicEnvSchema = z.object({
   EXPO_PUBLIC_TARGET_URI: z.string().url(),
   EXPO_PUBLIC_APP_SIGNER_ADDRESS: HexSchema.optional(),
   EXPO_PUBLIC_INDEXER_URL: z.string().url(),
+  EXPO_PUBLIC_DEMO_API_URL: z.string().url(),
   EXPO_PUBLIC_RPC_URL: z.string().url(),
   EXPO_PUBLIC_COMMENT_AUTHOR_URL: z.string().url().optional(),
+  EXPO_PUBLIC_PINATA_HOST: z.string(),
 });
 
 export const publicEnv = publicEnvSchema.parse({
@@ -20,6 +22,8 @@ export const publicEnv = publicEnvSchema.parse({
   EXPO_PUBLIC_TARGET_URI: process.env.EXPO_PUBLIC_TARGET_URI,
   EXPO_PUBLIC_APP_SIGNER_ADDRESS: process.env.EXPO_PUBLIC_APP_SIGNER_ADDRESS,
   EXPO_PUBLIC_INDEXER_URL: process.env.EXPO_PUBLIC_INDEXER_URL,
+  EXPO_PUBLIC_DEMO_API_URL: process.env.EXPO_PUBLIC_DEMO_API_URL,
   EXPO_PUBLIC_RPC_URL: process.env.EXPO_PUBLIC_RPC_URL,
   EXPO_PUBLIC_COMMENT_AUTHOR_URL: process.env.EXPO_PUBLIC_COMMENT_AUTHOR_URL,
+  EXPO_PUBLIC_PINATA_HOST: process.env.EXPO_PUBLIC_PINATA_HOST,
 });
