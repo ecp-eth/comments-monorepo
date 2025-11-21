@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { createENSByNameResolver } from "../../src/resolvers/ens-by-name-resolver.ts";
-import { metrics } from "../../src/services/metrics.ts";
+import { createENSByNameResolver } from "../../../src/services/resolvers/ens-by-name-resolver";
+import { metrics } from "../../../src/services/metrics";
 
 const resolver = createENSByNameResolver({
   chainRpcUrl: process.env.ENS_RPC_URL ?? "https://ethereum-rpc.publicnode.com",

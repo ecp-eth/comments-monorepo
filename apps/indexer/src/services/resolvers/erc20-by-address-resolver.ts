@@ -1,11 +1,8 @@
 import type { Hex } from "viem";
-import type { ChainID, ResolvedERC20Data } from "./erc20.types.ts";
-import { SUPPORTED_CHAIN_IDS } from "../env.ts";
-import {
-  type SIMAPITokenInfoSchemaType,
-  type ISIMAPIService,
-} from "../services/types.ts";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import type { ChainID, ResolvedERC20Data } from "./erc20.types";
+import { SUPPORTED_CHAIN_IDS } from "../../env";
+import { type SIMAPITokenInfoSchemaType, type ISIMAPIService } from "../types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ERC20ByAddressResolverKey = [Hex] | [Hex, ChainID];
 

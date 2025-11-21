@@ -3,8 +3,8 @@ import { z } from "zod";
 import DeferredCtor, { type Deferred } from "promise-deferred";
 import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
-import type { ResolvedENSData } from "./ens.types.ts";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import type { ResolvedENSData } from "./ens.types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;

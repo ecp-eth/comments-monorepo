@@ -1,8 +1,8 @@
 import { type Hex } from "viem";
 import { LRUCache } from "lru-cache";
 import { env } from "../env";
-import { createENSByNameResolver } from "../resolvers/ens-by-name-resolver";
-import type { ResolvedENSData } from "../resolvers";
+import { createENSByNameResolver } from "./resolvers/ens-by-name-resolver";
+import type { ResolvedENSData } from "./resolvers/ens.types";
 import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({

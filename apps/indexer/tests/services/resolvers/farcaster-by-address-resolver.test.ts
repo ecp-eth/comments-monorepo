@@ -1,7 +1,7 @@
 import nock from "nock";
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from "vitest";
-import { createFarcasterByAddressResolver } from "../../src/resolvers/farcaster-by-address-resolver.ts";
-import { metrics } from "../../src/services/metrics.ts";
+import { createFarcasterByAddressResolver } from "../../../src/services/resolvers/farcaster-by-address-resolver";
+import { metrics } from "../../../src/services/metrics";
 
 describe("farcaster-by-address-resolver", () => {
   const resolver = createFarcasterByAddressResolver({

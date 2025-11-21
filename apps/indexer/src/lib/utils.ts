@@ -7,8 +7,8 @@ import {
   ERC20Caip19Schema,
   ERC_20_CAIP_19_REGEX,
   type ETHAddressSchemaType,
-} from "./schemas.ts";
-import type { ENSByNameResolver } from "../resolvers/ens-by-name-resolver.ts";
+} from "./schemas";
+import type { ENSByNameResolver } from "../services/resolvers";
 
 export function normalizeUrl(url: string) {
   return _normalizeUrl(url, {

@@ -1,5 +1,5 @@
 import { type Hex } from "@ecp.eth/sdk/core";
-import { type ChainID } from "../resolvers";
+import { type ChainID } from "./resolvers/erc20.types";
 import {
   type ISIMAPIService,
   type SIMAPITokenInfoSchemaType,

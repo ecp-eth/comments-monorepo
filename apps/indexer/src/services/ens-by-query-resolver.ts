@@ -3,8 +3,8 @@ import { env } from "../env";
 import {
   createENSByQueryResolver,
   type ENSByQueryResolverKey,
-} from "../resolvers/ens-by-query-resolver";
-import type { ResolvedENSData } from "../resolvers";
+} from "./resolvers/ens-by-query-resolver";
+import type { ResolvedENSData } from "./resolvers/ens.types";
 import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<

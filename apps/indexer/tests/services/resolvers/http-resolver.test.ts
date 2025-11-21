@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import nock from "nock";
 import fs from "fs";
 import path from "path";
-import { createHTTPResolver } from "../../src/resolvers/http-resolver.ts";
-import { metrics } from "../../src/services/metrics.ts";
+import { createHTTPResolver } from "../../../src/services/resolvers/http-resolver";
+import { metrics } from "../../../src/services/metrics";
 import { Readable } from "stream";
 
 nock.disableNetConnect();

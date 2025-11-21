@@ -2,10 +2,10 @@ import * as Sentry from "@sentry/node";
 import { CommentManagerABI } from "@ecp.eth/sdk";
 import { type Hex } from "@ecp.eth/sdk/core";
 import { decodeFunctionData } from "viem";
-import type config from "../../ponder.config.ts";
+import type config from "../../../ponder.config";
 import { isSameHex } from "@ecp.eth/shared/helpers";
-import type { CommentByIdResolver } from "./comment-by-id-resolver.ts";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import type { CommentByIdResolver } from "./comment-by-id-resolver";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type CAIP373QuotedCommentResolverKey = {
   functionCallData: Hex;

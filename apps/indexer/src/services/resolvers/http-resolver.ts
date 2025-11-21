@@ -7,9 +7,9 @@ import type {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { parse as parseHTML } from "node-html-parser";
 import z from "zod";
-import { getImageMeta } from "../utils/getImageMeta.ts";
-import { getVideoMeta } from "../utils/getVideoMeta.ts";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import { getImageMeta } from "../../utils/getImageMeta";
+import { getVideoMeta } from "../../utils/getVideoMeta";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ResolvedHTTP =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">

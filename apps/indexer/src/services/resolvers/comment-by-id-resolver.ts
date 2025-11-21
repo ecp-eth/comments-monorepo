@@ -1,7 +1,7 @@
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
-import type { DB } from "../services/db";
+import type { DB } from "../db";
 import type { CommentSelectType } from "ponder:schema";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 import { isSameHex } from "@ecp.eth/shared/helpers";
 
 export type CommentByIdResolver = DataLoader<

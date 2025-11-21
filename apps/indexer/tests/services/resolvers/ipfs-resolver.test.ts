@@ -3,15 +3,15 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createIPFSResolver,
   IPFS_URL_REGEX,
-} from "../../src/resolvers/ipfs-resolver.ts";
-import { createHTTPResolver } from "../../src/resolvers/http-resolver.ts";
+} from "../../../src/services/resolvers/ipfs-resolver";
+import { createHTTPResolver } from "../../../src/services/resolvers/http-resolver";
 import { type PinataSDK } from "pinata";
 import nock from "nock";
 import path from "path";
-import { metrics } from "../../src/services/metrics.ts";
+import { metrics } from "../../../src/services/metrics";
 
 // Mock environment variables
-vi.mock("../../src/env.ts", () => ({
+vi.mock("../../../src/env", () => ({
   env: {
     PINATA_JWT: "test-jwt",
     PINATA_GATEWAY: "test-gateway.pinata.cloud",

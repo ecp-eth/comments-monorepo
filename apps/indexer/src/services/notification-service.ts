@@ -1,13 +1,10 @@
-import type { DB } from "./db.ts";
-import type { NotificationTypeSchemaType } from "../notifications/schemas.ts";
-import { schema } from "../../schema.ts";
+import type { DB } from "./db";
+import type { NotificationTypeSchemaType } from "../notifications/schemas";
+import { schema } from "../../schema";
 import { and, eq, inArray, isNull, gt, sql } from "drizzle-orm";
-import type { ENSByNameResolver } from "../resolvers/index.ts";
-import type {
-  ENSNameSchemaType,
-  ETHAddressSchemaType,
-} from "../lib/schemas.ts";
-import { resolveUsersByAddressOrEnsName } from "../lib/utils.ts";
+import type { ENSByNameResolver } from "./resolvers";
+import type { ENSNameSchemaType, ETHAddressSchemaType } from "../lib/schemas";
+import { resolveUsersByAddressOrEnsName } from "../lib/utils";
 import type { Hex } from "viem";
 
 type NotificationServiceOptions = {

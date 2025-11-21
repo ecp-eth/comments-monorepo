@@ -4,7 +4,7 @@ import path from "path";
 import { getImageMeta } from "../../src/utils/getImageMeta";
 
 describe("getImageDimension", () => {
-  const fixturesDir = path.join(__dirname, "../resolvers/fixtures");
+  const fixturesDir = path.join(__dirname, "../services/resolvers/fixtures");
   const jpgBuffer = fs.readFileSync(
     path.join(fixturesDir, "example-image.jpg"),
   );

@@ -1,8 +1,11 @@
 import { LRUCache } from "lru-cache";
-import { createFarcasterByNameResolver } from "../resolvers/farcaster-by-name-resolver";
+import { createFarcasterByNameResolver } from "./resolvers/farcaster-by-name-resolver";
 import { env } from "../env";
 import { metrics } from "./metrics";
-import type { FarcasterName, ResolvedFarcasterData } from "../resolvers";
+import type {
+  FarcasterName,
+  ResolvedFarcasterData,
+} from "./resolvers/farcaster.types";
 
 // could also use redis
 const cacheMap = new LRUCache<

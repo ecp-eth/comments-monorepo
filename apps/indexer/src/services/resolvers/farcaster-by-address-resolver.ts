@@ -10,8 +10,8 @@ import {
   IndexerAPIFarcasterDataSchema,
   type IndexerAPIFarcasterDataSchemaType,
 } from "@ecp.eth/sdk/indexer";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
-import type { ResolvedFarcasterData } from "./farcaster.types.ts";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
+import type { ResolvedFarcasterData } from "./farcaster.types";
 
 export type FarcasterByAddressResolver = DataLoader<
   Hex,

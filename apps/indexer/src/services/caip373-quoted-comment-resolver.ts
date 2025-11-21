@@ -1,7 +1,7 @@
 import {
   createCAIP373QuotedCommentResolver,
   type CAIP373QuotedCommentResolverResult,
-} from "../resolvers/caip373-quoted-comment-resolver";
+} from "./resolvers/caip373-quoted-comment-resolver";
 import { LRUCache } from "lru-cache";
 import config from "../../ponder.config";
 import { commentByIdResolverService } from "./comment-by-id-resolver";

@@ -1,4 +1,4 @@
-import { createCommentByIdResolver } from "../resolvers/comment-by-id-resolver";
+import { createCommentByIdResolver } from "./resolvers/comment-by-id-resolver";
 import { db } from "./db";
 import { metrics } from "./metrics";
 

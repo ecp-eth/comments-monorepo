@@ -1,6 +1,6 @@
 import { LRUCache } from "lru-cache";
-import { createIPFSResolver } from "../resolvers/ipfs-resolver";
-import type { ResolvedHTTP } from "../resolvers/http-resolver";
+import { createIPFSResolver } from "./resolvers/ipfs-resolver";
+import type { ResolvedHTTP } from "./resolvers/http-resolver";
 import { httpResolverService } from "./http-resolver";
 import { PinataSDK } from "pinata";
 import { env } from "../env";

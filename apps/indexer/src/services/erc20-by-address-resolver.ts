@@ -1,8 +1,8 @@
 import { LRUCache } from "lru-cache";
-import { createERC20ByAddressResolver } from "../resolvers/erc20-by-address-resolver";
+import { createERC20ByAddressResolver } from "./resolvers/erc20-by-address-resolver";
 import { simAPIService } from "./sim-api-service";
 import { metrics } from "./metrics";
-import type { ResolvedERC20Data } from "../resolvers";
+import type { ResolvedERC20Data } from "./resolvers/erc20.types";
 
 // could also use redis
 const cacheMap = new LRUCache<string, Promise<ResolvedERC20Data | null>>({

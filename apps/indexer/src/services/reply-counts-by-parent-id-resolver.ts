@@ -1,4 +1,4 @@
-import { createReplyCountsByParentIdResolver } from "../resolvers/reply-counts-by-parent-id-resolver";
+import { createReplyCountsByParentIdResolver } from "./resolvers/reply-counts-by-parent-id-resolver";
 import { db } from "./db";
 import { metrics } from "./metrics";
 

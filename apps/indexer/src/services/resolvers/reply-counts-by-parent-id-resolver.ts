@@ -1,4 +1,4 @@
-import type { DB } from "../services/db";
+import type { DB } from "../db";
 import { type Hex } from "@ecp.eth/sdk/core";
 import {
   and,
@@ -10,14 +10,14 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import { schema } from "../../schema";
-import { convertExcludeModerationLabelsToConditions } from "../api/comments/helpers";
+import * as schema from "../../../ponder.schema";
+import { convertExcludeModerationLabelsToConditions } from "../../api/comments/helpers";
 import {
   type LowercasedHex,
   type CommentModerationLabel,
   type ModerationStatus,
-} from "../services/types";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+} from "../types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ReplyCountsByParentIdResolverKey = {
   parentId: Hex;

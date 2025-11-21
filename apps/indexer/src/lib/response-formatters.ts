@@ -7,21 +7,21 @@ import {
 } from "@ecp.eth/sdk/indexer/schemas";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import type { CommentSelectType } from "ponder:schema";
-import { ensByAddressResolverService } from "../services/ens-by-address-resolver.ts";
-import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver.ts";
+import { ensByAddressResolverService } from "../services/ens-by-address-resolver";
+import { farcasterByAddressResolverService } from "../services/farcaster-by-address-resolver";
 import { getCommentCursor } from "@ecp.eth/sdk/indexer";
-import { env } from "../env.ts";
+import { env } from "../env";
 import type {
   ReplyCountsByParentIdResolverKey,
   ResolvedENSData,
   ResolvedFarcasterData,
-} from "../resolvers/index.ts";
+} from "../services/resolvers";
 import type {
   CommentModerationLabel,
   LowercasedHex,
   ModerationStatus,
-} from "../services/types.ts";
-import { replyCountsByParentIdResolverService } from "../services/reply-counts-by-parent-id-resolver.ts";
+} from "../services/types";
+import { replyCountsByParentIdResolverService } from "../services/reply-counts-by-parent-id-resolver";
 
 type CommentFromDB = CommentSelectType & {
   replies?: CommentSelectType[];

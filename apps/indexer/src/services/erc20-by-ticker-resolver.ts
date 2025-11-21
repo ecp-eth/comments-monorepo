@@ -3,10 +3,10 @@ import { erc20RpcClientsRegistryService } from "./erc20-rpc-clients-registry";
 import {
   createERC20ByTickerResolver,
   type ERC20ByTickerResolverKey,
-} from "../resolvers/erc20-by-ticker-resolver";
+} from "./resolvers/erc20-by-ticker-resolver";
 import { erc20TokensService } from "./erc20-tokens-service";
 import { metrics } from "./metrics";
-import type { ResolvedERC20Data } from "../resolvers";
+import type { ResolvedERC20Data } from "./resolvers/erc20.types";
 
 // could also use redis
 const cacheMap = new LRUCache<

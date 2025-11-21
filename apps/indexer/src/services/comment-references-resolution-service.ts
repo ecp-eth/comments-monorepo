@@ -1,11 +1,11 @@
 import * as Sentry from "@sentry/node";
-import { type CommentSelectType } from "../../ponder.schema.ts";
+import { type CommentSelectType } from "../../ponder.schema";
 import type {
   CommentReferencesResolutionServiceResolveParams,
   CommentReferencesResolutionServiceResolveFromCacheFirstResult,
   ICommentReferencesResolutionService,
   CommentReferencesResolutionServiceResolveFromNetworkResult,
-} from "./types.ts";
+} from "./types";
 import { type IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import type {
   ENSByAddressResolver,
@@ -16,10 +16,10 @@ import type {
   HTTPResolver,
   FarcasterByNameResolver,
   CAIP373QuotedCommentResolver,
-} from "../resolvers/index.ts";
-import type { IPFSResolver } from "../resolvers/ipfs-resolver.ts";
-import type { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
-import { type ResolveCommentReferencePosition } from "../lib/resolve-comment-references.ts";
+} from "./resolvers";
+import type { IPFSResolver } from "./resolvers/ipfs-resolver";
+import type { CommentReferencesCacheService } from "./comment-references-cache-service";
+import { type ResolveCommentReferencePosition } from "../lib/resolve-comment-references";
 
 /**
  * Type for a collection of comment reference resolvers

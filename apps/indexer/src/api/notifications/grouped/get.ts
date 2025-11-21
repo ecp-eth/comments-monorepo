@@ -3,44 +3,44 @@ import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import {
   NotificationTypeSchema,
   type NotificationTypeSchemaType,
-} from "../../../notifications/schemas.ts";
+} from "../../../notifications/schemas";
 import {
   APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   OpenAPIBigintStringSchema,
   OpenAPIENSNameOrAddressSchema,
-} from "../../../lib/schemas.ts";
-import { db, appKeyMiddleware } from "../../../services/index.ts";
-import { AppManagerAppNotFoundError } from "../../../services/app-manager-service.ts";
+} from "../../../lib/schemas";
+import { db, appKeyMiddleware } from "../../../services";
+import { AppManagerAppNotFoundError } from "../../../services/app-manager-service";
 import type { Hex } from "@ecp.eth/sdk/core";
-import { schema } from "../../../../schema.ts";
+import { schema } from "../../../../schema";
 import { resolveUsersByAddressOrEnsName } from "../../../lib/utils";
-import { ensByNameResolverService } from "../../../services/ens-by-name-resolver.ts";
+import { ensByNameResolverService } from "../../../services/ens-by-name-resolver";
 import {
   createUserDataAndFormatSingleCommentResponseResolver,
   formatAuthor,
   formatResponseUsingZodSchema,
   mapReplyCountsByCommentId,
   resolveUserData,
-} from "../../../lib/response-formatters.ts";
+} from "../../../lib/response-formatters";
 import {
   AppNotificationGetRequestQueryAppSchema,
   AppNotificationGetRequestQuerySeenSchema,
   AppNotificationGetRequestQueryTypeSchema,
   AppNotificationOutputSchema,
-} from "../schemas.ts";
-import { AppNotificationsCursorOutputSchema } from "../get.ts";
+} from "../schemas";
+import { AppNotificationsCursorOutputSchema } from "../get";
 import type { SnakeCasedProperties } from "type-fest";
-import type { AppNotificationSelectType } from "../../../../schema.offchain.ts";
-import type { JSONCommentSelectType } from "../types.ts";
+import type { AppNotificationSelectType } from "../../../../schema.offchain";
+import type { JSONCommentSelectType } from "../types";
 import { IndexerAPICommentOutputSchema } from "@ecp.eth/sdk/indexer";
-import { ensByAddressResolverService } from "../../../services/ens-by-address-resolver.ts";
-import { farcasterByAddressResolverService } from "../../../services/farcaster-by-address-resolver.ts";
-import { convertJsonCommentToCommentSelectType } from "../utils.ts";
-import type { ResolvedENSData } from "../../../resolvers/ens.types.ts";
-import type { ResolvedFarcasterData } from "../../../resolvers/farcaster.types.ts";
+import { ensByAddressResolverService } from "../../../services/ens-by-address-resolver";
+import { farcasterByAddressResolverService } from "../../../services/farcaster-by-address-resolver";
+import { convertJsonCommentToCommentSelectType } from "../utils";
+import type { ResolvedENSData } from "../../../services/resolvers/ens.types";
+import type { ResolvedFarcasterData } from "../../../services/resolvers/farcaster.types";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
-import type { LowercasedHex } from "../../../services/types.ts";
+import type { LowercasedHex } from "../../../services/types";
 
 const GROUPED_NOTIFICATIONS_LIMIT = 5;
 

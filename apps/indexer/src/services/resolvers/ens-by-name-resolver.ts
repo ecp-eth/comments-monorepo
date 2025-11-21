@@ -1,8 +1,8 @@
 import { createPublicClient, http, type PublicClient } from "viem";
-import type { ResolvedENSData } from "./ens.types.ts";
+import type { ResolvedENSData } from "./ens.types";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ENSByNameResolver = DataLoader<string, ResolvedENSData | null>;
 

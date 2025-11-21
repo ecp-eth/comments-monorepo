@@ -13,9 +13,9 @@ import type {
   HTTPResolver,
   FarcasterByNameResolver,
   CAIP373QuotedCommentResolver,
-} from "../../src/resolvers";
+} from "../../src/services/resolvers";
 import { encodeFunctionData, type Hex, toHex } from "viem";
-import { type IPFSResolver } from "../../src/resolvers/ipfs-resolver";
+import { type IPFSResolver } from "../../src/services/resolvers/ipfs-resolver";
 import { COMMENT_MANAGER_ADDRESS, CommentManagerABI } from "@ecp.eth/sdk";
 import { randomBytes } from "crypto";
 

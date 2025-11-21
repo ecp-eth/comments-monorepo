@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/node";
 import type { PinataSDK } from "pinata";
 import type { HTTPResolver, ResolvedHTTP } from "./http-resolver.ts";
 import { runAsync } from "@ecp.eth/sdk/core";
-import { DataLoader, type DataLoaderOptions } from "../services/dataloader.ts";
+import { DataLoader, type DataLoaderOptions } from "../dataloader.ts";
 
 export type IPFSResolver = DataLoader<string, ResolvedHTTP | null>;
 
