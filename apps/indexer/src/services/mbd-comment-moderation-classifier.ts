@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import { z } from "zod";
 import {
   type CommentModerationClassfierResult,
@@ -7,8 +6,9 @@ import {
   CommentModerationLabel,
   type CommentModerationLabelsWithScore,
   type ModerationNotificationServicePendingComment,
-} from "./types.ts";
+} from "./types";
 import type { CommentSelectType } from "ponder:schema";
+import { DataLoader, type DataLoaderOptions } from "./dataloader";
 
 const responseSchema = z.object({
   status_code: z.literal(200),
@@ -22,7 +22,15 @@ const responseSchema = z.object({
   ),
 });
 
-type CommentModerationClassifierOptions = {
+type CommentModerationClassifierResult = Omit<
+  CommentModerationClassfierResult,
+  "save" | "action"
+>;
+
+type CommentModerationClassifierOptions = Omit<
+  DataLoaderOptions<string, CommentModerationClassifierResult>,
+  "name" | "cache"
+> & {
   apiKey: string;
   cacheService: ICommentClassifierCacheService;
 };
@@ -33,10 +41,7 @@ type CommentModerationClassifierOptions = {
  * @see https://docs.mbd.xyz/reference/post_casts-labels-for-text
  */
 export class CommentModerationClassifier
-  extends DataLoader<
-    string,
-    Omit<CommentModerationClassfierResult, "save" | "action">
-  >
+  extends DataLoader<string, CommentModerationClassifierResult>
   implements ICommentModerationClassifierService
 {
   private cacheService: ICommentClassifierCacheService;
@@ -106,7 +111,9 @@ export class CommentModerationClassifier
         });
       },
       {
+        ...options,
         cache: false,
+        name: "CommentModerationClassifier",
       },
     );
 

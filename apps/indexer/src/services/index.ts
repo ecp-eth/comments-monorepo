@@ -1,48 +1,49 @@
-import { env } from "../env.ts";
-import { CommentModerationClassifier } from "./mbd-comment-moderation-classifier.ts";
-import { ModerationNotificationsService } from "./moderation-notifications-service.ts";
-import { NoopCommentModerationClassifier } from "./noop-comment-moderation-classifier.ts";
-import { PremoderationService } from "./premoderation-service.ts";
-import { NoopPremoderationService } from "./noop-premoderation-service.ts";
-import { ClassificationCacheService } from "./classification-cache-service.ts";
-import { CommentReportsService } from "./comment-reports-service.ts";
-import { CommentModerationService } from "../management/services/comment-moderation-service.ts";
+import { env } from "../env";
+import { CommentModerationClassifier } from "./mbd-comment-moderation-classifier";
+import { ModerationNotificationsService } from "./moderation-notifications-service";
+import { NoopCommentModerationClassifier } from "./noop-comment-moderation-classifier";
+import { PremoderationService } from "./premoderation-service";
+import { NoopPremoderationService } from "./noop-premoderation-service";
+import { ClassificationCacheService } from "./classification-cache-service";
+import { CommentReportsService } from "./comment-reports-service";
+import { CommentModerationService } from "../management/services/comment-moderation-service";
 import { type Hex } from "@ecp.eth/sdk/core";
-import { ensByAddressResolverService } from "./ens-by-address-resolver.ts";
-import { ReportsNotificationsService } from "./reports-notifications-service.ts";
-import { TelegramNotificationsService } from "./telegram-notifications-service.ts";
-import { ensByNameResolverService } from "./ens-by-name-resolver.ts";
-import { erc20ByAddressResolverService } from "./erc20-by-address-resolver.ts";
-import { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver.ts";
-import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver.ts";
-import { farcasterByNameResolverService } from "./farcaster-by-name-resolver.ts";
-import { httpResolverService } from "./http-resolver.ts";
-import { ipfsResolverService } from "./ipfs-resolver.ts";
-import { NoopAdminBotService } from "./admin-noop-bot-service.ts";
-import { AdminTelegramBotService } from "./admin-telegram-bot-service/index.ts";
-import { StartCommand } from "./admin-telegram-bot-service/commands/start.ts";
-import { ReportCommand } from "./admin-telegram-bot-service/commands/report.ts";
-import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/report-pending.ts";
-import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate.ts";
-import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending.ts";
-import { db } from "./db.ts";
-import { ManagementAuthService } from "../management/services/auth.ts";
-import { MutedAccountsManagementService } from "../management/services/muted-accounts.ts";
-import { SiweAuthService } from "./siwe-auth-service.ts";
+import { ensByAddressResolverService } from "./ens-by-address-resolver";
+import { ReportsNotificationsService } from "./reports-notifications-service";
+import { TelegramNotificationsService } from "./telegram-notifications-service";
+import { ensByNameResolverService } from "./ens-by-name-resolver";
+import { erc20ByAddressResolverService } from "./erc20-by-address-resolver";
+import { erc20ByTickerResolverService } from "./erc20-by-ticker-resolver";
+import { farcasterByAddressResolverService } from "./farcaster-by-address-resolver";
+import { farcasterByNameResolverService } from "./farcaster-by-name-resolver";
+import { httpResolverService } from "./http-resolver";
+import { ipfsResolverService } from "./ipfs-resolver";
+import { NoopAdminBotService } from "./admin-noop-bot-service";
+import { AdminTelegramBotService } from "./admin-telegram-bot-service";
+import { StartCommand } from "./admin-telegram-bot-service/commands/start";
+import { ReportCommand } from "./admin-telegram-bot-service/commands/report";
+import { ReportPendingCommand } from "./admin-telegram-bot-service/commands/report-pending";
+import { ModerateCommand } from "./admin-telegram-bot-service/commands/moderate";
+import { ModeratePendingCommand } from "./admin-telegram-bot-service/commands/moderate-pending";
+import { db } from "./db";
+import { ManagementAuthService } from "../management/services/auth";
+import { MutedAccountsManagementService } from "../management/services/muted-accounts";
+import { SiweAuthService } from "./siwe-auth-service";
 import config from "../../ponder.config.ts";
-import { createSiweMiddleware } from "../middleware/siwe.ts";
-import { AppManager } from "./app-manager-service.ts";
-import { AppWebhookManager } from "./app-webhook-manager-service.ts";
-import { EventOutboxService } from "./events/event-outbox-service.ts";
-import { resolveCommentReferences } from "../lib/resolve-comment-references.ts";
-import { CommentReferencesResolutionService } from "./comment-references-resolution-service.ts";
-import { CommentReferencesCacheService } from "./comment-references-cache-service.ts";
-import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-service.ts";
-import { NotificationService } from "./notification-service.ts";
-import { AppKeyAuthService } from "./app-key-auth-service.ts";
-import { createAppKeyMiddleware } from "../middleware/app-key.ts";
-import { NotificationOutboxService } from "./notifications/notification-outbox-service.ts";
-import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver.ts";
+import { createSiweMiddleware } from "../middleware/siwe";
+import { AppManager } from "./app-manager-service";
+import { AppWebhookManager } from "./app-webhook-manager-service";
+import { EventOutboxService } from "./events/event-outbox-service";
+import { resolveCommentReferences } from "../lib/resolve-comment-references";
+import { CommentReferencesResolutionService } from "./comment-references-resolution-service";
+import { CommentReferencesCacheService } from "./comment-references-cache-service";
+import { AppWebhookDeliveryManager } from "./app-webhook-delivery-manager-service";
+import { NotificationService } from "./notification-service";
+import { AppKeyAuthService } from "./app-key-auth-service";
+import { createAppKeyMiddleware } from "../middleware/app-key";
+import { NotificationOutboxService } from "./notifications/notification-outbox-service";
+import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver";
+import { metrics } from "./metrics";
 
 export { db };
 
@@ -95,6 +96,7 @@ export const commentModerationClassifierService =
     ? new CommentModerationClassifier({
         apiKey: env.MODERATION_MBD_API_KEY,
         cacheService: classifierCacheService,
+        metrics,
       })
     : new NoopCommentModerationClassifier();
 

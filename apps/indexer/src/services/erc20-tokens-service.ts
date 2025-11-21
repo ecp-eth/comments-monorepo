@@ -1,7 +1,8 @@
-import DataLoader from "dataloader";
 import { z } from "zod";
-import { ERC20Caip19Schema } from "../lib/schemas.ts";
+import { ERC20Caip19Schema } from "../lib/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core";
+import { DataLoader, type DataLoaderOptions } from "./dataloader";
+import { metrics } from "./metrics";
 
 const tokenSchema = z.object({
   address: HexSchema,
@@ -22,25 +23,36 @@ const tokenListSchema = z.object({
   tokens: z.array(tokenSchema),
 });
 
+type ERC20TokensServiceOptions = Omit<
+  DataLoaderOptions<"", ERC20Token[]>,
+  "name"
+>;
+
 export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
   private listPromise: Promise<ERC20Token[]> = Promise.resolve([]);
 
-  constructor() {
-    super(async (queries) => {
-      try {
-        const list = await this.listPromise;
+  constructor(options: ERC20TokensServiceOptions) {
+    super(
+      async (queries) => {
+        try {
+          const list = await this.listPromise;
 
-        return queries.map(() => {
-          return list;
-        });
-      } catch (e) {
-        console.error("ERC20TokensService: Failed to load list", {
-          error: e,
-        });
+          return queries.map(() => {
+            return list;
+          });
+        } catch (e) {
+          console.error("ERC20TokensService: Failed to load list", {
+            error: e,
+          });
 
-        return queries.map(() => []);
-      }
-    });
+          return queries.map(() => []);
+        }
+      },
+      {
+        ...options,
+        name: "ERC20TokensService",
+      },
+    );
 
     this.listPromise = this.loadList();
   }
@@ -71,4 +83,6 @@ export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
   }
 }
 
-export const erc20TokensService = new ERC20TokensService();
+export const erc20TokensService = new ERC20TokensService({
+  metrics,
+});
