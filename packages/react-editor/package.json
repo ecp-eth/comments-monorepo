@@ -23,6 +23,7 @@
     "./editor": {
       "types": "./dist/esm/editor.d.ts",
       "import": "./dist/esm/editor.js",
+      "react-native": "./dist/esm/editor.native.js",
       "default": "./dist/cjs/editor.cjs"
     },
     "./extensions": {
@@ -55,17 +56,17 @@
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared": "workspace:*",
     "@tiptap/core": "^2.12.0",
-    "@tiptap/react": "^2.12.0",
     "@tiptap/extension-document": "^2.12.0",
-    "@tiptap/extension-paragraph": "^2.12.0",
-    "@tiptap/extension-text": "^2.12.0",
-    "@tiptap/extension-link": "^2.12.0",
-    "@tiptap/extension-placeholder": "^2.12.0",
     "@tiptap/extension-hard-break": "^2.12.0",
+    "@tiptap/extension-link": "^2.12.0",
     "@tiptap/extension-mention": "^2.12.0",
+    "@tiptap/extension-paragraph": "^2.12.0",
+    "@tiptap/extension-placeholder": "^2.12.0",
+    "@tiptap/extension-text": "^2.12.0",
+    "@tiptap/react": "^2.12.0",
     "@tiptap/suggestion": "^2.12.0",
-    "prosemirror-state": "^1.4.3",
     "prosemirror-model": "^1.25.1",
+    "prosemirror-state": "^1.4.3",
     "prosemirror-transform": "^1.10.4",
     "tippy.js": "^6.3.7"
   },
@@ -73,6 +74,8 @@
     "@tanstack/react-query": ">=5.0.0",
     "pinata": "^2.5.0",
     "react": "18 || 19",
+    "react-native": ">=0.81.0",
+    "react-native-webview": ">=13.16.0",
     "viem": "^2.29.2"
   },
   "devDependencies": {
@@ -83,19 +86,24 @@
     "@types/node": "^22.13.1",
     "@types/react": "~19.1.0",
     "@types/react-dom": "~19.1.0",
-    "pinata": "^2.5.0",
     "eslint": "^9.19.0",
+    "pinata": "^2.5.0",
     "react": "~19.1.0",
     "react-dom": "~19.1.0",
-    "viem": "^2.29.2"
+    "react-native": "0.81.5",
+    "react-native-webview": "^13.16.0",
+    "viem": "^2.29.2",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.3.0"
   },
   "scripts": {
     "check-types": "tsc --noEmit",
     "dev": "tsup --format esm --out-dir dist/esm --watch",
     "build:cjs": "tsup --format cjs --out-dir dist/cjs",
     "build:esm": "tsup --format esm --out-dir dist/esm",
-    "build:all": "rm -rf dist && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
+    "build:all": "rm -rf dist && pnpm run build:webview-container && npm run build:cjs && npm run build:esm && proxy-package generate ./package.json && proxy-package hide ./package.json",
     "build:dev": "export NODE_ENV=development && pnpm run build:all",
+    "build:webview-container": "rm -rf src/webview-container/generated && vite build --config vite.webview-container.config.js",
     "build": "export NODE_ENV=production && pnpm run build:all",
     "lint": "eslint \"./src/**/*.ts\"",
     "test": "vitest run",
