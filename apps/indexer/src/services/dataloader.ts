@@ -1,17 +1,9 @@
 import BaseDataLoader, { type Options } from "dataloader";
-import { type metrics } from "./metrics";
+import type { MetricsService } from "./metrics";
 
 export type DataLoaderOptions<K, V, C = K> = Options<K, V, C> & {
   name: string;
-  metrics: Pick<
-    typeof metrics,
-    | "dataloaderBatchDuration"
-    | "dataloaderBatchSize"
-    | "dataloaderBatchesTotal"
-    | "dataloaderItemsTotal"
-    | "dataloaderCacheHitsTotal"
-    | "dataloaderCacheMissesTotal"
-  >;
+  metrics: MetricsService;
 };
 
 export class DataLoader<K, V, C = K> extends BaseDataLoader<K, V, C> {
