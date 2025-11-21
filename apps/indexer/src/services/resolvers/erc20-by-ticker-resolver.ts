@@ -1,11 +1,11 @@
-import DataLoader from "dataloader";
 import { type Hex } from "viem";
 import type {
   ResolvedERC20Data,
   ChainID,
   ERC20ClientRegistry,
-} from "./erc20.types.ts";
-import { type ERC20TokensService } from "../services/erc20-tokens-service.ts";
+} from "./erc20.types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
+import { type ERC20TokensService } from "../erc20-tokens-service";
 
 export type ERC20ByTickerResolverKey = [string, ChainID];
 
@@ -57,7 +57,10 @@ async function resolveErc20Data(
 export type ERC20ByTickerResolverOptions = {
   clientRegistry: ERC20ClientRegistry;
   erc20TokensService: ERC20TokensService;
-} & DataLoader.Options<ERC20ByTickerResolverKey, ResolvedERC20Data | null>;
+} & Omit<
+  DataLoaderOptions<ERC20ByTickerResolverKey, ResolvedERC20Data | null>,
+  "name"
+>;
 
 export function createERC20ByTickerResolver({
   clientRegistry,
@@ -72,6 +75,9 @@ export function createERC20ByTickerResolver({
         ),
       );
     },
-    dataLoaderOptions,
+    {
+      ...dataLoaderOptions,
+      name: "ERC20ByTickerResolver",
+    },
   );
 }

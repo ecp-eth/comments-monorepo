@@ -1,8 +1,8 @@
-import DataLoader from "dataloader";
 import { createPublicClient, http, type PublicClient } from "viem";
-import type { ResolvedENSData } from "./ens.types.ts";
+import type { ResolvedENSData } from "./ens.types";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ENSByNameResolver = DataLoader<string, ResolvedENSData | null>;
 
@@ -33,7 +33,7 @@ async function resolveEnsData(
 
 export type ENSByNameResolverOptions = {
   chainRpcUrl: string;
-} & DataLoader.Options<string, ResolvedENSData | null>;
+} & Omit<DataLoaderOptions<string, ResolvedENSData | null>, "name">;
 
 export function createENSByNameResolver({
   chainRpcUrl,
@@ -44,9 +44,15 @@ export function createENSByNameResolver({
     transport: http(chainRpcUrl),
   });
 
-  return new DataLoader<string, ResolvedENSData | null>(async (addresses) => {
-    return Promise.all(
-      addresses.map((address) => resolveEnsData(publicClient, address)),
-    );
-  }, dataLoaderOptions);
+  return new DataLoader<string, ResolvedENSData | null>(
+    async (addresses) => {
+      return Promise.all(
+        addresses.map((address) => resolveEnsData(publicClient, address)),
+      );
+    },
+    {
+      ...dataLoaderOptions,
+      name: "ENSByNameResolver",
+    },
+  );
 }

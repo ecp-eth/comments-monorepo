@@ -8,8 +8,9 @@ import {
   vi,
 } from "vitest";
 import nock from "nock";
-import { CommentModerationClassifier } from "../../src/services/mbd-comment-moderation-classifier";
-import { type ICommentClassifierCacheService } from "../../src/services/types";
+import { CommentModerationClassifier } from "../../../src/services/mbd-comment-moderation-classifier";
+import { type ICommentClassifierCacheService } from "../../../src/services/types";
+import { metrics } from "../../../src/services/metrics";
 
 const mockClassifierCacheService = {
   getByCommentId: vi.fn(),
@@ -23,6 +24,7 @@ describe("CommentModerationClassifier", () => {
     new CommentModerationClassifier({
       apiKey: API_KEY,
       cacheService: mockClassifierCacheService,
+      metrics,
     });
 
   beforeAll(() => {

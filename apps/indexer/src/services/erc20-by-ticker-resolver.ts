@@ -1,11 +1,12 @@
 import { LRUCache } from "lru-cache";
-import { erc20RpcClientsRegistryService } from "./erc20-rpc-clients-registry.ts";
+import { erc20RpcClientsRegistryService } from "./erc20-rpc-clients-registry";
 import {
   createERC20ByTickerResolver,
   type ERC20ByTickerResolverKey,
-  type ResolvedERC20Data,
-} from "../resolvers/index.ts";
-import { erc20TokensService } from "./erc20-tokens-service.ts";
+} from "./resolvers/erc20-by-ticker-resolver";
+import { erc20TokensService } from "./erc20-tokens-service";
+import { metrics } from "./metrics";
+import type { ResolvedERC20Data } from "./resolvers/erc20.types";
 
 // could also use redis
 const cacheMap = new LRUCache<
@@ -21,4 +22,5 @@ export const erc20ByTickerResolverService = createERC20ByTickerResolver({
   clientRegistry: erc20RpcClientsRegistryService,
   erc20TokensService: erc20TokensService,
   cacheMap,
+  metrics,
 });

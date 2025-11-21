@@ -5,11 +5,11 @@ import type {
   IndexerAPICommentReferenceURLVideoSchemaType,
   IndexerAPICommentReferenceURLWebPageSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
-import DataLoader from "dataloader";
 import { parse as parseHTML } from "node-html-parser";
 import z from "zod";
-import { getImageMeta } from "../utils/getImageMeta.ts";
-import { getVideoMeta } from "../utils/getVideoMeta.ts";
+import { getImageMeta } from "../../utils/getImageMeta";
+import { getVideoMeta } from "../../utils/getVideoMeta";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ResolvedHTTP =
   | Omit<IndexerAPICommentReferenceURLImageSchemaType, "position">
@@ -224,8 +224,8 @@ function resolveFaviconURL(href: string, pageUrl: string): string {
 }
 
 type HTTPResolverOptions = Omit<
-  DataLoader.Options<string, ResolvedHTTP | null>,
-  "batchLoadFn"
+  DataLoaderOptions<string, ResolvedHTTP | null>,
+  "batchLoadFn" | "name"
 > & {
   /**
    * @default 5000
@@ -236,13 +236,14 @@ type HTTPResolverOptions = Omit<
 export function createHTTPResolver({
   timeout = 5000,
   ...dataLoaderOptions
-}: HTTPResolverOptions = {}): HTTPResolver {
+}: HTTPResolverOptions): HTTPResolver {
   return new DataLoader<string, ResolvedHTTP | null>(
     async (urls) => {
       return Promise.all(urls.map((url) => resolveHTTP(url, timeout)));
     },
     {
       maxBatchSize: 5,
+      name: "HTTPResolver",
       ...dataLoaderOptions,
     },
   );

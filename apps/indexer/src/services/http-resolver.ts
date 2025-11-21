@@ -2,7 +2,8 @@ import { LRUCache } from "lru-cache";
 import {
   createHTTPResolver,
   type ResolvedHTTP,
-} from "../resolvers/http-resolver.ts";
+} from "./resolvers/http-resolver";
+import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
   max: 10000,
@@ -12,4 +13,5 @@ const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
 
 export const httpResolverService = createHTTPResolver({
   cacheMap,
+  metrics,
 });

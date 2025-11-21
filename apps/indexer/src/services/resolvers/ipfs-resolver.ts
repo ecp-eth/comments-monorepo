@@ -1,8 +1,8 @@
 import * as Sentry from "@sentry/node";
 import type { PinataSDK } from "pinata";
-import DataLoader from "dataloader";
 import type { HTTPResolver, ResolvedHTTP } from "./http-resolver.ts";
 import { runAsync } from "@ecp.eth/sdk/core";
+import { DataLoader, type DataLoaderOptions } from "../dataloader.ts";
 
 export type IPFSResolver = DataLoader<string, ResolvedHTTP | null>;
 
@@ -155,8 +155,8 @@ async function resolveIPFSURL({
 }
 
 type IPFSResolverOptions = Omit<
-  DataLoader.Options<string, ResolvedHTTP | null>,
-  "batchLoadFn"
+  DataLoaderOptions<string, ResolvedHTTP | null>,
+  "batchLoadFn" | "name"
 > & {
   httpResolver: HTTPResolver;
   pinataSDK: PinataSDK;
@@ -190,6 +190,7 @@ export function createIPFSResolver({
     },
     {
       maxBatchSize: 3, // Smaller batch size for IPFS operations
+      name: "IPFSResolver",
       ...dataLoaderOptions,
     },
   );

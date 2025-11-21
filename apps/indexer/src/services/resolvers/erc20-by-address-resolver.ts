@@ -1,11 +1,8 @@
-import DataLoader from "dataloader";
 import type { Hex } from "viem";
-import type { ChainID, ResolvedERC20Data } from "./erc20.types.ts";
-import { SUPPORTED_CHAIN_IDS } from "../env.ts";
-import {
-  type SIMAPITokenInfoSchemaType,
-  type ISIMAPIService,
-} from "../services/types.ts";
+import type { ChainID, ResolvedERC20Data } from "./erc20.types";
+import { SUPPORTED_CHAIN_IDS } from "../../env";
+import { type SIMAPITokenInfoSchemaType, type ISIMAPIService } from "../types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ERC20ByAddressResolverKey = [Hex] | [Hex, ChainID];
 
@@ -32,12 +29,12 @@ export type ERC20ByAddressResolver = DataLoader<
 export type ERC20ByAddressResolverOptions = {
   simAPIService: ISIMAPIService;
 } & Omit<
-  DataLoader.Options<
+  DataLoaderOptions<
     ERC20ByAddressResolverKey,
     ResolvedERC20Data | null,
     string
   >,
-  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn"
+  "batchLoadFn" | "maxBatchSize" | "cacheKeyFn" | "name"
 >;
 
 export function createERC20ByAddressResolver({
@@ -99,6 +96,7 @@ export function createERC20ByAddressResolver({
             : [address.toLowerCase() as Hex]
         ).join(":");
       },
+      name: "ERC20ByAddressResolver",
     },
   );
 }

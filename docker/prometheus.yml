@@ -7,3 +7,8 @@ scrape_configs:
     static_configs:
       - targets: ["host.docker.internal:42069"]
     metrics_path: "/metrics"
+
+  - job_name: "indexer"
+    static_configs:
+      - targets: ["host.docker.internal:42069"]
+    metrics_path: "/api/internal/metrics"

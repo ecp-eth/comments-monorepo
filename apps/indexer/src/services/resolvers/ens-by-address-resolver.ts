@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import {
   createPublicClient,
   http,
@@ -8,8 +7,9 @@ import {
 } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
-import type { ResolvedENSData } from "./ens.types.ts";
-import type { ENSByQueryResolver } from "./ens-by-query-resolver.ts";
+import type { ResolvedENSData } from "./ens.types";
+import type { ENSByQueryResolver } from "./ens-by-query-resolver";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ENSByAddressResolver = DataLoader<Hex, ResolvedENSData | null>;
 
@@ -68,7 +68,7 @@ async function resolveEnsData(
 export type ENSByAddressResolverOptions = {
   chainRpcUrl: string;
   ensByQueryResolver: ENSByQueryResolver;
-} & Omit<DataLoader.Options<Hex, ResolvedENSData | null>, "cacheKeyFn">;
+} & Omit<DataLoaderOptions<Hex, ResolvedENSData | null>, "cacheKeyFn" | "name">;
 
 export function createENSByAddressResolver({
   chainRpcUrl,
@@ -93,6 +93,7 @@ export function createENSByAddressResolver({
       cacheKeyFn(key) {
         return key.toLowerCase() as Hex;
       },
+      name: "ENSByAddressResolver",
     },
   );
 }

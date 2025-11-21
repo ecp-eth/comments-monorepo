@@ -1,11 +1,10 @@
 import { type Hex } from "viem";
-import { env } from "../env.ts";
+import { env } from "../env";
 import { LRUCache } from "lru-cache";
-import {
-  createENSByAddressResolver,
-  type ResolvedENSData,
-} from "../resolvers/index.ts";
-import { ensByQueryResolverService } from "./ens-by-query-resolver.ts";
+import { createENSByAddressResolver } from "./resolvers/ens-by-address-resolver";
+import { ensByQueryResolverService } from "./ens-by-query-resolver";
+import { metrics } from "./metrics";
+import type { ResolvedENSData } from "./resolvers/ens.types";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedENSData | null>>({
@@ -18,4 +17,5 @@ export const ensByAddressResolverService = createENSByAddressResolver({
   chainRpcUrl: env.ENS_RPC_URL,
   cacheMap,
   ensByQueryResolver: ensByQueryResolverService,
+  metrics,
 });

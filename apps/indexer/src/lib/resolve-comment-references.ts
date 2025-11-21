@@ -15,7 +15,7 @@ import {
   IndexerAPICommentReferenceURLWebPageSchema,
   IndexerAPICommentReferenceQuotedCommentSchema,
 } from "@ecp.eth/sdk/indexer";
-import type { CommentSelectType } from "../../ponder.schema.ts";
+import type { CommentSelectType } from "../../ponder.schema";
 import type { Hex } from "viem";
 import z from "zod";
 import {
@@ -29,11 +29,11 @@ import {
   type FarcasterName,
   HTTP_URL_REGEX,
   type CAIP373QuotedCommentResolver,
-} from "../resolvers/index.ts";
+} from "../services/resolvers";
 import {
   IPFS_URL_REGEX,
   type IPFSResolver,
-} from "../resolvers/ipfs-resolver.ts";
+} from "../services/resolvers/ipfs-resolver";
 
 export type ResolveCommentReferencesOptions = {
   caip373QuotedCommentResolver: CAIP373QuotedCommentResolver;

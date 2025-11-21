@@ -4,7 +4,7 @@ import path from "path";
 import { getVideoMeta } from "../../src/utils/getVideoMeta";
 
 describe("getVideoTracks", () => {
-  const fixturesDir = path.join(__dirname, "../resolvers/fixtures");
+  const fixturesDir = path.join(__dirname, "../services/resolvers/fixtures");
   const mp4Buffer = fs.readFileSync(
     path.join(fixturesDir, "example-video.mp4"),
   );

@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createCAIP373QuotedCommentResolver } from "../../src/resolvers/caip373-quoted-comment-resolver.ts";
+import { createCAIP373QuotedCommentResolver } from "../../../src/services/resolvers/caip373-quoted-comment-resolver";
 import { CommentManagerABI, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { createPublicClient, encodeFunctionData, http, toHex } from "viem";
 import { anvil } from "viem/chains";
 import { randomBytes } from "crypto";
-import { commentByIdResolverService } from "../../src/services/comment-by-id-resolver.ts";
+import { commentByIdResolverService } from "../../../src/services/comment-by-id-resolver";
+import { metrics } from "../../../src/services/metrics";
 
-vi.mock("../../src/services/comment-by-id-resolver.ts", () => {
+vi.mock("../../../src/services/comment-by-id-resolver", () => {
   return {
     commentByIdResolverService: {
       loadMany: vi.fn(),
@@ -18,8 +19,8 @@ vi.mock("../../src/services/comment-by-id-resolver.ts", () => {
 
 const { commentByIdResolverService: commentByIdResolverServiceMock } =
   await vi.importMock<
-    typeof import("../../src/services/comment-by-id-resolver.ts")
-  >("../../src/services/comment-by-id-resolver.ts");
+    typeof import("../../../src/services/comment-by-id-resolver")
+  >("../../../src/services/comment-by-id-resolver");
 
 describe("CAIP373QuotedCommentResolver", () => {
   const resolver = createCAIP373QuotedCommentResolver({
@@ -36,6 +37,7 @@ describe("CAIP373QuotedCommentResolver", () => {
       },
     },
     commentByIdResolver: commentByIdResolverService,
+    metrics,
   });
 
   beforeEach(() => {

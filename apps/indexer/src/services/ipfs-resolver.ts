@@ -1,9 +1,10 @@
 import { LRUCache } from "lru-cache";
-import { createIPFSResolver } from "../resolvers/ipfs-resolver.ts";
-import type { ResolvedHTTP } from "../resolvers/http-resolver.ts";
-import { httpResolverService } from "./http-resolver.ts";
+import { createIPFSResolver } from "./resolvers/ipfs-resolver";
+import type { ResolvedHTTP } from "./resolvers/http-resolver";
+import { httpResolverService } from "./http-resolver";
 import { PinataSDK } from "pinata";
-import { env } from "../env.ts";
+import { env } from "../env";
+import { metrics } from "./metrics";
 
 const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
   max: 10000,
@@ -22,4 +23,5 @@ export const ipfsResolverService = createIPFSResolver({
   httpResolver: httpResolverService,
   retryCount: env.IPFS_RESOLUTION_RETRY_COUNT,
   retryTimeout: env.IPFS_RESOLUTION_RETRY_TIMEOUT,
+  metrics,
 });

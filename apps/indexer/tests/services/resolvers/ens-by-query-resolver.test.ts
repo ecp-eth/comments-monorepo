@@ -1,9 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
 import * as graphqlRequest from "graphql-request";
-import { createENSByQueryResolver } from "../../src/resolvers";
+import { createENSByQueryResolver } from "../../../src/services/resolvers/ens-by-query-resolver";
+import { metrics } from "../../../src/services/metrics";
 
 const resolver = createENSByQueryResolver({
   subgraphUrl: "https://api.alpha.ensnode.io/subgraph",
+  metrics,
 });
 
 vi.mock("graphql-request", async () => {

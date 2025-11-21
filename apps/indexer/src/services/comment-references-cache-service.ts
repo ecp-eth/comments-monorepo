@@ -1,12 +1,12 @@
-import type { DB } from "./db.ts";
+import type { DB } from "./db";
 import { and, eq, desc } from "drizzle-orm";
-import { schema } from "../../schema.ts";
+import { schema } from "../../schema";
 import {
   type CommentReferencesCacheServiceGetReferenceResolutionResult,
   type CommentReferencesCacheServiceGetReferenceResolutionResultParams,
   type CommentReferencesCacheServiceUpdateReferenceResolutionResultParams,
   type ICommentReferencesCacheService,
-} from "./types.ts";
+} from "./types";
 
 export class CommentReferencesCacheService
   implements ICommentReferencesCacheService

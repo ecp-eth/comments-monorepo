@@ -6,7 +6,7 @@ import { farcasterByAddressResolverService } from "../../../services/farcaster-b
 import { erc20ByAddressResolverService } from "../../../services/erc20-by-address-resolver";
 import { ensByNameResolverService } from "../../../services/ens-by-name-resolver";
 import { farcasterByNameResolverService } from "../../../services/farcaster-by-name-resolver";
-import { isEthName, isFarcasterFname } from "../../../resolvers";
+import { isEthName, isFarcasterFname } from "../../../services/resolvers";
 import {
   extractERC20CAIP19,
   isERC20CAIP19,

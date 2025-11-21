@@ -1,7 +1,7 @@
-import DataLoader from "dataloader";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
-import type { DB } from "../services/db";
+import type { DB } from "../db";
 import type { CommentSelectType } from "ponder:schema";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 import { isSameHex } from "@ecp.eth/shared/helpers";
 
 export type CommentByIdResolver = DataLoader<
@@ -16,7 +16,7 @@ export type CommentByIdResolver = DataLoader<
 export type CommentByIdResolverOptions = {
   db: DB;
 } & Omit<
-  DataLoader.Options<
+  DataLoaderOptions<
     {
       id: Hex;
       chainId: number;
@@ -24,7 +24,7 @@ export type CommentByIdResolverOptions = {
     CommentSelectType | null,
     string
   >,
-  "batchLoadFn" | "cacheKeyFn"
+  "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
 export function createCommentByIdResolver({
@@ -66,6 +66,7 @@ export function createCommentByIdResolver({
           chainId: key.chainId,
         });
       },
+      name: "CommentByIdResolver",
     },
   );
 }

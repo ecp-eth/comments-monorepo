@@ -3,14 +3,15 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createIPFSResolver,
   IPFS_URL_REGEX,
-} from "../../src/resolvers/ipfs-resolver.ts";
-import { createHTTPResolver } from "../../src/resolvers/http-resolver.ts";
+} from "../../../src/services/resolvers/ipfs-resolver";
+import { createHTTPResolver } from "../../../src/services/resolvers/http-resolver";
 import { type PinataSDK } from "pinata";
 import nock from "nock";
 import path from "path";
+import { metrics } from "../../../src/services/metrics";
 
 // Mock environment variables
-vi.mock("../../src/env.ts", () => ({
+vi.mock("../../../src/env", () => ({
   env: {
     PINATA_JWT: "test-jwt",
     PINATA_GATEWAY: "test-gateway.pinata.cloud",
@@ -72,7 +73,7 @@ describe("IPFS Resolver", () => {
         "content-type": "image/png",
         "content-length": pngBuffer.length.toString(),
       });
-    const httpResolver = createHTTPResolver();
+    const httpResolver = createHTTPResolver({ metrics });
     vi.spyOn(httpResolver, "load");
     const pinataSDK = {
       config: {
@@ -89,6 +90,7 @@ describe("IPFS Resolver", () => {
       pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
+      metrics,
     });
     const ipfsUrl = "ipfs://QmTestHash";
     const result = await ipfsResolver.load(ipfsUrl);
@@ -123,7 +125,7 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const httpResolver = createHTTPResolver();
+    const httpResolver = createHTTPResolver({ metrics });
     vi.spyOn(httpResolver, "load");
     const pinataSDK = {
       config: {
@@ -140,6 +142,7 @@ describe("IPFS Resolver", () => {
       pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
+      metrics,
     });
     const ipfsUrl = "ipfs://QmTestHash/path/to/file.png";
     const result = await ipfsResolver.load(ipfsUrl);
@@ -175,7 +178,7 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const httpResolver = createHTTPResolver();
+    const httpResolver = createHTTPResolver({ metrics });
     vi.spyOn(httpResolver, "load");
 
     // Mock Pinata SDK to fail
@@ -197,6 +200,7 @@ describe("IPFS Resolver", () => {
       pinataSDK: pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
+      metrics,
     });
 
     const ipfsUrl = "ipfs://QmFallbackHash";
@@ -238,7 +242,7 @@ describe("IPFS Resolver", () => {
         "content-length": pngBuffer.length.toString(),
       });
 
-    const httpResolver = createHTTPResolver();
+    const httpResolver = createHTTPResolver({ metrics });
     vi.spyOn(httpResolver, "load");
 
     // Mock Pinata SDK to fail
@@ -258,6 +262,7 @@ describe("IPFS Resolver", () => {
       pinataSDK: pinataSDK,
       retryCount: 3,
       retryTimeout: 300,
+      metrics,
     });
 
     const ipfsUrl = "ipfs://QmTestHash/path/to/file.png";

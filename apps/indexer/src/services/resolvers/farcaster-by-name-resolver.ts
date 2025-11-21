@@ -1,4 +1,3 @@
-import DataLoader from "dataloader";
 import type { Hex } from "viem";
 import {
   NeynarAPIClient,
@@ -7,11 +6,9 @@ import {
 } from "@neynar/nodejs-sdk";
 
 import { type IndexerAPIFarcasterDataSchemaType } from "@ecp.eth/sdk/indexer";
-import type {
-  FarcasterName,
-  ResolvedFarcasterData,
-} from "./farcaster.types.ts";
-import { constructFname, extractFarcasterName } from "./farcaster.utils.ts";
+import type { FarcasterName, ResolvedFarcasterData } from "./farcaster.types";
+import { constructFname, extractFarcasterName } from "./farcaster.utils";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type FarcasterByNameKey = string | FarcasterName;
 
@@ -27,8 +24,8 @@ export type FarcasterByNameResolverOptions = {
    */
   generateProfileUrl?: (user: IndexerAPIFarcasterDataSchemaType) => string;
 } & Omit<
-  DataLoader.Options<FarcasterByNameKey, ResolvedFarcasterData | null>,
-  "batchLoadFn" | "maxBatchSize"
+  DataLoaderOptions<FarcasterByNameKey, ResolvedFarcasterData | null>,
+  "batchLoadFn" | "maxBatchSize" | "name"
 >;
 
 export function createFarcasterByNameResolver({
@@ -82,6 +79,7 @@ export function createFarcasterByNameResolver({
     {
       ...dataLoaderOptions,
       maxBatchSize: 1,
+      name: "FarcasterByNameResolver",
     },
   );
 }

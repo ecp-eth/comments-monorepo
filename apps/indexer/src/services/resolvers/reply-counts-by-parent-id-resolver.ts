@@ -1,5 +1,4 @@
-import DataLoader from "dataloader";
-import type { DB } from "../services/db";
+import type { DB } from "../db";
 import { type Hex } from "@ecp.eth/sdk/core";
 import {
   and,
@@ -11,13 +10,14 @@ import {
   type SQL,
   sql,
 } from "drizzle-orm";
-import { schema } from "../../schema";
-import { convertExcludeModerationLabelsToConditions } from "../api/comments/helpers";
+import * as schema from "../../../ponder.schema";
+import { convertExcludeModerationLabelsToConditions } from "../../api/comments/helpers";
 import {
   type LowercasedHex,
   type CommentModerationLabel,
   type ModerationStatus,
-} from "../services/types";
+} from "../types";
+import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
 export type ReplyCountsByParentIdResolverKey = {
   parentId: Hex;
@@ -39,8 +39,8 @@ export type ReplyCountsByParentIdResolver = DataLoader<
 export type ReplyCountsByParentIdResolverOptions = {
   db: DB;
 } & Omit<
-  DataLoader.Options<ReplyCountsByParentIdResolverKey, number, string>,
-  "batchLoadFn" | "cacheKeyFn"
+  DataLoaderOptions<ReplyCountsByParentIdResolverKey, number, string>,
+  "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
 function keyToString(key: ReplyCountsByParentIdResolverKey): string {
@@ -122,6 +122,7 @@ export function createReplyCountsByParentIdResolver({
     {
       ...options,
       cacheKeyFn: keyToString,
+      name: "ReplyCountsByParentIdResolver",
     },
   );
 }

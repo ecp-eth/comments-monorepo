@@ -13,8 +13,8 @@ import type {
   FarcasterByAddressResolver,
   FarcasterByNameResolver,
   HTTPResolver,
-} from "../../src/resolvers";
-import { type IPFSResolver } from "../../src/resolvers/ipfs-resolver";
+} from "../../src/services/resolvers";
+import { type IPFSResolver } from "../../src/services/resolvers/ipfs-resolver";
 
 // Mock the cache service
 const mockCacheService = {

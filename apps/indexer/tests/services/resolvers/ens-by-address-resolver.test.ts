@@ -1,12 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { createENSByAddressResolver } from "../../src/resolvers/ens-by-address-resolver";
-import { createENSByQueryResolver } from "../../src/resolvers";
+import { createENSByAddressResolver } from "../../../src/services/resolvers/ens-by-address-resolver";
+import { createENSByQueryResolver } from "../../../src/services/resolvers/ens-by-query-resolver";
+import { metrics } from "../../../src/services/metrics";
 
 const resolver = createENSByAddressResolver({
   chainRpcUrl: process.env.ENS_RPC_URL ?? "https://ethereum-rpc.publicnode.com",
   ensByQueryResolver: createENSByQueryResolver({
     subgraphUrl: "https://api.alpha.ensnode.io/subgraph",
+    metrics,
   }),
+  metrics,
 });
 
 describe("ENSByAddressResolver", () => {
