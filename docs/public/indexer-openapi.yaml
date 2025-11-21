@@ -26483,4 +26483,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/APIErrorResponse'
+  /api/internal/metrics:
+    get:
+      tags:
+        - internal
+        - metrics
+      description: Get the internal metrics
+      responses:
+        '200':
+          description: The internal metrics
+          content:
+            text/plain:
+              schema:
+                type: string
 webhooks: {}
