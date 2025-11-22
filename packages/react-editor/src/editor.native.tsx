@@ -21,11 +21,13 @@ export function Editor(props: EditorProps) {
         flex: 1,
         minHeight: 60,
         minWidth: 40,
+        borderWidth: 1,
+        borderColor: "blue",
       }}
     >
       <WebView
         ref={webViewRef}
-        style={{ flex: 1 }}
+        style={{ flex: 1, borderWidth: 1, borderColor: "green" }}
         originWhitelist={["*"]}
         scrollEnabled={false}
         onMessage={(event) => {

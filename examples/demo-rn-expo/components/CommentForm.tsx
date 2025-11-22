@@ -29,6 +29,7 @@ import {
   useIndexerSuggestions,
   usePinataUploadFiles,
 } from "@ecp.eth/react-editor/hooks";
+import { GenerateUploadUrlResponseSchema } from "../lib/generated/schemas";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;

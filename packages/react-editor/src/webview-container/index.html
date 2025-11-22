@@ -9,16 +9,45 @@
       * {
         outline: 0px solid transparent;
       }
-      html,
-      body {
-        font-family:
-          "-apple-system", "HelveticaNeue", Helvetica, Roboto, Arial, sans-serif;
+
+      html {
+        flex: 1;
+        height: 100%;
+        width: 100%;
+
         padding: 0;
         margin: 0;
       }
-      #root {
-        width: 100%;
+
+      body {
+        flex: 1;
         height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+
+        margin: 0;
+        padding: 0 0.8em;
+
+        font-family:
+          "-apple-system", "HelveticaNeue", Helvetica, Roboto, Arial, sans-serif;
+        font-size: 0.9rem;
+        line-height: 1.2em;
+
+        outline: 1px solid red;
+      }
+
+      p {
+        margin: 0 0;
+      }
+
+      #root {
+        flex: 1;
+        height: 100%;
+        width: 100%;
+
+        overflow-y: auto;
+
+        outline: 1px solid purple;
       }
     </style>
   </head>
