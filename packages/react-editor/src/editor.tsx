@@ -1,10 +1,4 @@
-import {
-  type Editor as TipTapEditor,
-  EditorContent,
-  type JSONContent,
-  useEditor,
-  type EditorEvents,
-} from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
 import { Paragraph } from "@tiptap/extension-paragraph";
 import { Text } from "@tiptap/extension-text";
@@ -20,70 +14,15 @@ import {
   UploadTracker,
 } from "./extensions/upload-tracker.js";
 import { HardBreak } from "@tiptap/extension-hard-break";
-import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
+
 import { useHandleDefaultEditorValue } from "./hooks/use-handle-default-editor-value.js";
-import type {
-  LinkAttributes,
-  MentionsExtensionTheme,
-  UploadTrackerFileComponent,
-  UploadTrackerImageComponent,
-  UploadTrackerVideoComponent,
-} from "./extensions/types.js";
+import type { LinkAttributes } from "./extensions/types.js";
 import { cn } from "@ecp.eth/shared/helpers";
-import type { EditorSuggestionsService, UploadFilesService } from "./types.js";
+
 import { CommentEditorMediaImage } from "./components/CommentEditorMediaImage.js";
 import { CommentEditorMediaVideo } from "./components/CommentEditorMediaVideo.js";
 import { CommentEditorMediaFile } from "./components/CommentEditorMediaFile.js";
-
-export type EditorRef = {
-  focus: () => void;
-  /**
-   * Clears the editor content
-   */
-  clear: () => void;
-  editor: TipTapEditor | null;
-  getDefaultContent: () => JSONContent;
-  getUploadedFiles: () => UploadTrackerUploadedFile[];
-  getFilesForUpload: () => UploadTrackerFileToUpload[];
-  setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
-  setFileUploadAsFailed: (fileId: string) => void;
-  addFiles: (files: File[]) => void;
-};
-
-export type EditorProps = {
-  className?: string;
-  wrapperClassName?: string;
-  disabled?: boolean;
-  defaultValue?: {
-    content: string;
-    references: IndexerAPICommentReferencesSchemaType;
-  };
-  placeholder: string;
-  /**
-   * @default false
-   */
-  autoFocus?: boolean;
-  ref?: React.Ref<EditorRef>;
-  onCreate?: (props: EditorEvents["create"]) => void;
-  onUpdate?: (props: EditorEvents["update"]) => void;
-  onBlur?: (props: EditorEvents["blur"]) => void;
-  onEscapePress?: () => void;
-  suggestions: EditorSuggestionsService;
-  suggestionsTheme?: MentionsExtensionTheme;
-  uploads: UploadFilesService;
-  /**
-   * @default CommentMediaImage
-   */
-  imageComponent?: UploadTrackerImageComponent;
-  /**
-   * @default CommentMediaVideo
-   */
-  videoComponent?: UploadTrackerVideoComponent;
-  /**
-   * @default CommentMediaFile
-   */
-  fileComponent?: UploadTrackerFileComponent;
-};
+import { EditorProps } from "./editor.type.js";
 
 export function Editor({
   className,

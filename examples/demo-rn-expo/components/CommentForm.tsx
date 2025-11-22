@@ -24,6 +24,12 @@ import theme from "../theme";
 import { ApplyFadeToScrollable } from "./ApplyFadeToScrollable";
 import useWaitConnected from "../hooks/useWaitConnected";
 import { Hex } from "viem";
+import { Editor } from "@ecp.eth/react-editor/editor";
+import {
+  useIndexerSuggestions,
+  usePinataUploadFiles,
+} from "@ecp.eth/react-editor/hooks";
+import { GenerateUploadUrlResponseSchema } from "../lib/generated/schemas";
 
 const chainId = chain.id;
 const TOTAL_COMMENT_AREA_PERCENTAGE = 0.5;
@@ -93,11 +99,55 @@ export function CommentForm({
     textAreaRef.current?.focus();
   }, [replyingComment, justViewingReplies]);
 
+  const uploads = usePinataUploadFiles({
+    allowedMimeTypes: ["image/jpeg"],
+    maxFileSize: 3000,
+    pinataGatewayUrl: publicEnv.EXPO_PUBLIC_PINATA_HOST,
+    generateUploadUrl: async (filename) => {
+      const uploadAPIURL = new URL(
+        "/api/generate-upload-url",
+        publicEnv.EXPO_PUBLIC_DEMO_API_URL,
+      );
+      const response = await fetch(uploadAPIURL, {
+        method: "POST",
+        body: JSON.stringify({ filename }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate upload URL");
+      }
+
+      const { url } = GenerateUploadUrlResponseSchema.parse(
+        await response.json(),
+      );
+
+      return url;
+    },
+  });
+
+  const suggestions = useIndexerSuggestions({
+    indexerApiUrl: publicEnv.EXPO_PUBLIC_INDEXER_URL,
+    debounceMs: 700,
+  });
+
+  console.log("suggestions", suggestions, "uploads", uploads);
+
   return (
     <View style={{ gap: 20 }}>
       {replyingComment && (
         <ReplyToComment comment={replyingComment} onClose={onCancelReply} />
       )}
+      <Editor
+        disabled={isProcessing}
+        autoFocus={true}
+        placeholder={"Test editor"}
+        uploads={uploads}
+        defaultValue={{
+          content: "hello world",
+          references: [],
+        }}
+        suggestions={suggestions}
+      />
 
       <TextArea
         editable={!isProcessing}
