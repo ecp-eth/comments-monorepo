@@ -16,7 +16,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./docker/local/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
   # in Grafana you can connect http://prometheus:9090 as source
   # use admin / admin as credentials
@@ -25,4 +25,4 @@ services:
     ports:
       - "127.0.0.1:4000:3000"
     volumes:
-      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - ./docker/local/grafana/provisioning:/etc/grafana/provisioning

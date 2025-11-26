@@ -12,3 +12,7 @@ scrape_configs:
     static_configs:
       - targets: ["host.docker.internal:42069"]
     metrics_path: "/api/internal/metrics"
+
+  - job_name: "tempo"
+    static_configs:
+      - targets: ["tempo:3200"]
