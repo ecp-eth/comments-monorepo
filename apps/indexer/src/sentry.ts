@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { env } from "./env";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
+// import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -26,13 +26,14 @@ if (env.SENTRY_DSN) {
     environment: process.env.NODE_ENV ?? "development",
     release: process.env["RAILWAY_DEPLOYMENT_ID"] ?? "unknown",
     integrations: [
-      nodeProfilingIntegration(),
+      // nodeProfilingIntegration(),
       Sentry.captureConsoleIntegration({
         levels: ["error", "warn"],
       }),
     ],
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
+    skipOpenTelemetrySetup: true,
   });
 
   // this is hack: we need to be able to report errors to sentry and ponder doesn't use console.error but pino
@@ -86,5 +87,6 @@ if (env.SENTRY_DSN) {
 
   Sentry.init({
     debug: true,
+    skipOpenTelemetrySetup: true,
   });
 }
