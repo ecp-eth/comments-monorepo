@@ -10,7 +10,7 @@ services:
       - "127.0.0.1:5432:5432"
 
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v3.7.3
     ports:
       - "127.0.0.1:9090:9090"
     extra_hosts:
@@ -21,7 +21,7 @@ services:
   # in Grafana you can connect http://prometheus:9090 as source
   # use admin / admin as credentials
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:12.1.4
     ports:
       - "127.0.0.1:4000:3000"
     volumes:

@@ -1,4 +1,3 @@
-FROM grafana/grafana:latest
-ADD ./grafana/provisioning /etc/grafana/provisioning
+FROM grafana/grafana:12.1.4
+COPY ./grafana/provisioning /etc/grafana/provisioning
 EXPOSE 3000
-USER root
