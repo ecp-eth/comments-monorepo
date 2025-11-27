@@ -33,7 +33,7 @@ services:
 
   tempo:
     image: grafana/tempo:2.9.0
-    command: ["-config.file=/etc/tempo.yaml"]
+    command: ["-config.file=/etc/tempo.yaml", "--config.expand-env=true"]
     volumes:
       - ./docker/local/tempo/tempo.yml:/etc/tempo.yaml
       - ./docker/local/tempo/overrides.yml:/etc/overrides.yaml
