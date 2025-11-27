@@ -35,8 +35,8 @@ services:
       - ./docker/local/tempo/overrides.yml:/etc/overrides.yaml
     ports:
       # - "127.0.0.1:14268:14268" # jaeger ingest
-      # - "127.0.0.1:3200:3200" # tempo
-      # - "127.0.0.1:9095:9095" # tempo grpc
-      # - "127.0.0.1:4317:4317" # otlp grpc
-      # - "127.0.0.1:4318:4318" # otlp http
-      - "127.0.0.1:9411:9411" # zipkin
+      - "127.0.0.1:3200:3200" # tempo
+      - "127.0.0.1:9095:9095" # tempo grpc
+      - "127.0.0.1:4317:4317" # otlp grpc
+      - "127.0.0.1:4318:4318" # otlp http
+      # - "127.0.0.1:9411:9411" # zipkin

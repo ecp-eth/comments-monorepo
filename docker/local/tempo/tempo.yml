@@ -35,14 +35,14 @@ distributor:
     #       endpoint: "tempo:6832"
     #     thrift_compact:
     #       endpoint: "tempo:6831"
-    zipkin:
-      endpoint: "tempo:9411"
-    # otlp:
-    #   protocols:
-    #     grpc:
-    #       endpoint: "tempo:4317"
-    #     http:
-    #       endpoint: "tempo:4318"
+    # zipkin:
+    #   endpoint: "tempo:9411"
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "tempo:4317"
+        http:
+          endpoint: "tempo:4318"
     # opencensus:
     #   endpoint: "tempo:55678"
 
