@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { env } from "./env";
-// import { nodeProfilingIntegration } from "@sentry/profiling-node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 declare global {
   // eslint-disable-next-line no-var
@@ -26,7 +26,7 @@ if (env.SENTRY_DSN) {
     environment: process.env.NODE_ENV ?? "development",
     release: process.env["RAILWAY_DEPLOYMENT_ID"] ?? "unknown",
     integrations: [
-      // nodeProfilingIntegration(),
+      nodeProfilingIntegration(),
       Sentry.captureConsoleIntegration({
         levels: ["error", "warn"],
       }),
@@ -87,6 +87,14 @@ if (env.SENTRY_DSN) {
 
   Sentry.init({
     debug: true,
+    integrations: [
+      nodeProfilingIntegration(),
+      Sentry.captureConsoleIntegration({
+        levels: ["error", "warn"],
+      }),
+    ],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
     skipOpenTelemetrySetup: true,
   });
 }
