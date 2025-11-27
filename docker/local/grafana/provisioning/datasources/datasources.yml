@@ -10,21 +10,35 @@ datasources:
     editable: false
     jsonData:
       timeInterval: "10s"
-  - name: Tempo (yes streaming)
+  - name: Tempo
     type: tempo
     access: proxy
-    orgId: 1
     url: http://tempo:3200
     basicAuth: false
     isDefault: false
-    version: 1
     editable: false
-    apiVersion: 1
-    uid: tempo-streaming-enabled
+    uid: tempo
     jsonData:
       httpMethod: GET
       serviceMap:
-        datasourceUid: prometheus
+        datasourceUid: "prometheus"
+      nodeGraph:
+        enabled: true
       streamingEnabled:
         search: true
         metrics: true
+      spanBar:
+        type: "Tag"
+        tag: "http.path"
+      tracesToMetrics:
+        datasourceUid: "prometheus"
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "1h"
+        tags: [{ key: "service.name", value: "service" }, { key: "job" }]
+        queries:
+          - name: "Sample query"
+            query: "sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))"
+      traceQuery:
+        timeShiftEnabled: true
+        spanStartTimeShift: "-1h"
+        spanEndTimeShift: "1h"
