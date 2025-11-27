@@ -5,9 +5,31 @@ import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { resourceFromAttributes } from "@opentelemetry/resources";
+import {
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  type SpanProcessor,
+} from "@opentelemetry/sdk-trace-base";
 import packageJson from "../package.json";
+import { env } from "./env";
 
 otelApi.propagation.setGlobalPropagator(new SentryPropagator());
+
+const spanProcessors: SpanProcessor[] = [new SentrySpanProcessor()];
+
+if (env.OPENTELEMETRY_GRAFANA_TEMPO_URL) {
+  spanProcessors.push(
+    new BatchSpanProcessor(
+      new OTLPTraceExporter({
+        url: env.OPENTELEMETRY_GRAFANA_TEMPO_URL,
+      }),
+    ),
+  );
+}
+
+if (env.NODE_ENV === "development") {
+  spanProcessors.push(new BatchSpanProcessor(new ConsoleSpanExporter()));
+}
 
 export const openTelemetrySDK = new NodeSDK({
   resource: resourceFromAttributes({
@@ -15,10 +37,7 @@ export const openTelemetrySDK = new NodeSDK({
     [SemanticResourceAttributes.SERVICE_VERSION]: packageJson.version,
   }),
   instrumentations: [getNodeAutoInstrumentations()],
-  spanProcessors: [new SentrySpanProcessor()],
-  traceExporter: new OTLPTraceExporter({
-    url: "http://localhost:4318/v1/traces",
-  }),
+  spanProcessors,
 });
 
 openTelemetrySDK.start();

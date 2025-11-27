@@ -51,6 +51,7 @@
     "@opentelemetry/resources": "2.2.0",
     "@opentelemetry/semantic-conventions": "1.38.0",
     "@opentelemetry/sdk-node": "0.208.0",
+    "@opentelemetry/sdk-trace-base": "2.2.0",
     "@ponder/client": "0.12.21",
     "@sentry/node": "9.47.1",
     "@sentry/opentelemetry": "9.47.1",
