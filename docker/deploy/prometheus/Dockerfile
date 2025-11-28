@@ -5,4 +5,4 @@ USER root
 
 EXPOSE 9090
 
-CMD ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus-tsdb", "--web.enable-remote-write-receiver"]
+CMD ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--web.enable-remote-write-receiver"]
