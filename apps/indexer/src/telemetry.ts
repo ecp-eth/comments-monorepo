@@ -3,7 +3,10 @@ import * as otelApi from "@opentelemetry/api";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+} from "@opentelemetry/semantic-conventions";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
   BatchSpanProcessor,
@@ -31,8 +34,8 @@ if (env.NODE_ENV === "development") {
 
 export const openTelemetrySDK = new NodeSDK({
   resource: resourceFromAttributes({
-    [SemanticResourceAttributes.SERVICE_NAME]: packageJson.name,
-    [SemanticResourceAttributes.SERVICE_VERSION]: packageJson.version,
+    [ATTR_SERVICE_NAME]: packageJson.name,
+    [ATTR_SERVICE_VERSION]: packageJson.version,
   }),
   instrumentations: [getNodeAutoInstrumentations()],
   spanProcessors,
