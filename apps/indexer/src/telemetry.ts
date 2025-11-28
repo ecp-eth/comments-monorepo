@@ -56,3 +56,34 @@ if (globalThis.PONDER_COMMON) {
 }
 
 export const tracer = otelApi.trace.getTracer("indexer");
+
+/**
+ * @param name - The name of the span
+ * @param fn - The function to execute within the span
+ * @returns The result of the function
+ *
+ * @example
+ * const result = await withSpan("get-comments", async () => {
+ *   return await getComments();
+ * });
+ *
+ * console.log(result);
+ */
+export async function withSpan<T>(
+  name: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  return tracer.startActiveSpan(name, async (span) => {
+    try {
+      return await fn();
+    } catch (error) {
+      span.recordException(
+        error instanceof Error ? error : new Error(String(error)),
+      );
+      span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+      throw error;
+    } finally {
+      span.end();
+    }
+  });
+}
