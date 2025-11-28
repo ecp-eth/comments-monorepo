@@ -64,7 +64,15 @@
       "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
       "@wagmi/connectors": "patches/@wagmi__connectors.patch",
       "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch",
-      "ponder": "patches/ponder.patch"
+      "ponder": "patches/ponder.patch",
+      "@opentelemetry/exporter-logs-otlp-http@0.208.0": "patches/@opentelemetry__exporter-logs-otlp-http@0.208.0.patch",
+      "@opentelemetry/otlp-grpc-exporter-base@0.208.0": "patches/@opentelemetry__otlp-grpc-exporter-base@0.208.0.patch",
+      "@opentelemetry/exporter-logs-otlp-proto@0.208.0": "patches/@opentelemetry__exporter-logs-otlp-proto@0.208.0.patch",
+      "@opentelemetry/exporter-metrics-otlp-http@0.208.0": "patches/@opentelemetry__exporter-metrics-otlp-http@0.208.0.patch",
+      "@opentelemetry/exporter-metrics-otlp-proto@0.208.0": "patches/@opentelemetry__exporter-metrics-otlp-proto@0.208.0.patch",
+      "@opentelemetry/exporter-trace-otlp-proto@0.208.0": "patches/@opentelemetry__exporter-trace-otlp-proto@0.208.0.patch",
+      "@opentelemetry/exporter-trace-otlp-http@0.208.0": "patches/@opentelemetry__exporter-trace-otlp-http@0.208.0.patch",
+      "@hono/otel@1.0.1": "patches/@hono__otel@1.0.1.patch"
     }
   },
   "lint-staged": {

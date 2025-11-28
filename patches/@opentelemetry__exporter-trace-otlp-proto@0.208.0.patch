@@ -1,0 +1,25 @@
+diff --git a/build/src/platform/node/OTLPTraceExporter.js b/build/src/platform/node/OTLPTraceExporter.js
+index b17e7f902ccc26f54c7fb7ae53f3c329b7aec3ae..3b9c1b684ab08b8016b72d6742f455470cbecbf6 100644
+--- a/build/src/platform/node/OTLPTraceExporter.js
++++ b/build/src/platform/node/OTLPTraceExporter.js
+@@ -18,7 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.OTLPTraceExporter = void 0;
+ const otlp_exporter_base_1 = require("@opentelemetry/otlp-exporter-base");
+ const otlp_transformer_1 = require("@opentelemetry/otlp-transformer");
+-const node_http_1 = require("@opentelemetry/otlp-exporter-base/node-http");
++const node_http_1 = require("@opentelemetry/otlp-exporter-base/build/src/index-node-http");
+ /**
+  * Collector Trace Exporter for Node with protobuf
+  */
+diff --git a/package.json b/package.json
+index f2775dd9e802f63b65ded3e8479dbdbb55075931..c483da497441c873a3b550bd52e7ae1549791571 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,7 @@
+ {
+   "name": "@opentelemetry/exporter-trace-otlp-proto",
+   "version": "0.208.0",
++  "type": "commonjs",
+   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
+   "main": "build/src/index.js",
+   "module": "build/esm/index.js",

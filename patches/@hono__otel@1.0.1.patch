@@ -1,0 +1,16 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 8aba4d8d41e2a9c95cf6cfccd263218b61c1324d..0000000000000000000000000000000000000000
+diff --git a/dist/index.js b/dist/index.js
+index 9eac5336b0609d36e2baace6e783a57d7cfc9eb7..87c9812cf688fc7e08d86fbd9e5fafa9bb455e52 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -95,7 +95,7 @@ import { metrics, ValueType } from "@opentelemetry/api";
+ import {
+   METRIC_HTTP_SERVER_ACTIVE_REQUESTS,
+   METRIC_HTTP_SERVER_REQUEST_DURATION
+-} from "@opentelemetry/semantic-conventions/incubating";
++} from "@opentelemetry/semantic-conventions/build/src/index-incubating.js";
+ var getMeter = (config) => (config.meterProvider ?? metrics.getMeterProvider()).getMeter(INSTRUMENTATION_SCOPE.name);
+ var createRequestDurationTracker = (config) => {
+   const histogram = getMeter(config).createHistogram(METRIC_HTTP_SERVER_REQUEST_DURATION, {

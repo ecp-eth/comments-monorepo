@@ -1,0 +1,25 @@
+diff --git a/build/src/platform/node/OTLPLogExporter.js b/build/src/platform/node/OTLPLogExporter.js
+index 8f6facfad17fb72e738514cb16c5759b01c03990..be7890d9f4c5ab53edd18ec1d89c3201388131ab 100644
+--- a/build/src/platform/node/OTLPLogExporter.js
++++ b/build/src/platform/node/OTLPLogExporter.js
+@@ -18,7 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.OTLPLogExporter = void 0;
+ const otlp_exporter_base_1 = require("@opentelemetry/otlp-exporter-base");
+ const otlp_transformer_1 = require("@opentelemetry/otlp-transformer");
+-const node_http_1 = require("@opentelemetry/otlp-exporter-base/node-http");
++const node_http_1 = require("@opentelemetry/otlp-exporter-base/build/src/index-node-http");
+ /**
+  * OTLP Log Protobuf Exporter for Node.js
+  */
+diff --git a/package.json b/package.json
+index 5db42e6d6cbc18ed9f1d4c9918779ccef4f33cae..b76f4babe43a24137770f24094399052c378a86e 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,7 @@
+ {
+   "name": "@opentelemetry/exporter-logs-otlp-proto",
+   "version": "0.208.0",
++  "type": "commonjs",
+   "description": "An OTLP exporter to send logs using protobuf over HTTP",
+   "main": "build/src/index.js",
+   "module": "build/esm/index.js",
