@@ -835,9 +835,6 @@ importers:
       xxhash-wasm:
         specifier: ^1.1.0
         version: 1.1.0
-      zipkin:
-        specifier: ^0.22.0
-        version: 0.22.0
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -9207,9 +9204,6 @@ packages:
     resolution: {integrity: sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg==}
     engines: {node: '>=12'}
 
-  is-promise@2.2.2:
-    resolution: {integrity: sha512-+lP4/6lKUBfQjZ2pdxThZvLUAafmZb8OAxFb8XXtiQmS35INgr85hdOGoEs124ez1FCnZJt6jau/T+alh58QFQ==}
-
   is-reference@1.2.1:
     resolution: {integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==}
 
@@ -13264,9 +13258,6 @@ packages:
 
   zenscroll@4.0.2:
     resolution: {integrity: sha512-jEA1znR7b4C/NnaycInCU6h/d15ZzCd1jmsruqOKnZP6WXQSMH3W2GL+OXbkruslU4h+Tzuos0HdswzRUk/Vgg==}
-
-  zipkin@0.22.0:
-    resolution: {integrity: sha512-SZgorBAvywnj5R26mqsFP+2MRUsBXGg0B8GLRLw9R0FeE4alMUAfhXYvzeAt2+MvkXne9QdQyziuqO5oXNQ0Sg==}
 
   zod-validation-error@4.0.2:
     resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
@@ -23369,8 +23360,6 @@ snapshots:
 
   is-plain-obj@4.1.0: {}
 
-  is-promise@2.2.2: {}
-
   is-reference@1.2.1:
     dependencies:
       '@types/estree': 1.0.7
@@ -28700,11 +28689,6 @@ snapshots:
   yocto-queue@1.2.1: {}
 
   zenscroll@4.0.2: {}
-
-  zipkin@0.22.0:
-    dependencies:
-      base64-js: 1.5.1
-      is-promise: 2.2.2
 
   zod-validation-error@4.0.2(zod@3.25.76):
     dependencies:

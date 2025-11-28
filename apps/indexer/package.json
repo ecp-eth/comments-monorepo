@@ -85,7 +85,6 @@
     "viem": "^2.29.2",
     "vite": "5.0.7",
     "xxhash-wasm": "^1.1.0",
-    "zipkin": "^0.22.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
