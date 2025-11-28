@@ -16,7 +16,7 @@ const app = new OpenAPIHono();
 
 app.use(
   httpInstrumentationMiddleware({
-    tracer: tracer,
+    tracer,
     captureRequestHeaders: ["user-agent", "service-name"],
   }),
 );
