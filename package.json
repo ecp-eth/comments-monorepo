@@ -72,7 +72,8 @@
       "@opentelemetry/exporter-metrics-otlp-proto@0.208.0": "patches/@opentelemetry__exporter-metrics-otlp-proto@0.208.0.patch",
       "@opentelemetry/exporter-trace-otlp-proto@0.208.0": "patches/@opentelemetry__exporter-trace-otlp-proto@0.208.0.patch",
       "@opentelemetry/exporter-trace-otlp-http@0.208.0": "patches/@opentelemetry__exporter-trace-otlp-http@0.208.0.patch",
-      "@hono/otel@1.0.1": "patches/@hono__otel@1.0.1.patch"
+      "@hono/otel@1.0.1": "patches/@hono__otel@1.0.1.patch",
+      "@sentry/node@9.47.1": "patches/@sentry__node@9.47.1.patch"
     }
   },
   "lint-staged": {
