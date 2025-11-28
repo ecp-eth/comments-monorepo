@@ -1,6 +1,6 @@
 FROM grafana/grafana:12.1.4
 
-USER 472
+USER root
 
 COPY ./grafana/provisioning /etc/grafana/provisioning
 
