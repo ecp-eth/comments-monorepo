@@ -13,8 +13,6 @@ import {
 import packageJson from "../package.json";
 import { env } from "./env";
 
-otelApi.propagation.setGlobalPropagator(new SentryPropagator());
-
 const spanProcessors: SpanProcessor[] = [new SentrySpanProcessor()];
 
 if (env.OPENTELEMETRY_GRAFANA_TEMPO_URL) {
@@ -38,6 +36,7 @@ export const openTelemetrySDK = new NodeSDK({
   }),
   instrumentations: [getNodeAutoInstrumentations()],
   spanProcessors,
+  textMapPropagator: new SentryPropagator(),
 });
 
 openTelemetrySDK.start();
