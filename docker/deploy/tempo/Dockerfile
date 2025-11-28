@@ -1,5 +1,5 @@
 FROM grafana/tempo:2.9.0
-COPY ./copy /etc
+COPY ./config /etc
 
 ENV PROMETHEUS_WRITE_URL=http://prometheus.railway.internal:9090/api/v1/write
 
