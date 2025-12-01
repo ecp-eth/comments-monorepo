@@ -88,7 +88,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -134,7 +134,7 @@ describe("comment", () => {
       commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -183,7 +183,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -218,8 +218,7 @@ describe("comment", () => {
           comment: createCommentData({
             app: appAccount.address,
             author: account.address,
-            content:
-              "Test comment content different from the one in the signature",
+            content: generateRandomContent(),
             metadata: [],
             targetUri: "https://example.com",
           }),
@@ -233,12 +232,13 @@ describe("comment", () => {
 
   describe("getComment()", () => {
     let commentId: Hex;
+    const commentContent = generateRandomContent();
 
     beforeEach(async () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: commentContent,
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -280,7 +280,7 @@ describe("comment", () => {
       });
 
       expect(result.comment.author).toBe(account.address);
-      expect(result.comment.content).toBe("Test comment content");
+      expect(result.comment.content).toBe(commentContent);
     });
   });
 
@@ -290,7 +290,7 @@ describe("comment", () => {
         commentData: {
           app: appAccount.address,
           author: account.address,
-          content: "Test comment content",
+          content: generateRandomContent(),
           metadata: [],
           targetUri: "https://example.com",
         },
@@ -310,7 +310,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content for deleteComment",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -376,7 +376,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test comment content",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -496,7 +496,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test editComment",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -536,6 +536,7 @@ describe("comment", () => {
     });
 
     it("edits a comment as author", async () => {
+      const content = generateRandomContent("Updated comment content:");
       const nonce = await getNonce({
         author: account.address,
         app: appAccount.address,
@@ -546,7 +547,7 @@ describe("comment", () => {
         app: appAccount.address,
         commentId,
         nonce,
-        content: "Updated comment content",
+        content,
         metadata: [
           createMetadataEntry("test", "bool", true),
           createMetadataEntry("updated", "bool", true),
@@ -571,7 +572,7 @@ describe("comment", () => {
 
       const receipt = await client.waitForTransactionReceipt({
         hash: result.txHash,
-        confirmations: 2,
+        confirmations: 1,
       });
 
       expect(receipt.status).toBe("success");
@@ -583,7 +584,7 @@ describe("comment", () => {
         commentsAddress,
       });
 
-      expect(updatedComment.comment.content).toBe("Updated comment content");
+      expect(updatedComment.comment.content).toBe(content);
     });
   });
 
@@ -604,7 +605,7 @@ describe("comment", () => {
       const commentData = createCommentData({
         author: account.address,
         app: appAccount.address,
-        content: "Test editCommentWithSig",
+        content: generateRandomContent(),
         metadata: [],
         targetUri: "https://example.com",
       });
@@ -643,6 +644,7 @@ describe("comment", () => {
     });
 
     it("edits a comment with signatures", async () => {
+      const content = generateRandomContent("Updated comment content:");
       const nonce = await getNonce({
         author: account.address,
         app: appAccount.address,
@@ -654,7 +656,7 @@ describe("comment", () => {
         app: appAccount.address,
         commentId,
         nonce,
-        content: "Updated comment content",
+        content,
         metadata: [
           createMetadataEntry("test", "bool", true),
           createMetadataEntry("updated", "bool", true),
@@ -679,6 +681,7 @@ describe("comment", () => {
 
       const receipt = await appClient.waitForTransactionReceipt({
         hash: result.txHash,
+        confirmations: 1,
       });
 
       expect(receipt.status).toBe("success");
@@ -690,7 +693,7 @@ describe("comment", () => {
         commentsAddress,
       });
 
-      expect(updatedComment.comment.content).toBe("Updated comment content");
+      expect(updatedComment.comment.content).toBe(content);
     });
 
     it("fails with invalid signatures", async () => {
@@ -705,7 +708,7 @@ describe("comment", () => {
         app: appAccount.address,
         commentId,
         nonce,
-        content: "Updated comment content",
+        content: generateRandomContent("Updated comment content:"),
         metadata: [
           createMetadataEntry("test", "bool", true),
           createMetadataEntry("updated", "bool", true),
@@ -730,7 +733,7 @@ describe("comment", () => {
         commentId:
           "0x1234567890123456789012345678901234567890123456789012345678901234",
         nonce: 1n,
-        content: "Updated comment content",
+        content: generateRandomContent("Updated comment content:"),
         metadata: [
           createMetadataEntry("test", "bool", true),
           createMetadataEntry("updated", "bool", true),
@@ -799,7 +802,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with string metadata",
+          content: generateRandomContent("Test comment with string metadata:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -905,7 +908,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with boolean metadata",
+          content: generateRandomContent("Test comment with boolean metadata:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1008,7 +1011,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with uint256 metadata",
+          content: generateRandomContent("Test comment with uint256 metadata:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1113,7 +1116,9 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with various uint types",
+          content: generateRandomContent(
+            "Test comment with various uint types:",
+          ),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1183,7 +1188,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with signed int types",
+          content: generateRandomContent("Test comment with signed int types:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1257,7 +1262,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with address metadata",
+          content: generateRandomContent("Test comment with address metadata:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1354,7 +1359,7 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with bytes metadata",
+          content: generateRandomContent("Test comment with bytes metadata:"),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1507,7 +1512,9 @@ describe("comment", () => {
         const commentData = createCommentData({
           author: account.address,
           app: appAccount.address,
-          content: "Test comment with ALL metadata types",
+          content: generateRandomContent(
+            "Test comment with ALL metadata types:",
+          ),
           metadata: metadataEntries,
           targetUri: "https://example.com",
         });
@@ -1661,3 +1668,7 @@ describe("comment", () => {
     });
   });
 });
+
+function generateRandomContent(prefixText = "Test comment content:") {
+  return prefixText + Math.random().toString(36).substring(2, 15);
+}
