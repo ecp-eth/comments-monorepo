@@ -77,7 +77,7 @@ storage:
       path: /var/tempo/blocks
 
 overrides:
-  per_tenant_override_config: /etc/overrides.yaml
+  per_tenant_override_config: /etc/overrides.yml
   defaults:
     cost_attribution:
       dimensions:
