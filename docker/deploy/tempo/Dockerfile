@@ -7,4 +7,4 @@ EXPOSE 3200 9095 4317 4318
 
 ENTRYPOINT []
 
-CMD ["/tempo", "-config.file=/etc/tempo.yaml", "--config.expand-env=true"]
+CMD ["/tempo", "-config.file=/etc/tempo.yml", "--config.expand-env=true"]
