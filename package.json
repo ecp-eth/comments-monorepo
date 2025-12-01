@@ -24,8 +24,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@ecp.eth/sdk": "workspace:*",
-    "@ecp.eth/shared-signer": "workspace:*",
+    "@ecp.eth/sdk": "^0.0.36",
+    "@ecp.eth/shared-signer": "^0.0.2",
     "@privy-io/server-auth": "^1.30.0",
     "@types/node": "^20",
     "@types/react": "~19.1.0",
@@ -38,5 +38,17 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.8.3"
-  }
+  },
+  "pnpm": {
+    "overrides": {
+      "@privy-io/server-auth": "1.30.0"
+    },
+    "patchedDependencies": {
+      "@privy-io/server-auth": "patches/@privy-io__server-auth.patch"
+    }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.11.1"
 }
