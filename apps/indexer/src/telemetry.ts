@@ -90,3 +90,76 @@ export async function withSpan<T>(
     }
   });
 }
+
+/**
+ * This function wraps a service and instruments all its methods with OpenTelemetry spans.
+ *
+ * @param service - The service to wrap
+ * @returns The wrapped service
+ *
+ * @example
+ * const service = wrapServiceWithTracing(new Service());
+ *
+ * service.doSomething();
+ */
+export function wrapServiceWithTracing<T extends object>(service: T): T {
+  return new Proxy(service, {
+    get(target, prop, receiver) {
+      const original = Reflect.get(target, prop, receiver);
+
+      if (typeof original !== "function") {
+        return original;
+      }
+
+      return function (...args: unknown[]) {
+        return tracer.startActiveSpan(
+          `${target.constructor.name}.${String(prop)}`,
+          (span) => {
+            try {
+              const result = original.apply(target, args);
+
+              if (isPromiseLike(result)) {
+                return result.then(
+                  (value) => {
+                    span.end();
+
+                    return value;
+                  },
+                  (error) => {
+                    span.recordException(
+                      error instanceof Error ? error : new Error(String(error)),
+                    );
+                    span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+                    span.end();
+
+                    throw error;
+                  },
+                );
+              }
+
+              span.end();
+
+              return result;
+            } catch (error) {
+              span.recordException(
+                error instanceof Error ? error : new Error(String(error)),
+              );
+              span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+              span.end();
+
+              throw error;
+            }
+          },
+        );
+      };
+    },
+  });
+}
+
+function isPromiseLike<T>(value: unknown): value is PromiseLike<T> {
+  try {
+    return !!value && typeof (value as PromiseLike<T>).then === "function";
+  } catch {
+    return false;
+  }
+}

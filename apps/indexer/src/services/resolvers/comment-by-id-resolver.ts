@@ -4,15 +4,6 @@ import type { CommentSelectType } from "ponder:schema";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
 import { isSameHex } from "@ecp.eth/shared/helpers";
 
-export type CommentByIdResolver = DataLoader<
-  {
-    id: Hex;
-    chainId: number;
-  },
-  CommentSelectType | null,
-  string
->;
-
 export type CommentByIdResolverOptions = {
   db: DB;
 } & Omit<
@@ -27,46 +18,53 @@ export type CommentByIdResolverOptions = {
   "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
-export function createCommentByIdResolver({
-  db,
-  ...options
-}: CommentByIdResolverOptions): CommentByIdResolver {
-  return new DataLoader(
-    async (keys) => {
-      const comments = await db.query.comment.findMany({
-        where(fields, operators) {
-          return operators.sql`
-            (${fields.id}, ${fields.chainId}) IN (
-              ${operators.sql.join(
-                keys.map(
-                  (key) =>
-                    operators.sql`(${key.id.toLowerCase()}, ${key.chainId})`,
-                ),
-                operators.sql`, `,
-              )}
-            )
-          `;
-        },
-      });
+export class CommentByIdResolver extends DataLoader<
+  {
+    id: Hex;
+    chainId: number;
+  },
+  CommentSelectType | null,
+  string
+> {
+  constructor({ db, ...options }: CommentByIdResolverOptions) {
+    super(
+      async (keys) => {
+        const comments = await db.query.comment.findMany({
+          where(fields, operators) {
+            return operators.sql`
+              (${fields.id}, ${fields.chainId}) IN (
+                ${operators.sql.join(
+                  keys.map(
+                    (key) =>
+                      operators.sql`(${key.id.toLowerCase()}, ${key.chainId})`,
+                  ),
+                  operators.sql`, `,
+                )}
+              )
+            `;
+          },
+        });
 
-      return keys.map((key) => {
-        return (
-          comments.find(
-            (comment) =>
-              isSameHex(comment.id, key.id) && comment.chainId === key.chainId,
-          ) ?? null
-        );
-      });
-    },
-    {
-      ...options,
-      cacheKeyFn(key) {
-        return JSON.stringify({
-          id: key.id.toLowerCase(),
-          chainId: key.chainId,
+        return keys.map((key) => {
+          return (
+            comments.find(
+              (comment) =>
+                isSameHex(comment.id, key.id) &&
+                comment.chainId === key.chainId,
+            ) ?? null
+          );
         });
       },
-      name: "CommentByIdResolver",
-    },
-  );
+      {
+        ...options,
+        cacheKeyFn(key) {
+          return JSON.stringify({
+            id: key.id.toLowerCase(),
+            chainId: key.chainId,
+          });
+        },
+        name: "CommentByIdResolver",
+      },
+    );
+  }
 }

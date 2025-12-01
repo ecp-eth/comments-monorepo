@@ -11,10 +11,6 @@ const MAX_DOMAIN_PER_ADDRESS = 30;
 const MAX_BATCH_SIZE = 5;
 
 export type ENSByQueryResolverKey = string;
-export type ENSByQueryResolver = DataLoader<
-  ENSByQueryResolverKey,
-  ResolvedENSData[] | null
->;
 
 export type ENSByQueryResolverOptions = {
   /**
@@ -26,75 +22,77 @@ export type ENSByQueryResolverOptions = {
   "name"
 >;
 
-/**
- * Creates a resolver that uses ENSNode.io subgraph to resolve ENS data
- */
-export function createENSByQueryResolver({
-  subgraphUrl,
-  ...dataLoaderOptions
-}: ENSByQueryResolverOptions): ENSByQueryResolver {
-  return new DataLoader(
-    async (queries) => {
-      if (!subgraphUrl) {
-        return queries.map(() => null);
-      }
-
-      const fullAddresses: Hex[] = [];
-      const fullAddressesDeferred: Deferred<ResolvedENSData[] | null>[] = [];
-
-      const promises = queries.map((query) => {
-        if (isFullAddress(query)) {
-          const deferred = new DeferredCtor<ResolvedENSData[]>();
-
-          fullAddresses.push(query);
-          fullAddressesDeferred.push(deferred);
-
-          return deferred.promise;
+export class ENSByQueryResolver extends DataLoader<
+  ENSByQueryResolverKey,
+  ResolvedENSData[] | null
+> {
+  constructor({
+    subgraphUrl,
+    ...dataLoaderOptions
+  }: ENSByQueryResolverOptions) {
+    super(
+      async (queries) => {
+        if (!subgraphUrl) {
+          return queries.map(() => null);
         }
 
-        return searchEns(query, subgraphUrl);
-      });
+        const fullAddresses: Hex[] = [];
+        const fullAddressesDeferred: Deferred<ResolvedENSData[] | null>[] = [];
 
-      if (fullAddresses.length > 0) {
-        searchEnsByExactAddressInBatch(fullAddresses, subgraphUrl)
-          .then((results) => {
-            if (results === null) {
+        const promises = queries.map((query) => {
+          if (isFullAddress(query)) {
+            const deferred = new DeferredCtor<ResolvedENSData[]>();
+
+            fullAddresses.push(query);
+            fullAddressesDeferred.push(deferred);
+
+            return deferred.promise;
+          }
+
+          return searchEns(query, subgraphUrl);
+        });
+
+        if (fullAddresses.length > 0) {
+          searchEnsByExactAddressInBatch(fullAddresses, subgraphUrl)
+            .then((results) => {
+              if (results === null) {
+                fullAddressesDeferred.forEach((deferred) => {
+                  deferred.resolve(null);
+                });
+                return;
+              }
+
+              fullAddressesDeferred.forEach((deferred, index) => {
+                deferred.resolve(results[index] ?? null);
+              });
+            })
+            .catch((error) => {
+              // Resolve all deferred promises with null on error
               fullAddressesDeferred.forEach((deferred) => {
                 deferred.resolve(null);
               });
-              return;
-            }
 
-            fullAddressesDeferred.forEach((deferred, index) => {
-              deferred.resolve(results[index] ?? null);
-            });
-          })
-          .catch((error) => {
-            // Resolve all deferred promises with null on error
-            fullAddressesDeferred.forEach((deferred) => {
-              deferred.resolve(null);
-            });
-
-            Sentry.captureMessage(
-              "failed to batch query ENS with full addresses",
-              {
-                level: "warning",
-                extra: {
-                  error,
+              Sentry.captureMessage(
+                "failed to batch query ENS with full addresses",
+                {
+                  level: "warning",
+                  extra: {
+                    error,
+                  },
                 },
-              },
-            );
-          });
-      }
+              );
+            });
+        }
 
-      return Promise.all(promises);
-    },
-    {
-      maxBatchSize: MAX_BATCH_SIZE,
-      name: "ENSByQueryResolver",
-      ...dataLoaderOptions,
-    },
-  );
+        return Promise.all(promises);
+      },
+      {
+        maxBatchSize: MAX_BATCH_SIZE,
+        name: "ENSByQueryResolver",
+        ...dataLoaderOptions,
+      },
+    );
+  }
 }
 
 function isFullAddress(query: string): query is Hex {

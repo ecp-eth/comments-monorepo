@@ -4,8 +4,6 @@ import type { HTTPResolver, ResolvedHTTP } from "./http-resolver.ts";
 import { runAsync } from "@ecp.eth/sdk/core";
 import { DataLoader, type DataLoaderOptions } from "../dataloader.ts";
 
-export type IPFSResolver = DataLoader<string, ResolvedHTTP | null>;
-
 /**
  * IPFS protocol URL pattern
  */
@@ -164,34 +162,33 @@ type IPFSResolverOptions = Omit<
   retryTimeout: number;
 };
 
-/**
- * Create an IPFS resolver that pins CIDs to Pinata and resolves metadata
- */
-export function createIPFSResolver({
-  httpResolver,
-  pinataSDK,
-  retryCount,
-  retryTimeout,
-  ...dataLoaderOptions
-}: IPFSResolverOptions): IPFSResolver {
-  return new DataLoader<string, ResolvedHTTP | null>(
-    async (ipfsUrls) => {
-      return Promise.all(
-        ipfsUrls.map((ipfsUrl) =>
-          resolveIPFSURL({
-            ipfsUrl,
-            pinataSDK,
-            httpResolver,
-            retryCount,
-            retryTimeout,
-          }),
-        ),
-      );
-    },
-    {
-      maxBatchSize: 3, // Smaller batch size for IPFS operations
-      name: "IPFSResolver",
-      ...dataLoaderOptions,
-    },
-  );
+export class IPFSResolver extends DataLoader<string, ResolvedHTTP | null> {
+  constructor({
+    httpResolver,
+    pinataSDK,
+    retryCount,
+    retryTimeout,
+    ...dataLoaderOptions
+  }: IPFSResolverOptions) {
+    super(
+      async (ipfsUrls) => {
+        return Promise.all(
+          ipfsUrls.map((ipfsUrl) =>
+            resolveIPFSURL({
+              ipfsUrl,
+              pinataSDK,
+              httpResolver,
+              retryCount,
+              retryTimeout,
+            }),
+          ),
+        );
+      },
+      {
+        maxBatchSize: 3,
+        name: "IPFSResolver",
+        ...dataLoaderOptions,
+      },
+    );
+  }
 }

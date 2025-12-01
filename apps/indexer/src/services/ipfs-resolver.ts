@@ -1,10 +1,11 @@
 import { LRUCache } from "lru-cache";
-import { createIPFSResolver } from "./resolvers/ipfs-resolver";
+import { IPFSResolver } from "./resolvers/ipfs-resolver";
 import type { ResolvedHTTP } from "./resolvers/http-resolver";
 import { httpResolverService } from "./http-resolver";
 import { PinataSDK } from "pinata";
 import { env } from "../env";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
   max: 10000,
@@ -17,11 +18,13 @@ const pinataSDK = new PinataSDK({
   pinataGateway: env.PINATA_GATEWAY,
 });
 
-export const ipfsResolverService = createIPFSResolver({
-  cacheMap,
-  pinataSDK,
-  httpResolver: httpResolverService,
-  retryCount: env.IPFS_RESOLUTION_RETRY_COUNT,
-  retryTimeout: env.IPFS_RESOLUTION_RETRY_TIMEOUT,
-  metrics,
-});
+export const ipfsResolverService = wrapServiceWithTracing(
+  new IPFSResolver({
+    cacheMap,
+    pinataSDK,
+    httpResolver: httpResolverService,
+    retryCount: env.IPFS_RESOLUTION_RETRY_COUNT,
+    retryTimeout: env.IPFS_RESOLUTION_RETRY_TIMEOUT,
+    metrics,
+  }),
+);

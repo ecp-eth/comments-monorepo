@@ -20,12 +20,6 @@ export class SimApiError extends Error {
   }
 }
 
-export type ERC20ByAddressResolver = DataLoader<
-  ERC20ByAddressResolverKey,
-  ResolvedERC20Data | null,
-  string
->;
-
 export type ERC20ByAddressResolverOptions = {
   simAPIService: ISIMAPIService;
 } & Omit<
@@ -37,66 +31,68 @@ export type ERC20ByAddressResolverOptions = {
   "batchLoadFn" | "maxBatchSize" | "cacheKeyFn" | "name"
 >;
 
-export function createERC20ByAddressResolver({
-  simAPIService,
-  ...dataLoaderOptions
-}: ERC20ByAddressResolverOptions): ERC20ByAddressResolver {
-  return new DataLoader<
-    ERC20ByAddressResolverKey,
-    ResolvedERC20Data | null,
-    string
-  >(
-    async (addressAndChainIds) => {
-      if (!addressAndChainIds.length) {
-        return [];
-      }
+export class ERC20ByAddressResolver extends DataLoader<
+  ERC20ByAddressResolverKey,
+  ResolvedERC20Data | null,
+  string
+> {
+  constructor({
+    simAPIService,
+    ...dataLoaderOptions
+  }: ERC20ByAddressResolverOptions) {
+    super(
+      async (addressAndChainIds) => {
+        if (!addressAndChainIds.length) {
+          return [];
+        }
 
-      return Promise.all(
-        addressAndChainIds.map(
-          async ([address, chainId]): Promise<ResolvedERC20Data | null> => {
-            const tokensInfos: SIMAPITokenInfoSchemaType[] =
-              await simAPIService.getTokenInfo(
+        return Promise.all(
+          addressAndChainIds.map(
+            async ([address, chainId]): Promise<ResolvedERC20Data | null> => {
+              const tokensInfos: SIMAPITokenInfoSchemaType[] =
+                await simAPIService.getTokenInfo(
+                  address,
+                  chainId ? [chainId] : chainsIdToSearch,
+                );
+
+              const chainIds = new Set<ChainID>();
+
+              for (const tokenInfo of tokensInfos) {
+                chainIds.add(tokenInfo.chain_id);
+              }
+
+              const firstTokenInfo = tokensInfos[0];
+
+              if (!firstTokenInfo) {
+                return null;
+              }
+
+              return {
                 address,
-                chainId ? [chainId] : chainsIdToSearch,
-              );
-
-            const chainIds = new Set<ChainID>();
-
-            for (const tokenInfo of tokensInfos) {
-              chainIds.add(tokenInfo.chain_id);
-            }
-
-            const firstTokenInfo = tokensInfos[0];
-
-            if (!firstTokenInfo) {
-              return null;
-            }
-
-            return {
-              address,
-              logoURI: firstTokenInfo.logo ?? null,
-              symbol: firstTokenInfo.symbol,
-              name: firstTokenInfo.name || firstTokenInfo.symbol,
-              decimals: firstTokenInfo.decimals,
-              chains: Array.from(chainIds).map((chainId) => ({
-                caip: `eip155:${chainId}/erc20:${address}`,
-                chainId,
-              })),
-            };
-          },
-        ),
-      );
-    },
-    {
-      ...dataLoaderOptions,
-      cacheKeyFn([address, chainId]) {
-        return (
-          chainId
-            ? [address.toLowerCase() as Hex, chainId]
-            : [address.toLowerCase() as Hex]
-        ).join(":");
+                logoURI: firstTokenInfo.logo ?? null,
+                symbol: firstTokenInfo.symbol,
+                name: firstTokenInfo.name || firstTokenInfo.symbol,
+                decimals: firstTokenInfo.decimals,
+                chains: Array.from(chainIds).map((chainId) => ({
+                  caip: `eip155:${chainId}/erc20:${address}`,
+                  chainId,
+                })),
+              };
+            },
+          ),
+        );
       },
-      name: "ERC20ByAddressResolver",
-    },
-  );
+      {
+        ...dataLoaderOptions,
+        cacheKeyFn([address, chainId]) {
+          return (
+            chainId
+              ? [address.toLowerCase() as Hex, chainId]
+              : [address.toLowerCase() as Hex]
+          ).join(":");
+        },
+        name: "ERC20ByAddressResolver",
+      },
+    );
+  }
 }

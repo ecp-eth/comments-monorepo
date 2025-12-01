@@ -30,11 +30,9 @@ export type ReplyCountsByParentIdResolverKey = {
   moderationStatus?: ModerationStatus[];
 };
 
-export type ReplyCountsByParentIdResolver = DataLoader<
-  ReplyCountsByParentIdResolverKey,
-  number,
-  string
->;
+function keyToString(key: ReplyCountsByParentIdResolverKey): string {
+  return `${key.parentId.toLowerCase()}-${key.mode}-${key.isDeleted ? "true" : "false"}-${key.app?.toLowerCase() ?? ""}-${key.commentType ?? ""}-${key.excludeModerationLabels?.join(",") ?? ""}-${key.moderationScore ?? ""}-${key.moderationStatus?.join(",") ?? ""}`;
+}
 
 export type ReplyCountsByParentIdResolverOptions = {
   db: DB;
@@ -43,86 +41,87 @@ export type ReplyCountsByParentIdResolverOptions = {
   "batchLoadFn" | "cacheKeyFn" | "name"
 >;
 
-function keyToString(key: ReplyCountsByParentIdResolverKey): string {
-  return `${key.parentId.toLowerCase()}-${key.mode}-${key.isDeleted ? "true" : "false"}-${key.app?.toLowerCase() ?? ""}-${key.commentType ?? ""}-${key.excludeModerationLabels?.join(",") ?? ""}-${key.moderationScore ?? ""}-${key.moderationStatus?.join(",") ?? ""}`;
-}
+export class ReplyCountsByParentIdResolver extends DataLoader<
+  ReplyCountsByParentIdResolverKey,
+  number,
+  string
+> {
+  constructor({ db, ...options }: ReplyCountsByParentIdResolverOptions) {
+    super(
+      async (keys) => {
+        const queries: SQL[] = [];
 
-export function createReplyCountsByParentIdResolver({
-  db,
-  ...options
-}: ReplyCountsByParentIdResolverOptions): ReplyCountsByParentIdResolver {
-  return new DataLoader(
-    async (keys) => {
-      const queries: SQL[] = [];
-
-      for (const conditions of keys) {
-        queries.push(sql`
-          SELECT 
-            ${keyToString(conditions)} as "key", 
-            COUNT(*)::int as "count"
-          FROM ${schema.comment}
-          WHERE ${and(
-            conditions.mode === "flat"
-              ? eq(
-                  schema.comment.rootCommentId,
-                  conditions.parentId.toLowerCase() as LowercasedHex,
-                )
-              : eq(
-                  schema.comment.parentId,
-                  conditions.parentId.toLowerCase() as LowercasedHex,
-                ),
-            conditions.app ? eq(schema.comment.app, conditions.app) : undefined,
-            conditions.commentType != null
-              ? eq(schema.comment.commentType, conditions.commentType)
-              : undefined,
-            conditions.excludeModerationLabels
-              ? convertExcludeModerationLabelsToConditions(
-                  conditions.excludeModerationLabels,
-                )
-              : undefined,
-            conditions.moderationScore != null
-              ? lte(
-                  schema.comment.moderationClassifierScore,
-                  conditions.moderationScore,
-                )
-              : undefined,
-            typeof conditions.isDeleted === "boolean"
-              ? conditions.isDeleted
-                ? isNotNull(schema.comment.deletedAt)
-                : isNull(schema.comment.deletedAt)
-              : undefined,
-            conditions.moderationStatus != null &&
-              conditions.moderationStatus.length > 0
-              ? inArray(
-                  schema.comment.moderationStatus,
-                  conditions.moderationStatus,
-                )
-              : undefined,
-          )}
-        `);
-      }
-
-      const { rows } = await db.execute<{
-        key: string;
-        count: number;
-      }>(sql.join(queries, sql` UNION ALL `));
-
-      return keys.map((key) => {
-        const stringKey = keyToString(key);
-
-        for (const result of rows) {
-          if (result.key === stringKey) {
-            return result.count;
-          }
+        for (const conditions of keys) {
+          queries.push(sql`
+            SELECT 
+              ${keyToString(conditions)} as "key", 
+              COUNT(*)::int as "count"
+            FROM ${schema.comment}
+            WHERE ${and(
+              conditions.mode === "flat"
+                ? eq(
+                    schema.comment.rootCommentId,
+                    conditions.parentId.toLowerCase() as LowercasedHex,
+                  )
+                : eq(
+                    schema.comment.parentId,
+                    conditions.parentId.toLowerCase() as LowercasedHex,
+                  ),
+              conditions.app
+                ? eq(schema.comment.app, conditions.app)
+                : undefined,
+              conditions.commentType != null
+                ? eq(schema.comment.commentType, conditions.commentType)
+                : undefined,
+              conditions.excludeModerationLabels
+                ? convertExcludeModerationLabelsToConditions(
+                    conditions.excludeModerationLabels,
+                  )
+                : undefined,
+              conditions.moderationScore != null
+                ? lte(
+                    schema.comment.moderationClassifierScore,
+                    conditions.moderationScore,
+                  )
+                : undefined,
+              typeof conditions.isDeleted === "boolean"
+                ? conditions.isDeleted
+                  ? isNotNull(schema.comment.deletedAt)
+                  : isNull(schema.comment.deletedAt)
+                : undefined,
+              conditions.moderationStatus != null &&
+                conditions.moderationStatus.length > 0
+                ? inArray(
+                    schema.comment.moderationStatus,
+                    conditions.moderationStatus,
+                  )
+                : undefined,
+            )}
+          `);
         }
 
-        return 0;
-      });
-    },
-    {
-      ...options,
-      cacheKeyFn: keyToString,
-      name: "ReplyCountsByParentIdResolver",
-    },
-  );
+        const { rows } = await db.execute<{
+          key: string;
+          count: number;
+        }>(sql.join(queries, sql` UNION ALL `));
+
+        return keys.map((key) => {
+          const stringKey = keyToString(key);
+
+          for (const result of rows) {
+            if (result.key === stringKey) {
+              return result.count;
+            }
+          }
+
+          return 0;
+        });
+      },
+      {
+        ...options,
+        cacheKeyFn: keyToString,
+        name: "ReplyCountsByParentIdResolver",
+      },
+    );
+  }
 }

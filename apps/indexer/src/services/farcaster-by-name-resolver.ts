@@ -1,11 +1,12 @@
 import { LRUCache } from "lru-cache";
-import { createFarcasterByNameResolver } from "./resolvers/farcaster-by-name-resolver";
+import { FarcasterByNameResolver } from "./resolvers/farcaster-by-name-resolver";
 import { env } from "../env";
 import { metrics } from "./metrics";
 import type {
   FarcasterName,
   ResolvedFarcasterData,
 } from "./resolvers/farcaster.types";
+import { wrapServiceWithTracing } from "../telemetry";
 
 // could also use redis
 const cacheMap = new LRUCache<
@@ -17,8 +18,10 @@ const cacheMap = new LRUCache<
   allowStale: true,
 });
 
-export const farcasterByNameResolverService = createFarcasterByNameResolver({
-  neynarApiKey: env.NEYNAR_API_KEY,
-  cacheMap,
-  metrics,
-});
+export const farcasterByNameResolverService = wrapServiceWithTracing(
+  new FarcasterByNameResolver({
+    neynarApiKey: env.NEYNAR_API_KEY,
+    cacheMap,
+    metrics,
+  }),
+);

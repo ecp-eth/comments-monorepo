@@ -17,8 +17,6 @@ export type ResolvedHTTP =
   | Omit<IndexerAPICommentReferenceURLFileSchemaType, "position">
   | Omit<IndexerAPICommentReferenceURLWebPageSchemaType, "position">;
 
-export type HTTPResolver = DataLoader<string, ResolvedHTTP | null>;
-
 /**
  * Regex to match http/https url
  */
@@ -233,18 +231,17 @@ type HTTPResolverOptions = Omit<
   timeout?: number;
 };
 
-export function createHTTPResolver({
-  timeout = 5000,
-  ...dataLoaderOptions
-}: HTTPResolverOptions): HTTPResolver {
-  return new DataLoader<string, ResolvedHTTP | null>(
-    async (urls) => {
-      return Promise.all(urls.map((url) => resolveHTTP(url, timeout)));
-    },
-    {
-      maxBatchSize: 5,
-      name: "HTTPResolver",
-      ...dataLoaderOptions,
-    },
-  );
+export class HTTPResolver extends DataLoader<string, ResolvedHTTP | null> {
+  constructor({ timeout = 5000, ...dataLoaderOptions }: HTTPResolverOptions) {
+    super(
+      async (urls) => {
+        return Promise.all(urls.map((url) => resolveHTTP(url, timeout)));
+      },
+      {
+        maxBatchSize: 5,
+        name: "HTTPResolver",
+        ...dataLoaderOptions,
+      },
+    );
+  }
 }

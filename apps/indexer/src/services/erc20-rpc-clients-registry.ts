@@ -5,6 +5,7 @@ import {
   type ERC20ClientConfig,
   type ERC20ClientRegistry,
 } from "./resolvers/erc20.types";
+import { wrapServiceWithTracing } from "../telemetry";
 
 class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   private clientsByChainId: Record<number, ERC20ClientConfig>;
@@ -49,4 +50,6 @@ class ERC20RpcClientsRegistry implements ERC20ClientRegistry {
   }
 }
 
-export const erc20RpcClientsRegistryService = new ERC20RpcClientsRegistry();
+export const erc20RpcClientsRegistryService = wrapServiceWithTracing(
+  new ERC20RpcClientsRegistry(),
+);
