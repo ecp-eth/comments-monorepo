@@ -1,4 +1,4 @@
-import "./sentry";
+import "./instrumentation";
 import { ponder } from "ponder:registry";
 import { initializeApprovalEventsIndexing } from "./indexing/approvals";
 import { initializeCommentEventsIndexing } from "./indexing/comments";

@@ -33,6 +33,7 @@ if (env.SENTRY_DSN) {
     ],
     tracesSampleRate: 1.0,
     profilesSampleRate: 1.0,
+    skipOpenTelemetrySetup: true,
   });
 
   // this is hack: we need to be able to report errors to sentry and ponder doesn't use console.error but pino
@@ -86,5 +87,14 @@ if (env.SENTRY_DSN) {
 
   Sentry.init({
     debug: true,
+    integrations: [
+      nodeProfilingIntegration(),
+      Sentry.captureConsoleIntegration({
+        levels: ["error", "warn"],
+      }),
+    ],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+    skipOpenTelemetrySetup: true,
   });
 }

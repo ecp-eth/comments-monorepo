@@ -5,7 +5,7 @@ datasources:
     type: prometheus
     access: proxy
     uid: prometheus
-    url: http://prometheus.railway.internal:9090
+    url: http://prometheus:9090
     isDefault: true
     editable: false
     jsonData:
@@ -13,7 +13,7 @@ datasources:
   - name: Tempo
     type: tempo
     access: proxy
-    url: http://tempo.railway.internal:3200
+    url: http://tempo:3200
     basicAuth: false
     isDefault: false
     editable: false

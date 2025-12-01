@@ -2,7 +2,6 @@ import { cors } from "hono/cors";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
-import "@sentry/tracing";
 import { initializeRoutes } from "./routes";
 
 const app = new OpenAPIHono();

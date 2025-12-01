@@ -29,6 +29,7 @@ import {
   normalizeModerationStatusFilter,
 } from "./helpers";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
+import { withSpan } from "../../telemetry";
 
 const getCommentsRoute = createRoute({
   method: "get",
@@ -173,102 +174,107 @@ export default (app: OpenAPIHono) => {
       );
     }
 
-    const previousCommentsQuery = cursor
-      ? db.query.comment
-          .findFirst({
-            where: and(
-              ...sharedConditions,
-              // use opposite order for asc and desc
-              ...(sort === "asc"
-                ? [
-                    or(
-                      and(
-                        eq(schema.comment.createdAt, cursor.createdAt),
-                        lte(schema.comment.id, cursor.id),
-                      ),
-                      lt(schema.comment.createdAt, cursor.createdAt),
-                    ),
-                  ]
-                : []),
-              ...(sort === "desc"
-                ? [
-                    or(
-                      and(
-                        eq(schema.comment.createdAt, cursor.createdAt),
-                        gte(schema.comment.id, cursor.id),
-                      ),
-                      gt(schema.comment.createdAt, cursor.createdAt),
-                    ),
-                  ]
-                : []),
-            ),
-            orderBy:
-              sort === "desc"
-                ? [asc(schema.comment.createdAt), asc(schema.comment.id)]
-                : [desc(schema.comment.createdAt), desc(schema.comment.id)],
-          })
-          .execute()
-      : undefined;
+    const [comments, previousComment] = await withSpan(
+      "get-comments",
+      async () => {
+        const previousCommentsQuery = cursor
+          ? db.query.comment
+              .findFirst({
+                where: and(
+                  ...sharedConditions,
+                  // use opposite order for asc and desc
+                  ...(sort === "asc"
+                    ? [
+                        or(
+                          and(
+                            eq(schema.comment.createdAt, cursor.createdAt),
+                            lte(schema.comment.id, cursor.id),
+                          ),
+                          lt(schema.comment.createdAt, cursor.createdAt),
+                        ),
+                      ]
+                    : []),
+                  ...(sort === "desc"
+                    ? [
+                        or(
+                          and(
+                            eq(schema.comment.createdAt, cursor.createdAt),
+                            gte(schema.comment.id, cursor.id),
+                          ),
+                          gt(schema.comment.createdAt, cursor.createdAt),
+                        ),
+                      ]
+                    : []),
+                ),
+                orderBy:
+                  sort === "desc"
+                    ? [asc(schema.comment.createdAt), asc(schema.comment.id)]
+                    : [desc(schema.comment.createdAt), desc(schema.comment.id)],
+              })
+              .execute()
+          : undefined;
 
-    const commentsQuery = db.query.comment.findMany({
-      with: {
-        [mode === "flat" ? "flatReplies" : "replies"]: {
-          where: and(...repliesConditions),
-          orderBy: [desc(schema.comment.createdAt), desc(schema.comment.id)],
-          limit: REPLIES_PER_COMMENT + 1,
+        const commentsQuery = db.query.comment.findMany({
           with: {
+            [mode === "flat" ? "flatReplies" : "replies"]: {
+              where: and(...repliesConditions),
+              orderBy: [
+                desc(schema.comment.createdAt),
+                desc(schema.comment.id),
+              ],
+              limit: REPLIES_PER_COMMENT + 1,
+              with: {
+                viewerReactions: viewer
+                  ? {
+                      where: and(...viewerReactionsConditions),
+                    }
+                  : undefined,
+              },
+            },
             viewerReactions: viewer
               ? {
                   where: and(...viewerReactionsConditions),
                 }
               : undefined,
           },
-        },
-        viewerReactions: viewer
-          ? {
-              where: and(...viewerReactionsConditions),
-            }
-          : undefined,
+          where: and(
+            ...sharedConditions,
+            ...(sort === "desc" && !!cursor
+              ? [
+                  or(
+                    and(
+                      eq(schema.comment.createdAt, cursor.createdAt),
+                      lt(schema.comment.id, cursor.id),
+                    ),
+                    lt(schema.comment.createdAt, cursor.createdAt),
+                  ),
+                ]
+              : []),
+            ...(sort === "asc" && !!cursor
+              ? [
+                  or(
+                    and(
+                      eq(schema.comment.createdAt, cursor.createdAt),
+                      gt(schema.comment.id, cursor.id),
+                    ),
+                    gt(schema.comment.createdAt, cursor.createdAt),
+                  ),
+                ]
+              : []),
+          ),
+          orderBy:
+            sort === "desc"
+              ? [desc(schema.comment.createdAt), desc(schema.comment.id)]
+              : [asc(schema.comment.createdAt), asc(schema.comment.id)],
+          limit: limit + 1,
+        });
+
+        return await Promise.all([commentsQuery, previousCommentsQuery]);
       },
-      where: and(
-        ...sharedConditions,
-        ...(sort === "desc" && !!cursor
-          ? [
-              or(
-                and(
-                  eq(schema.comment.createdAt, cursor.createdAt),
-                  lt(schema.comment.id, cursor.id),
-                ),
-                lt(schema.comment.createdAt, cursor.createdAt),
-              ),
-            ]
-          : []),
-        ...(sort === "asc" && !!cursor
-          ? [
-              or(
-                and(
-                  eq(schema.comment.createdAt, cursor.createdAt),
-                  gt(schema.comment.id, cursor.id),
-                ),
-                gt(schema.comment.createdAt, cursor.createdAt),
-              ),
-            ]
-          : []),
-      ),
-      orderBy:
-        sort === "desc"
-          ? [desc(schema.comment.createdAt), desc(schema.comment.id)]
-          : [asc(schema.comment.createdAt), asc(schema.comment.id)],
-      limit: limit + 1,
-    });
+    );
 
-    const [comments, previousComment] = await Promise.all([
-      commentsQuery,
-      previousCommentsQuery,
-    ]);
-
-    const formattedComments =
-      await resolveUserDataAndFormatListCommentsResponse({
+    const formattedComments = await withSpan("format-comments", async () => {
+      return await resolveUserDataAndFormatListCommentsResponse({
         comments,
         limit,
         previousComment,
@@ -283,6 +289,7 @@ export default (app: OpenAPIHono) => {
           moderationStatus: moderationStatusFilter,
         },
       });
+    });
 
     return c.json(
       IndexerAPIListCommentsOutputSchema.parse(formattedComments),

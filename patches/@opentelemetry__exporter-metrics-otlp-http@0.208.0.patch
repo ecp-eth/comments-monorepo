@@ -1,0 +1,25 @@
+diff --git a/build/src/platform/node/OTLPMetricExporter.js b/build/src/platform/node/OTLPMetricExporter.js
+index 13ea3433ef067d107392e11f2354aa597f29c88f..d20beb9c1c1742f2fd51e2ad86338f4c5d0ed23c 100644
+--- a/build/src/platform/node/OTLPMetricExporter.js
++++ b/build/src/platform/node/OTLPMetricExporter.js
+@@ -18,7 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.OTLPMetricExporter = void 0;
+ const OTLPMetricExporterBase_1 = require("../../OTLPMetricExporterBase");
+ const otlp_transformer_1 = require("@opentelemetry/otlp-transformer");
+-const node_http_1 = require("@opentelemetry/otlp-exporter-base/node-http");
++const node_http_1 = require("@opentelemetry/otlp-exporter-base/build/src/index-node-http");
+ /**
+  * OTLP Metric Exporter for Node.js
+  */
+diff --git a/package.json b/package.json
+index 0806ebd51e3ed059bcc87fa89d4ced7d07be163b..c7bef9244398c49d6899055f81578cad6a55f11f 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,7 @@
+ {
+   "name": "@opentelemetry/exporter-metrics-otlp-http",
+   "version": "0.208.0",
++  "type": "commonjs",
+   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
+   "main": "build/src/index.js",
+   "module": "build/esm/index.js",

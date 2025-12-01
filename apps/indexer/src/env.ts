@@ -86,6 +86,9 @@ const EnvSchema = z
     DATABASE_SCHEMA: z.string().optional(),
     NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
 
     // Pinata IPFS configuration
     PINATA_JWT: z.string().min(1),
@@ -219,6 +222,7 @@ const EnvSchema = z
       .default(2592000),
     JWT_REFRESH_TOKEN_ISSUER: z.string().nonempty().default("ecp-indexer"),
     JWT_REFRESH_TOKEN_AUDIENCE: z.string().nonempty().default("ecp-indexer-rt"),
+    OPENTELEMETRY_GRAFANA_TEMPO_URL: z.string().url().optional(),
   })
   .superRefine((vars, ctx) => {
     if (

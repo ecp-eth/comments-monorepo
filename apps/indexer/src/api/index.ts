@@ -6,11 +6,20 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
-import "@sentry/tracing";
 
 import { useSentry } from "@envelop/sentry";
 
+import { httpInstrumentationMiddleware } from "@hono/otel";
+import { tracer } from "../telemetry";
+
 const app = new OpenAPIHono();
+
+app.use(
+  httpInstrumentationMiddleware({
+    tracer,
+    captureRequestHeaders: ["user-agent", "service-name"],
+  }),
+);
 
 // Add logging middleware
 app.use("*", async (c, next) => {

@@ -1,0 +1,25 @@
+diff --git a/build/src/configuration/otlp-grpc-env-configuration.js b/build/src/configuration/otlp-grpc-env-configuration.js
+index 292df421ecb48c44ca6b12ac251fa8f0fa0c275e..3a64dbc2cfdf0da5a38345dd7933ef6aaf080f34 100644
+--- a/build/src/configuration/otlp-grpc-env-configuration.js
++++ b/build/src/configuration/otlp-grpc-env-configuration.js
+@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getOtlpGrpcConfigurationFromEnv = void 0;
+ const core_1 = require("@opentelemetry/core");
+ const grpc_exporter_transport_1 = require("../grpc-exporter-transport");
+-const node_http_1 = require("@opentelemetry/otlp-exporter-base/node-http");
++const node_http_1 = require("@opentelemetry/otlp-exporter-base/build/src/index-node-http");
+ const fs = require("fs");
+ const path = require("path");
+ const api_1 = require("@opentelemetry/api");
+diff --git a/package.json b/package.json
+index cb65ac4a5a498eeb6c917dea75d5f34befb29b02..50fe10582f67f48637102c33d9394c188865ac0d 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,7 @@
+ {
+   "name": "@opentelemetry/otlp-grpc-exporter-base",
+   "version": "0.208.0",
++  "type": "commonjs",
+   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
+   "main": "build/src/index.js",
+   "types": "build/src/index.d.ts",

@@ -1,0 +1,25 @@
+diff --git a/build/src/platform/node/OTLPMetricExporter.js b/build/src/platform/node/OTLPMetricExporter.js
+index 15d7b2c0e7f2066edceecdc8081d48c675130bdf..d78ef9c23d35a7945fc00c64be512854ac9fcd1a 100644
+--- a/build/src/platform/node/OTLPMetricExporter.js
++++ b/build/src/platform/node/OTLPMetricExporter.js
+@@ -18,7 +18,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.OTLPMetricExporter = void 0;
+ const exporter_metrics_otlp_http_1 = require("@opentelemetry/exporter-metrics-otlp-http");
+ const otlp_transformer_1 = require("@opentelemetry/otlp-transformer");
+-const node_http_1 = require("@opentelemetry/otlp-exporter-base/node-http");
++const node_http_1 = require("@opentelemetry/otlp-exporter-base/build/src/index-node-http");
+ class OTLPMetricExporter extends exporter_metrics_otlp_http_1.OTLPMetricExporterBase {
+     constructor(config) {
+         super((0, node_http_1.createOtlpHttpExportDelegate)((0, node_http_1.convertLegacyHttpOptions)(config ?? {}, 'METRICS', 'v1/metrics', {
+diff --git a/package.json b/package.json
+index 535e980756bd0710cfc6a5462bed2743dad2673b..e82e3605b68770f8f252ae1050559d060f659d60 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,7 @@
+ {
+   "name": "@opentelemetry/exporter-metrics-otlp-proto",
+   "version": "0.208.0",
++  "type": "commonjs",
+   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector using protobuf over HTTP",
+   "main": "build/src/index.js",
+   "module": "build/esm/index.js",
