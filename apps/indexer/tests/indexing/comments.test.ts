@@ -3,6 +3,13 @@ import * as Sentry from "@sentry/node";
 import { initializeCommentEventsIndexing } from "../../src/indexing/comments";
 import { type Event } from "ponder:registry";
 
+// do not wrap the services in proxy
+vi.mock("../../src/telemetry", () => {
+  return {
+    wrapServiceWithTracing: (service: any) => service,
+  };
+});
+
 // Mock Sentry to avoid real reporting
 vi.mock("@sentry/node", () => ({
   captureMessage: vi.fn(),
