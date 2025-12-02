@@ -22,8 +22,8 @@ declare global {
 if (env.SENTRY_DSN) {
   Sentry.init({
     dsn: env.SENTRY_DSN,
-    debug: process.env.NODE_ENV !== "production",
-    environment: process.env.NODE_ENV ?? "development",
+    debug: env.NODE_ENV !== "production",
+    environment: env.NODE_ENV,
     release: process.env["RAILWAY_DEPLOYMENT_ID"] ?? "unknown",
     integrations: [
       nodeProfilingIntegration(),
