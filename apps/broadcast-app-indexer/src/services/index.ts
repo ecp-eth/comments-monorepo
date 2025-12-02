@@ -9,6 +9,7 @@ import { createPublicClient, http } from "viem";
 import config from "../../ponder.config";
 import { anvil, base } from "viem/chains";
 import { FarcasterChannelNotificationSettingsLoader } from "./farcaster-channel-notification-settings-loader";
+import { wrapServiceWithTracing } from "../telemetry";
 
 export { db };
 
@@ -20,35 +21,43 @@ const publicClient = createPublicClient({
 });
 
 export const farcasterChannelNotificationSettingsLoader =
-  new FarcasterChannelNotificationSettingsLoader({
+  wrapServiceWithTracing(
+    new FarcasterChannelNotificationSettingsLoader({
+      db,
+    }),
+  );
+
+export const miniAppConfigRegistryService = wrapServiceWithTracing(
+  new MiniAppConfigRegistryService({
+    apps: env.BROADCAST_MINI_APPS,
+  }),
+);
+
+export const siweAuthService = wrapServiceWithTracing(
+  new SiweAuthService({
     db,
-  });
-
-export const miniAppConfigRegistryService = new MiniAppConfigRegistryService({
-  apps: env.BROADCAST_MINI_APPS,
-});
-
-export const siweAuthService = new SiweAuthService({
-  db,
-  miniAppConfigRegistryService,
-  jwtSecret: env.JWT_SECRET,
-  jwtIssuer: env.JWT_ISSUER,
-  jwtAudienceNonce: env.JWT_AUDIENCE_NONCE,
-  jwtNonceTokenLifetime: env.JWT_NONCE_TOKEN_LIFETIME,
-  jwtAudienceAccessToken: env.JWT_AUDIENCE_ACCESS,
-  jwtAudienceRefreshToken: env.JWT_AUDIENCE_REFRESH,
-  jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
-  jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
-  publicClient,
-});
+    miniAppConfigRegistryService,
+    jwtSecret: env.JWT_SECRET,
+    jwtIssuer: env.JWT_ISSUER,
+    jwtAudienceNonce: env.JWT_AUDIENCE_NONCE,
+    jwtNonceTokenLifetime: env.JWT_NONCE_TOKEN_LIFETIME,
+    jwtAudienceAccessToken: env.JWT_AUDIENCE_ACCESS,
+    jwtAudienceRefreshToken: env.JWT_AUDIENCE_REFRESH,
+    jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
+    jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
+    publicClient,
+  }),
+);
 
 export const notificationService: INotificationsService = env.NEYNAR_API_KEY
-  ? new NeynarNotificationsService({
-      apiKey: env.NEYNAR_API_KEY,
-      db,
-      miniAppConfigRegistryService,
-    })
-  : new NoopNotificationsService();
+  ? wrapServiceWithTracing(
+      new NeynarNotificationsService({
+        apiKey: env.NEYNAR_API_KEY,
+        db,
+        miniAppConfigRegistryService,
+      }),
+    )
+  : wrapServiceWithTracing(new NoopNotificationsService());
 
 notificationService.process();
 

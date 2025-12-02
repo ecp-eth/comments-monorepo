@@ -3,8 +3,17 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
 import { initializeRoutes } from "./routes";
+import { httpInstrumentationMiddleware } from "@hono/otel";
+import { tracer } from "../telemetry";
 
 const app = new OpenAPIHono();
+
+app.use(
+  httpInstrumentationMiddleware({
+    tracer,
+    captureRequestHeaders: ["user-agent", "service-name"],
+  }),
+);
 
 // Add logging middleware
 app.use("*", async (c, next) => {

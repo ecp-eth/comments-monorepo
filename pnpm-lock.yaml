@@ -246,6 +246,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.18.2(hono@4.9.1)
+      '@hono/otel':
+        specifier: ^1.0.1
+        version: 1.0.1(patch_hash=dfb997fcdc9c740ca42f9c57fdf2bf8868265f25737b2f6f333422435b1d42b4)(hono@4.9.1)
       '@hono/zod-openapi':
         specifier: ^0.18.4
         version: 0.18.4(hono@4.9.1)(zod@3.25.76)

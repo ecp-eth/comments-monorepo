@@ -1,7 +1,7 @@
 import "./instrumentation";
 import * as Sentry from "@sentry/node";
 import { schema } from "../schema";
-import { ponder } from "ponder:registry";
+import { type IndexingFunctionArgs, ponder } from "ponder:registry";
 import { isZeroHex } from "@ecp.eth/sdk/core";
 import { db, notificationService } from "./services";
 import { Hex, hexToBigInt, hexToNumber, hexToString, sliceHex } from "viem";
@@ -14,6 +14,7 @@ import {
 } from "./abi/generated/efp-abi";
 import { env } from "./env";
 import { and, eq, sql } from "drizzle-orm";
+import { wrapServiceWithTracing } from "./telemetry";
 
 function isChain(chain: unknown): chain is { id: number } {
   if (!chain || typeof chain !== "object") {
@@ -27,7 +28,10 @@ function isChain(chain: unknown): chain is { id: number } {
   return true;
 }
 
-ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
+async function channelCreatedHandler({
+  event,
+  context,
+}: IndexingFunctionArgs<"BroadcastHook:ChannelCreated">) {
   const channelEvent = event.args;
 
   // Convert block timestamp to Date
@@ -58,9 +62,17 @@ ponder.on("BroadcastHook:ChannelCreated", async ({ event, context }) => {
     txHash: event.transaction.hash,
     logIndex: event.log.logIndex,
   });
-});
+}
 
-ponder.on("ChannelManager:Transfer", async ({ event, context }) => {
+ponder.on(
+  "BroadcastHook:ChannelCreated",
+  wrapServiceWithTracing(channelCreatedHandler),
+);
+
+async function channelTransferHandler({
+  event,
+  context,
+}: IndexingFunctionArgs<"ChannelManager:Transfer">) {
   const { to, tokenId: channelId } = event.args;
 
   try {
@@ -86,9 +98,17 @@ ponder.on("ChannelManager:Transfer", async ({ event, context }) => {
 
     throw error;
   }
-});
+}
 
-ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
+ponder.on(
+  "ChannelManager:Transfer",
+  wrapServiceWithTracing(channelTransferHandler),
+);
+
+async function channelUpdatedHandler({
+  event,
+  context,
+}: IndexingFunctionArgs<"ChannelManager:ChannelUpdated">) {
   const { channelId, description, name, metadata } = event.args;
 
   try {
@@ -112,9 +132,17 @@ ponder.on("ChannelManager:ChannelUpdated", async ({ event, context }) => {
 
     throw error;
   }
-});
+}
 
-ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
+ponder.on(
+  "ChannelManager:ChannelUpdated",
+  wrapServiceWithTracing(channelUpdatedHandler),
+);
+
+async function commentAddedHandler({
+  event,
+  context,
+}: IndexingFunctionArgs<"CommentManager:CommentAdded">) {
   const { channelId, parentId } = event.args;
 
   if (!isZeroHex(parentId)) {
@@ -135,9 +163,17 @@ ponder.on("CommentManager:CommentAdded", async ({ event, context }) => {
     comment: event.args,
     channel,
   });
-});
+}
 
-ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
+ponder.on(
+  "CommentManager:CommentAdded",
+  wrapServiceWithTracing(commentAddedHandler),
+);
+
+async function listOpHandler({
+  event,
+  context,
+}: IndexingFunctionArgs<"EFPListRecords:ListOp">) {
   if (!isChain(context.chain)) {
     Sentry.captureMessage("Channel created event received with invalid chain", {
       level: "error",
@@ -400,4 +436,6 @@ ponder.on("EFPListRecords:ListOp", async ({ event, context }) => {
 
     return;
   }
-});
+}
+
+ponder.on("EFPListRecords:ListOp", wrapServiceWithTracing(listOpHandler));
