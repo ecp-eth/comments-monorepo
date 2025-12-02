@@ -1,9 +1,7 @@
 import { LRUCache } from "lru-cache";
-import {
-  createHTTPResolver,
-  type ResolvedHTTP,
-} from "./resolvers/http-resolver";
+import { HTTPResolver, type ResolvedHTTP } from "./resolvers/http-resolver";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
   max: 10000,
@@ -11,7 +9,9 @@ const cacheMap = new LRUCache<string, Promise<ResolvedHTTP | null>>({
   allowStale: true,
 });
 
-export const httpResolverService = createHTTPResolver({
-  cacheMap,
-  metrics,
-});
+export const httpResolverService = wrapServiceWithTracing(
+  new HTTPResolver({
+    cacheMap,
+    metrics,
+  }),
+);

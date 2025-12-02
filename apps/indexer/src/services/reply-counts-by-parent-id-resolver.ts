@@ -1,10 +1,12 @@
-import { createReplyCountsByParentIdResolver } from "./resolvers/reply-counts-by-parent-id-resolver";
+import { ReplyCountsByParentIdResolver } from "./resolvers/reply-counts-by-parent-id-resolver";
 import { db } from "./db";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
-export const replyCountsByParentIdResolverService =
-  createReplyCountsByParentIdResolver({
+export const replyCountsByParentIdResolverService = wrapServiceWithTracing(
+  new ReplyCountsByParentIdResolver({
     db,
     cache: false,
     metrics,
-  });
+  }),
+);

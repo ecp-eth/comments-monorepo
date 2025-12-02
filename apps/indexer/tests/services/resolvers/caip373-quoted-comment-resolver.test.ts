@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { createCAIP373QuotedCommentResolver } from "../../../src/services/resolvers/caip373-quoted-comment-resolver";
+import { CAIP373QuotedCommentResolver } from "../../../src/services/resolvers/caip373-quoted-comment-resolver";
 import { CommentManagerABI, SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 import { createPublicClient, encodeFunctionData, http, toHex } from "viem";
 import { anvil } from "viem/chains";
@@ -23,7 +23,7 @@ const { commentByIdResolverService: commentByIdResolverServiceMock } =
   >("../../../src/services/comment-by-id-resolver");
 
 describe("CAIP373QuotedCommentResolver", () => {
-  const resolver = createCAIP373QuotedCommentResolver({
+  const resolver = new CAIP373QuotedCommentResolver({
     chains: {
       31337: {
         commentManagerAddress: SUPPORTED_CHAINS[31337].commentManagerAddress,

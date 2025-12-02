@@ -11,8 +11,6 @@ import type { ResolvedENSData } from "./ens.types";
 import type { ENSByQueryResolver } from "./ens-by-query-resolver";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
-export type ENSByAddressResolver = DataLoader<Hex, ResolvedENSData | null>;
-
 async function resolveEnsData(
   client: PublicClient,
   address: Hex,
@@ -70,30 +68,35 @@ export type ENSByAddressResolverOptions = {
   ensByQueryResolver: ENSByQueryResolver;
 } & Omit<DataLoaderOptions<Hex, ResolvedENSData | null>, "cacheKeyFn" | "name">;
 
-export function createENSByAddressResolver({
-  chainRpcUrl,
-  ensByQueryResolver,
-  ...dataLoaderOptions
-}: ENSByAddressResolverOptions): ENSByAddressResolver {
-  const publicClient = createPublicClient({
-    chain: mainnet,
-    transport: http(chainRpcUrl),
-  });
+export class ENSByAddressResolver extends DataLoader<
+  Hex,
+  ResolvedENSData | null
+> {
+  constructor({
+    chainRpcUrl,
+    ensByQueryResolver,
+    ...dataLoaderOptions
+  }: ENSByAddressResolverOptions) {
+    const publicClient = createPublicClient({
+      chain: mainnet,
+      transport: http(chainRpcUrl),
+    });
 
-  return new DataLoader<Hex, ResolvedENSData | null>(
-    async (addresses) => {
-      return Promise.all(
-        addresses.map((address) =>
-          resolveEnsData(publicClient, address, ensByQueryResolver),
-        ),
-      );
-    },
-    {
-      ...dataLoaderOptions,
-      cacheKeyFn(key) {
-        return key.toLowerCase() as Hex;
+    super(
+      async (addresses) => {
+        return Promise.all(
+          addresses.map((address) =>
+            resolveEnsData(publicClient, address, ensByQueryResolver),
+          ),
+        );
       },
-      name: "ENSByAddressResolver",
-    },
-  );
+      {
+        ...dataLoaderOptions,
+        cacheKeyFn(key) {
+          return key.toLowerCase() as Hex;
+        },
+        name: "ENSByAddressResolver",
+      },
+    );
+  }
 }

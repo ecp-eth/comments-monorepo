@@ -13,11 +13,6 @@ import {
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
 import type { ResolvedFarcasterData } from "./farcaster.types";
 
-export type FarcasterByAddressResolver = DataLoader<
-  Hex,
-  ResolvedFarcasterData | null
->;
-
 export type FarcasterByAddressResolverOptions = {
   neynarApiKey: string;
   /**
@@ -29,76 +24,83 @@ export type FarcasterByAddressResolverOptions = {
   "batchLoadFn" | "maxBatchSize" | "cacheKeyFn" | "name"
 >;
 
-export function createFarcasterByAddressResolver({
-  neynarApiKey,
-  generateProfileUrl = (user) =>
-    new URL(`https://farcaster.xyz/${user.username}`).toString(),
-  ...dataLoaderOptions
-}: FarcasterByAddressResolverOptions): FarcasterByAddressResolver {
-  const neynarClient = new NeynarAPIClient(
-    new NeynarConfiguration({
-      apiKey: neynarApiKey,
-    }),
-  );
+export class FarcasterByAddressResolver extends DataLoader<
+  Hex,
+  ResolvedFarcasterData | null
+> {
+  constructor({
+    neynarApiKey,
+    generateProfileUrl = (user) =>
+      new URL(`https://farcaster.xyz/${user.username}`).toString(),
+    ...dataLoaderOptions
+  }: FarcasterByAddressResolverOptions) {
+    const neynarClient = new NeynarAPIClient(
+      new NeynarConfiguration({
+        apiKey: neynarApiKey,
+      }),
+    );
 
-  return new DataLoader<Hex, ResolvedFarcasterData | null>(
-    async (addresses) => {
-      if (!addresses.length) {
-        return [];
-      }
-
-      try {
-        const response = await neynarClient.fetchBulkUsersByEthOrSolAddress({
-          addresses: addresses.slice(),
-        });
-
-        const normalizedResponse: Record<Address, User[]> = {};
-
-        for (const [key, value] of Object.entries(response)) {
-          normalizedResponse[getAddress(key)] = value;
+    super(
+      async (addresses) => {
+        if (!addresses.length) {
+          return [];
         }
 
-        return addresses.map((address) => {
-          const normalizedAddress = getAddress(address);
-          const [user] = normalizedResponse[normalizedAddress] ?? [];
-          const parseUserDataResult = IndexerAPIFarcasterDataSchema.safeParse({
-            fid: user?.fid,
-            username: user?.username,
-            displayName: user?.display_name,
-            pfpUrl: user?.pfp_url,
+        try {
+          const response = await neynarClient.fetchBulkUsersByEthOrSolAddress({
+            addresses: addresses.slice(),
           });
 
-          if (!parseUserDataResult.success) {
-            return null;
+          const normalizedResponse: Record<Address, User[]> = {};
+
+          for (const [key, value] of Object.entries(response)) {
+            normalizedResponse[getAddress(key)] = value;
           }
 
-          return {
-            address: normalizedAddress,
-            url: generateProfileUrl(parseUserDataResult.data),
-            fname: `${parseUserDataResult.data.username}.fcast.id`,
-            ...parseUserDataResult.data,
-          };
-        });
-      } catch (e) {
-        if (isApiErrorResponse(e) && e.response.status === 404) {
-          // this is expected edge case in neynar api when you pass only one address and that address does not exist
-          // in this case we return null for all addresses
-          return addresses.map(() => null);
+          return addresses.map((address) => {
+            const normalizedAddress = getAddress(address);
+            const [user] = normalizedResponse[normalizedAddress] ?? [];
+            const parseUserDataResult = IndexerAPIFarcasterDataSchema.safeParse(
+              {
+                fid: user?.fid,
+                username: user?.username,
+                displayName: user?.display_name,
+                pfpUrl: user?.pfp_url,
+              },
+            );
+
+            if (!parseUserDataResult.success) {
+              return null;
+            }
+
+            return {
+              address: normalizedAddress,
+              url: generateProfileUrl(parseUserDataResult.data),
+              fname: `${parseUserDataResult.data.username}.fcast.id`,
+              ...parseUserDataResult.data,
+            };
+          });
+        } catch (e) {
+          if (isApiErrorResponse(e) && e.response.status === 404) {
+            // this is expected edge case in neynar api when you pass only one address and that address does not exist
+            // in this case we return null for all addresses
+            return addresses.map(() => null);
+          }
+
+          console.error(e);
+
+          const err = e instanceof Error ? e : new Error(String(e));
+          throw err;
         }
-
-        console.error(e);
-
-        const err = e instanceof Error ? e : new Error(String(e));
-        throw err;
-      }
-    },
-    {
-      ...dataLoaderOptions,
-      maxBatchSize: 350, // this is limit coming from neynar api
-      cacheKeyFn(key) {
-        return key.toLowerCase() as Hex;
       },
-      name: "FarcasterByAddressResolver",
-    },
-  );
+      {
+        ...dataLoaderOptions,
+        maxBatchSize: 350, // this is limit coming from neynar api
+        cacheKeyFn(key) {
+          return key.toLowerCase() as Hex;
+        },
+        name: "FarcasterByAddressResolver",
+      },
+    );
+  }
 }

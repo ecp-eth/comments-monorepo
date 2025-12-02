@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { createENSByAddressResolver } from "../../../src/services/resolvers/ens-by-address-resolver";
-import { createENSByQueryResolver } from "../../../src/services/resolvers/ens-by-query-resolver";
+import { ENSByAddressResolver } from "../../../src/services/resolvers/ens-by-address-resolver";
+import { ENSByQueryResolver } from "../../../src/services/resolvers/ens-by-query-resolver";
 import { metrics } from "../../../src/services/metrics";
 
-const resolver = createENSByAddressResolver({
+const resolver = new ENSByAddressResolver({
   chainRpcUrl: process.env.ENS_RPC_URL ?? "https://ethereum-rpc.publicnode.com",
-  ensByQueryResolver: createENSByQueryResolver({
+  ensByQueryResolver: new ENSByQueryResolver({
     subgraphUrl: "https://api.alpha.ensnode.io/subgraph",
     metrics,
   }),

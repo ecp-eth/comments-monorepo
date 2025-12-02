@@ -1,11 +1,12 @@
 import { LRUCache } from "lru-cache";
 import { env } from "../env";
 import {
-  createENSByQueryResolver,
+  ENSByQueryResolver,
   type ENSByQueryResolverKey,
 } from "./resolvers/ens-by-query-resolver";
 import type { ResolvedENSData } from "./resolvers/ens.types";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const cacheMap = new LRUCache<
   ENSByQueryResolverKey,
@@ -16,8 +17,10 @@ const cacheMap = new LRUCache<
   allowStale: true,
 });
 
-export const ensByQueryResolverService = createENSByQueryResolver({
-  subgraphUrl: env.ENSNODE_SUBGRAPH_URL,
-  cacheMap,
-  metrics,
-});
+export const ensByQueryResolverService = wrapServiceWithTracing(
+  new ENSByQueryResolver({
+    subgraphUrl: env.ENSNODE_SUBGRAPH_URL,
+    cacheMap,
+    metrics,
+  }),
+);

@@ -9,6 +9,7 @@ import {
 import PQueue from "p-queue";
 import { env } from "../env";
 import * as Sentry from "@sentry/node";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const SIM_TOKEN_INFO_URL = "https://api.sim.dune.com/v1/evm/token-info/";
 
@@ -129,4 +130,6 @@ export class SIMAPIService implements ISIMAPIService {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const simAPIService = new SIMAPIService(env.SIM_API_KEY);
+export const simAPIService = wrapServiceWithTracing(
+  new SIMAPIService(env.SIM_API_KEY),
+);

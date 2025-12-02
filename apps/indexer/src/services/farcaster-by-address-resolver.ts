@@ -2,9 +2,10 @@ import { type Hex } from "viem";
 import { LRUCache } from "lru-cache";
 
 import { env } from "../env";
-import { createFarcasterByAddressResolver } from "./resolvers/farcaster-by-address-resolver";
+import { FarcasterByAddressResolver } from "./resolvers/farcaster-by-address-resolver";
 import { metrics } from "./metrics";
 import type { ResolvedFarcasterData } from "./resolvers/farcaster.types";
+import { wrapServiceWithTracing } from "../telemetry";
 
 // could also use redis
 const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({
@@ -13,9 +14,10 @@ const cacheMap = new LRUCache<Hex, Promise<ResolvedFarcasterData | null>>({
   allowStale: true,
 });
 
-export const farcasterByAddressResolverService =
-  createFarcasterByAddressResolver({
+export const farcasterByAddressResolverService = wrapServiceWithTracing(
+  new FarcasterByAddressResolver({
     neynarApiKey: env.NEYNAR_API_KEY,
     cacheMap,
     metrics,
-  });
+  }),
+);

@@ -9,11 +9,6 @@ import { type ERC20TokensService } from "../erc20-tokens-service";
 
 export type ERC20ByTickerResolverKey = [string, ChainID];
 
-export type ERC20ByTickerResolver = DataLoader<
-  ERC20ByTickerResolverKey,
-  ResolvedERC20Data | null
->;
-
 async function resolveErc20Data(
   ticker: string,
   chainId: ChainID,
@@ -62,22 +57,32 @@ export type ERC20ByTickerResolverOptions = {
   "name"
 >;
 
-export function createERC20ByTickerResolver({
-  clientRegistry,
-  erc20TokensService,
-  ...dataLoaderOptions
-}: ERC20ByTickerResolverOptions): ERC20ByTickerResolver {
-  return new DataLoader<ERC20ByTickerResolverKey, ResolvedERC20Data | null>(
-    async (keys) => {
-      return Promise.all(
-        keys.map(([ticker, chainId]) =>
-          resolveErc20Data(ticker, chainId, clientRegistry, erc20TokensService),
-        ),
-      );
-    },
-    {
-      ...dataLoaderOptions,
-      name: "ERC20ByTickerResolver",
-    },
-  );
+export class ERC20ByTickerResolver extends DataLoader<
+  ERC20ByTickerResolverKey,
+  ResolvedERC20Data | null
+> {
+  constructor({
+    clientRegistry,
+    erc20TokensService,
+    ...dataLoaderOptions
+  }: ERC20ByTickerResolverOptions) {
+    super(
+      async (keys) => {
+        return Promise.all(
+          keys.map(([ticker, chainId]) =>
+            resolveErc20Data(
+              ticker,
+              chainId,
+              clientRegistry,
+              erc20TokensService,
+            ),
+          ),
+        );
+      },
+      {
+        ...dataLoaderOptions,
+        name: "ERC20ByTickerResolver",
+      },
+    );
+  }
 }

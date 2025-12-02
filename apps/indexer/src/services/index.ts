@@ -44,6 +44,7 @@ import { createAppKeyMiddleware } from "../middleware/app-key";
 import { NotificationOutboxService } from "./notifications/notification-outbox-service";
 import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 export { db };
 
@@ -59,146 +60,176 @@ function resolveAuthor(author: Hex): Promise<string | Hex> {
   });
 }
 
-export const eventOutboxService = new EventOutboxService({
-  db,
-});
-
-export const telegramNotificationsService = new TelegramNotificationsService(
-  env.MODERATION_TELEGRAM_BOT_TOKEN &&
-  env.MODERATION_TELEGRAM_CHANNEL_ID &&
-  env.MODERATION_TELEGRAM_WEBHOOK_URL &&
-  env.MODERATION_TELEGRAM_WEBHOOK_SECRET &&
-  env.MODERATION_ENABLE_NOTIFICATIONS
-    ? {
-        enabled: true,
-        telegramBotToken: env.MODERATION_TELEGRAM_BOT_TOKEN,
-        telegramChannelId: env.MODERATION_TELEGRAM_CHANNEL_ID,
-        telegramWebhookUrl: env.MODERATION_TELEGRAM_WEBHOOK_URL,
-        telegramWebhookSecret: env.MODERATION_TELEGRAM_WEBHOOK_SECRET,
-        telegramApiRootUrl: env.MODERATION_TELEGRAM_API_ROOT_URL,
-      }
-    : {
-        enabled: false,
-      },
+export const eventOutboxService = wrapServiceWithTracing(
+  new EventOutboxService({
+    db,
+  }),
 );
 
-export const moderationNotificationsService =
+export const telegramNotificationsService = wrapServiceWithTracing(
+  new TelegramNotificationsService(
+    env.MODERATION_TELEGRAM_BOT_TOKEN &&
+    env.MODERATION_TELEGRAM_CHANNEL_ID &&
+    env.MODERATION_TELEGRAM_WEBHOOK_URL &&
+    env.MODERATION_TELEGRAM_WEBHOOK_SECRET &&
+    env.MODERATION_ENABLE_NOTIFICATIONS
+      ? {
+          enabled: true,
+          telegramBotToken: env.MODERATION_TELEGRAM_BOT_TOKEN,
+          telegramChannelId: env.MODERATION_TELEGRAM_CHANNEL_ID,
+          telegramWebhookUrl: env.MODERATION_TELEGRAM_WEBHOOK_URL,
+          telegramWebhookSecret: env.MODERATION_TELEGRAM_WEBHOOK_SECRET,
+          telegramApiRootUrl: env.MODERATION_TELEGRAM_API_ROOT_URL,
+        }
+      : {
+          enabled: false,
+        },
+  ),
+);
+
+export const moderationNotificationsService = wrapServiceWithTracing(
   new ModerationNotificationsService({
     enabled: env.MODERATION_ENABLE_NOTIFICATIONS,
     telegramNotificationsService,
     resolveAuthor,
-  });
+  }),
+);
 
-const classifierCacheService = new ClassificationCacheService(db);
+const classifierCacheService = wrapServiceWithTracing(
+  new ClassificationCacheService(db),
+);
 
 export const commentModerationClassifierService =
   env.MODERATION_ENABLE_AUTOMATIC_CLASSIFICATION && env.MODERATION_MBD_API_KEY
-    ? new CommentModerationClassifier({
-        apiKey: env.MODERATION_MBD_API_KEY,
-        cacheService: classifierCacheService,
-        metrics,
-      })
-    : new NoopCommentModerationClassifier();
+    ? wrapServiceWithTracing(
+        new CommentModerationClassifier({
+          apiKey: env.MODERATION_MBD_API_KEY,
+          cacheService: classifierCacheService,
+          metrics,
+        }),
+      )
+    : wrapServiceWithTracing(new NoopCommentModerationClassifier());
 
-export const managementAuthService = new ManagementAuthService(db);
+export const managementAuthService = wrapServiceWithTracing(
+  new ManagementAuthService(db),
+);
 
-export const reportsNotificationsService = new ReportsNotificationsService({
-  enabled: env.REPORTS_ENABLE_NOTIFICATIONS,
-  telegramNotificationsService,
-  resolveAuthor,
-});
+export const reportsNotificationsService = wrapServiceWithTracing(
+  new ReportsNotificationsService({
+    enabled: env.REPORTS_ENABLE_NOTIFICATIONS,
+    telegramNotificationsService,
+    resolveAuthor,
+  }),
+);
 
-export const commentReportsService = new CommentReportsService({
-  db,
-  notificationService: reportsNotificationsService,
-});
+export const commentReportsService = wrapServiceWithTracing(
+  new CommentReportsService({
+    db,
+    notificationService: reportsNotificationsService,
+  }),
+);
 
 export const premoderationService = env.MODERATION_ENABLED
-  ? new PremoderationService({
-      classificationThreshold:
-        env.MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD,
-      db,
-      eventOutboxService,
-    })
-  : new NoopPremoderationService();
+  ? wrapServiceWithTracing(
+      new PremoderationService({
+        classificationThreshold:
+          env.MODERATION_NOTIFICATION_TRIGGERING_CLASSIFICATION_THRESHOLD,
+        db,
+        eventOutboxService,
+      }),
+    )
+  : wrapServiceWithTracing(new NoopPremoderationService());
 
-export const commentModerationService = new CommentModerationService({
-  knownReactions: env.MODERATION_KNOWN_REACTIONS,
-  premoderationService,
-  notificationService: moderationNotificationsService,
-  classifierService: commentModerationClassifierService,
-});
+export const commentModerationService = wrapServiceWithTracing(
+  new CommentModerationService({
+    knownReactions: env.MODERATION_KNOWN_REACTIONS,
+    premoderationService,
+    notificationService: moderationNotificationsService,
+    classifierService: commentModerationClassifierService,
+  }),
+);
 
 export const telegramAdminBotService =
   env.ADMIN_TELEGRAM_BOT_ENABLED &&
   env.ADMIN_TELEGRAM_BOT_TOKEN &&
   env.ADMIN_TELEGRAM_BOT_WEBHOOK_URL &&
   env.ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET
-    ? new AdminTelegramBotService({
-        botToken: env.ADMIN_TELEGRAM_BOT_TOKEN,
-        apiRootUrl: env.ADMIN_TELEGRAM_BOT_API_ROOT_URL,
-        allowedUserIds: env.ADMIN_TELEGRAM_BOT_ALLOWED_USER_IDS || [],
-        webhookUrl: env.ADMIN_TELEGRAM_BOT_WEBHOOK_URL,
-        webhookSecret: env.ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET,
-        commands: [
-          new StartCommand(),
-          new ReportCommand(),
-          new ReportPendingCommand(),
-          new ModerateCommand(),
-          new ModeratePendingCommand(),
-        ],
-        premoderationService,
-        reportsService: commentReportsService,
-        resolveAuthor,
-      })
-    : new NoopAdminBotService();
+    ? wrapServiceWithTracing(
+        new AdminTelegramBotService({
+          botToken: env.ADMIN_TELEGRAM_BOT_TOKEN,
+          apiRootUrl: env.ADMIN_TELEGRAM_BOT_API_ROOT_URL,
+          allowedUserIds: env.ADMIN_TELEGRAM_BOT_ALLOWED_USER_IDS || [],
+          webhookUrl: env.ADMIN_TELEGRAM_BOT_WEBHOOK_URL,
+          webhookSecret: env.ADMIN_TELEGRAM_BOT_WEBHOOK_SECRET,
+          commands: [
+            new StartCommand(),
+            new ReportCommand(),
+            new ReportPendingCommand(),
+            new ModerateCommand(),
+            new ModeratePendingCommand(),
+          ],
+          premoderationService,
+          reportsService: commentReportsService,
+          resolveAuthor,
+        }),
+      )
+    : wrapServiceWithTracing(new NoopAdminBotService());
 
-export const mutedAccountsManagementService =
-  new MutedAccountsManagementService(db);
-
-export const siweAuthService = new SiweAuthService({
-  jwtNonceTokenAudience: env.JWT_SIWE_NONCE_AUDIENCE,
-  jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
-  jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
-  jwtNonceTokenPrivateKey: env.JWT_SIWE_NONCE_PRIVATE_KEY,
-  jwtNonceTokenPublicKey: env.JWT_SIWE_NONCE_PUBLIC_KEY,
-
-  jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
-  jwtAccessTokenIssuer: env.JWT_ACCESS_TOKEN_ISSUER,
-  jwtAccessTokenAudience: env.JWT_ACCESS_TOKEN_AUDIENCE,
-  jwtAccessTokenPrivateKey: env.JWT_ACCESS_TOKEN_PRIVATE_KEY,
-  jwtAccessTokenPublicKey: env.JWT_ACCESS_TOKEN_PUBLIC_KEY,
-
-  jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
-  jwtRefreshTokenIssuer: env.JWT_REFRESH_TOKEN_ISSUER,
-  jwtRefreshTokenAudience: env.JWT_REFRESH_TOKEN_AUDIENCE,
-  jwtRefreshTokenPrivateKey: env.JWT_REFRESH_TOKEN_PRIVATE_KEY,
-  jwtRefreshTokenPublicKey: env.JWT_REFRESH_TOKEN_PUBLIC_KEY,
-
-  db,
-  resolveChainClient: async (chainId) => {
-    return config.chains[chainId]?.publicClient;
-  },
-});
-
-export const siweMiddleware = createSiweMiddleware({
-  siweAuthService,
-});
-
-export const appManager = new AppManager({
-  db,
-});
-
-export const appWebhookManager = new AppWebhookManager({
-  db,
-  eventOutboxService,
-});
-
-export const commentReferencesCacheService = new CommentReferencesCacheService(
-  db,
+export const mutedAccountsManagementService = wrapServiceWithTracing(
+  new MutedAccountsManagementService(db),
 );
 
-export const commentReferencesResolutionService =
+export const siweAuthService = wrapServiceWithTracing(
+  new SiweAuthService({
+    jwtNonceTokenAudience: env.JWT_SIWE_NONCE_AUDIENCE,
+    jwtNonceTokenIssuer: env.JWT_SIWE_NONCE_ISSUER,
+    jwtNonceTokenLifetime: env.JWT_SIWE_NONCE_LIFETIME,
+    jwtNonceTokenPrivateKey: env.JWT_SIWE_NONCE_PRIVATE_KEY,
+    jwtNonceTokenPublicKey: env.JWT_SIWE_NONCE_PUBLIC_KEY,
+
+    jwtAccessTokenLifetime: env.JWT_ACCESS_TOKEN_LIFETIME,
+    jwtAccessTokenIssuer: env.JWT_ACCESS_TOKEN_ISSUER,
+    jwtAccessTokenAudience: env.JWT_ACCESS_TOKEN_AUDIENCE,
+    jwtAccessTokenPrivateKey: env.JWT_ACCESS_TOKEN_PRIVATE_KEY,
+    jwtAccessTokenPublicKey: env.JWT_ACCESS_TOKEN_PUBLIC_KEY,
+
+    jwtRefreshTokenLifetime: env.JWT_REFRESH_TOKEN_LIFETIME,
+    jwtRefreshTokenIssuer: env.JWT_REFRESH_TOKEN_ISSUER,
+    jwtRefreshTokenAudience: env.JWT_REFRESH_TOKEN_AUDIENCE,
+    jwtRefreshTokenPrivateKey: env.JWT_REFRESH_TOKEN_PRIVATE_KEY,
+    jwtRefreshTokenPublicKey: env.JWT_REFRESH_TOKEN_PUBLIC_KEY,
+
+    db,
+    resolveChainClient: async (chainId) => {
+      return config.chains[chainId]?.publicClient;
+    },
+  }),
+);
+
+export const siweMiddleware = wrapServiceWithTracing(
+  createSiweMiddleware({
+    siweAuthService,
+  }),
+);
+
+export const appManager = wrapServiceWithTracing(
+  new AppManager({
+    db,
+  }),
+);
+
+export const appWebhookManager = wrapServiceWithTracing(
+  new AppWebhookManager({
+    db,
+    eventOutboxService,
+  }),
+);
+
+export const commentReferencesCacheService = wrapServiceWithTracing(
+  new CommentReferencesCacheService(db),
+);
+
+export const commentReferencesResolutionService = wrapServiceWithTracing(
   new CommentReferencesResolutionService({
     resolveCommentReferences: resolveCommentReferences,
     commentReferencesResolvers: {
@@ -213,25 +244,36 @@ export const commentReferencesResolutionService =
       ipfsResolver: ipfsResolverService,
     },
     commentReferencesCacheService: commentReferencesCacheService,
-  });
+  }),
+);
 
-export const appWebhookDeliveryManager = new AppWebhookDeliveryManager({
-  db,
-});
+export const appWebhookDeliveryManager = wrapServiceWithTracing(
+  new AppWebhookDeliveryManager({
+    db,
+  }),
+);
 
-export const appKeyAuthService = new AppKeyAuthService({
-  db,
-});
+export const appKeyAuthService = wrapServiceWithTracing(
+  new AppKeyAuthService({
+    db,
+  }),
+);
 
-export const appKeyMiddleware = createAppKeyMiddleware({
-  appKeyService: appKeyAuthService,
-});
+export const appKeyMiddleware = wrapServiceWithTracing(
+  createAppKeyMiddleware({
+    appKeyService: appKeyAuthService,
+  }),
+);
 
-export const notificationService = new NotificationService({
-  db,
-  ensByNameResolver: ensByNameResolverService,
-});
+export const notificationService = wrapServiceWithTracing(
+  new NotificationService({
+    db,
+    ensByNameResolver: ensByNameResolverService,
+  }),
+);
 
-export const notificationOutboxService = new NotificationOutboxService({
-  db,
-});
+export const notificationOutboxService = wrapServiceWithTracing(
+  new NotificationOutboxService({
+    db,
+  }),
+);

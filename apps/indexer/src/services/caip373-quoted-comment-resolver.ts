@@ -1,11 +1,12 @@
 import {
-  createCAIP373QuotedCommentResolver,
+  CAIP373QuotedCommentResolver,
   type CAIP373QuotedCommentResolverResult,
 } from "./resolvers/caip373-quoted-comment-resolver";
 import { LRUCache } from "lru-cache";
 import config from "../../ponder.config";
 import { commentByIdResolverService } from "./comment-by-id-resolver";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const cacheMap = new LRUCache<
   string,
@@ -16,10 +17,11 @@ const cacheMap = new LRUCache<
   allowStale: true,
 });
 
-export const caip373QuotedCommentResolverService =
-  createCAIP373QuotedCommentResolver({
+export const caip373QuotedCommentResolverService = wrapServiceWithTracing(
+  new CAIP373QuotedCommentResolver({
     chains: config.chains,
     cacheMap,
     commentByIdResolver: commentByIdResolverService,
     metrics,
-  });
+  }),
+);

@@ -3,6 +3,7 @@ import { ERC20Caip19Schema } from "../lib/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core";
 import { DataLoader, type DataLoaderOptions } from "./dataloader";
 import { metrics } from "./metrics";
+import { wrapServiceWithTracing } from "../telemetry";
 
 const tokenSchema = z.object({
   address: HexSchema,
@@ -83,6 +84,8 @@ export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
   }
 }
 
-export const erc20TokensService = new ERC20TokensService({
-  metrics,
-});
+export const erc20TokensService = wrapServiceWithTracing(
+  new ERC20TokensService({
+    metrics,
+  }),
+);
