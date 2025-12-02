@@ -185,11 +185,9 @@ export function wrapServiceWithTracing<
         return original;
       }
 
-      const methodName =
-        options?.name ||
-        (target.constructor?.name
-          ? `${target.constructor.name}.${String(prop)}`
-          : String(prop));
+      const constructorName =
+        options?.name || target.constructor?.name || "AnonymousClass";
+      const methodName = `${constructorName}.${String(prop)}`;
 
       return createTracedFunction(
         original as (...args: unknown[]) => unknown,
