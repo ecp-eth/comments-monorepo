@@ -185,9 +185,9 @@ export class IPFSResolver extends DataLoader<string, ResolvedHTTP | null> {
         );
       },
       {
+        ...dataLoaderOptions,
         maxBatchSize: 3,
         name: "IPFSResolver",
-        ...dataLoaderOptions,
       },
     );
   }
