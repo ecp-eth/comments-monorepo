@@ -252,12 +252,39 @@ importers:
       '@neynar/nodejs-sdk':
         specifier: ^2.44.0
         version: 2.44.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+      '@opentelemetry/api':
+        specifier: 1.9.0
+        version: 1.9.0
+      '@opentelemetry/auto-instrumentations-node':
+        specifier: 0.67.1
+        version: 0.67.1(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))
+      '@opentelemetry/exporter-trace-otlp-http':
+        specifier: 0.208.0
+        version: 0.208.0(patch_hash=d98b3d4dce1f51c2a0eaeb937d9bc7efbe6cfee1a123be5fb183e8425f686acc)(@opentelemetry/api@1.9.0)
+      '@opentelemetry/otlp-exporter-base':
+        specifier: 0.208.0
+        version: 0.208.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/resources':
+        specifier: 2.2.0
+        version: 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-node':
+        specifier: 0.208.0
+        version: 0.208.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/sdk-trace-base':
+        specifier: 2.2.0
+        version: 2.2.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/semantic-conventions':
+        specifier: 1.34.0
+        version: 1.34.0
       '@ponder/client':
         specifier: 0.12.21
         version: 0.12.21(@electric-sql/pglite@0.2.13)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(kysely@0.26.3)(pg@8.16.0)(typescript@5.8.3)
       '@sentry/node':
         specifier: 9.47.1
         version: 9.47.1(patch_hash=50e0fa2ddec23c7f1308856d55d5994e7cb64de0145c61461cc6683ee4b9371e)
+      '@sentry/opentelemetry':
+        specifier: 9.47.1
+        version: 9.47.1(@opentelemetry/api@1.9.0)(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.34.0)
       '@sentry/profiling-node':
         specifier: 9.47.1
         version: 9.47.1

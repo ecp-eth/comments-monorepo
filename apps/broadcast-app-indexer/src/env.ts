@@ -58,6 +58,9 @@ const ChainBaseConfig = z.union([
 const ChainConfig = z.intersection(ChainAnvilConfig, ChainBaseConfig);
 
 const BaseConfig = z.object({
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
   DATABASE_URL: z.string().url(),
   DATABASE_SCHEMA: z.string().trim().nonempty(),
   NEYNAR_API_KEY: z.string().optional(),
@@ -105,6 +108,7 @@ const BaseConfig = z.object({
   EFP_ACCOUNT_METADATA_ADDRESS: HexSchema,
   EFP_LIST_REGISTRY_ADDRESS: HexSchema,
   CHAIN_ANVIL_EFP_OVERRIDE_CHAIN_ID: z.coerce.number().int().optional(),
+  OPENTELEMETRY_GRAFANA_TEMPO_URL: z.string().url().optional(),
 });
 
 const EnvSchema = z.intersection(BaseConfig, ChainConfig);
