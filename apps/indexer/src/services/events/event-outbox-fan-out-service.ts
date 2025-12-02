@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import Deferred from "promise-deferred";
 import { schema } from "../../../schema.ts";
 import type { DB } from "../db.ts";
+import { withSpan } from "../../telemetry.ts";
 
 type EventOutboxFanOutService_FanOutEventsParams = {
   signal: AbortSignal;
@@ -79,58 +80,62 @@ export class EventOutboxFanOutService {
         /**
          * Select events from event outbox and mark them as locked for update. Then fan out the events to webhooks that are subscribed to the event.
          */
-        const { rows } = await this.db.transaction(async (tx) => {
-          return tx.execute(sql`
-          WITH
-            -- 1) Claim a batch of events to be fanned out
-            claimed_events AS (
-              SELECT * FROM ${schema.eventOutbox}
-              WHERE ${schema.eventOutbox.processedAt} IS NULL
-              ORDER BY ${schema.eventOutbox.id} ASC
-              LIMIT 100
-              FOR UPDATE SKIP LOCKED
-            ),
+        const { rows } = await withSpan(
+          "EventOutboxFanOutService.fanOutEvents.processBatch",
+          async () =>
+            this.db.transaction(async (tx) => {
+              return tx.execute(sql`
+              WITH
+                -- 1) Claim a batch of events to be fanned out
+                claimed_events AS (
+                  SELECT * FROM ${schema.eventOutbox}
+                  WHERE ${schema.eventOutbox.processedAt} IS NULL
+                  ORDER BY ${schema.eventOutbox.id} ASC
+                  LIMIT 100
+                  FOR UPDATE SKIP LOCKED
+                ),
 
-            -- 2) Insert the events for subscribers which are interested in the event
-            inserted_events AS (
-              INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id, app_id, owner_id, retry_number)
-              SELECT ${schema.appWebhook.id}, e.id, ${schema.appWebhook.appId}, ${schema.appWebhook.ownerId}, 0 as retry_number
-              FROM claimed_events e
-              JOIN ${schema.appWebhook} ON (
-                ${schema.appWebhook.paused} = FALSE
-                AND 
-                (
-                  ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
-                  OR ${schema.appWebhook.eventFilter} = '{}'
-                )
-                AND
-                (
-                  e.event_type != 'test'
-                  OR
-                  (
-                    ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
+                -- 2) Inserst the events for subscribers which are interested in the event
+                inserted_events AS (
+                  INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id, app_id, owner_id, retry_number)
+                  SELECT ${schema.appWebhook.id}, e.id, ${schema.appWebhook.appId}, ${schema.appWebhook.ownerId}, 0 as retry_number
+                  FROM claimed_events e
+                  JOIN ${schema.appWebhook} ON (
+                    ${schema.appWebhook.paused} = FALSE
+                    AND 
+                    (
+                      ${schema.appWebhook.eventFilter} @> ARRAY[e.event_type]
+                      OR ${schema.appWebhook.eventFilter} = '{}'
+                    )
                     AND
-                    ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
+                    (
+                      e.event_type != 'test'
+                      OR
+                      (
+                        ${schema.appWebhook.id} = (e.payload->>'webhookId')::uuid
+                        AND
+                        ${schema.appWebhook.appId} = (e.payload->>'appId')::uuid
+                      )
+                    )
+                    AND
+                    -- prevents from sending the events that the webhook has not been subscribed to previously
+                    -- on reindex. For example if the webhook was updated to subscribe to more events than previously
+                    -- then on reindex it would send the past events to the webhook. This guarantees that the webhook will pick only 
+                    -- newer events.
+                    e.id > GREATEST(${schema.appWebhook.eventOutboxPosition}, (${schema.appWebhook.eventActivations}->>(e.event_type))::bigint)
                   )
+                  ON CONFLICT (app_webhook_id, event_id, retry_number) DO NOTHING
+                  RETURNING 1
                 )
-                AND
-                -- prevents from sending the events that the webhook has not been subscribed to previously
-                -- on reindex. For example if the webhook was updated to subscribe to more events than previously
-                -- then on reindex it would send the past events to the webhook. This guarantees that the webhook will pick only 
-                -- newer events.
-                e.id > GREATEST(${schema.appWebhook.eventOutboxPosition}, (${schema.appWebhook.eventActivations}->>(e.event_type))::bigint)
-              )
-              ON CONFLICT (app_webhook_id, event_id, retry_number) DO NOTHING
-              RETURNING 1
-            )
 
-          -- 3) Mark the events as processed
-          UPDATE ${schema.eventOutbox}
-          SET processed_at = NOW()
-          WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events)
-          RETURNING *;
-        `);
-        });
+              -- 3) Mark the events as processed
+              UPDATE ${schema.eventOutbox}
+              SET processed_at = NOW()
+              WHERE ${schema.eventOutbox.id} IN (SELECT id FROM claimed_events)
+              RETURNING *;
+            `);
+            }),
+        );
 
         // if no rows were returned we essentially processed all the events
         // otherwise we want to drain the queue completely

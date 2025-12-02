@@ -3,6 +3,7 @@
 /**
  * This script is used to fan out notifications to all app clients.
  */
+import { shutdown as shutdownTelemetry } from "../src/telemetry.ts";
 import * as Sentry from "@sentry/node";
 import { db } from "../src/services/db.ts";
 import { NotificationOutboxFanOutService } from "../src/services/notifications/notification-outbox-fan-out-service.ts";
@@ -23,8 +24,10 @@ const notificationOutboxFanOutService = new NotificationOutboxFanOutService({
 // graceful shutdown
 (["SIGINT", "SIGTERM", "SIGHUP"] as NodeJS.Signals[]).forEach((signal) => {
   process.on(signal, () => {
-    abortController.abort();
     console.log(`Received ${signal}, shutting down...`);
+    void shutdownTelemetry().finally(() => {
+      abortController.abort();
+    });
   });
 });
 
