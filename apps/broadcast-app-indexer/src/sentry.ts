@@ -22,8 +22,8 @@ declare global {
 if (env.SENTRY_DSN) {
   Sentry.init({
     dsn: env.SENTRY_DSN,
-    debug: process.env.NODE_ENV !== "production",
-    environment: process.env.NODE_ENV ?? "development",
+    debug: env.NODE_ENV !== "production",
+    environment: env.NODE_ENV,
     release: process.env["RAILWAY_DEPLOYMENT_ID"] ?? "unknown",
     integrations: [
       nodeProfilingIntegration(),
@@ -78,4 +78,17 @@ if (env.SENTRY_DSN) {
   }
 } else {
   console.log("Sentry DSN not set");
+
+  Sentry.init({
+    debug: true,
+    integrations: [
+      nodeProfilingIntegration(),
+      Sentry.captureConsoleIntegration({
+        levels: ["error", "warn"],
+      }),
+    ],
+    tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+    skipOpenTelemetrySetup: true,
+  });
 }
