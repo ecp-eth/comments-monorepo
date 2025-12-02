@@ -95,7 +95,7 @@ export class EventOutboxFanOutService {
                   FOR UPDATE SKIP LOCKED
                 ),
 
-                -- 2) Inserst the events for subscribers which are interested in the event
+                -- 2) Insert the events for subscribers which are interested in the event
                 inserted_events AS (
                   INSERT INTO ${schema.appWebhookDelivery} (app_webhook_id, event_id, app_id, owner_id, retry_number)
                   SELECT ${schema.appWebhook.id}, e.id, ${schema.appWebhook.appId}, ${schema.appWebhook.ownerId}, 0 as retry_number
