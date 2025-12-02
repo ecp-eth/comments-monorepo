@@ -84,6 +84,7 @@ export async function withSpan<T>(
         error instanceof Error ? error : new Error(String(error)),
       );
       span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+
       throw error;
     } finally {
       span.end();

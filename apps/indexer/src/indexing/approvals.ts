@@ -1,4 +1,7 @@
-import { type ponder as Ponder } from "ponder:registry";
+import {
+  type IndexingFunctionArgs,
+  type ponder as Ponder,
+} from "ponder:registry";
 import { db, eventOutboxService } from "../services/index.ts";
 import {
   ponderEventToApprovalAddedEvent,
@@ -6,9 +9,12 @@ import {
 } from "../events/approval/index.ts";
 import { schema } from "../../schema.ts";
 import { eq } from "drizzle-orm";
+import { wrapServiceWithTracing } from "../telemetry.ts";
 
 export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
-  ponder.on("CommentsV1:ApprovalAdded", async ({ event, context }) => {
+  const approvalAddedHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:ApprovalAdded">,
+  ) => Promise<void> = async function approvalAddedHandler({ event, context }) {
     const id = `${event.args.author}-${event.args.app}-${context.chain.id}`;
 
     await db.transaction(async (tx) => {
@@ -51,9 +57,19 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
         tx,
       });
     });
-  });
+  };
 
-  ponder.on("CommentsV1:ApprovalRemoved", async ({ event, context }) => {
+  ponder.on(
+    "CommentsV1:ApprovalAdded",
+    wrapServiceWithTracing(approvalAddedHandler),
+  );
+
+  const approvalRemovedHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:ApprovalRemoved">,
+  ) => Promise<void> = async function approvalRemovedHandler({
+    event,
+    context,
+  }) {
     const id = `${event.args.author}-${event.args.app}-${context.chain.id}`;
 
     await db.transaction(async (tx) => {
@@ -82,5 +98,10 @@ export function initializeApprovalEventsIndexing(ponder: typeof Ponder) {
         tx,
       });
     });
-  });
+  };
+
+  ponder.on(
+    "CommentsV1:ApprovalRemoved",
+    wrapServiceWithTracing(approvalRemovedHandler),
+  );
 }

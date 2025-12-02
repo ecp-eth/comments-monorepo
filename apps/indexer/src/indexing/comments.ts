@@ -1,5 +1,9 @@
 import * as Sentry from "@sentry/node";
-import { type Context, type ponder as Ponder } from "ponder:registry";
+import {
+  type IndexingFunctionArgs,
+  type Context,
+  type ponder as Ponder,
+} from "ponder:registry";
 import {
   transformCommentParentId,
   transformCommentTargetUri,
@@ -41,9 +45,12 @@ import type {
 } from "../notifications/schemas.ts";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
+import { wrapServiceWithTracing } from "../telemetry.ts";
 
 export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
-  ponder.on("CommentsV1:CommentAdded", async ({ event, context }) => {
+  const commendsAddedHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:CommentAdded">,
+  ) => Promise<void> = async function commendsAddedHandler({ event, context }) {
     if (event.args.content.length > env.COMMENT_CONTENT_LENGTH_LIMIT) {
       Sentry.captureMessage(
         `Comment content length limit exceeded, comment id: ${event.args.commentId}`,
@@ -249,10 +256,19 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         tx,
       });
     });
-  });
+  };
 
-  // Handle hook metadata setting separately
-  ponder.on("CommentsV1:CommentHookMetadataSet", async ({ event, context }) => {
+  ponder.on(
+    "CommentsV1:CommentAdded",
+    wrapServiceWithTracing(commendsAddedHandler),
+  );
+
+  const commentHookMetadataSetHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:CommentHookMetadataSet">,
+  ) => Promise<void> = async function commentHookMetadataSetHandler({
+    event,
+    context,
+  }) {
     await db.transaction(async (tx) => {
       const comment = await tx.query.comment.findFirst({
         where: eq(schema.comment.id, event.args.commentId),
@@ -332,9 +348,20 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         tx,
       });
     });
-  });
+  };
 
-  ponder.on("CommentsV1:CommentDeleted", async ({ event, context }) => {
+  // Handle hook metadata setting separately
+  ponder.on(
+    "CommentsV1:CommentHookMetadataSet",
+    wrapServiceWithTracing(commentHookMetadataSetHandler),
+  );
+
+  const commentDeletedHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:CommentDeleted">,
+  ) => Promise<void> = async function commentDeletedHandler({
+    event,
+    context,
+  }) {
     await db.transaction(async (tx) => {
       const existingComment = await tx.query.comment.findFirst({
         where: eq(schema.comment.id, event.args.commentId),
@@ -408,9 +435,16 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         });
       }
     });
-  });
+  };
 
-  ponder.on("CommentsV1:CommentEdited", async ({ event, context }) => {
+  ponder.on(
+    "CommentsV1:CommentDeleted",
+    wrapServiceWithTracing(commentDeletedHandler),
+  );
+
+  const commentEditedHandler: (
+    args: IndexingFunctionArgs<"CommentsV1:CommentEdited">,
+  ) => Promise<void> = async function commentEditedHandler({ event, context }) {
     // Check if the author is muted
     if (
       await mutedAccountsManagementService.getMutedAccount(event.args.author)
@@ -506,7 +540,12 @@ export function initializeCommentEventsIndexing(ponder: typeof Ponder) {
         tx,
       });
     });
-  });
+  };
+
+  ponder.on(
+    "CommentsV1:CommentEdited",
+    wrapServiceWithTracing(commentEditedHandler),
+  );
 }
 
 async function resolveNotificationsFromReferences({
