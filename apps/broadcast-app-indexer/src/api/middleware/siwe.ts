@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { type Hex } from "@ecp.eth/sdk/core";
 import { siweAuthService } from "../../services";
 import { SiweAuthError } from "../../services/siwe-auth-service";
+import { wrapServiceWithTracing } from "../../telemetry";
 
 export type SiweAuthEnv = {
   Variables: {
@@ -20,30 +21,35 @@ export type SiweAuthEnv = {
  *
  * @returns {Promise<void>}
  */
-export const siweMiddleware = createMiddleware<SiweAuthEnv>(async (c, next) => {
-  const authorization = c.req.header("Authorization");
-  const [, token] = authorization?.split(" ") || [];
+export const siweMiddleware = wrapServiceWithTracing(
+  createMiddleware<SiweAuthEnv>(async (c, next) => {
+    const authorization = c.req.header("Authorization");
+    const [, token] = authorization?.split(" ") || [];
 
-  if (!token) {
-    throw new HTTPException(401, { message: "Missing token" });
-  }
-
-  try {
-    const payload = await siweAuthService.verifyJWTAccessToken(token);
-
-    c.set("user", {
-      address: payload.address,
-      sessionId: payload.sessionId,
-    });
-  } catch (e) {
-    if (e instanceof SiweAuthError) {
-      throw new HTTPException(401, { message: "Invalid token" });
+    if (!token) {
+      throw new HTTPException(401, { message: "Missing token" });
     }
 
-    console.error(e);
+    try {
+      const payload = await siweAuthService.verifyJWTAccessToken(token);
 
-    throw e;
-  }
+      c.set("user", {
+        address: payload.address,
+        sessionId: payload.sessionId,
+      });
+    } catch (e) {
+      if (e instanceof SiweAuthError) {
+        throw new HTTPException(401, { message: "Invalid token" });
+      }
 
-  await next();
-});
+      console.error(e);
+
+      throw e;
+    }
+
+    await next();
+  }),
+  {
+    name: "siweMiddleware",
+  },
+);

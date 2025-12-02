@@ -47,7 +47,7 @@ distributor:
     #   endpoint: "tempo:55678"
 
 ingester:
-  max_block_duration: 5m # cut the headblock when this much time passes. this is being set for demo purposes and should probably be left alone normally
+  max_block_duration: 2m # cut the headblock when this much time passes. this is being set for demo purposes and should probably be left alone normally
 
 compactor:
   compaction:
@@ -71,6 +71,7 @@ metrics_generator:
 storage:
   trace:
     backend: local # backend configuration to use
+    blocklist_poll: 1m
     wal:
       path: /var/tempo/wal # where to store the wal locally
     local:

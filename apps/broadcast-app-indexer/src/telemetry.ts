@@ -109,7 +109,7 @@ export async function withSpan<T>(
  */
 export function wrapServiceWithTracing<
   T extends object | ((...args: unknown[]) => unknown),
->(service: T): T {
+>(service: T, options?: { name?: string }): T {
   // Helper function to create a traced function wrapper
   const createTracedFunction = (
     fn: (...args: unknown[]) => unknown,
@@ -165,6 +165,7 @@ export function wrapServiceWithTracing<
   // If the service itself is a function, wrap it directly
   if (typeof service === "function") {
     const functionName =
+      options?.name ||
       service.name ||
       (service as { constructor?: { name?: string } }).constructor?.name ||
       "AnonymousFunction";
@@ -184,9 +185,9 @@ export function wrapServiceWithTracing<
         return original;
       }
 
-      const methodName = target.constructor?.name
-        ? `${target.constructor.name}.${String(prop)}`
-        : String(prop);
+      const constructorName =
+        options?.name || target.constructor?.name || "AnonymousClass";
+      const methodName = `${constructorName}.${String(prop)}`;
 
       return createTracedFunction(
         original as (...args: unknown[]) => unknown,
