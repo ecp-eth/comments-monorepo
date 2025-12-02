@@ -1,5 +1,6 @@
 import { SentryPropagator, SentrySpanProcessor } from "@sentry/opentelemetry";
 import * as otelApi from "@opentelemetry/api";
+import { context } from "@opentelemetry/api";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
@@ -112,45 +113,47 @@ export function wrapServiceWithTracing<T extends object>(service: T): T {
       }
 
       return function (...args: unknown[]) {
-        return tracer.startActiveSpan(
+        const span = tracer.startSpan(
           `${target.constructor.name}.${String(prop)}`,
-          (span) => {
-            try {
-              const result = original.apply(target, args);
-
-              if (isPromiseLike(result)) {
-                return result.then(
-                  (value) => {
-                    span.end();
-
-                    return value;
-                  },
-                  (error) => {
-                    span.recordException(
-                      error instanceof Error ? error : new Error(String(error)),
-                    );
-                    span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
-                    span.end();
-
-                    throw error;
-                  },
-                );
-              }
-
-              span.end();
-
-              return result;
-            } catch (error) {
-              span.recordException(
-                error instanceof Error ? error : new Error(String(error)),
-              );
-              span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
-              span.end();
-
-              throw error;
-            }
-          },
         );
+        const activeContext = otelApi.trace.setSpan(context.active(), span);
+
+        try {
+          const result = context.with(activeContext, () => {
+            return original.apply(target, args);
+          });
+
+          if (isPromiseLike(result)) {
+            return result.then(
+              (value) => {
+                span.end();
+
+                return value;
+              },
+              (error) => {
+                span.recordException(
+                  error instanceof Error ? error : new Error(String(error)),
+                );
+                span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+                span.end();
+
+                throw error;
+              },
+            );
+          }
+
+          span.end();
+
+          return result;
+        } catch (error) {
+          span.recordException(
+            error instanceof Error ? error : new Error(String(error)),
+          );
+          span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+          span.end();
+
+          throw error;
+        }
       };
     },
   });
