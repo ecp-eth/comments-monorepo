@@ -1,6 +1,5 @@
 import { SentryPropagator, SentrySpanProcessor } from "@sentry/opentelemetry";
 import * as otelApi from "@opentelemetry/api";
-import { context } from "@opentelemetry/api";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
@@ -94,16 +93,88 @@ export async function withSpan<T>(
 
 /**
  * This function wraps a service and instruments all its methods with OpenTelemetry spans.
+ * It also handles direct function calls (like middleware functions) via the apply trap.
  *
- * @param service - The service to wrap
+ * @param service - The service to wrap (can be an object or a function)
  * @returns The wrapped service
  *
  * @example
  * const service = wrapServiceWithTracing(new Service());
- *
  * service.doSomething();
+ *
+ * @example
+ * const middleware = wrapServiceWithTracing(createMiddleware());
+ * await middleware(context, next);
  */
-export function wrapServiceWithTracing<T extends object>(service: T): T {
+export function wrapServiceWithTracing<
+  T extends object | ((...args: unknown[]) => unknown),
+>(service: T): T {
+  // Helper function to create a traced function wrapper
+  const createTracedFunction = (
+    fn: (...args: unknown[]) => unknown,
+    name: string,
+    target?: object,
+  ) => {
+    return function (...args: unknown[]) {
+      const span = tracer.startSpan(name);
+      const activeContext = otelApi.trace.setSpan(
+        otelApi.context.active(),
+        span,
+      );
+
+      try {
+        const result = otelApi.context.with(activeContext, () => {
+          return target ? fn.apply(target, args) : fn(...args);
+        });
+
+        if (isPromiseLike(result)) {
+          return result.then(
+            (value) => {
+              span.end();
+
+              return value;
+            },
+            (error) => {
+              span.recordException(
+                error instanceof Error ? error : new Error(String(error)),
+              );
+              span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+              span.end();
+
+              throw error;
+            },
+          );
+        }
+
+        span.end();
+
+        return result;
+      } catch (error) {
+        span.recordException(
+          error instanceof Error ? error : new Error(String(error)),
+        );
+        span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
+        span.end();
+
+        throw error;
+      }
+    };
+  };
+
+  // If the service itself is a function, wrap it directly
+  if (typeof service === "function") {
+    const functionName =
+      service.name ||
+      (service as { constructor?: { name?: string } }).constructor?.name ||
+      "AnonymousFunction";
+
+    return createTracedFunction(
+      service as (...args: unknown[]) => unknown,
+      functionName,
+    ) as unknown as T;
+  }
+
+  // Otherwise, wrap it as an object with methods
   return new Proxy(service, {
     get(target, prop, receiver) {
       const original = Reflect.get(target, prop, receiver);
@@ -112,49 +183,15 @@ export function wrapServiceWithTracing<T extends object>(service: T): T {
         return original;
       }
 
-      return function (...args: unknown[]) {
-        const span = tracer.startSpan(
-          `${target.constructor.name}.${String(prop)}`,
-        );
-        const activeContext = otelApi.trace.setSpan(context.active(), span);
+      const methodName = target.constructor?.name
+        ? `${target.constructor.name}.${String(prop)}`
+        : String(prop);
 
-        try {
-          const result = context.with(activeContext, () => {
-            return original.apply(target, args);
-          });
-
-          if (isPromiseLike(result)) {
-            return result.then(
-              (value) => {
-                span.end();
-
-                return value;
-              },
-              (error) => {
-                span.recordException(
-                  error instanceof Error ? error : new Error(String(error)),
-                );
-                span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
-                span.end();
-
-                throw error;
-              },
-            );
-          }
-
-          span.end();
-
-          return result;
-        } catch (error) {
-          span.recordException(
-            error instanceof Error ? error : new Error(String(error)),
-          );
-          span.setStatus({ code: otelApi.SpanStatusCode.ERROR });
-          span.end();
-
-          throw error;
-        }
-      };
+      return createTracedFunction(
+        original as (...args: unknown[]) => unknown,
+        methodName,
+        target,
+      );
     },
   });
 }
