@@ -1,4 +1,4 @@
-import "./sentry";
+import "./instrumentation";
 import * as Sentry from "@sentry/node";
 import { schema } from "../schema";
 import { ponder } from "ponder:registry";
