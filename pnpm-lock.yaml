@@ -52,9 +52,9 @@ patchedDependencies:
   '@opentelemetry/otlp-grpc-exporter-base@0.208.0':
     hash: 9176f87f20ced717fd3330f020d92d6ecc4172706684b946438d143e9254b238
     path: patches/@opentelemetry__otlp-grpc-exporter-base@0.208.0.patch
-  '@privy-io/server-auth':
-    hash: 3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c
-    path: patches/@privy-io__server-auth.patch
+  '@privy-io/server-auth@1.32.5':
+    hash: d41a1bd62074e9a581c9470cf4a958f8b78fb9860d3989d75496cd3102e275a4
+    path: patches/@privy-io__server-auth@1.32.5.patch
   '@rainbow-me/rainbowkit':
     hash: de27859521ffa1f2f5bc03d5400233e30552e5f51b766007d69da9b01003d1c8
     path: patches/@rainbow-me__rainbowkit.patch
@@ -367,7 +367,7 @@ importers:
         version: 2.46.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@privy-io/server-auth':
         specifier: ^1.32.5
-        version: 1.32.5(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        version: 1.32.5(patch_hash=d41a1bd62074e9a581c9470cf4a958f8b78fb9860d3989d75496cd3102e275a4)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@radix-ui/react-avatar':
         specifier: ^1.1.3
         version: 1.1.10(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1291,7 +1291,7 @@ importers:
         version: link:../../packages/shared-signer
       '@privy-io/server-auth':
         specifier: ^1.32.5
-        version: 1.32.5(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
+        version: 1.32.5(patch_hash=d41a1bd62074e9a581c9470cf4a958f8b78fb9860d3989d75496cd3102e275a4)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))
       '@types/node':
         specifier: ^20
         version: 20.11.17
@@ -16438,7 +16438,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@privy-io/server-auth@1.32.5(patch_hash=3261a77169140110e743634bd597f6f14d53817310de531811ffee9d2940c88c)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
+  '@privy-io/server-auth@1.32.5(patch_hash=d41a1bd62074e9a581c9470cf4a958f8b78fb9860d3989d75496cd3102e275a4)(bufferutil@4.0.9)(ethers@6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(typescript@5.8.3)(utf-8-validate@5.0.10)(viem@2.29.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.76))':
     dependencies:
       '@hpke/chacha20poly1305': 1.6.2
       '@hpke/core': 1.7.5
