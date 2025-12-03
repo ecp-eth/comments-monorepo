@@ -103,7 +103,7 @@
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared-signer": "workspace:*",
     "@ecp.eth/typescript-config": "workspace:*",
-    "@neynar/nodejs-sdk": "^2.13.1",
+    "@neynar/nodejs-sdk": "^2.46.0",
     "@rainbow-me/rainbowkit": "^2.2.5",
     "@tanstack/react-query": "^5.75.6",
     "@types/react": "~19.1.0",

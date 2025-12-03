@@ -1,13 +1,13 @@
 diff --git a/dist/dts/viem.d.mts b/dist/dts/viem.d.mts
-index 2d6ee0e0175e05b26e32190dd05775d5d08a3abd..027549d94658f08d7dac5c7bc90d6ce96642c73b 100644
+index 94f4281bacbde118efdc1e505498c43649d3e4b2..355247013c0fb33574cb913099b102b9e4548af6 100644
 --- a/dist/dts/viem.d.mts
 +++ b/dist/dts/viem.d.mts
 @@ -1,6 +1,6 @@
  import { LocalAccount } from 'viem/accounts';
 -import { PrivyClient } from './index.js';
--import { H as Hex } from './public-DQ5eO1J3.js';
+-import { H as Hex } from './public-DTbbnwMV.js';
 +import { PrivyClient } from './index.mts';
-+import { H as Hex } from './public-DQ5eO1J3.mts';
++import { H as Hex } from './public-DTbbnwMV.mts';
  import '@solana/web3.js';
  import 'redaxios';
  import '@privy-io/public-api';

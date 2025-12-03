@@ -64,8 +64,8 @@
     "@tiptap/extension-hard-break": "^2.12.0",
     "@tiptap/extension-mention": "^2.12.0",
     "@tiptap/suggestion": "^2.12.0",
-    "prosemirror-state": "^1.4.3",
-    "prosemirror-model": "^1.25.1",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-model": "^1.25.4",
     "prosemirror-transform": "^1.10.4",
     "tippy.js": "^6.3.7"
   },
