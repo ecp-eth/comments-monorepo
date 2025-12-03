@@ -12,8 +12,6 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@hpke/chacha20poly1305": "^1.6.2",
-    "@hpke/core": "^1.7.2",
     "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.35.0",
     "jose": "^6.1.0",
@@ -26,7 +24,7 @@
   "devDependencies": {
     "@ecp.eth/sdk": "workspace:*",
     "@ecp.eth/shared-signer": "workspace:*",
-    "@privy-io/server-auth": "^1.30.0",
+    "@privy-io/server-auth": "^1.32.5",
     "@types/node": "^20",
     "@types/react": "~19.1.0",
     "@types/react-dom": "~19.1.0",

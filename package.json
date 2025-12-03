@@ -27,7 +27,6 @@
     "eslint": "^9.19.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.0.0",
-    "localtunnel": "^2.0.2",
     "prettier": "^3.4.2",
     "prettier-plugin-solidity": "^2.0.0",
     "tsup": "^8.3.6",
@@ -42,6 +41,7 @@
   "pnpm": {
     "overrides": {
       "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0",
+      "@hpke/core": "^1.7.5",
       "@react-native-async-storage/async-storage": "^2.1.2",
       "@opentelemetry/api": "1.9.0",
       "@opentelemetry/api-logs": "0.208.0",
@@ -54,6 +54,9 @@
       "@walletconnect/core": "~2.21.1",
       "@walletconnect/sign-client": "~2.21.1",
       "@walletconnect/universal-provider": "~2.21.1",
+      "axios": "^1.13.2",
+      "linkifyjs": "^4.3.2",
+      "playwright": "^1.55.0",
       "zod": "^3.25.76",
       "viem": "~2.29.2",
       "use-sync-external-store": "^1.5.0",

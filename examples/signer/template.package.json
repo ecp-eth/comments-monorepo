@@ -1,7 +1,7 @@
 {
   "pnpm": {
     "overrides": {
-      "@privy-io/server-auth": "1.30.0"
+      "@privy-io/server-auth": "1.32.5"
     },
     "patchedDependencies": {
       "@privy-io/server-auth": "patches/@privy-io__server-auth.patch"
