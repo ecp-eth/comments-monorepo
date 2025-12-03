@@ -4,6 +4,7 @@ import { createHmac } from "node:crypto";
 import Deferred from "promise-deferred";
 import { schema } from "../../../schema.ts";
 import type { DB } from "../db.ts";
+import { withSpan } from "../../telemetry.ts";
 
 type WebhookEventDeliveryService_DeliverEventsParams = {
   signal: AbortSignal;
@@ -107,61 +108,65 @@ export class WebhookEventDeliveryService {
     });
 
     while (!signal.aborted) {
-      const { rows } = await this.db.transaction(async (tx) => {
-        return tx.execute<{
-          id: bigint;
-          appWebhookId: string;
-          eventId: bigint;
-        }>(sql`
-          WITH
-            -- select the head of the queue for each subscription (FIFO)
-            subscription_pending_delivery_heads AS (
-              SELECT DISTINCT ON (w.app_webhook_id) w.app_webhook_id, w.next_attempt_at, w.id, w.event_id
-              FROM ${schema.appWebhookDelivery} w
-              WHERE
-                -- include expired leases
-                w.status IN ('pending', 'processing')
-                AND 
-                w.next_attempt_at <= now()
-                AND NOT EXISTS(
-                  SELECT 1
-                  FROM ${schema.appWebhookDelivery} x
+      const { rows } = await withSpan(
+        "WebhookEventDeliveryService.deliveryEvents.processBatch",
+        async () =>
+          this.db.transaction(async (tx) => {
+            return tx.execute<{
+              id: bigint;
+              appWebhookId: string;
+              eventId: bigint;
+            }>(sql`
+              WITH
+                -- select the head of the queue for each subscription (FIFO)
+                subscription_pending_delivery_heads AS (
+                  SELECT DISTINCT ON (w.app_webhook_id) w.app_webhook_id, w.next_attempt_at, w.id, w.event_id
+                  FROM ${schema.appWebhookDelivery} w
                   WHERE
-                    x.app_webhook_id = w.app_webhook_id
-                    AND
-                    x.status = 'processing'
+                    -- include expired leases
+                    w.status IN ('pending', 'processing')
                     AND 
-                    x.lease_until > now()
+                    w.next_attempt_at <= now()
+                    AND NOT EXISTS(
+                      SELECT 1
+                      FROM ${schema.appWebhookDelivery} x
+                      WHERE
+                        x.app_webhook_id = w.app_webhook_id
+                        AND
+                        x.status = 'processing'
+                        AND 
+                        x.lease_until > now()
+                    )
+                  ORDER BY w.app_webhook_id, w.next_attempt_at, w.id
+                ),
+      
+                -- avoid lock spray
+                subscription_pending_deliveries AS (
+                  SELECT *
+                  FROM subscription_pending_delivery_heads
+                  ORDER BY next_attempt_at, id
+                  LIMIT ${this.batchSize}
+                ),
+      
+                -- lock the head of the queue for each subscription (FIFO)
+                subscription_pending_deliveries_locked AS (
+                  SELECT h.*
+                  FROM subscription_pending_deliveries h
+                  WHERE pg_try_advisory_xact_lock(hashtextextended(h.app_webhook_id::text, 0)) -- non blocking lock
+                  ORDER BY h.next_attempt_at, h.id
                 )
-              ORDER BY w.app_webhook_id, w.next_attempt_at, w.id
-            ),
-  
-            -- avoid lock spray
-            subscription_pending_deliveries AS (
-              SELECT *
-              FROM subscription_pending_delivery_heads
-              ORDER BY next_attempt_at, id
-              LIMIT ${this.batchSize}
-            ),
-  
-            -- lock the head of the queue for each subscription (FIFO)
-            subscription_pending_deliveries_locked AS (
-              SELECT h.*
-              FROM subscription_pending_deliveries h
-              WHERE pg_try_advisory_xact_lock(hashtextextended(h.app_webhook_id::text, 0)) -- non blocking lock
-              ORDER BY h.next_attempt_at, h.id
-            )
-  
-            -- update the deliveries to processing
-            UPDATE ${schema.appWebhookDelivery} d
-            SET 
-              status = 'processing',
-              lease_until = NOW() + interval '60 seconds'
-            FROM subscription_pending_deliveries_locked l
-            WHERE l.id = d.id
-            RETURNING d.id, d.app_webhook_id, d.event_id
-        `);
-      });
+      
+                -- update the deliveries to processing
+                UPDATE ${schema.appWebhookDelivery} d
+                SET 
+                  status = 'processing',
+                  lease_until = NOW() + interval '60 seconds'
+                FROM subscription_pending_deliveries_locked l
+                WHERE l.id = d.id
+                RETURNING d.id, d.app_webhook_id, d.event_id
+            `);
+          }),
+      );
 
       // if no rows were returned we essentially processed all the deliveries
       // otherwise we want to drain the queue completely
@@ -177,7 +182,13 @@ export class WebhookEventDeliveryService {
       }
 
       // we could use all settled here but we prefer to fail if there is some unhandled error
-      await Promise.all(rows.map((row) => this.deliver(row.id)));
+      await Promise.all(
+        rows.map((row) =>
+          withSpan("WebhookEventDeliveryService.deliveryEvents.deliver", () =>
+            this.deliver(row.id),
+          ),
+        ),
+      );
     }
 
     cleanup();

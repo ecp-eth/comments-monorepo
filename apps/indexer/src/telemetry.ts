@@ -58,6 +58,8 @@ if (globalThis.PONDER_COMMON) {
   });
 }
 
+export const shutdown = openTelemetrySDK.shutdown.bind(openTelemetrySDK);
+
 export const tracer = otelApi.trace.getTracer("indexer");
 
 /**

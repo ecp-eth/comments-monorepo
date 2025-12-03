@@ -9,6 +9,7 @@ export function initSentry(environmentNamePrefix: string) {
     debug: !(process.env.NODE_ENV === "production" && !!env.SENTRY_DSN),
     dsn: env.SENTRY_DSN,
     environment: `${environmentNamePrefix}-${process.env.NODE_ENV || "development"}`,
+    skipOpenTelemetrySetup: true,
   });
 }
 

@@ -3,6 +3,7 @@
 /**
  * This script is used to deliver events to webhooks that are subscribed to the event.
  */
+import { shutdown as shutdownTelemetry } from "../src/telemetry.ts";
 import * as Sentry from "@sentry/node";
 import { initSentry, waitForIndexerToBeReady } from "./utils.ts";
 import { db } from "../src/services/db.ts";
@@ -34,8 +35,10 @@ if (options.waitForIndexer) {
 // graceful shutdown
 (["SIGINT", "SIGTERM", "SIGHUP"] as NodeJS.Signals[]).forEach((signal) => {
   process.on(signal, () => {
-    abortController.abort();
     console.log(`Received ${signal}, shutting down...`);
+    void shutdownTelemetry().finally(() => {
+      abortController.abort();
+    });
   });
 });
 

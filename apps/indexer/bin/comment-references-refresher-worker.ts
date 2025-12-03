@@ -7,6 +7,7 @@
  *
  * The script is supposed to be run as a cron job in sequential manner.
  */
+import { shutdown as shutdownTelemetry, withSpan } from "../src/telemetry.ts";
 import * as Sentry from "@sentry/node";
 import {
   initSentry,
@@ -32,6 +33,7 @@ import { parseWorkerCommandOptions, workerCommand } from "./shared.ts";
 import { EventOutboxService } from "../src/services/events/event-outbox-service.ts";
 import { createCommentReferencesUpdatedEvent } from "../src/events/comment/index.ts";
 import { ipfsResolverService } from "../src/services/ipfs-resolver.ts";
+import { wrapServiceWithTracing } from "../src/telemetry.ts";
 
 initSentry("comment-references-refresher-worker");
 
@@ -84,8 +86,10 @@ if (options.waitForIndexer) {
   console.log("Comments are indexed");
 }
 
-const commentReferencesCacheService = new CommentReferencesCacheService(db);
-const commentReferencesResolutionService =
+const commentReferencesCacheService = wrapServiceWithTracing(
+  new CommentReferencesCacheService(db),
+);
+const commentReferencesResolutionService = wrapServiceWithTracing(
   new CommentReferencesResolutionService({
     commentReferencesCacheService,
     resolveCommentReferences,
@@ -100,16 +104,21 @@ const commentReferencesResolutionService =
       httpResolver: httpResolverService,
       ipfsResolver: ipfsResolverService,
     },
-  });
-const eventOutboxService = new EventOutboxService({
-  db,
-});
+  }),
+);
+const eventOutboxService = wrapServiceWithTracing(
+  new EventOutboxService({
+    db,
+  }),
+);
 
 // Graceful shutdown
 (["SIGINT", "SIGTERM", "SIGHUP"] as NodeJS.Signals[]).forEach((signal) => {
   process.on(signal, () => {
-    abortController.abort();
     console.log(`Received ${signal}, shutting down...`);
+    void shutdownTelemetry().finally(() => {
+      abortController.abort();
+    });
   });
 });
 
@@ -177,89 +186,94 @@ async function processFailedReferences() {
       `Retrying resolution for commentId: ${result.commentId}, revision: ${result.commentRevision}`,
     );
 
-    try {
-      await db.transaction(async (tx) => {
-        // Get the comment details to retry resolution
-        const comments = await tx
-          .select()
-          .from(schema.comment)
-          .where(eq(schema.comment.id, result.commentId))
-          .for("update");
+    await withSpan(
+      "comment-references-refresher-worker.processFailedReferences.retryResolution",
+      async () => {
+        try {
+          await db.transaction(async (tx) => {
+            // Get the comment details to retry resolution
+            const comments = await tx
+              .select()
+              .from(schema.comment)
+              .where(eq(schema.comment.id, result.commentId))
+              .for("update");
 
-        const comment = comments[0];
+            const comment = comments[0];
 
-        if (!comment) {
-          failedCount++;
-          console.warn(
-            `Comment not found for commentId: ${result.commentId}, skipping`,
-          );
-          return;
-        }
+            if (!comment) {
+              failedCount++;
+              console.warn(
+                `Comment not found for commentId: ${result.commentId}, skipping`,
+              );
+              return;
+            }
 
-        const resolved =
-          await commentReferencesResolutionService.resolveFromNetworkFirst({
-            commentId: result.commentId,
-            commentRevision: result.commentRevision,
-            content: comment.content,
-            chainId: comment.chainId,
+            const resolved =
+              await commentReferencesResolutionService.resolveFromNetworkFirst({
+                commentId: result.commentId,
+                commentRevision: result.commentRevision,
+                content: comment.content,
+                chainId: comment.chainId,
+              });
+
+            switch (resolved.status) {
+              case "success":
+                successCount++;
+                break;
+              case "partial":
+                partialCount++;
+                break;
+              case "failed":
+                failedCount++;
+                break;
+            }
+
+            const newRefs = {
+              references: resolved.references,
+              referencesResolutionStatus: resolved.status,
+              referencesResolutionStatusChangedAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            await tx
+              .update(schema.comment)
+              .set(newRefs)
+              .where(eq(schema.comment.id, result.commentId));
+
+            await eventOutboxService.publishEvent({
+              tx,
+              aggregateId: result.commentId,
+              aggregateType: "comment",
+              event: createCommentReferencesUpdatedEvent({
+                comment: {
+                  ...comment,
+                  ...newRefs,
+                },
+              }),
+            });
           });
+        } catch (error) {
+          failedCount++;
+          console.error(
+            `Failed to retry resolution for commentId: ${result.commentId}`,
+            error,
+          );
 
-        switch (resolved.status) {
-          case "success":
-            successCount++;
-            break;
-          case "partial":
-            partialCount++;
-            break;
-          case "failed":
-            failedCount++;
-            break;
-        }
-
-        const newRefs = {
-          references: resolved.references,
-          referencesResolutionStatus: resolved.status,
-          referencesResolutionStatusChangedAt: new Date(),
-          updatedAt: new Date(),
-        };
-
-        await tx
-          .update(schema.comment)
-          .set(newRefs)
-          .where(eq(schema.comment.id, result.commentId));
-
-        await eventOutboxService.publishEvent({
-          tx,
-          aggregateId: result.commentId,
-          aggregateType: "comment",
-          event: createCommentReferencesUpdatedEvent({
-            comment: {
-              ...comment,
-              ...newRefs,
+          // Report unexpected failures to Sentry
+          Sentry.captureException(error, {
+            tags: {
+              component: "comment-references-refresher-worker",
+              commentId: result.commentId,
+              commentRevision: result.commentRevision,
             },
-          }),
-        });
-      });
-    } catch (error) {
-      failedCount++;
-      console.error(
-        `Failed to retry resolution for commentId: ${result.commentId}`,
-        error,
-      );
-
-      // Report unexpected failures to Sentry
-      Sentry.captureException(error, {
-        tags: {
-          component: "comment-references-refresher-worker",
-          commentId: result.commentId,
-          commentRevision: result.commentRevision,
-        },
-        extra: {
-          originalStatus: result.referencesResolutionStatus,
-          originalUpdatedAt: result.updatedAt.toISOString(),
-        },
-      });
-    }
+            extra: {
+              originalStatus: result.referencesResolutionStatus,
+              originalUpdatedAt: result.updatedAt.toISOString(),
+            },
+          });
+        }
+      },
+    );
   }
 
   console.log(
