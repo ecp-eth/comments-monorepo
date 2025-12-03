@@ -21,7 +21,7 @@ overrides:
   '@walletconnect/universal-provider': ~2.21.1
   axios: ^1.13.2
   linkifyjs: ^4.3.2
-  playwright: ^1.55.0
+  playwright: ^1.57.0
   zod: ^3.25.76
   viem: ~2.29.2
   use-sync-external-store: ^1.5.0
@@ -10007,7 +10007,7 @@ packages:
   mermaid-isomorphic@3.0.4:
     resolution: {integrity: sha512-XQTy7H1XwHK3DPEHf+ZNWiqUEd9BwX3Xws38R9Fj2gx718srmgjlZoUzHr+Tca+O+dqJOJsAJaKzCoP65QDfDg==}
     peerDependencies:
-      playwright: ^1.55.0
+      playwright: ^1.57.0
     peerDependenciesMeta:
       playwright:
         optional: true
@@ -11570,7 +11570,7 @@ packages:
   rehype-mermaid@3.0.0:
     resolution: {integrity: sha512-fxrD5E4Fa1WXUjmjNDvLOMT4XB1WaxcfycFIWiYU0yEMQhcTDElc9aDFnbDFRLxG1Cfo1I3mfD5kg4sjlWaB+Q==}
     peerDependencies:
-      playwright: ^1.55.0
+      playwright: ^1.57.0
     peerDependenciesMeta:
       playwright:
         optional: true

@@ -56,7 +56,7 @@
       "@walletconnect/universal-provider": "~2.21.1",
       "axios": "^1.13.2",
       "linkifyjs": "^4.3.2",
-      "playwright": "^1.55.0",
+      "playwright": "^1.57.0",
       "zod": "^3.25.76",
       "viem": "~2.29.2",
       "use-sync-external-store": "^1.5.0",
