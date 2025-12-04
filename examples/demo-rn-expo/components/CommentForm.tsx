@@ -108,6 +108,9 @@ export function CommentForm({
       );
       const response = await fetch(uploadAPIURL, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ filename }),
       });
 

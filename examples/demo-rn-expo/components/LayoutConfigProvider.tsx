@@ -1,4 +1,11 @@
-import { createContext, useContext, PropsWithChildren, useState } from "react";
+import {
+  createContext,
+  useContext,
+  PropsWithChildren,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 
 type CommentFormType = "on-top" | "on-bottom";
 type LayoutConfig = {
@@ -10,17 +17,15 @@ const LayoutConfigContext = createContext<LayoutConfig>({
   toggle: () => {},
 });
 export function LayoutConfigProvider({ children }: PropsWithChildren) {
-  const [config, setConfig] = useState<LayoutConfig>({
-    commentForm: "on-top",
-    toggle: () => {
-      setConfig((prev) => {
-        return {
-          ...prev,
-          commentForm: prev.commentForm === "on-top" ? "on-bottom" : "on-top",
-        };
-      });
-    },
-  });
+  const [commentForm, setCommentForm] = useState<CommentFormType>("on-top");
+  const toggle = useCallback(() => {
+    setCommentForm((prev) => (prev === "on-top" ? "on-bottom" : "on-top"));
+  }, []);
+
+  const config = useMemo(
+    () => ({ commentForm, toggle }),
+    [commentForm, toggle],
+  );
 
   return (
     <LayoutConfigContext.Provider value={config}>

@@ -83,7 +83,6 @@ packages/shared/schemas/indexer-siwe-api/*
 packages/shared-signer/helpers/*
 packages/shared-signer/schemas/signer-api/*
 packages/shared-signer/services/*
-packages/react-editor/editor.web
 packages/react-editor/editor.native
 packages/react-editor/editor.style.css
 packages/react-editor/editor.css

@@ -30,10 +30,16 @@ import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
 
 export type { EditorProps, EditorRef } from "./editor.type.js";
 
-const emitter = new EventEmitter();
-const subscriptionMap = new Map<(event: unknown) => void, EventSubscription>();
-
 export function Editor(props: EditorProps) {
+  const emitter = useRef<EventEmitter>(null);
+  emitter.current ??= new EventEmitter();
+  const subscriptionMap =
+    useRef<Map<(event: unknown) => void, EventSubscription>>(null);
+  subscriptionMap.current ??= new Map<
+    (event: unknown) => void,
+    EventSubscription
+  >();
+
   const webViewContainerViewRef = useRef<View>(null);
   const webViewRef = useRef<WebView>(null);
   const webViewComRef = useRef<Remote<IWebViewExposedCom>>(null);
@@ -59,8 +65,12 @@ export function Editor(props: EditorProps) {
           return;
         }
 
-        const sub = emitter.addListener(eventName, callback);
-        subscriptionMap.set(callback, sub);
+        const sub = emitter.current?.addListener(eventName, callback);
+        if (!sub) {
+          return;
+        }
+
+        subscriptionMap.current?.set(callback, sub);
       },
       removeEventListener(
         eventName: string,
@@ -70,8 +80,8 @@ export function Editor(props: EditorProps) {
           return;
         }
 
-        subscriptionMap.get(callback)?.remove();
-        subscriptionMap.delete(callback);
+        subscriptionMap.current?.get(callback)?.remove();
+        subscriptionMap.current?.delete(callback);
       },
       postMessage(message: unknown) {
         webViewRef.current?.postMessage(JSON.stringify(message));
@@ -82,7 +92,6 @@ export function Editor(props: EditorProps) {
   useSyncPropsRef(props, webViewComRef, nativeMessageEventEndpoint);
 
   useEffect(() => {
-    const props = freshProps.current;
     expose(
       {
         setViewportHeight: (height: number) => {
@@ -93,24 +102,24 @@ export function Editor(props: EditorProps) {
         },
         onWebViewReady: () => {
           console.log("onWebViewReady");
-          webViewComRef.current?.setProps(props);
+          webViewComRef.current?.setProps(freshProps.current);
         },
         onEditorCreated: () => {
-          props.onCreate?.();
+          freshProps.current.onCreate?.();
         },
         onEditorUpdated: () => {
-          props.onUpdate?.();
+          freshProps.current.onUpdate?.();
         },
         onEditorBlurred: () => {
-          props.onBlur?.();
+          freshProps.current.onBlur?.();
           setSuggestionsEnabled(false);
         },
         onEditorEscapePressed: () => {
-          props.onEscapePress?.();
+          freshProps.current.onEscapePress?.();
           setSuggestionsEnabled(false);
         },
         async searchSuggestions(query: string, char: "@" | "$") {
-          return await props.suggestions.search(query, char);
+          return await freshProps.current.suggestions.search(query, char);
         },
         onMentionSuggestionStart: ({ items, query, clientRect }) => {
           setSuggestionsEnabled(true);
@@ -156,8 +165,8 @@ export function Editor(props: EditorProps) {
 
     return () => {
       // comlink didn't provide a way to unexpose, so we need to manually remove the subscriptions
-      subscriptionMap.forEach((sub) => sub.remove());
-      subscriptionMap.clear();
+      subscriptionMap.current?.forEach((sub) => sub.remove());
+      subscriptionMap.current?.clear();
     };
   }, [freshProps, nativeMessageEventEndpoint, freshWebViewLayout]);
 
@@ -175,9 +184,9 @@ export function Editor(props: EditorProps) {
           style={{ flex: 1 }}
           originWhitelist={["*"]}
           scrollEnabled={false}
-          webviewDebuggingEnabled={true}
+          webviewDebuggingEnabled={__DEV__}
           onMessage={(event) => {
-            emitter.emit("message", {
+            emitter.current?.emit("message", {
               origin: "file://webview",
               data: JSON.parse(event.nativeEvent.data),
             });

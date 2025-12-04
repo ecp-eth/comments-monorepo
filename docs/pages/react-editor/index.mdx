@@ -91,10 +91,10 @@ editorRef.current?.clear();
 editorRef.current?.addFiles([file1, file2]);
 
 // Get uploaded files
-const uploadedFiles = editorRef.current?.getUploadedFiles();
+const uploadedFiles = await editorRef.current?.getUploadedFiles();
 
 // Get files pending upload
-const pendingFiles = editorRef.current?.getFilesForUpload();
+const pendingFiles = await editorRef.current?.getFilesForUpload();
 
 // Mark file as uploaded
 editorRef.current?.setFileAsUploaded(uploadedFile);

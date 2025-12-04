@@ -102,6 +102,20 @@
     "react-native-webview": ">=13.16.0",
     "viem": "^2.29.2"
   },
+  "peerDependenciesMeta": {
+    "react-dom": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    },
+    "react-native-safe-area-context": {
+      "optional": true
+    },
+    "react-native-webview": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@ecp.eth/sdk": "workspace:^",
     "@ecp.eth/shared": "workspace:^",
