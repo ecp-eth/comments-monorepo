@@ -42,7 +42,9 @@ export const openTelemetrySDK = new NodeSDK({
   textMapPropagator: new SentryPropagator(),
 });
 
-openTelemetrySDK.start();
+if (env.OPENTELEMETRY_ENABLED) {
+  openTelemetrySDK.start();
+}
 
 if (globalThis.PONDER_COMMON) {
   globalThis.PONDER_COMMON.shutdown.add(async () => {

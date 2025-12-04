@@ -223,6 +223,10 @@ const EnvSchema = z
     JWT_REFRESH_TOKEN_ISSUER: z.string().nonempty().default("ecp-indexer"),
     JWT_REFRESH_TOKEN_AUDIENCE: z.string().nonempty().default("ecp-indexer-rt"),
     OPENTELEMETRY_GRAFANA_TEMPO_URL: z.string().url().optional(),
+    OPENTELEMETRY_ENABLED: z
+      .enum(["0", "1", "yes", "no", "true", "false"])
+      .default("false")
+      .transform((val) => val === "1" || val === "yes" || val === "true"),
   })
   .superRefine((vars, ctx) => {
     if (
