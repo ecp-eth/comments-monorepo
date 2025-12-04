@@ -13,13 +13,11 @@ import { useSafeAreaFrame } from "react-native-safe-area-context";
 /**
  * Utility hook used to calculate keyboard dimensions.
  *
- * @param `useListenersOnAndroid` Will register keyboard listeners for Android
- *
  * ⚠️ You shouldn't use this hook on the same screen with `KeyboardAccessoryView` component, unexpected behavior might occur
  * @returns `keyboardEndPositionY` Keyboard's top line Y position
  * @returns `keyboardHeight` Keyboard's height
  */
-export const useKeyboardDimensions = (useListenersOnAndroid?: boolean) => {
+export const useKeyboardDimensions = () => {
   const { height } = useSafeAreaFrame();
   const [state, setState] = React.useState({
     keyboardEndPositionY: height,
@@ -77,7 +75,7 @@ export const useKeyboardDimensions = (useListenersOnAndroid?: boolean) => {
 
     const keyboardListeners: EventSubscription[] = [];
 
-    if (Platform.OS === "android" && useListenersOnAndroid) {
+    if (Platform.OS === "android") {
       keyboardListeners.push(
         Keyboard.addListener("keyboardDidHide", resetKeyboardDimensions),
         Keyboard.addListener("keyboardDidShow", updateKeyboardDimensions),
@@ -96,7 +94,7 @@ export const useKeyboardDimensions = (useListenersOnAndroid?: boolean) => {
 
       dimensionsListener.remove();
     };
-  }, [height, useListenersOnAndroid]);
+  }, [height]);
 
   return state;
 };

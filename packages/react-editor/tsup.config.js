@@ -19,7 +19,7 @@ const entry = files
       return;
     }
 
-    if (filePath.match(/(\/test\/|\.test\.tsx|\.d\.ts|\.html|\.css?)/)) {
+    if (filePath.match(/(\/test\/|\.test\.tsx?|\.d\.ts|\.html|\.css)/)) {
       return;
     }
 

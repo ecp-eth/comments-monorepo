@@ -23,7 +23,6 @@ interface Props {
     popAbove: boolean;
     maxHeight: number;
   }) => React.ReactNode;
-  useListenersOnAndroid?: boolean;
   onDismiss: () => void;
 }
 
@@ -33,13 +32,10 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
   children,
   inputRect,
   gap,
-  useListenersOnAndroid,
   onDismiss,
 }: Props) {
   const safeArea = useSafeAreaInsets();
-  const { keyboardHeight, keyboardEndPositionY } = useKeyboardDimensions(
-    useListenersOnAndroid,
-  );
+  const { keyboardHeight, keyboardEndPositionY } = useKeyboardDimensions();
   const screenHeight = Dimensions.get("screen").height;
   // if the topLimiter is above of mid of available space, we make the layer underneath the input
   // otherwise, we make the layer above the input

@@ -82,31 +82,5 @@
   "lint-staged": {
     "*.{js,ts,tsx,sol}": "prettier --write"
   },
-  "license": "MIT",
-  "overrides": {
-    "@hono/zod-openapi>@asteasolutions/zod-to-openapi": "^7.3.0",
-    "@react-native-async-storage/async-storage": "^2.1.2",
-    "@walletconnect/core": "~2.21.1",
-    "@walletconnect/sign-client": "~2.21.1",
-    "@walletconnect/universal-provider": "~2.21.1",
-    "zod": "^3.25.76",
-    "viem": "~2.29.2",
-    "use-sync-external-store": "^1.5.0",
-    "vite": "6.4.1"
-  },
-  "patchedDependencies": {
-    "@privy-io/server-auth": "patches/@privy-io__server-auth.patch",
-    "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
-    "@wagmi/connectors": "patches/@wagmi__connectors.patch",
-    "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch",
-    "ponder": "patches/ponder.patch"
-  },
-  "workspaces": [
-    "apps/*",
-    "!examples/demo-rn-expo",
-    "packages/*",
-    "examples/*",
-    "docs",
-    "!docs/templates/*"
-  ]
+  "license": "MIT"
 }

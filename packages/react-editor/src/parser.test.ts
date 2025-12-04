@@ -214,7 +214,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "https://example.com/test",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },
@@ -230,7 +230,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "http://localhost:3000",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },
@@ -422,7 +422,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "https://example.com",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },

@@ -6,6 +6,6 @@
     "moduleResolution": "bundler"
   },
 
-  "include": ["src", "postcss.config.js", "tailwind.config.js"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
