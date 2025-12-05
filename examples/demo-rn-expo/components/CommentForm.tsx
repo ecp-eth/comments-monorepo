@@ -195,6 +195,8 @@ export function CommentForm({
           txHashRef.current = undefined;
 
           try {
+            editorRef.current?.dismissKeyboard();
+
             console.log("connecting async...");
 
             const address = await waitConnected();

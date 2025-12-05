@@ -72,6 +72,9 @@ export function exposeWebViewCom() {
       invokeMentionCommand(mentionItem: MentionItem) {
         webViewComSharedContext.command?.(mentionItem);
       },
+      dismissKeyboard() {
+        webViewComSharedContext.editor?.editor?.view.dom.blur();
+      },
     } satisfies IWebViewExposedCom,
     webViewMessageEventEndpoint,
   );
