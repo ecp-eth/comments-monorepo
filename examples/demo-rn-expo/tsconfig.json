@@ -3,8 +3,7 @@
     "moduleResolution": "bundler",
     "module": "ESNext",
     "strictNullChecks": true,
-    "jsx": "react-native",
-    "preserveSymlinks": false
+    "jsx": "react-native"
     // "paths": { "react": ["./node_modules/@types/react"] }
   },
   "extends": "expo/tsconfig.base"
