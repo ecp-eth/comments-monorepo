@@ -189,6 +189,9 @@ export function Editor({
       async getDefaultContent() {
         return content;
       },
+      dismissKeyboard: () => {
+        editor?.view.dom.blur();
+      },
     }),
     [editor, content],
   );

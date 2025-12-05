@@ -37,6 +37,7 @@ export type EditorRef = {
   setFileAsUploaded: (file: UploadTrackerUploadedFile) => void;
   setFileUploadAsFailed: (fileId: string) => void;
   addFiles: (files: File[]) => void;
+  dismissKeyboard: () => void;
 };
 
 /**
