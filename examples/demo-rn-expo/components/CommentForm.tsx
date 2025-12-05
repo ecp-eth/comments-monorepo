@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   View,
   Text,
@@ -69,10 +75,6 @@ export function CommentForm({
     reset,
   } = usePostComment();
 
-  const insertPendingOperations = useInsertPendingOperations(rootComment);
-  const textIsEmpty = !text || text.trim().length === 0;
-  const disabledSubmit = textIsEmpty || isPostingComment || isProcessing;
-
   useShowErrorInToast(error);
 
   useAppStateEffect({
@@ -132,6 +134,32 @@ export function CommentForm({
   });
 
   const editable = !isProcessing;
+  const editorTheme = useMemo(() => {
+    return {
+      styleSheetText:
+        editorCssText +
+        `
+      .editor {
+        border-width: 1px;
+        border-radius: 8px;
+        padding: 3px 10px;
+        min-height: 80px;
+        border-color: ${error ? theme.colors.border.error : theme.colors.border.default};
+        color: ${editable ? theme.colors.text.default : theme.colors.text.nonEditable};
+        background-color: ${editable ? theme.colors.background.default : theme.colors.background.nonEditable};
+        max-height: ${keyboardRemainingHeight}px;
+      }
+      `,
+      editor: {
+        classNames:
+          "editor placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
+      },
+    };
+  }, [editable, error, keyboardRemainingHeight]);
+
+  const insertPendingOperations = useInsertPendingOperations(rootComment);
+  const textIsEmpty = !text || text.trim().length === 0;
+  const disabledSubmit = textIsEmpty || isPostingComment || isProcessing;
 
   return (
     <View style={{ gap: 20 }}>
@@ -148,26 +176,7 @@ export function CommentForm({
         }
         uploads={uploads}
         suggestions={suggestions}
-        theme={{
-          styleSheetText:
-            editorCssText +
-            `
-          .editor {
-            border-width: 1px;
-            border-radius: 8px;
-            padding: 3px 10px;
-            min-height: 80px;
-            border-color: ${error ? theme.colors.border.error : theme.colors.border.default};
-            color: ${editable ? theme.colors.text.default : theme.colors.text.nonEditable};
-            background-color: ${editable ? theme.colors.background.default : theme.colors.background.nonEditable};
-            max-height: ${keyboardRemainingHeight}px;
-          }
-          `,
-          editor: {
-            classNames:
-              "editor placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
-          },
-        }}
+        theme={editorTheme}
         onUpdate={async () => {
           const text = await editorRef.current?.getText();
           setText(text ?? "");
