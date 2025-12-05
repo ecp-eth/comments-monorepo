@@ -31,18 +31,10 @@ import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
 export type { EditorProps, EditorRef } from "./editor.type.js";
 
 export function Editor(props: EditorProps) {
-  const emitter = useRef<EventEmitter>(null);
-  emitter.current ??= new EventEmitter();
-  const subscriptionMap =
-    useRef<Map<(event: unknown) => void, EventSubscription>>(null);
-  subscriptionMap.current ??= new Map<
-    (event: unknown) => void,
-    EventSubscription
-  >();
-
   const webViewContainerViewRef = useRef<View>(null);
   const webViewRef = useRef<WebView>(null);
   const webViewComRef = useRef<Remote<IWebViewExposedCom>>(null);
+  const [isWebViewReady, setIsWebViewReady] = useState(false);
   const [notifiedHeight, setNotifiedHeight] = useState(0);
   const { onLayout: webViewOnLayout, layout: webViewLayout } = useClientRect();
   const [mentionSuggestionProps, setMentionSuggestionProps] = useState<{
@@ -57,39 +49,20 @@ export function Editor(props: EditorProps) {
   const [suggestionsEnabled, setSuggestionsEnabled] = useState(false);
   const freshProps = useFreshRef(props);
   const freshWebViewLayout = useFreshRef(webViewLayout);
+  const {
+    endpoint: nativeMessageEventEndpoint,
+    clearListeners: clearNativeMessageEventListeners,
+    emitMessage: emitMessageToNative,
+  } = useNativeMessageEventEndpoint(webViewRef);
+  useSyncRef(props, webViewComRef, nativeMessageEventEndpoint);
 
-  const nativeMessageEventEndpoint = useMemo(() => {
-    return {
-      addEventListener(eventName: string, callback: (event: unknown) => void) {
-        if (eventName !== "message") {
-          return;
-        }
-
-        const sub = emitter.current?.addListener(eventName, callback);
-        if (!sub) {
-          return;
-        }
-
-        subscriptionMap.current?.set(callback, sub);
-      },
-      removeEventListener(
-        eventName: string,
-        callback: (event: unknown) => void,
-      ) {
-        if (eventName !== "message") {
-          return;
-        }
-
-        subscriptionMap.current?.get(callback)?.remove();
-        subscriptionMap.current?.delete(callback);
-      },
-      postMessage(message: unknown) {
-        webViewRef.current?.postMessage(JSON.stringify(message));
-      },
-    };
-  }, []);
-
-  useSyncPropsRef(props, webViewComRef, nativeMessageEventEndpoint);
+  // sync props to webview when webview is ready
+  useEffect(() => {
+    if (!isWebViewReady) {
+      return;
+    }
+    webViewComRef.current?.setProps(props);
+  }, [isWebViewReady, props]);
 
   useEffect(() => {
     expose(
@@ -102,7 +75,7 @@ export function Editor(props: EditorProps) {
         },
         onWebViewReady: () => {
           console.log("onWebViewReady");
-          webViewComRef.current?.setProps(freshProps.current);
+          setIsWebViewReady(true);
         },
         onEditorCreated: () => {
           freshProps.current.onCreate?.();
@@ -165,10 +138,14 @@ export function Editor(props: EditorProps) {
 
     return () => {
       // comlink didn't provide a way to unexpose, so we need to manually remove the subscriptions
-      subscriptionMap.current?.forEach((sub) => sub.remove());
-      subscriptionMap.current?.clear();
+      clearNativeMessageEventListeners();
     };
-  }, [freshProps, nativeMessageEventEndpoint, freshWebViewLayout]);
+  }, [
+    freshProps,
+    freshWebViewLayout,
+    nativeMessageEventEndpoint,
+    clearNativeMessageEventListeners,
+  ]);
 
   return (
     <>
@@ -186,10 +163,7 @@ export function Editor(props: EditorProps) {
           scrollEnabled={false}
           webviewDebuggingEnabled={__DEV__}
           onMessage={(event) => {
-            emitter.current?.emit("message", {
-              origin: "file://webview",
-              data: JSON.parse(event.nativeEvent.data),
-            });
+            emitMessageToNative(JSON.parse(event.nativeEvent.data));
           }}
           source={{ html: `${editorHtml}` }}
           onLayout={webViewOnLayout}
@@ -209,7 +183,7 @@ export function Editor(props: EditorProps) {
   );
 }
 
-function useSyncPropsRef(
+function useSyncRef(
   props: EditorProps,
   webViewComRef: RefObject<Remote<IWebViewExposedCom> | null>,
   nativeMessageEventEndpoint: ComlinkEndpoint,
@@ -257,4 +231,65 @@ function useClientRect() {
   }, []);
 
   return { onLayout, layout };
+}
+
+function useNativeMessageEventEndpoint(webViewRef: RefObject<WebView | null>) {
+  const emitter = useRef<EventEmitter>(null);
+  emitter.current ??= new EventEmitter();
+  const subscriptionMap =
+    useRef<Map<(event: unknown) => void, EventSubscription>>(null);
+  subscriptionMap.current ??= new Map<
+    (event: unknown) => void,
+    EventSubscription
+  >();
+
+  const endpoint = useMemo(() => {
+    return {
+      addEventListener(eventName: string, callback: (event: unknown) => void) {
+        if (eventName !== "message") {
+          return;
+        }
+
+        const sub = emitter.current?.addListener(eventName, callback);
+        if (!sub) {
+          return;
+        }
+
+        subscriptionMap.current?.set(callback, sub);
+      },
+      removeEventListener(
+        eventName: string,
+        callback: (event: unknown) => void,
+      ) {
+        if (eventName !== "message") {
+          return;
+        }
+
+        subscriptionMap.current?.get(callback)?.remove();
+        subscriptionMap.current?.delete(callback);
+      },
+      postMessage(message: unknown) {
+        webViewRef.current?.postMessage(JSON.stringify(message));
+      },
+    };
+  }, [webViewRef]);
+
+  const clearListeners = useCallback(() => {
+    // comlink didn't provide a way to unexpose, so we need to manually remove the subscriptions
+    subscriptionMap.current?.forEach((sub) => sub.remove());
+    subscriptionMap.current?.clear();
+  }, []);
+
+  const emitMessage = useCallback((data: string) => {
+    emitter.current?.emit("message", {
+      origin: "file://webview",
+      data,
+    });
+  }, []);
+
+  return {
+    endpoint,
+    clearListeners,
+    emitMessage,
+  };
 }
