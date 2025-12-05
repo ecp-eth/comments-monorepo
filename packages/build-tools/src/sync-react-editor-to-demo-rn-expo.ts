@@ -1,17 +1,8 @@
 #!/usr/bin/env node
 
 import { execSync } from "child_process";
-import {
-  existsSync,
-  rmSync,
-  cpSync,
-  readFileSync,
-  lstatSync,
-  readlinkSync,
-  readdirSync,
-  writeFileSync,
-} from "fs";
-import { join, dirname, resolve } from "path";
+import { existsSync, rmSync, cpSync, readFileSync, writeFileSync } from "fs";
+import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const INCLUDE_NODE_MODULES = false as boolean;
@@ -93,19 +84,6 @@ cpSync(reactEditorDir, targetDir, {
     return true;
   },
 });
-
-if ("peerDependencies" in reactEditorPkgJson) {
-  for (const [peerName, peerVersion] of Object.entries(
-    reactEditorPkgJson.peerDependencies,
-  )) {
-    const modulePath = `node_modules/${peerName}`;
-    console.log(`module path to delete ${modulePath}`);
-    execSync(`rm -rf ${modulePath}`, {
-      cwd: targetDir,
-      stdio: "inherit",
-    });
-  }
-}
 
 console.log("✅ Files copied successfully");
 
