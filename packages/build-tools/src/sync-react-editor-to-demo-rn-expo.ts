@@ -36,55 +36,6 @@ const reactEditorPkg = readFileSync(
 );
 const reactEditorPkgJson = JSON.parse(reactEditorPkg);
 
-/**
- * Recursively converts all symbolic links in a directory to actual copies
- */
-function convertSymlinksToCopies(dir: string): void {
-  if (!existsSync(dir)) {
-    return;
-  }
-
-  const entries = readdirSync(dir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-
-    try {
-      const stats = lstatSync(fullPath);
-
-      if (stats.isSymbolicLink()) {
-        const targetPath = readlinkSync(fullPath);
-        // Resolve the symlink target (handles both absolute and relative paths)
-        const resolvedTarget = resolve(dirname(fullPath), targetPath);
-
-        console.log(`   Converting symlink: ${entry.name} -> ${targetPath}`);
-
-        // Remove the symlink
-        rmSync(fullPath, { force: true });
-
-        // Copy the actual contents
-        if (existsSync(resolvedTarget)) {
-          const targetStats = lstatSync(resolvedTarget);
-          if (targetStats.isDirectory()) {
-            cpSync(resolvedTarget, fullPath, { recursive: true });
-          } else {
-            cpSync(resolvedTarget, fullPath);
-          }
-        } else {
-          console.warn(
-            `   ⚠️  Symlink target does not exist: ${resolvedTarget}`,
-          );
-        }
-      } else if (stats.isDirectory()) {
-        // Recursively process subdirectories
-        convertSymlinksToCopies(fullPath);
-      }
-    } catch (error) {
-      console.warn(`   ⚠️  Error processing ${fullPath}:`, error);
-    }
-  }
-}
-
 console.log("📋 Configuration:");
 console.log(`   Root: ${rootDir}`);
 console.log(`   Source: ${reactEditorDir}`);
@@ -166,15 +117,12 @@ writeFileSync(
 );
 console.log("✅ updated\n");
 
-// console.log("\n🔗 Step 5: pnpm/npm install...");
-// execSync(`pnpm install`, {
-//   cwd: targetDir,
-//   stdio: "inherit",
-// });
-// console.log("✅ installed dependencies\n");
-
-// console.log("\n🔗 Step 4: Converting symbolic links to actual copies...");
-// convertSymlinksToCopies(resolve(targetDir, "node_modules"));
-// console.log("✅ Symbolic links converted\n");
+console.log("\n🔗 Step 5: use npm to install only dependencies...");
+// no dev deps and no peer deps (forcing it to use peer deps from parent folder)
+execSync(`npm install --omit=dev --legacy-peer-deps`, {
+  cwd: targetDir,
+  stdio: "inherit",
+});
+console.log("✅ installed dependencies\n");
 
 console.log("🎉 All done! react-editor has been synced to demo-rn-expo");
