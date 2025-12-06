@@ -11,7 +11,8 @@
     "replace-workspace-version": "./bin/replace-workspace-version.js",
     "merge-json": "./bin/merge-json.js",
     "backup-nuke-restore": "./bin/backup-nuke-restore.sh",
-    "rivet": "./bin/rivet.sh"
+    "rivet": "./bin/rivet.sh",
+    "sync-react-editor-to-demo-rn-expo": "./bin/sync-react-editor-to-demo-rn-expo.js"
   },
   "scripts": {
     "proxy-package": "tsx ./src/proxy-package.ts"

@@ -70,16 +70,20 @@ type CJSESMExportEntry = [string, CJSESMExport];
  * @param pkg The package to iterate over the exports of
  * @param onEachExport The function to apply to each export
  */
-export async function everyExportWithCJSModule<RetType>(
+export async function everyExportWithCJSESMModule<RetType>(
   pkg: NonPrivatePackageWithExports,
   onEachExport: ({
     key,
     cjsPath,
+    esmPath,
     typePath,
+    reactNativePath,
   }: {
     key: string;
     cjsPath: string;
+    esmPath?: string;
     typePath: string;
+    reactNativePath?: string;
   }) => Promise<RetType>,
   avoidSpread: boolean,
 ): Promise<RetType[]> {
@@ -162,7 +166,9 @@ export async function everyExportWithCJSModule<RetType>(
       return await onEachExport({
         key,
         cjsPath: exports.default,
+        esmPath: exports.import,
         typePath: exports.types,
+        reactNativePath: exports["react-native"],
       });
     }),
   );

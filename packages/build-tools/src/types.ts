@@ -1,4 +1,9 @@
-export type CJSESMExport = { types: string; default: string };
+export type CJSESMExport = {
+  types: string;
+  default: string;
+  import?: string;
+  ["react-native"]?: string;
+};
 
 export type Exports = Record<string, CJSESMExport | string>;
 

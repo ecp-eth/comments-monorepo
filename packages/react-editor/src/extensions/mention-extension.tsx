@@ -16,8 +16,7 @@ import type {
   UploadTrackerVideoComponent,
 } from "./types.js";
 import type { SearchSuggestionsFunction } from "./types.js";
-
-const MINIMUM_QUERY_LENGTH = 2;
+import { MINIMUM_QUERY_LENGTH } from "../constants.js";
 
 type SuggestionItem = MentionItem;
 
@@ -31,6 +30,10 @@ type MentionExtensionOptions = MentionOptions<SuggestionItem, MentionItem> & {
   videoComponent: UploadTrackerVideoComponent;
   fileComponent: UploadTrackerFileComponent;
   theme?: MentionsExtensionTheme;
+  mentionSuggestionRenderer?: () => MentionOptions<
+    SuggestionItem,
+    MentionItem
+  >["suggestion"]["render"];
 };
 
 export const MentionExtension = Mention.extend<MentionExtensionOptions>({
@@ -294,128 +297,136 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
       return results;
     };
 
-    this.options.suggestion.render = () => {
-      let reactRenderer: ReactRenderer<SuggestionsRef, SuggestionsProps>;
-      let popup: Instance;
-      let scrollListener: (() => void) | undefined;
+    const mentionSuggestionRenderer = this.options.mentionSuggestionRenderer;
 
-      return {
-        onStart: (props) => {
-          const clientRect = props.clientRect?.();
+    this.options.suggestion.render = mentionSuggestionRenderer
+      ? mentionSuggestionRenderer()
+      : webSuggestionsRenderer(this.options.theme);
+  },
+});
 
-          if (!clientRect) {
-            return;
+const webSuggestionsRenderer =
+  (
+    mentionExtensionTheme?: MentionsExtensionTheme,
+  ): MentionOptions<SuggestionItem, MentionItem>["suggestion"]["render"] =>
+  () => {
+    let reactRenderer: ReactRenderer<SuggestionsRef, SuggestionsProps>;
+    let popup: Instance;
+    let scrollListener: (() => void) | undefined;
+
+    return {
+      onStart: (props) => {
+        const clientRect = props.clientRect?.();
+
+        if (!clientRect) {
+          return;
+        }
+
+        reactRenderer = new ReactRenderer(Suggestions, {
+          props: {
+            ...props,
+            theme: mentionExtensionTheme,
+          },
+          editor: props.editor,
+        });
+
+        popup = tippy(document.body, {
+          getReferenceClientRect: () => props.clientRect?.() ?? clientRect,
+          appendTo: document.body,
+          content: reactRenderer.element,
+          showOnCreate: true,
+          interactive: true,
+          trigger: "manual",
+          placement: "bottom-start",
+          popperOptions: {
+            modifiers: [
+              {
+                name: "offset",
+                options: {
+                  offset: [0, 8],
+                },
+              },
+              {
+                name: "preventOverflow",
+                options: {
+                  boundary: "viewport",
+                  padding: 16,
+                  altBoundary: false,
+                },
+              },
+              {
+                name: "flip",
+                options: {
+                  fallbackPlacements: ["top-start", "bottom-end", "top-end"],
+                  padding: 16,
+                },
+              },
+            ],
+          },
+        });
+
+        scrollListener = () => {
+          if (popup) {
+            popup.setProps({
+              getReferenceClientRect: () => props.clientRect?.() ?? clientRect,
+            });
           }
+        };
 
-          reactRenderer = new ReactRenderer(Suggestions, {
-            props: {
-              ...props,
-              theme: this.options.theme,
-              minimumQueryLength: MINIMUM_QUERY_LENGTH,
-            },
-            editor: props.editor,
-          });
+        window.addEventListener("scroll", scrollListener);
+      },
 
-          popup = tippy(document.body, {
-            getReferenceClientRect: () => props.clientRect?.() ?? clientRect,
-            appendTo: document.body,
-            content: reactRenderer.element,
-            showOnCreate: true,
-            interactive: true,
-            trigger: "manual",
-            placement: "bottom-start",
-            popperOptions: {
-              modifiers: [
-                {
-                  name: "offset",
-                  options: {
-                    offset: [0, 8],
-                  },
-                },
-                {
-                  name: "preventOverflow",
-                  options: {
-                    boundary: "viewport",
-                    padding: 16,
-                    altBoundary: false,
-                  },
-                },
-                {
-                  name: "flip",
-                  options: {
-                    fallbackPlacements: ["top-start", "bottom-end", "top-end"],
-                    padding: 16,
-                  },
-                },
-              ],
-            },
-          });
+      onUpdate(props) {
+        reactRenderer?.updateProps(props);
 
-          scrollListener = () => {
-            if (popup) {
-              popup.setProps({
-                getReferenceClientRect: () =>
-                  props.clientRect?.() ?? clientRect,
-              });
-            }
-          };
+        const clientRect = props.clientRect?.();
 
-          window.addEventListener("scroll", scrollListener);
-        },
+        if (!clientRect) {
+          return;
+        }
 
-        onUpdate(props) {
-          reactRenderer?.updateProps(props);
+        popup?.setProps({
+          getReferenceClientRect: () => clientRect,
+        });
+      },
 
-          const clientRect = props.clientRect?.();
+      onKeyDown(props) {
+        if (props.event.key === "Escape") {
+          popup?.hide();
 
-          if (!clientRect) {
-            return;
-          }
+          return true;
+        }
 
-          popup?.setProps({
-            getReferenceClientRect: () => clientRect,
-          });
-        },
-
-        onKeyDown(props) {
-          if (props.event.key === "Escape") {
-            popup?.hide();
+        if (!popup?.state.isShown) {
+          if (
+            props.event.key === "ArrowUp" ||
+            props.event.key === "ArrowDown"
+          ) {
+            popup?.show();
 
             return true;
           }
 
-          if (!popup?.state.isShown) {
-            if (
-              props.event.key === "ArrowUp" ||
-              props.event.key === "ArrowDown"
-            ) {
-              popup?.show();
+          // make sure that we won't select a last selected suggestion if popup is not shown
+          return false;
+        }
 
-              return true;
-            }
+        return reactRenderer?.ref?.onKeyDown(props) || false;
+      },
 
-            // make sure that we won't select a last selected suggestion if popup is not shown
-            return false;
-          }
+      onExit() {
+        // avoid warnings
+        if (popup) {
+          popup.destroy();
+        }
 
-          return reactRenderer?.ref?.onKeyDown(props) || false;
-        },
+        if (reactRenderer) {
+          reactRenderer.destroy();
+        }
 
-        onExit() {
-          // avoid warnings
-          if (popup) {
-            popup.destroy();
-          }
-
-          if (reactRenderer) {
-            reactRenderer.destroy();
-          }
-
-          if (scrollListener) {
-            window.removeEventListener("scroll", scrollListener);
-          }
-        },
-      };
+        if (scrollListener) {
+          window.removeEventListener("scroll", scrollListener);
+        }
+      },
     };
-  },
-});
+  };
