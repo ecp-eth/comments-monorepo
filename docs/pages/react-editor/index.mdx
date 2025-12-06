@@ -32,7 +32,7 @@ pnpm add @ecp.eth/react-editor
 - **Customizable Components**: Fully customizable media components and themes
 - **TypeScript Support**: Full TypeScript support with comprehensive type definitions
 
-## Quick Start
+## Quick Start (Web)
 
 ```tsx
 import { Editor } from "@ecp.eth/react-editor";
@@ -53,6 +53,43 @@ function CommentEditor() {
   );
 }
 ```
+
+## React Native Usage
+
+The editor also supports React Native! Import the native version and wrap your app with `PortalProvider`:
+
+```tsx
+import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor.native";
+import { PortalProvider } from "@gorhom/portal";
+import { useIndexerSuggestions } from "@ecp.eth/react-editor/hooks";
+import { usePinataUploadFiles } from "@ecp.eth/react-editor/hooks";
+
+function App() {
+  return (
+    <PortalProvider>
+      <CommentEditor />
+    </PortalProvider>
+  );
+}
+
+function CommentEditor() {
+  const editorRef = useRef<EditorRef>(null);
+  const suggestions = useIndexerSuggestions();
+  const uploads = usePinataUploadFiles();
+
+  return (
+    <Editor
+      ref={editorRef}
+      placeholder="Write your comment..."
+      suggestions={suggestions}
+      uploads={uploads}
+      onBlur={() => console.log("Editor lost focus")}
+    />
+  );
+}
+```
+
+**Important:** The `PortalProvider` from `@gorhom/portal` is required for React Native to ensure the suggestion UI displays correctly. Make sure to wrap your app (or at least the component tree containing the editor) with `PortalProvider`.
 
 ## Core Components
 
@@ -258,12 +295,22 @@ const customUploads: UploadFilesService = {
 
 ## Peer Dependencies
 
-This package requires the following peer dependencies:
+### Web (React)
 
 - `@tanstack/react-query` >= 5.0.0
-- `pinata` ^2.4.3
+- `pinata` ^2.5.0
 - `react` 18 || 19
+- `react-dom` 18 || 19
 - `viem` ^2.29.2
+
+### React Native
+
+All web dependencies plus:
+
+- `@gorhom/portal` >= 1.0.14 (required for suggestion UI)
+- `react-native` >= 0.81.0
+- `react-native-safe-area-context` >= 5.6.0
+- `react-native-webview` >= 13.16.0
 
 ## License
 
