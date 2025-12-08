@@ -356,6 +356,17 @@ export function EditorComposer({
     [],
   );
 
+  const editorTheme = useMemo(() => {
+    return {
+      editorContainer: {
+        classNames: "flex-1",
+      },
+      editor: {
+        classNames: "min-h-4 px-2 py-2",
+      },
+    };
+  }, []);
+
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -404,14 +415,7 @@ export function EditorComposer({
 
           onCancel?.();
         }}
-        theme={{
-          editorContainer: {
-            classNames: "flex-1",
-          },
-          editor: {
-            classNames: "min-h-4 px-2 py-2",
-          },
-        }}
+        theme={editorTheme}
       />
 
       {submitMutation.error && (

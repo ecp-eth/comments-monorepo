@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
@@ -274,6 +274,22 @@ function BaseCommentForm({
     [],
   );
 
+  const editorTheme = useMemo(() => {
+    return {
+      editor: {
+        classNames: cn(
+          "w-full p-2 border border-gray-300 rounded",
+          submitMutation.error &&
+            submitMutation.error instanceof InvalidCommentError &&
+            "border-destructive focus-visible:border-destructive",
+        ),
+      },
+      editor_disabled: {
+        classNames: "opacity-50",
+      },
+    };
+  }, [submitMutation.error]);
+
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -325,19 +341,7 @@ function BaseCommentForm({
 
           onCancel?.();
         }}
-        theme={{
-          editor: {
-            classNames: cn(
-              "w-full p-2 border border-gray-300 rounded",
-              submitMutation.error &&
-                submitMutation.error instanceof InvalidCommentError &&
-                "border-destructive focus-visible:border-destructive",
-            ),
-          },
-          editor_disabled: {
-            classNames: cn(disabled && "opacity-50"),
-          },
-        }}
+        theme={editorTheme}
       />
       <div className="flex gap-2 justify-between text-xs">
         {address && <CommentFormAuthor address={address} />}

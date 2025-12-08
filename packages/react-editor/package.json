@@ -103,6 +103,9 @@
     "viem": "^2.29.2"
   },
   "peerDependenciesMeta": {
+    "@gorhom/portal": {
+      "optional": true
+    },
     "react-dom": {
       "optional": true
     },
