@@ -3,13 +3,15 @@ import { resolveNFTMetadataAsResponse } from "../../../resolve-nft-metadata";
 import { config } from "../../../config";
 
 const paramsParser = z.object({
-  chainId: z.coerce.number().int().positive(),
-  channelId: z.coerce.bigint(),
+  channelId: z.string().transform((val) => z.coerce.bigint().parse(val)),
+  chainId: z
+    .string()
+    .transform((val) => z.coerce.number().int().positive().parse(val)),
 });
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<z.infer<typeof paramsParser>> },
+  { params }: { params: Promise<z.input<typeof paramsParser>> },
 ) {
   const paramsResult = paramsParser.safeParse(await params);
 

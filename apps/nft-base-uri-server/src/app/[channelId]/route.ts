@@ -3,12 +3,12 @@ import { resolveNFTMetadataAsResponse } from "../resolve-nft-metadata";
 import { config } from "../config";
 
 const paramsParser = z.object({
-  channelId: z.coerce.bigint(),
+  channelId: z.string().transform((val) => z.coerce.bigint().parse(val)),
 });
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<z.infer<typeof paramsParser>> },
+  { params }: { params: Promise<z.input<typeof paramsParser>> },
 ) {
   const paramsResult = paramsParser.safeParse(await params);
 
