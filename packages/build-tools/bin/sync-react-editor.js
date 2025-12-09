@@ -5,7 +5,7 @@ import path from "path";
 
 const scriptPath = path.resolve(
   import.meta.dirname,
-  "../src/sync-react-editor-to-demo-rn-expo.ts",
+  "../src/sync-react-editor.ts",
 );
 
 const childProcess = spawn(
