@@ -35,7 +35,6 @@
     "expo-application": "~7.0.8",
     "expo-auth-session": "^7.0.10",
     "expo-status-bar": "^3.0.9",
-    "lottie-react": "^2.4.1",
     "nativewind": "^4.2.1",
     "never": "^1.1.0",
     "pinata": "^2.5.1",
