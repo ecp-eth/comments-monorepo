@@ -41,7 +41,7 @@
       "default": "./dist/cjs/editor.css"
     },
     "./editor.css.js": {
-      "types": "./dist/esm/editor.css.d.ts",
+      "types": "./dist/esm/editor.css.js.d.ts",
       "import": "./dist/esm/editor.css.js",
       "default": "./dist/cjs/editor.css.js"
     },

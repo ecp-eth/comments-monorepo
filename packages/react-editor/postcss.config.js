@@ -18,6 +18,8 @@ const exportCSSPlugin = () => {
         recursive: true,
       });
       const outFile = path.resolve(tsupOpts.outDir, "editor.css.js");
+      const outJSTypeFile = path.resolve(tsupOpts.outDir, "editor.css.js.d.ts");
+      const outCSSTypeFile = path.resolve(tsupOpts.outDir, "editor.css.d.ts");
 
       const content =
         tsupOpts.format[0] === "esm"
@@ -25,6 +27,15 @@ const exportCSSPlugin = () => {
           : `module.exports = { css: ${JSON.stringify(css)} };`;
 
       fs.writeFileSync(outFile, content);
+      fs.writeFileSync(outJSTypeFile, `export const css: string;`);
+      fs.writeFileSync(
+        outCSSTypeFile,
+        `declare module "@ecp.eth/react-editor/editor.css" {}`,
+      );
+
+      console.log(`exported CSS to ${outFile}`);
+      console.log(`exported CSS type to ${outCSSTypeFile}`);
+      console.log(`exported CSS JS type to ${outJSTypeFile}`);
     },
   };
 };
