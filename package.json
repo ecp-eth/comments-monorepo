@@ -22,7 +22,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.12",
+    "@changesets/cli": "^2.29.4",
     "@ecp.eth/build-tools": "workspace:^",
     "eslint": "^9.19.0",
     "husky": "^9.1.7",
