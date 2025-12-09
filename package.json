@@ -30,7 +30,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-solidity": "^2.0.0",
     "tsup": "^8.3.6",
-    "turbo": "^2.5.0",
+    "turbo": "^2.6.3",
     "typescript": "^5.8.3",
     "vitest": "3.2.4"
   },
