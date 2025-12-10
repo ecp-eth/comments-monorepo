@@ -11,6 +11,7 @@ import {
   RefObject,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -61,7 +62,11 @@ export function Editor(props: EditorProps) {
     if (!isWebViewReady) {
       return;
     }
-    webViewComRef.current?.setProps(props);
+
+    // we don't want to pass ref to the webview, it will be handled by useSyncRef
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ref: _, ...rest } = props;
+    webViewComRef.current?.setProps(rest);
   }, [isWebViewReady, props]);
 
   useEffect(() => {
@@ -152,8 +157,8 @@ export function Editor(props: EditorProps) {
       <View
         ref={webViewContainerViewRef}
         style={{
-          height: notifiedHeight || 60,
-          minWidth: 40,
+          height: notifiedHeight || 20,
+          flexGrow: 1,
         }}
       >
         <WebView
@@ -192,35 +197,19 @@ function useSyncRef(
     () => wrap<IWebViewExposedCom>(nativeMessageEventEndpoint),
     [nativeMessageEventEndpoint],
   );
-  const updatePropsRef = useCallback(() => {
-    const bridgeEditorRef = new Proxy<EditorRef>({} as EditorRef, {
+  const proxiedEditorRef = useMemo(() => {
+    return new Proxy<EditorRef>({} as EditorRef, {
       get(target, prop) {
         return webViewComRef.current?.[prop as keyof IWebViewExposedCom];
       },
     });
+  }, [webViewComRef]);
 
-    if (props.ref) {
-      if (typeof props.ref === "function") {
-        props.ref(bridgeEditorRef);
-      } else {
-        props.ref.current = bridgeEditorRef;
-      }
-    }
-  }, [webViewComRef, props]);
+  useImperativeHandle(props.ref, () => proxiedEditorRef);
 
   useEffect(() => {
     webViewComRef.current ??= wrappedWebViewCom;
-
-    updatePropsRef();
-  }, [webViewComRef, updatePropsRef, wrappedWebViewCom]);
-
-  useEffect(() => {
-    if (!props.ref) {
-      return;
-    }
-
-    updatePropsRef();
-  }, [props, props.ref, updatePropsRef]);
+  }, [webViewComRef, wrappedWebViewCom]);
 }
 
 function useClientRect() {

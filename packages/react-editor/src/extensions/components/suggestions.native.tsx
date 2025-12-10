@@ -6,9 +6,14 @@ import {
   FlatList,
   Image,
   ImageSourcePropType,
-  Animated,
-  Easing,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+  Easing,
+} from "react-native-reanimated";
 import type { Hex } from "viem";
 import * as chains from "viem/chains";
 import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
@@ -123,8 +128,9 @@ export function Suggestions({
       gap={GAP_DROPDOWN_FROM_INPUT_BOTTOM}
       onDismiss={onDismiss}
     >
-      {({ popAbove, maxHeight }) =>
-        enableContent ? (
+      {({ popAbove, maxHeight }) => {
+        console.log("render flatlist", enableContent, items.length, maxHeight);
+        return enableContent ? (
           <View
             style={{
               flex: 1,
@@ -133,7 +139,7 @@ export function Suggestions({
               borderTopWidth: 1,
               borderColor: "#EFEFEF",
 
-              backgroundColor: "#fff",
+              backgroundColor: "#FFF",
             }}
           >
             {items.length <= 0 ? null : (
@@ -142,7 +148,11 @@ export function Suggestions({
                 data={items}
                 renderItem={renderItem}
                 keyExtractor={(item) => `${query}-${item.address}`}
-                style={{ flex: 1, flexShrink: 1, maxHeight }}
+                style={{
+                  flex: 1,
+                  flexShrink: 1,
+                  maxHeight,
+                }}
                 horizontal={false}
                 onScrollToIndexFailed={(info) => {
                   // Fallback if scroll fails
@@ -157,8 +167,8 @@ export function Suggestions({
               />
             )}
           </View>
-        ) : null
-      }
+        ) : null;
+      }}
     </KeyboardAvoidPopUpView>
   );
 }
@@ -179,8 +189,8 @@ function SuggestionItem({
   index: number;
 }) {
   const { left, right } = useSafeAreaInsets();
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateX = useRef(new Animated.Value(SLIDE_DISTANCE)).current;
+  const opacity = useSharedValue(0);
+  const translateX = useSharedValue(SLIDE_DISTANCE);
   const [hasAnimated, setHasAnimated] = useState(false);
 
   const handleLayout = useCallback(() => {
@@ -189,43 +199,49 @@ function SuggestionItem({
 
     const delay = index * ANIMATION_DELAY_PER_ITEM;
 
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
+    opacity.value = withDelay(
+      delay,
+      withTiming(1, {
         duration: ANIMATION_DURATION,
-        delay,
         easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
       }),
-      Animated.timing(translateX, {
-        toValue: 0,
+    );
+    translateX.value = withDelay(
+      delay,
+      withTiming(0, {
         duration: ANIMATION_DURATION,
-        delay,
         easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
       }),
-    ]).start();
-  }, [index, opacity, translateX, hasAnimated]);
+    );
+  }, [hasAnimated, index, opacity, translateX]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ translateX: translateX.value }],
+    };
+  });
 
   return (
     <Animated.View
       onLayout={handleLayout}
-      style={{
-        marginLeft: left,
-        marginRight: right,
-        flex: 1,
-        flexDirection: "row",
-        flexGrow: 1,
-        flexShrink: 0,
-        alignItems: "center",
-        justifyContent: "flex-start",
-        gap: GAP,
-        paddingVertical: PADDING_VERTICAL,
-        paddingHorizontal: PADDING_HORIZONTAL,
-        overflow: "hidden",
-        opacity,
-        transform: [{ translateX }],
-      }}
+      style={[
+        {
+          marginLeft: left,
+          marginRight: right,
+          flex: 1,
+          flexDirection: "row",
+          flexGrow: 1,
+          flexShrink: 0,
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: GAP,
+          paddingVertical: PADDING_VERTICAL,
+          paddingHorizontal: PADDING_HORIZONTAL,
+          overflow: "hidden",
+        },
+        animatedStyle,
+      ]}
     >
       <Image
         source={source}

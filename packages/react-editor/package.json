@@ -73,7 +73,6 @@
   },
   "dependencies": {
     "@tiptap/core": "^2.12.0",
-    "@tiptap/pm": "^2.12.0",
     "@tiptap/extension-document": "^2.12.0",
     "@tiptap/extension-hard-break": "^2.12.0",
     "@tiptap/extension-link": "^2.12.0",
@@ -81,11 +80,12 @@
     "@tiptap/extension-paragraph": "^2.12.0",
     "@tiptap/extension-placeholder": "^2.12.0",
     "@tiptap/extension-text": "^2.12.0",
+    "@tiptap/pm": "^2.12.0",
     "@tiptap/react": "^2.12.0",
     "@tiptap/suggestion": "^2.12.0",
     "comlink": "^4.4.2",
-    "prosemirror-state": "^1.4.4",
     "prosemirror-model": "^1.25.4",
+    "prosemirror-state": "^1.4.4",
     "prosemirror-transform": "^1.10.4",
     "tippy.js": "^6.3.7"
   },
@@ -98,8 +98,10 @@
     "react": "18 || 19",
     "react-dom": "18 || 19",
     "react-native": ">=0.81.0",
+    "react-native-reanimated": ">=4.1.1",
     "react-native-safe-area-context": ">=5.6.0",
     "react-native-webview": ">=13.16.0",
+    "react-native-worklets": ">=0.7.1",
     "viem": "^2.29.2"
   },
   "peerDependenciesMeta": {
@@ -112,18 +114,24 @@
     "react-native": {
       "optional": true
     },
+    "react-native-reanimated": {
+      "optional": true
+    },
     "react-native-safe-area-context": {
       "optional": true
     },
     "react-native-webview": {
       "optional": true
+    },
+    "react-native-worklets": {
+      "optional": true
     }
   },
   "devDependencies": {
-    "@ecp.eth/sdk": "workspace:^",
-    "@ecp.eth/shared": "workspace:^",
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/eslint-config": "workspace:*",
+    "@ecp.eth/sdk": "workspace:^",
+    "@ecp.eth/shared": "workspace:^",
     "@ecp.eth/typescript-config": "workspace:*",
     "@gorhom/portal": "^1.0.14",
     "@tailwindcss/vite": "^4.1.17",
@@ -139,8 +147,10 @@
     "react": "~19.1.2",
     "react-dom": "~19.1.2",
     "react-native": "0.81.5",
+    "react-native-reanimated": "^4.1.1",
     "react-native-safe-area-context": "^5.6.2",
     "react-native-webview": "^13.16.0",
+    "react-native-worklets": "^0.7.1",
     "tailwindcss": "^3.4.1",
     "viem": "^2.29.2",
     "vite": "6.4.1",

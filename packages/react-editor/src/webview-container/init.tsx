@@ -31,7 +31,9 @@ function EntryPoint() {
   useEffect(() => {
     log("exposing webview api...");
 
-    webViewComSharedContext.setEditorProps = setEditorProps;
+    webViewComSharedContext.setEditorProps = (props) => {
+      setEditorProps(() => props);
+    };
     exposeWebViewCom();
     nativeWrap.onWebViewReady();
   }, []);

@@ -304,7 +304,9 @@ All web dependencies plus:
 - `@gorhom/portal` >= 1.0.14 (required for suggestion UI)
 - `react-native` >= 0.81.0
 - `react-native-safe-area-context` >= 5.6.0
+- `react-native-reanimated` >= 4.1.1
 - `react-native-webview` >= 13.16.0
+- `react-native-worklets` >= 0.7.1
 
 ## License
 

@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, memo, useState } from "react";
-import {
-  Animated,
-  Dimensions,
+import React, { useEffect, memo, useState } from "react";
+import { Dimensions, TouchableWithoutFeedback, View } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
   Easing,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Portal } from "@gorhom/portal";
 import { useKeyboardDimensions } from "../hooks/use-keyboard-dimensions";
@@ -46,8 +47,14 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
   const bottomLimit = popAbove
     ? screenHeight - (inputRect.top - gap)
     : keyboardHeight;
-  const animatedTopRef = useRef<Animated.Value>(new Animated.Value(0));
+  const translateY = useSharedValue(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }],
+    };
+  });
 
   useEffect(() => {
     if (!enabled) {
@@ -56,16 +63,18 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
     }
 
     setIsAnimating(true);
-    animatedTopRef.current.setValue(keyboardEndPositionY - safeArea.top);
-    Animated.timing(animatedTopRef.current, {
-      toValue: 0,
-      easing: slideInEasing,
-      duration: 550,
-      useNativeDriver: true,
-    }).start(() => {
-      setIsAnimating(false);
-    });
-  }, [enabled, keyboardEndPositionY, safeArea.top]);
+    translateY.value = keyboardEndPositionY - safeArea.top;
+    translateY.value = withTiming(
+      0,
+      {
+        duration: 550,
+        easing: slideInEasing,
+      },
+      () => {
+        scheduleOnRN(setIsAnimating, false);
+      },
+    );
+  }, [enabled, keyboardEndPositionY, safeArea.top, translateY]);
 
   if (!enabled) {
     return null;
@@ -132,9 +141,8 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
                         top: 0,
                       }),
                   backgroundColor: "#FFF",
-
-                  transform: [{ translateY: animatedTopRef.current }],
                 },
+                animatedStyle,
               ]}
             >
               {/* View that contains the pop content with in safe area */}
