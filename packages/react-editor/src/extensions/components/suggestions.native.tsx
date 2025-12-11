@@ -129,7 +129,6 @@ export function Suggestions({
       onDismiss={onDismiss}
     >
       {({ popAbove, maxHeight }) => {
-        console.log("render flatlist", enableContent, items.length, maxHeight);
         return enableContent ? (
           <View
             style={{
