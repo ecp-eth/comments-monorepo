@@ -1,5 +1,11 @@
 # @ecp.eth/react-editor
 
+## 0.0.21
+
+### Patch Changes
+
+- 17c462e: feat(react-editor): support react native
+
 ## 0.0.20
 
 ### Patch Changes
