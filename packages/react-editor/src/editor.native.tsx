@@ -1,4 +1,4 @@
-import { LayoutChangeEvent, View } from "react-native";
+import { LayoutChangeEvent, StyleProp, View, ViewStyle } from "react-native";
 import {
   type EditorProps,
   EditorRef,
@@ -31,7 +31,14 @@ import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
 
 export type { EditorProps, EditorRef } from "./editor.type.js";
 
-export function Editor(props: EditorProps) {
+type EditorNativeProps = {
+  /**
+   * Style applies to the top most wrapper of view of native editor
+   */
+  style?: StyleProp<ViewStyle>;
+};
+
+export function Editor(props: EditorProps & EditorNativeProps) {
   const webViewContainerViewRef = useRef<View>(null);
   const webViewRef = useRef<WebView>(null);
   const webViewComRef = useRef<Remote<IWebViewExposedCom>>(null);
@@ -156,10 +163,15 @@ export function Editor(props: EditorProps) {
     <>
       <View
         ref={webViewContainerViewRef}
-        style={{
-          height: notifiedHeight || 20,
-          flexGrow: 1,
-        }}
+        style={[
+          {
+            // the height should be dictated by the editor content
+            height: notifiedHeight,
+            minHeight: 20,
+            minWidth: 20,
+          },
+          props.style,
+        ]}
       >
         <WebView
           ref={webViewRef}

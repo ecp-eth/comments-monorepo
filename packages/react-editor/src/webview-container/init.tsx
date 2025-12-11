@@ -44,9 +44,10 @@ function EntryPoint() {
     }
 
     const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(document.documentElement);
+    resizeObserver.observe(document.body);
 
     return () => {
+      log("disconnecting resize observer");
       resizeObserver.disconnect();
     };
   }, []);
