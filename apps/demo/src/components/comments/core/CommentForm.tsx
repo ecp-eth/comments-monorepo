@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import type { OnSubmitSuccessFunction } from "@ecp.eth/shared/types";
 import type { Comment } from "@ecp.eth/shared/schemas";
+import { defaultTheme } from "@ecp.eth/react-editor/default-theme";
 import { Editor, type EditorRef } from "@ecp.eth/react-editor/editor";
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import {
@@ -253,6 +254,7 @@ function BaseCommentForm({
     return {
       editor: {
         classNames: cn(
+          defaultTheme.editor.classNames,
           "w-full p-2 border border-gray-300 rounded",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
@@ -260,7 +262,7 @@ function BaseCommentForm({
         ),
       },
       editor_disabled: {
-        classNames: "opacity-50",
+        classNames: cn(defaultTheme.editor_disabled.classNames, "opacity-50"),
       },
     };
   }, [submitMutation.error]);

@@ -14,6 +14,7 @@ import {
   useIndexerSuggestions,
   usePinataUploadFiles,
 } from "@ecp.eth/react-editor/hooks";
+import { defaultTheme } from "@ecp.eth/react-editor/default-theme";
 import { extractReferences } from "@ecp.eth/react-editor/extract-references";
 import { type QueryKey, useMutation } from "@tanstack/react-query";
 import { publicEnv } from "@/env/public";
@@ -40,7 +41,10 @@ import type {
   PendingPostCommentOperationSchemaType,
 } from "@ecp.eth/shared/schemas";
 import { signCommentOrReaction } from "@/api/sign-comment-or-reaction";
-import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
+import {
+  cn,
+  formatContractFunctionExecutionError,
+} from "@ecp.eth/shared/helpers";
 import { ContractFunctionExecutionError } from "viem";
 import { signEditComment } from "@/api/sign-edit-comment";
 import { COMMENT_MANAGER_ADDRESS } from "@/wagmi/client";
@@ -359,10 +363,10 @@ export function EditorComposer({
   const editorTheme = useMemo(() => {
     return {
       editorContainer: {
-        classNames: "flex-1",
+        classNames: cn(defaultTheme.editorContainer.classNames, "flex-1"),
       },
       editor: {
-        classNames: "min-h-4 px-2 py-2",
+        classNames: cn(defaultTheme.editor.classNames, "min-h-4 px-2 py-2"),
       },
     };
   }, []);
