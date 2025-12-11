@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@ecp.eth/react-editor':
-        specifier: ~0.0.20
-        version: 0.0.20(045da731dae0d60bfee69d23efbfc8ed)
+        specifier: ~0.0.21
+        version: 0.0.21(15c7decce4184b5af830a196e5aaae0b)
       '@ecp.eth/sdk':
         specifier: ~0.0.36
         version: 0.0.36(@tanstack/react-query@5.83.0(react@19.1.0))(react@19.1.0)(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.3(3cef06be25b838a462914a72df633a17))(zod@3.25.76)
@@ -726,13 +726,37 @@ packages:
     peerDependencies:
       '@noble/ciphers': ^1.0.0
 
-  '@ecp.eth/react-editor@0.0.20':
-    resolution: {integrity: sha512-UHxeRdhD66xYiqQezp+0PdySTh5LS6Aqwy/nDNoVMCFPjrUK5DEWdT6mgwQpiSQ0JYlY0ZH1BphwTYT1maH01w==}
+  '@ecp.eth/react-editor@0.0.21':
+    resolution: {integrity: sha512-79/CEOjt0r8zDvWddVJ5ZZW3MFeWLJhkVkpRGfSd4ZmJ//Z5nhvXFLZSIOZg0idNusRSPTnUf1sSuEv3YBPQsQ==}
     peerDependencies:
+      '@ecp.eth/sdk': '>=0.0.36'
+      '@ecp.eth/shared': '>=0.0.19'
+      '@gorhom/portal': '>=1.0.14'
       '@tanstack/react-query': '>=5.0.0'
       pinata: ^2.5.0
       react: 18 || 19
+      react-dom: 18 || 19
+      react-native: '>=0.81.0'
+      react-native-reanimated: '>=4.1.1'
+      react-native-safe-area-context: '>=5.6.0'
+      react-native-webview: '>=13.16.0'
+      react-native-worklets: '>=0.7.1'
       viem: ^2.29.2
+    peerDependenciesMeta:
+      '@gorhom/portal':
+        optional: true
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+      react-native-reanimated:
+        optional: true
+      react-native-safe-area-context:
+        optional: true
+      react-native-webview:
+        optional: true
+      react-native-worklets:
+        optional: true
 
   '@ecp.eth/sdk@0.0.36':
     resolution: {integrity: sha512-T6bI9qOlTIpPD5GMZesZT5iA9S4Q9Q2Fioq4v7Q69Nu3MYBLiBInNQXkiGuK1j4qk707stU23tMPVNA0aggcig==}
@@ -2832,6 +2856,9 @@ packages:
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
+
+  comlink@4.4.2:
+    resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
 
   command-exists@1.2.9:
     resolution: {integrity: sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==}
@@ -7195,7 +7222,7 @@ snapshots:
     dependencies:
       '@noble/ciphers': 1.3.0
 
-  '@ecp.eth/react-editor@0.0.20(045da731dae0d60bfee69d23efbfc8ed)':
+  '@ecp.eth/react-editor@0.0.21(15c7decce4184b5af830a196e5aaae0b)':
     dependencies:
       '@ecp.eth/sdk': 0.0.36(@tanstack/react-query@5.83.0(react@19.1.0))(react@19.1.0)(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.3(3cef06be25b838a462914a72df633a17))(zod@3.25.76)
       '@ecp.eth/shared': 0.0.19(fe90443eb722c4029de256d006466d04)
@@ -7208,8 +7235,10 @@ snapshots:
       '@tiptap/extension-paragraph': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
       '@tiptap/extension-placeholder': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)
       '@tiptap/extension-text': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))
+      '@tiptap/pm': 2.27.1
       '@tiptap/react': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tiptap/suggestion': 2.27.1(@tiptap/core@2.27.1(@tiptap/pm@2.27.1))(@tiptap/pm@2.27.1)
+      comlink: 4.4.2
       pinata: 2.5.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       prosemirror-model: 1.25.4
       prosemirror-state: 1.4.4
@@ -7217,21 +7246,14 @@ snapshots:
       react: 19.1.0
       tippy.js: 6.3.7
       viem: 2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
-    transitivePeerDependencies:
-      - '@neynar/nodejs-sdk'
-      - '@rainbow-me/rainbowkit'
-      - '@tiptap/pm'
-      - '@upstash/ratelimit'
-      - '@upstash/redis'
-      - clsx
-      - lottie-react
-      - lucide-react
-      - next
-      - react-dom
-      - sonner
-      - tailwind-merge
-      - wagmi
-      - zod
+    optionalDependencies:
+      '@gorhom/portal': 1.0.14(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
+      react-dom: 19.1.0(react@19.1.0)
+      react-native: 0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)
+      react-native-reanimated: 4.1.1(@babel/core@7.26.10)(react-native-worklets@0.5.1(@babel/core@7.26.10)(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0))(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
+      react-native-safe-area-context: 5.6.0(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
+      react-native-webview: 13.15.0(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
+      react-native-worklets: 0.5.1(@babel/core@7.26.10)(react-native@0.81.5(@babel/core@7.26.10)(@react-native-community/cli@18.0.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10))(@types/react@19.1.17)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)
 
   '@ecp.eth/sdk@0.0.36(@tanstack/react-query@5.83.0(react@19.1.0))(react@19.1.0)(viem@2.38.6(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(wagmi@2.19.3(3cef06be25b838a462914a72df633a17))(zod@3.25.76)':
     dependencies:
@@ -10830,6 +10852,8 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+
+  comlink@4.4.2: {}
 
   command-exists@1.2.9: {}
 
