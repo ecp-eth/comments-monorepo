@@ -313,10 +313,9 @@ function ERC20TokenSuggestion({
   index,
   suggestion,
 }: ERC20TokenSuggestionProps) {
-  const chainName = getChainById(
-    suggestion.chainId,
-    Object.values(chains),
-  )?.name;
+  const chainName =
+    getChainById(suggestion.chainId, Object.values(chains))?.name ??
+    "Unknown Chain";
 
   return (
     <SuggestionItem
