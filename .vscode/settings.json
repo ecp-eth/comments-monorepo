@@ -47,6 +47,11 @@
     "packages/shared/schemas/indexer-siwe-api/*": true,
     "packages/shared-signer/helpers/*": true,
     "packages/shared-signer/schemas/signer-api/*": true,
-    "packages/shared-signer/services/*": true
+    "packages/shared-signer/services/*": true,
+    "packages/react-editor/editor.native": true,
+    "packages/react-editor/editor.style.css": true,
+    "packages/react-editor/editor.css": true,
+    "packages/react-editor/editor.css.js": true,
+    "packages/react-editor/default-theme": true
   }
 }

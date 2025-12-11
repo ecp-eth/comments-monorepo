@@ -19,7 +19,7 @@ import nodeFs from "fs";
 import nodePath from "path";
 import { Command } from "commander";
 import {
-  everyExportWithCJSModule,
+  everyExportWithCJSESMModule,
   everyPackage,
   findProjectRoot,
 } from "./utils";
@@ -40,18 +40,23 @@ program
 
       console.log(`Start processing ${pkg.name} at (${dir})`);
 
-      await everyExportWithCJSModule(
+      await everyExportWithCJSESMModule(
         pkg,
-        async ({ key, cjsPath, typePath }) => {
+        async ({ key, cjsPath, esmPath, typePath, reactNativePath }) => {
           const proxyDir = nodePath.resolve(dir, key);
           nodeFs.mkdirSync(proxyDir, { recursive: true });
 
           const types = nodePath.relative(key, typePath);
-          const main = nodePath.relative(key, cjsPath);
+          const main = !!esmPath
+            ? nodePath.relative(key, esmPath)
+            : nodePath.relative(key, cjsPath);
+          const reactNative = !!reactNativePath
+            ? nodePath.relative(key, reactNativePath)
+            : undefined;
 
           nodeFs.writeFileSync(
             `${proxyDir}/package.json`,
-            `${JSON.stringify({ type: "module", types, main }, undefined, 2)}\n`,
+            `${JSON.stringify({ type: "module", types, main, ...(reactNative ? { ["react-native"]: reactNative } : {}) }, undefined, 2)}\n`,
           );
 
           console.log(`created ${key} at (${proxyDir})`);
@@ -79,9 +84,9 @@ program
 
       console.log(`Cleaning ${pkg.name} at (${dir})`);
 
-      await everyExportWithCJSModule(
+      await everyExportWithCJSESMModule(
         pkg,
-        async ({ key, cjsPath, typePath }) => {
+        async ({ key }) => {
           const proxyDir = nodePath.resolve(dir, key);
 
           if (nodeFs.existsSync(proxyDir)) {
@@ -120,7 +125,7 @@ program
 
       console.log(`Start processing ${pkg.name} at (${dir})`);
 
-      await everyExportWithCJSModule(
+      await everyExportWithCJSESMModule(
         pkg,
         async ({ key }) => {
           const proxyDir = nodePath.resolve(dir, key);

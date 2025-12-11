@@ -8,6 +8,8 @@ import { createAppKit, AppKit } from "@reown/appkit-wagmi-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { metadata, projectId, config as wagmiConfig } from "./wagmi.config";
 import ErrorBoundary from "./ErrorBoundary";
+import { PortalProvider } from "@gorhom/portal";
+import { LayoutConfigProvider } from "./components/LayoutConfigProvider";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +35,11 @@ export default function Providers({ children }: PropsWithChildren) {
       <ErrorBoundary>
         <WagmiProvider config={wagmiConfig}>
           <QueryClientProvider client={queryClient}>
-            <GestureHandlerRootView>{children}</GestureHandlerRootView>
+            <GestureHandlerRootView>
+              <LayoutConfigProvider>
+                <PortalProvider>{children}</PortalProvider>
+              </LayoutConfigProvider>
+            </GestureHandlerRootView>
             <AppKit />
             <Toast />
           </QueryClientProvider>

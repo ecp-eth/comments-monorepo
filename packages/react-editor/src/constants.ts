@@ -10,3 +10,5 @@ export const ALLOWED_UPLOAD_MIME_TYPES = [
 ];
 
 export const MAX_UPLOAD_FILE_SIZE = 1024 * 1024 * 10; // 10MB
+
+export const MINIMUM_QUERY_LENGTH = 2;

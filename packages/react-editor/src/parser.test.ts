@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { parse } from "./parser";
+import { defaultTheme } from "./default-theme";
 
 describe("content parser", () => {
   it("returns doc with empty paragraph if no content is provided", () => {
-    const content = parse("", []);
+    const content = parse("", [], defaultTheme);
 
     expect(content).toEqual({
       type: "doc",
@@ -12,7 +13,7 @@ describe("content parser", () => {
   });
 
   it("properly maps new links to hard breaks", () => {
-    const content = parse("Hello\nWorld\n\n\n\r\n\rTest", []);
+    const content = parse("Hello\nWorld\n\n\n\r\n\rTest", [], defaultTheme);
 
     expect(content).toEqual({
       type: "doc",
@@ -31,7 +32,7 @@ describe("content parser", () => {
   });
 
   it("returns doc with text pargraph if only text is provided", () => {
-    const content = parse("Hello 🌎", []);
+    const content = parse("Hello 🌎", [], defaultTheme);
 
     expect(content).toEqual({
       type: "doc",
@@ -45,19 +46,23 @@ describe("content parser", () => {
   });
 
   it("maps ens references to mentions", () => {
-    const content = parse("Hello @0x1234567890123456789012345678901234567890", [
-      {
-        type: "ens",
-        address: "0x1234567890123456789012345678901234567890",
-        name: "John Doe",
-        avatarUrl: null,
-        url: "",
-        position: {
-          start: 6,
-          end: 49,
+    const content = parse(
+      "Hello @0x1234567890123456789012345678901234567890",
+      [
+        {
+          type: "ens",
+          address: "0x1234567890123456789012345678901234567890",
+          name: "John Doe",
+          avatarUrl: null,
+          url: "",
+          position: {
+            start: 6,
+            end: 49,
+          },
         },
-      },
-    ]);
+      ],
+      defaultTheme,
+    );
 
     expect(content).toEqual({
       type: "doc",
@@ -84,22 +89,26 @@ describe("content parser", () => {
   });
 
   it("maps farcaster references to mentions", () => {
-    const content = parse("Hello @0x1234567890123456789012345678901234567890", [
-      {
-        type: "farcaster",
-        address: "0x1234567890123456789012345678901234567890",
-        fid: 1234567890,
-        pfpUrl: null,
-        displayName: null,
-        url: "",
-        username: "username",
-        fname: "username.fcast.id",
-        position: {
-          start: 6,
-          end: 49,
+    const content = parse(
+      "Hello @0x1234567890123456789012345678901234567890",
+      [
+        {
+          type: "farcaster",
+          address: "0x1234567890123456789012345678901234567890",
+          fid: 1234567890,
+          pfpUrl: null,
+          displayName: null,
+          url: "",
+          username: "username",
+          fname: "username.fcast.id",
+          position: {
+            start: 6,
+            end: 49,
+          },
         },
-      },
-    ]);
+      ],
+      defaultTheme,
+    );
 
     expect(content).toEqual({
       type: "doc",
@@ -129,27 +138,31 @@ describe("content parser", () => {
   });
 
   it("maps erc20 references to mentions", () => {
-    const content = parse("Hello $0x1234567890123456789012345678901234567890", [
-      {
-        type: "erc20",
-        address: "0x1234567890123456789012345678901234567890",
-        name: "John Doe",
-        symbol: "JDOE",
-        chainId: 1,
-        position: {
-          start: 6,
-          end: 49,
-        },
-        logoURI: null,
-        decimals: 18,
-        chains: [
-          {
-            chainId: 1,
-            caip: "eip155:1/erc20:0x1234567890123456789012345678901234567890",
+    const content = parse(
+      "Hello $0x1234567890123456789012345678901234567890",
+      [
+        {
+          type: "erc20",
+          address: "0x1234567890123456789012345678901234567890",
+          name: "John Doe",
+          symbol: "JDOE",
+          chainId: 1,
+          position: {
+            start: 6,
+            end: 49,
           },
-        ],
-      },
-    ]);
+          logoURI: null,
+          decimals: 18,
+          chains: [
+            {
+              chainId: 1,
+              caip: "eip155:1/erc20:0x1234567890123456789012345678901234567890",
+            },
+          ],
+        },
+      ],
+      defaultTheme,
+    );
 
     expect(content).toEqual({
       type: "doc",
@@ -184,6 +197,7 @@ describe("content parser", () => {
     const content = parse(
       "🌎 https://example.com/test 💻 nehehe http://localhost:3000",
       [],
+      defaultTheme,
     );
 
     expect(content).toEqual({
@@ -200,7 +214,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "https://example.com/test",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },
@@ -216,7 +230,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "http://localhost:3000",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },
@@ -281,6 +295,7 @@ describe("content parser", () => {
           },
         },
       ],
+      defaultTheme,
     );
 
     expect(content).toEqual({
@@ -372,6 +387,7 @@ describe("content parser", () => {
           },
         },
       ],
+      defaultTheme,
     );
 
     expect(content).toEqual({
@@ -406,7 +422,7 @@ describe("content parser", () => {
                   type: "link",
                   attrs: {
                     href: "https://example.com",
-                    class: "underline cursor-pointer",
+                    class: "cursor-pointer underline",
                     rel: "noopener noreferrer",
                     target: "_blank",
                   },

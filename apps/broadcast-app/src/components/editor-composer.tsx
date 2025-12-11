@@ -153,7 +153,8 @@ export function EditorComposer({
         return undefined;
       });
 
-      const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+      const filesToUpload = await (editorRef.current?.getFilesForUpload() ||
+        []);
 
       await uploads.uploadFiles(filesToUpload, {
         onSuccess(uploadedFile) {
@@ -355,6 +356,17 @@ export function EditorComposer({
     [],
   );
 
+  const editorTheme = useMemo(() => {
+    return {
+      editorContainer: {
+        classNames: "flex-1",
+      },
+      editor: {
+        classNames: "min-h-4 px-2 py-2",
+      },
+    };
+  }, []);
+
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -389,8 +401,6 @@ export function EditorComposer({
         className="hidden"
       />
       <Editor
-        className="min-h-4 px-2 py-2"
-        wrapperClassName="flex-1"
         autoFocus={autoFocus}
         defaultValue={defaultValue}
         ref={editorRef}
@@ -405,6 +415,7 @@ export function EditorComposer({
 
           onCancel?.();
         }}
+        theme={editorTheme}
       />
 
       {submitMutation.error && (

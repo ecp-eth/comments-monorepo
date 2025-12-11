@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
@@ -173,7 +173,8 @@ function BaseCommentForm({
           throw new Error("Editor is not initialized");
         }
 
-        const filesToUpload = editorRef.current?.getFilesForUpload() || [];
+        const filesToUpload = await (editorRef.current?.getFilesForUpload() ||
+          []);
 
         await uploads.uploadFiles(filesToUpload, {
           onSuccess(uploadedFile) {
@@ -273,6 +274,22 @@ function BaseCommentForm({
     [],
   );
 
+  const editorTheme = useMemo(() => {
+    return {
+      editor: {
+        classNames: cn(
+          "w-full p-2 border border-gray-300 rounded",
+          submitMutation.error &&
+            submitMutation.error instanceof InvalidCommentError &&
+            "border-destructive focus-visible:border-destructive",
+        ),
+      },
+      editor_disabled: {
+        classNames: "opacity-50",
+      },
+    };
+  }, [submitMutation.error]);
+
   const handleAddFileClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -303,13 +320,6 @@ function BaseCommentForm({
       />
       <Editor
         autoFocus={autoFocus}
-        className={cn(
-          "w-[calc(100%-2px)] p-2 border border-gray-300 rounded text-foreground mx-[1px]",
-          disabled && "opacity-50",
-          submitMutation.error &&
-            submitMutation.error instanceof InvalidCommentError &&
-            "border-destructive focus-visible:border-destructive",
-        )}
         disabled={isSubmitting || disabled}
         placeholder={placeholder}
         defaultValue={defaultContent}
@@ -331,6 +341,7 @@ function BaseCommentForm({
 
           onCancel?.();
         }}
+        theme={editorTheme}
       />
       <div className="flex gap-2 justify-between text-xs">
         {address && <CommentFormAuthor address={address} />}

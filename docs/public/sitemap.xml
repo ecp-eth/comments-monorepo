@@ -212,7 +212,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/react-editor</loc>
-    <lastmod>2025-09-03T21:46:16.000Z</lastmod>
+    <lastmod>2025-12-09T09:59:38.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -962,37 +962,37 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/CAIP373Error</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/InvalidCommentIdError</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/InvalidCommentManagerAddressError</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/InvalidFunctionCallDataError</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/MalformedCaip373Error</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/comments/classes/UnsupportedChainError</loc>
-    <lastmod>2025-10-14T08:44:36.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2942,7 +2942,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/classes/ResponseError</loc>
-    <lastmod>2025-09-19T14:03:05.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3890,19 +3890,19 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/classes/InvalidEventError</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/classes/InvalidEventSignatureError</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/classes/InvalidRequestBodyError</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-09T08:48:22.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

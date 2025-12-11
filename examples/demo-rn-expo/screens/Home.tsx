@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { KeyboardAvoidingView, View } from "react-native";
 import { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import { CommentSection } from "../components/CommentSection";
 import { StatusBar } from "../components/StatusBar";
 import { CommentForm } from "../components/CommentForm";
 import { isZeroHex } from "@ecp.eth/sdk/core";
+import { useLayoutConfigContext } from "../components/LayoutConfigProvider";
 
 export default function Home() {
+  const layoutConfig = useLayoutConfigContext();
   const [justViewingReplies, setJustViewingReplies] = useState(false);
   const [replyingComment, setReplyingComment] =
     useState<IndexerAPICommentSchemaType>();
@@ -21,9 +23,12 @@ export default function Home() {
   };
 
   return (
-    <View
+    <KeyboardAvoidingView
+      behavior="padding"
       style={{
         flex: 1,
+        flexDirection:
+          layoutConfig.commentForm === "on-top" ? "column" : "column-reverse",
       }}
     >
       <View
@@ -64,6 +69,6 @@ export default function Home() {
           setRootComment(undefined);
         }}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
