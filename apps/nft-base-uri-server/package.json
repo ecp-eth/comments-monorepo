@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
-    "next": "^15.5.7",
+    "next": "15.5.9",
     "react": "~19.1.2",
     "react-dom": "~19.1.2",
     "viem": "^2.29.2",

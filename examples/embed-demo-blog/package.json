@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ecp.eth/sdk": "workspace:*",
-    "next": "^15.5.7",
+    "next": "15.5.9",
     "next-mdx-remote": "^5.0.0",
     "react": "~19.1.2",
     "react-dom": "~19.1.2",
