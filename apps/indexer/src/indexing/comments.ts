@@ -46,6 +46,7 @@ import type {
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
 import { wrapServiceWithTracing } from "../telemetry.ts";
+import { generateAuthorShortId, generateCommentShortId } from "./helpers.ts";
 
 async function commentsAddedHandler({
   event,
@@ -232,6 +233,10 @@ async function commentsAddedHandler({
     if (!insertedComment) {
       throw new Error("Failed to insert comment");
     }
+
+    // generate a short ids
+    await generateCommentShortId(insertedComment.id, tx);
+    await generateAuthorShortId(insertedComment.author, tx);
 
     await moderationResult.saveAndNotify();
 

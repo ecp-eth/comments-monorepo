@@ -1,4 +1,4 @@
-import { sql, relations, desc, asc } from "drizzle-orm";
+import { sql, relations, desc } from "drizzle-orm";
 import {
   integer,
   primaryKey,
@@ -831,5 +831,49 @@ export const appRecipientNotificationGroups = offchainSchema.table(
       desc(table.updatedAt),
       desc(table.appNotificationId),
     ),
+  ],
+);
+
+/**
+ * Stores mapping of author addresses to short ids
+ */
+export const authorShortIds = offchainSchema.table(
+  "author_short_id",
+  {
+    authorAddress: text().notNull().$type<Hex>(),
+    shortId: text()
+      .notNull()
+      .$type<Hex | `0x${string}...${string}`>()
+      .unique("author_short_id_by_short_id_uq"),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      name: "author_short_id_pk",
+      columns: [table.authorAddress],
+    }),
+    index("author_short_id_by_short_id_idx").on(table.shortId),
+  ],
+);
+
+/**
+ * Stores mapping of comment ids to short ids
+ */
+export const commentShortIds = offchainSchema.table(
+  "comment_short_id",
+  {
+    commentId: text().notNull().$type<Hex>(),
+    shortId: text()
+      .notNull()
+      .$type<Hex | `0x${string}...${string}`>()
+      .unique("comment_short_id_by_short_id_uq"),
+    createdAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      name: "comment_short_id_pk",
+      columns: [table.commentId],
+    }),
+    index("comment_short_id_by_short_id_idx").on(table.shortId),
   ],
 );
