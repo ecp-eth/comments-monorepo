@@ -57,7 +57,7 @@ jobs:
       - name: copy over patches and files
         run: |
           mkdir -p examples/signer/patches
-          cp patches/@privy-io__server-auth.patch examples/signer/patches/@privy-io__server-auth.patch
+          cp patches/* examples/signer/patches/*
           cp .node-version examples/signer/.node-version
 
       - name: commit changes
