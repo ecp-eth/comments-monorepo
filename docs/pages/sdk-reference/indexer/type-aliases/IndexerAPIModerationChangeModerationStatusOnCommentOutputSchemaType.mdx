@@ -44,6 +44,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;
@@ -173,7 +174,7 @@ type IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:565](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L565)
+Defined in: [packages/sdk/src/indexer/schemas.ts:566](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L566)
 
 ## Type declaration
 
@@ -363,6 +364,12 @@ moderationStatusChangedAt: Date;
 
 ```ts
 parentId: null | `0x${string}`;
+```
+
+### path
+
+```ts
+path: string;
 ```
 
 ### references

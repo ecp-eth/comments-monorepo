@@ -59,6 +59,7 @@ type IndexerAPINotificationMentionSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -207,7 +208,7 @@ type IndexerAPINotificationMentionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:751](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L751)
+Defined in: [packages/sdk/src/indexer/schemas.ts:752](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L752)
 
 ## Type declaration
 
@@ -337,6 +338,7 @@ comment: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;
@@ -652,6 +654,12 @@ moderationStatusChangedAt: Date;
 
 ```ts
 parentId: null | `0x${string}`;
+```
+
+#### comment.path
+
+```ts
+path: string;
 ```
 
 #### comment.references

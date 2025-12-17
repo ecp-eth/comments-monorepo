@@ -60,6 +60,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -226,6 +227,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -409,6 +411,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -607,6 +610,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -773,6 +777,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -956,6 +961,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -1122,6 +1128,7 @@ type IndexerAPINotificationSchemaType =
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -1255,6 +1262,6 @@ type IndexerAPINotificationSchemaType =
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:785](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L785)
+Defined in: [packages/sdk/src/indexer/schemas.ts:786](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L786)
 
 The notification schema

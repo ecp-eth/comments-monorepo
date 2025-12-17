@@ -1,4 +1,4 @@
-import { index, onchainTable, relations, sql } from "ponder";
+import { index, onchainTable, relations, sql, uniqueIndex } from "ponder";
 import type {
   IndexerAPICommentReferencesSchemaType,
   IndexerAPICommentZeroExSwapSchemaType,
@@ -57,6 +57,7 @@ export const comment = onchainTable(
       .$type<Record<string, number>>()
       .default({})
       .notNull(),
+    path: t.text().notNull(),
   }),
   (table) => ({
     targetUriIdx: index().on(table.targetUri),
@@ -66,6 +67,8 @@ export const comment = onchainTable(
     createdAtIdx: index().on(table.createdAt),
     deletedAtIdx: index().on(table.deletedAt),
     authorIdx: index().on(table.author),
+    pathIdx: index().on(table.path),
+    pathUq: uniqueIndex("comment_path_uq").on(table.path),
     moderationStatusIdx: index().on(table.moderationStatus),
     moderationClassifierScoreIdx: index().on(table.moderationClassifierScore),
     moderationClassifierResultIdx: index().using(

@@ -158,7 +158,7 @@ export function createUserDataAndFormatSingleCommentResponseResolver({
     const endReply = slicedReplies[slicedReplies.length - 1];
 
     return {
-      ...formatComment(comment),
+      ...formatComment(comment, resolvedAuthorEnsData),
       author: formatAuthor(
         author,
         resolvedAuthorEnsData,
@@ -181,7 +181,7 @@ export function createUserDataAndFormatSingleCommentResponseResolver({
           );
 
           return {
-            ...formatComment(reply),
+            ...formatComment(reply, resolvedAuthorEnsData),
             author: formatAuthor(
               reply.author,
               resolvedAuthorEnsData,
@@ -265,6 +265,7 @@ export async function mapReplyCountsByCommentId(
 
 function formatComment(
   comment: CommentSelectType & { viewerReactions?: CommentSelectType[] },
+  resolvedEnsData: ResolvedENSData | null | undefined,
 ) {
   return {
     ...comment,
@@ -275,6 +276,9 @@ function formatComment(
     cursor: getCommentCursor(comment.id as Hex, comment.createdAt),
     viewerReactions: formatViewerReactions(comment.viewerReactions),
     reactionCounts: comment.reactionCounts ?? {},
+    path: resolvedEnsData
+      ? [resolvedEnsData.name, comment.path.split("/")[1]].join("/")
+      : comment.path,
   };
 }
 
@@ -285,7 +289,7 @@ function formatViewerReactions(
     viewerReactions?.reduce(
       (acc, reaction) => {
         const reactionFormatted = {
-          ...formatComment(reaction),
+          ...formatComment(reaction, undefined),
           author: {
             address: reaction.author,
           },
@@ -328,7 +332,7 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
   ]);
 
   return {
-    ...formatComment(comment),
+    ...formatComment(comment, resolvedEnsData),
     author: formatAuthor(
       comment.author,
       resolvedEnsData,

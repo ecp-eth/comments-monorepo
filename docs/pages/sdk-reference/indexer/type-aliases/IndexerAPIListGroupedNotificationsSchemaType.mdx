@@ -53,6 +53,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${string}`;
+              path: string;
               references: (
                  | {
                  address: `0x${string}`;
@@ -227,6 +228,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -269,6 +271,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -328,6 +331,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -402,6 +406,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -444,6 +449,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -503,6 +509,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -545,6 +552,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
+                 path: string;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
                  revision: number;
                  targetUri: string;
@@ -578,7 +586,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:853](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L853)
+Defined in: [packages/sdk/src/indexer/schemas.ts:854](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L854)
 
 The list grouped notifications schema returned by fetchGroupedNotifications()
 
@@ -643,6 +651,7 @@ notifications: {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -817,6 +826,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -859,6 +869,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -918,6 +929,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -992,6 +1004,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -1034,6 +1047,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -1093,6 +1107,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;
@@ -1135,6 +1150,7 @@ notifications: {
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
+              path: string;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
               revision: number;
               targetUri: string;

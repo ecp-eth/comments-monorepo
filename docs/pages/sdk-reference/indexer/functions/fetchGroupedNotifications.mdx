@@ -53,6 +53,7 @@ function fetchGroupedNotifications(options): Promise<{
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
               parentId: null | `0x${string}`;
+              path: string;
               references: (
                  | {
                  address: `0x${(...)}`;
@@ -201,6 +202,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -233,6 +235,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -274,6 +277,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -322,6 +326,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -354,6 +359,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -395,6 +401,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -427,6 +434,7 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatus: ... | ... | ...;
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
+                 path: string;
                  references: ...[];
                  revision: number;
                  targetUri: string;
@@ -514,6 +522,7 @@ Fetch grouped notifications from the Indexer API
               `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
               `moderationStatusChangedAt`: `Date`;
               `parentId`: `null` \| `` `0x${string}` ``;
+              `path`: `string`;
               `references`: (
                  \| \{
                  `address`: `` `0x${(...)}` ``;
@@ -662,6 +671,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -694,6 +704,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -735,6 +746,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -783,6 +795,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -815,6 +828,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -856,6 +870,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;
@@ -888,6 +903,7 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatus`: ... \| ... \| ...;
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
+                 `path`: `string`;
                  `references`: ...[];
                  `revision`: `number`;
                  `targetUri`: `string`;

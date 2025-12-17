@@ -151,6 +151,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      moderationStatusChangedAt: ZodDate;
      parentId: ZodNullable<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
+     path: ZodString;
      references: ZodType<(
         | {
         address: `0x${string}`;
@@ -453,6 +454,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -616,6 +618,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -799,6 +802,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -982,6 +986,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -1116,4 +1121,4 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:725](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L725)
+Defined in: [packages/sdk/src/indexer/schemas.ts:726](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L726)

@@ -38,6 +38,7 @@ describe("CommentReportsService", () => {
     referencesResolutionStatus: "pending",
     referencesResolutionStatusChangedAt: null,
     reactionCounts: {},
+    path: "0x123/0x456",
   };
 
   const mockNotificationService: IReportsNotificationsService = {

@@ -56,6 +56,7 @@ function fetchCommentReplies(options): Promise<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      reactionCounts: Record<string, number>;
      references: (
         | {
@@ -216,6 +217,7 @@ function fetchCommentReplies(options): Promise<{
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
@@ -335,6 +337,7 @@ function fetchCommentReplies(options): Promise<{
               moderationStatus: ... | ... | ...;
               moderationStatusChangedAt: Date;
               parentId: ... | ...;
+              path: string;
               references: ...[];
               revision: number;
               targetUri: string;
@@ -398,6 +401,7 @@ function fetchCommentReplies(options): Promise<{
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${(...)}`;
@@ -585,6 +589,7 @@ Fetch replies for a comment from the Indexer API
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
+     `path`: `string`;
      `reactionCounts`: `Record`\<`string`, `number`\>;
      `references`: (
         \| \{
@@ -745,6 +750,7 @@ Fetch replies for a comment from the Indexer API
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
+           `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
@@ -864,6 +870,7 @@ Fetch replies for a comment from the Indexer API
               `moderationStatus`: ... \| ... \| ...;
               `moderationStatusChangedAt`: `Date`;
               `parentId`: ... \| ...;
+              `path`: `string`;
               `references`: ...[];
               `revision`: `number`;
               `targetUri`: `string`;
@@ -927,6 +934,7 @@ Fetch replies for a comment from the Indexer API
         `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
         `moderationStatusChangedAt`: `Date`;
         `parentId`: `null` \| `` `0x${string}` ``;
+        `path`: `string`;
         `references`: (
            \| \{
            `address`: `` `0x${(...)}` ``;

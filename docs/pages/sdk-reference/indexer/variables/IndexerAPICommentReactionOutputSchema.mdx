@@ -92,6 +92,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   moderationClassifierScore: ZodNumber;
   moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
   parentId: ZodNullable<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
+  path: ZodString;
   references: ZodType<(
      | {
      address: `0x${string}`;
@@ -415,6 +416,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationClassifierScore: ZodNumber;
      moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
      parentId: ZodNullable<ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>>;
+     path: ZodString;
      references: ZodType<(... | ... | ... | ... | ... | ... | ... | ...)[], ZodTypeDef, (... | ... | ... | ... | ... | ... | ... | ...)[]>;
      revision: ZodNumber;
      targetUri: ZodString;
@@ -472,6 +474,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${(...)}`;
@@ -617,6 +620,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${(...)}`;
@@ -763,6 +767,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -914,6 +919,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -1088,6 +1094,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -1239,6 +1246,7 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -1379,4 +1387,4 @@ const IndexerAPICommentReactionOutputSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:441](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L441)
+Defined in: [packages/sdk/src/indexer/schemas.ts:442](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L442)

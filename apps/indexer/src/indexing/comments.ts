@@ -46,6 +46,7 @@ import type {
 import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
 import { wrapServiceWithTracing } from "../telemetry.ts";
+import { generateAuthorShortId, generateCommentShortId } from "./helpers.ts";
 
 async function commentsAddedHandler({
   event,
@@ -197,6 +198,13 @@ async function commentsAddedHandler({
       referencesResolutionResult.references,
     );
 
+    // generate a short ids
+    const commentShortId = await generateCommentShortId(
+      event.args.commentId,
+      tx,
+    );
+    const authorShortId = await generateAuthorShortId(event.args.author, tx);
+
     const [insertedComment] = await tx
       .insert(schema.comment)
       .values({
@@ -225,6 +233,7 @@ async function commentsAddedHandler({
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
         reactionCounts: {},
+        path: `${authorShortId}/${commentShortId}`,
       })
       .returning()
       .execute();
