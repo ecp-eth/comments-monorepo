@@ -8,10 +8,8 @@ import {
   GetCommentParamSchema,
   GetCommentQuerySchema,
 } from "../../../lib/schemas";
-import {
-  fetchCommentWithReplies,
-  formatCommentWithRepliesResponse,
-} from "../helpers";
+import { formatCommentWithRepliesResponse } from "../formatters";
+import { fetchCommentWithReplies } from "../fetchers";
 
 const getCommentRoute = createRoute({
   method: "get",

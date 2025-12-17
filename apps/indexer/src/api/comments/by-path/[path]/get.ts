@@ -11,10 +11,8 @@ import { db } from "../../../../services";
 import schema from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
 import { eq } from "ponder";
-import {
-  fetchCommentWithReplies,
-  formatCommentWithRepliesResponse,
-} from "../../helpers";
+import { fetchCommentWithReplies } from "../../fetchers";
+import { formatCommentWithRepliesResponse } from "../../formatters";
 
 const getCommentsByPathRoute = createRoute({
   method: "get",
