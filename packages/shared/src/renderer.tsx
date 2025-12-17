@@ -357,14 +357,6 @@ export function hashKey(str: string) {
 }
 
 /**
- * Helper function to generate a random key for a React element
- * @returns A random key string
- */
-export function randomKey(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-}
-
-/**
  * Helper function to generate a key for a React element
  * @param element - The element to generate a key for
  * @returns The key for the element
@@ -417,12 +409,13 @@ export function generateKey(
  * Element renderers for React
  */
 class ReactElementRenderers implements ElementRenderers<React.ReactElement> {
+  private keyIdSeed = 0;
   constructor(private readonly keySet: Set<string> = new Set()) {}
   paragraph(children: React.ReactElement[]): React.ReactElement {
     const childKeys = children.map((child) => {
-      let key = generateKey(child) ?? randomKey();
+      let key = generateKey(child) ?? this.getNewKeyId();
       while (this.keySet.has(key)) {
-        key = key + "-" + randomKey();
+        key = key + "-" + this.getNewKeyId();
       }
       this.keySet.add(key);
       return key;
@@ -454,6 +447,9 @@ class ReactElementRenderers implements ElementRenderers<React.ReactElement> {
         {url}
       </a>
     );
+  }
+  private getNewKeyId() {
+    return `temp-key-id-${++this.keyIdSeed}`;
   }
 }
 
