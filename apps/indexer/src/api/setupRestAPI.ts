@@ -1,6 +1,6 @@
 import { setupGetChannel } from "./channels/[id]/get";
 import { setupGetChannels } from "./channels/get";
-import { setupGetCommentsByPath } from "./comments/by-path/[path]/get";
+import { setupGetCommentsByPath } from "./comments/by-path/[author]/[commentId]/get";
 import { setupGetComment } from "./comments/[commentId]/get";
 import { setupReportComment } from "./comments/[commentId]/reports/post";
 import setupGetComments from "./comments/get";

@@ -4,27 +4,25 @@ import {
   APIBadRequestResponseSchema,
   APIErrorResponseSchema,
   GetCommentQuerySchema,
-} from "../../../../lib/schemas";
-import { isEthName } from "../../../../services/resolvers";
-import { ensByNameResolverService } from "../../../../services/ens-by-name-resolver";
-import { db } from "../../../../services";
+} from "../../../../../lib/schemas";
+import { isEthName } from "../../../../../services/resolvers";
+import { ensByNameResolverService } from "../../../../../services/ens-by-name-resolver";
+import { db } from "../../../../../services";
 import schema from "ponder:schema";
 import type { Hex } from "@ecp.eth/sdk/core";
 import { eq } from "ponder";
-import { fetchCommentWithReplies } from "../../fetchers";
-import { formatCommentWithRepliesResponse } from "../../formatters";
+import { fetchCommentWithReplies } from "../../../fetchers";
+import { formatCommentWithRepliesResponse } from "../../../formatters";
 
 const getCommentsByPathRoute = createRoute({
   method: "get",
-  path: "/api/comments/by-path/{path}",
+  path: "/api/comments/by-path/{authorShortId}/{commentShortId}",
   tags: ["comments"],
   description: "Retrieve a single comment by path",
   request: {
     params: z.object({
-      path: z
-        .string()
-        .regex(/^[^/]+\/[^/]+$/)
-        .transform((val) => val.split("/") as [string, string]),
+      authorShortId: z.string(),
+      commentShortId: z.string().regex(/^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$/),
     }),
     query: GetCommentQuerySchema,
   },
@@ -58,24 +56,22 @@ const getCommentsByPathRoute = createRoute({
 
 export function setupGetCommentsByPath(app: OpenAPIHono) {
   app.openapi(getCommentsByPathRoute, async (c) => {
-    const {
-      path: [shortAuthorId, shortCommentId],
-    } = c.req.valid("param");
+    const { authorShortId, commentShortId } = c.req.valid("param");
     const { viewer, chainId, mode, commentType, isReplyDeleted } =
       c.req.valid("query");
 
     let path: string;
 
     // if the first path of path resembles ENS name, resolve it to an address
-    if (isEthName(shortAuthorId)) {
-      const ens = await ensByNameResolverService.load(shortAuthorId);
+    if (isEthName(authorShortId)) {
+      const ens = await ensByNameResolverService.load(authorShortId);
 
       if (!ens) {
         return c.json({ message: "Not found" }, 404);
       }
 
       // find author short id by address
-      const authorShortId = await db.query.authorShortIds.findFirst({
+      const shortId = await db.query.authorShortIds.findFirst({
         where(fields, operators) {
           return operators.eq(
             fields.authorAddress,
@@ -84,13 +80,13 @@ export function setupGetCommentsByPath(app: OpenAPIHono) {
         },
       });
 
-      if (!authorShortId) {
+      if (!shortId) {
         return c.json({ message: "Not found" }, 404);
       }
 
-      path = `${authorShortId.shortId}/${shortCommentId}`;
+      path = `${shortId.shortId}/${commentShortId}`;
     } else {
-      path = `${shortAuthorId}/${shortCommentId}`;
+      path = `${authorShortId}/${commentShortId}`;
     }
 
     const comment = await fetchCommentWithReplies(
