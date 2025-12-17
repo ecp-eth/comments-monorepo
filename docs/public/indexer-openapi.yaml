@@ -5681,7 +5681,7 @@ paths:
         - schema:
             type: string
             pattern: ^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$
-            description: The comment short id, whole address or ENS name
+            description: The comment short id or full comment ID in hex format
           required: true
           name: commentShortId
           in: path

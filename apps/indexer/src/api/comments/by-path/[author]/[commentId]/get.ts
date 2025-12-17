@@ -30,7 +30,7 @@ const getCommentsByPathRoute = createRoute({
         .regex(/^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$/)
         .transform((val) => val as `0x${string}...${string}` | Hex)
         .openapi({
-          description: "The comment short id, whole address or ENS name",
+          description: "The comment short id or full comment ID in hex format",
         }),
     }),
     query: GetCommentQuerySchema,
