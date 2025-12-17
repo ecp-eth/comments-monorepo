@@ -1,5 +1,15 @@
 # @ecp.eth/shared
 
+## 0.0.20
+
+### Patch Changes
+
+- 37b2775: feat: comment short paths
+- Updated dependencies [7e71452]
+- Updated dependencies [37b2775]
+  - @ecp.eth/sdk@0.0.37
+  - @ecp.eth/shared-signer@0.0.2
+
 ## 0.0.19
 
 ### Patch Changes
