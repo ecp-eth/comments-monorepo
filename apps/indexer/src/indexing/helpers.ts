@@ -1,4 +1,4 @@
-import type { ExtractTablesWithRelations } from "drizzle-orm";
+import { sql, type ExtractTablesWithRelations } from "drizzle-orm";
 import { DatabaseError } from "pg";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
@@ -29,6 +29,11 @@ export async function generateCommentShortId(
     const suffix = normalizedCommentId.slice(-i);
     const shortId: ShortID = `0x${prefix}...${suffix}`;
 
+    // insert a save point so if the insert fails we can rollback to the save point
+    const savePoint = `sp_c_${commentId}_${i}`;
+
+    await tx.execute(sql`SAVEPOINT ${sql.raw(savePoint)}`);
+
     try {
       await tx.insert(schema.commentShortIds).values({
         commentId: lowercasedCommentId,
@@ -38,6 +43,8 @@ export async function generateCommentShortId(
       return shortId;
     } catch (error) {
       if (error instanceof DatabaseError && error.code === "23505") {
+        await tx.execute(sql`ROLLBACK TO SAVEPOINT ${sql.raw(savePoint)}`);
+
         // if the error comes from unique constraint violation on commentId column, then we already have a short id for this comment
         // so we just need to get it
         if (error.constraint === "comment_short_id_pk") {
@@ -90,6 +97,11 @@ export async function generateAuthorShortId(
     const suffix = normalizedAuthorAddress.slice(-i);
     const shortId: ShortID = `0x${prefix}...${suffix}`;
 
+    // insert a save point so if the insert fails we can rollback to the save point
+    const savePoint = `sp_a_${authorAddress}_${i}`;
+
+    await tx.execute(sql`SAVEPOINT ${sql.raw(savePoint)}`);
+
     try {
       await tx.insert(schema.authorShortIds).values({
         authorAddress: lowercasedAuthorAddress,
@@ -99,6 +111,8 @@ export async function generateAuthorShortId(
       return shortId;
     } catch (error) {
       if (error instanceof DatabaseError && error.code === "23505") {
+        await tx.execute(sql`ROLLBACK TO SAVEPOINT ${sql.raw(savePoint)}`);
+
         // if the error comes from unique constraint violation on authorAddress column, then we already have a short id for this author
         // so we just need to get it
         if (error.constraint === "author_short_id_pk") {
