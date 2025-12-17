@@ -112,7 +112,7 @@ async function resolveCommentPathId(
   commentShortId: Hex | `0x${string}...${string}`,
 ): Promise<`0x${string}...${string}` | Hex | undefined> {
   if (commentShortId.includes("...")) {
-    return commentShortId as `0x${string}...${string}`;
+    return commentShortId.toLowerCase() as `0x${string}...${string}`;
   }
 
   const commentShortIdRow = await db.query.commentShortIds.findFirst({
@@ -154,7 +154,7 @@ async function resolveAuthorShortId(
   }
 
   if (authorShortId.includes("...")) {
-    return authorShortId as `0x${string}...${string}`;
+    return authorShortId.toLowerCase() as `0x${string}...${string}`;
   }
 
   return undefined;

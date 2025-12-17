@@ -11,8 +11,8 @@ vi.mock("../../src/telemetry", () => {
 });
 
 vi.mock("../../src/indexing/helpers", () => ({
-  generateCommentShortId: vi.fn().mockResolvedValue("0x123...456/0x789...012"),
-  generateAuthorShortId: vi.fn().mockResolvedValue("0x123...456/0x789...012"),
+  generateCommentShortId: vi.fn().mockResolvedValue("0x789...012"),
+  generateAuthorShortId: vi.fn().mockResolvedValue("0x789...012"),
 }));
 
 // Mock Sentry to avoid real reporting
