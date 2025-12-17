@@ -15085,12 +15085,6 @@ paths:
                                     type: string
                                     enum:
                                       - approval:added
-                                  uid:
-                                    type: string
-                                  version:
-                                    type: number
-                                    enum:
-                                      - 1
                                   data:
                                     type: object
                                     properties:
@@ -15134,27 +15128,27 @@ paths:
                                     description: >-
                                       Hex format string, e.g.
                                       `0x1234567890abcdef`
+                                  uid:
+                                    type: string
+                                  version:
+                                    type: number
+                                    enum:
+                                      - 1
                                 required:
                                   - event
-                                  - uid
-                                  - version
                                   - data
                                   - chainId
                                   - blockNumber
                                   - logIndex
                                   - txHash
+                                  - uid
+                                  - version
                               - type: object
                                 properties:
                                   event:
                                     type: string
                                     enum:
                                       - approval:added
-                                  uid:
-                                    type: string
-                                  version:
-                                    type: number
-                                    enum:
-                                      - 2
                                   data:
                                     type: object
                                     properties:
@@ -15202,27 +15196,27 @@ paths:
                                     description: >-
                                       Hex format string, e.g.
                                       `0x1234567890abcdef`
+                                  uid:
+                                    type: string
+                                  version:
+                                    type: number
+                                    enum:
+                                      - 2
                                 required:
                                   - event
-                                  - uid
-                                  - version
                                   - data
                                   - chainId
                                   - blockNumber
                                   - logIndex
                                   - txHash
+                                  - uid
+                                  - version
                           - type: object
                             properties:
                               event:
                                 type: string
                                 enum:
                                   - approval:removed
-                              uid:
-                                type: string
-                              version:
-                                type: number
-                                enum:
-                                  - 1
                               data:
                                 type: object
                                 properties:
@@ -15244,15 +15238,21 @@ paths:
                               txHash:
                                 type: string
                                 description: Hex format string, e.g. `0x1234567890abcdef`
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
                             required:
                               - event
-                              - uid
-                              - version
                               - data
                               - chainId
                               - blockNumber
                               - logIndex
                               - txHash
+                              - uid
+                              - version
                           - type: object
                             properties:
                               event:
