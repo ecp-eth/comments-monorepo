@@ -135,6 +135,7 @@ function getMockFetchCommentResponseData() {
         count: 0,
       },
     },
+    path: "0xc506739d39cbf1d94e2510bfca64cb6015f4bb1b/0x9e928d74c573428f69aa87aa084cc801c6c9a9c04c0512813abb3b82fbe1f21e",
   };
 
   return {
@@ -202,6 +203,7 @@ function getMockFetchCommentRepliesResponseData() {
             count: 0,
           },
         },
+        path: "0xa0ee7a142d267c1f36714e4a8f75612f20a79720/0x4639fe3e5aa762ed850143819b5022ab59e67713ce1561cf4f012f9f5246ec1a",
       },
       {
         app: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
@@ -261,6 +263,7 @@ function getMockFetchCommentRepliesResponseData() {
             count: 0,
           },
         },
+        path: "0xa0ee7a142d267c1f36714e4a8f75612f20a79720/0x733462c8fae87358165c88b84f6dc213333e0480a8607cf26c33ce53206beda4",
       },
     ],
     pagination: {
