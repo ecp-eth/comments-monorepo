@@ -198,6 +198,13 @@ async function commentsAddedHandler({
       referencesResolutionResult.references,
     );
 
+    // generate a short ids
+    const commentShortId = await generateCommentShortId(
+      event.args.commentId,
+      tx,
+    );
+    const authorShortId = await generateAuthorShortId(event.args.author, tx);
+
     const [insertedComment] = await tx
       .insert(schema.comment)
       .values({
@@ -226,6 +233,7 @@ async function commentsAddedHandler({
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
         reactionCounts: {},
+        path: `${authorShortId}/${commentShortId}`,
       })
       .returning()
       .execute();
@@ -233,10 +241,6 @@ async function commentsAddedHandler({
     if (!insertedComment) {
       throw new Error("Failed to insert comment");
     }
-
-    // generate a short ids
-    await generateCommentShortId(insertedComment.id, tx);
-    await generateAuthorShortId(insertedComment.author, tx);
 
     await moderationResult.saveAndNotify();
 
