@@ -407,24 +407,34 @@ export function generateKey(
 /**
  * Element renderers for React
  */
-const reactElementRenderers: ElementRenderers<React.ReactElement> = {
-  paragraph(children) {
-    const key = children
-      .map((child, index) => {
-        return generateKey(child) ?? `key-${index.toString()}`;
-      })
-      .join("-");
+class ReactElementRenderers implements ElementRenderers<React.ReactElement> {
+  private keyIdSeed = 0;
+  constructor(private readonly keySet: Set<string> = new Set()) {}
+  paragraph(children: React.ReactElement[]): React.ReactElement {
+    const childKeys = children.map((child) => {
+      let key = generateKey(child) ?? this.getNewKeyId();
+      while (this.keySet.has(key)) {
+        key = key + "-" + this.getNewKeyId();
+      }
+      this.keySet.add(key);
+      return key;
+    });
+    const paragraphKey = childKeys.join("-");
 
     return (
-      <p key={key}>
-        {children.map((el, i) => cloneElement(el, { key: key + i }))}
+      <p key={paragraphKey}>
+        {children.map((el, i) =>
+          cloneElement(el, {
+            key: childKeys[i],
+          }),
+        )}
       </p>
     );
-  },
-  text(text) {
+  }
+  text(text: string): React.ReactElement {
     return <Fragment>{text}</Fragment>;
-  },
-  url(url) {
+  }
+  url(url: string): React.ReactElement {
     return (
       <a
         key={hashKey(url)}
@@ -436,8 +446,11 @@ const reactElementRenderers: ElementRenderers<React.ReactElement> = {
         {url}
       </a>
     );
-  },
-};
+  }
+  private getNewKeyId() {
+    return `temp-key-id-${++this.keyIdSeed}`;
+  }
+}
 
 /**
  * Result type for renderToReact
@@ -461,6 +474,7 @@ export function renderToReact(
     "renderers" | "elementRenderers" | "processMediaReferences"
   >,
 ): RenderToReactResult {
+  const reactElementRenderers = new ReactElementRenderers();
   const { result, mediaReferences, isTruncated } = render<
     React.ReactElement,
     AllowedMediaReferences
