@@ -3,6 +3,8 @@ import {
   dateToIsoStringSchema,
   EventFromChainDbToOpenApiSchema,
   EventFromChainSchema,
+  EventV1Schema,
+  EventV2Schema,
 } from "../shared/schemas.ts";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
@@ -24,8 +26,6 @@ export const ApprovalAddedEventSchema = z.discriminatedUnion("version", [
   z
     .object({
       event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
-      uid: z.string(),
-      version: z.literal(1),
       data: z.object({
         approval: z.object({
           id: z.string(),
@@ -36,12 +36,11 @@ export const ApprovalAddedEventSchema = z.discriminatedUnion("version", [
         }),
       }),
     })
-    .merge(EventFromChainSchema),
+    .merge(EventFromChainSchema)
+    .merge(EventV1Schema),
   z
     .object({
       event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
-      uid: z.string(),
-      version: z.literal(2),
       data: z.object({
         approval: z.object({
           id: z.string(),
@@ -53,14 +52,13 @@ export const ApprovalAddedEventSchema = z.discriminatedUnion("version", [
         }),
       }),
     })
-    .merge(EventFromChainSchema),
+    .merge(EventFromChainSchema)
+    .merge(EventV2Schema),
 ]);
 
 export const ApprovalAddedV1EventDbToOpenApiSchema = z
   .object({
     event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
-    uid: z.string(),
-    version: z.literal(1),
     data: z.object({
       approval: z.object({
         id: z.string(),
@@ -71,13 +69,12 @@ export const ApprovalAddedV1EventDbToOpenApiSchema = z
       }),
     }),
   })
-  .merge(EventFromChainDbToOpenApiSchema);
+  .merge(EventFromChainDbToOpenApiSchema)
+  .merge(EventV1Schema);
 
 export const ApprovalAddedV2EventDbToOpenApiSchema = z
   .object({
     event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
-    uid: z.string(),
-    version: z.literal(2),
     data: z.object({
       approval: z.object({
         id: z.string(),
@@ -89,7 +86,8 @@ export const ApprovalAddedV2EventDbToOpenApiSchema = z
       }),
     }),
   })
-  .merge(EventFromChainDbToOpenApiSchema);
+  .merge(EventFromChainDbToOpenApiSchema)
+  .merge(EventV2Schema);
 
 export const ApprovalAddedEventDbToOpenApiSchema = z.discriminatedUnion(
   "version",
@@ -114,28 +112,26 @@ export type ApprovalAddedEvent = z.infer<typeof ApprovalAddedEventSchema>;
 export const ApprovalRemovedEventSchema = z
   .object({
     event: z.literal(EVENT_APPROVAL_REMOVED satisfies ApprovalEvent),
-    uid: z.string(),
-    version: z.literal(1),
     data: z.object({
       approval: z.object({
         id: z.string(),
       }),
     }),
   })
-  .merge(EventFromChainSchema);
+  .merge(EventFromChainSchema)
+  .merge(EventV1Schema);
 
 export const ApprovalRemovedEventDbToOpenApiSchema = z
   .object({
     event: z.literal(EVENT_APPROVAL_REMOVED satisfies ApprovalEvent),
-    uid: z.string(),
-    version: z.literal(1),
     data: z.object({
       approval: z.object({
         id: z.string(),
       }),
     }),
   })
-  .merge(EventFromChainDbToOpenApiSchema);
+  .merge(EventFromChainDbToOpenApiSchema)
+  .merge(EventV1Schema);
 
 export type ApprovalRemovedEventInput = z.input<
   typeof ApprovalRemovedEventSchema
