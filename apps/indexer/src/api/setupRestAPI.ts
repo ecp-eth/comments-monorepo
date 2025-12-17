@@ -1,6 +1,8 @@
 import { setupGetChannel } from "./channels/[id]/get";
 import { setupGetChannels } from "./channels/get";
+import { setupGetCommentsByPath } from "./comments/by-path/[path]/get";
 import { setupGetComment } from "./comments/[commentId]/get";
+import { setupReportComment } from "./comments/[commentId]/reports/post";
 import setupGetComments from "./comments/get";
 import setupGetCommentReplies from "./comments/replies/get";
 import setupGetApprovals from "./approvals/get";
@@ -14,7 +16,6 @@ import { setupChangeCommentModerationStatus } from "./moderate-comments/[comment
 import { setupGetModerateComment } from "./moderate-comments/[commentId]/get";
 import { setupWebhook } from "./webhook/post";
 import { setupGetAutocomplete } from "./autocomplete/get";
-import { setupReportComment } from "./comments/[commentId]/reports/post";
 import { setupGetReports } from "./reports/get";
 import { setupGetReport } from "./reports/[reportId]/get";
 import { setupPatchReport } from "./reports/[reportId]/patch";
@@ -63,6 +64,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannels(app);
   setupGetComment(app);
   setupGetComments(app);
+  setupGetCommentsByPath(app);
   setupGetCommentReplies(app);
   setupGetApprovals(app);
   setupGetAuthor(app);
