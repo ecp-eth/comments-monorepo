@@ -87,6 +87,8 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 if [[ ! $DRY_RUN == "true" ]]; then
+    # latest npm change made the token non permanent, so we need to login again
+    npm login
     # publish changes
     pnpm changeset publish
 else
