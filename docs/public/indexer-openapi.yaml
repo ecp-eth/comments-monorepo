@@ -5642,7 +5642,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/APIBadRequestResponse'
-  /api/comments/by-path/{path}:
+  /api/comments/by-path/{authorShortId}/{commentShortId}:
     get:
       tags:
         - comments
@@ -5650,9 +5650,14 @@ paths:
       parameters:
         - schema:
             type: string
-            pattern: ^[^/]+\/[^/]+$
           required: true
-          name: path
+          name: authorShortId
+          in: path
+        - schema:
+            type: string
+            pattern: ^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$
+          required: true
+          name: commentShortId
           in: path
         - schema:
             type: string
