@@ -6,7 +6,6 @@ import type {
   IndexerAPICommentReferenceSchemaType,
   IndexerAPICommentReferencesSchemaType,
 } from "@ecp.eth/sdk/indexer";
-import { never } from "./helpers";
 
 const KEEP_ORIGINAL_TEXT = Symbol("KEEP_ORIGINAL_TEXT");
 
