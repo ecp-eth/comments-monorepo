@@ -21,7 +21,7 @@ export function ponderEventToApprovalAddedEvent({
   return ApprovalAddedEventSchema.parse({
     event: "approval:added",
     uid,
-    version: 1,
+    version: 2,
     blockNumber: event.block.number,
     chainId: context.chain.id,
     txHash: event.transaction.hash,
