@@ -20,24 +20,43 @@ export const ApprovalEvents = [
 
 export type ApprovalEvent = (typeof ApprovalEvents)[number];
 
-export const ApprovalAddedEventSchema = z
-  .object({
-    event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
-    uid: z.string(),
-    version: z.literal(1),
-    data: z.object({
-      approval: z.object({
-        id: z.string(),
-        createdAt: dateToIsoStringSchema,
-        updatedAt: dateToIsoStringSchema,
-        author: HexSchema,
-        app: HexSchema,
+export const ApprovalAddedEventSchema = z.discriminatedUnion("version", [
+  z
+    .object({
+      event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
+      uid: z.string(),
+      version: z.literal(1),
+      data: z.object({
+        approval: z.object({
+          id: z.string(),
+          createdAt: dateToIsoStringSchema,
+          updatedAt: dateToIsoStringSchema,
+          author: HexSchema,
+          app: HexSchema,
+        }),
       }),
-    }),
-  })
-  .merge(EventFromChainSchema);
+    })
+    .merge(EventFromChainSchema),
+  z
+    .object({
+      event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
+      uid: z.string(),
+      version: z.literal(2),
+      data: z.object({
+        approval: z.object({
+          id: z.string(),
+          createdAt: dateToIsoStringSchema,
+          updatedAt: dateToIsoStringSchema,
+          author: HexSchema,
+          app: HexSchema,
+          expiresAt: dateToIsoStringSchema,
+        }),
+      }),
+    })
+    .merge(EventFromChainSchema),
+]);
 
-export const ApprovalAddedEventDbToOpenApiSchema = z
+export const ApprovalAddedV1EventDbToOpenApiSchema = z
   .object({
     event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
     uid: z.string(),
@@ -53,6 +72,32 @@ export const ApprovalAddedEventDbToOpenApiSchema = z
     }),
   })
   .merge(EventFromChainDbToOpenApiSchema);
+
+export const ApprovalAddedV2EventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_APPROVAL_ADDED satisfies ApprovalEvent),
+    uid: z.string(),
+    version: z.literal(2),
+    data: z.object({
+      approval: z.object({
+        id: z.string(),
+        createdAt: z.string().datetime(),
+        updatedAt: z.string().datetime(),
+        author: HexSchema,
+        app: HexSchema,
+        expiresAt: z.string().datetime(),
+      }),
+    }),
+  })
+  .merge(EventFromChainDbToOpenApiSchema);
+
+export const ApprovalAddedEventDbToOpenApiSchema = z.discriminatedUnion(
+  "version",
+  [
+    ApprovalAddedV1EventDbToOpenApiSchema,
+    ApprovalAddedV2EventDbToOpenApiSchema,
+  ],
+);
 
 export type ApprovalAddedEventInput = z.input<typeof ApprovalAddedEventSchema>;
 

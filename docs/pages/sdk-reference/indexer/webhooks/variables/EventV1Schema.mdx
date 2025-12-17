@@ -9,6 +9,7 @@
 ```ts
 const EventV1Schema: ZodObject<{
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   uid: string;
@@ -19,6 +20,6 @@ const EventV1Schema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:43](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L43)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/shared.ts:51](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/shared.ts#L51)
 
 Common schema for all v1 events.

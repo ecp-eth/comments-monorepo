@@ -1,8 +1,5 @@
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
-import {
-  IndexerAPICommentModerationStatusSchema,
-  IndexerAPIPaginationSchema,
-} from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPICommentModerationStatusSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
 import { normalizeUrl } from "./utils.ts";
@@ -407,7 +404,7 @@ export const InputReportsCursorSchema = z.preprocess((value, ctx) => {
   }
 }, ReportsCursorSchema);
 
-const ChainIdSchema = z
+export const OpenAPIChainIdSchema = z
   .preprocess(
     (val) => {
       if (typeof val === "string") {
@@ -447,7 +444,7 @@ export const GetCommentQuerySchema = z.object({
     description:
       "The viewer's address, for personalized data such as reactions",
   }),
-  chainId: ChainIdSchema,
+  chainId: OpenAPIChainIdSchema,
   mode: z.enum(["nested", "flat"]).default("nested").openapi({
     description:
       "The mode to fetch comments in. Nested will return only the first level of comments. Flat will return all replies sorted by timestamp in descending order.",
@@ -493,7 +490,7 @@ export const GetCommentsQuerySchema = z.object({
     description:
       "The comment type (e.g. 0=comment, 1=reaction, not passed = all)",
   }),
-  chainId: ChainIdSchema,
+  chainId: OpenAPIChainIdSchema,
   moderationStatus: z
     .preprocess(
       (val) => {
@@ -588,60 +585,6 @@ export const GetCommentRepliesParamSchema = z.object({
 });
 
 /**
- * Query string schema for getting a list of approvals.
- */
-export const GetApprovalsQuerySchema = z
-  .object({
-    author: OpenAPIHexSchema.openapi({
-      description:
-        "The author's address. Can be used to filter approvals by author. Either `author` or `app` must be provided or both.",
-    }).optional(),
-    app: OpenAPIHexSchema.openapi({
-      description:
-        "The address of the app signer. Can be used to filter approvals by app. Either `author` or `app` must be provided or both.",
-    }).optional(),
-    chainId: ChainIdSchema,
-    limit: z.coerce.number().int().positive().max(100).default(50).openapi({
-      description: "The number of comments to return",
-    }),
-    offset: z.coerce.number().int().min(0).default(0).openapi({
-      description: "The offset of the comments to return",
-    }),
-  })
-  .refine(
-    (val) => {
-      if (val.author || val.app) {
-        return true;
-      }
-
-      return false;
-    },
-    {
-      message: "Either `author` or `app` must be provided or both.",
-    },
-  );
-
-/**
- * Schema for a single approval.
- */
-export const GetApprovalSchema = z.object({
-  id: z.string(),
-  app: OpenAPIHexSchema,
-  author: OpenAPIHexSchema,
-  deletedAt: z.coerce.date().nullable(),
-  chainId: z.number().int(),
-  txHash: OpenAPIHexSchema,
-});
-
-/**
- * Response schema for getting a list of approvals.
- */
-export const GetApprovalsResponseSchema = z.object({
-  results: z.array(GetApprovalSchema),
-  pagination: IndexerAPIPaginationSchema,
-});
-
-/**
  * Query string schema for getting a list of pending comments.
  */
 export const GetCommentsPendingModerationQuerySchema = z.object({
@@ -705,7 +648,7 @@ export const GetChannelsQuerySchema = z.object({
   owner: OpenAPIHexSchema.optional().openapi({
     description: "Filter channels by owner",
   }),
-  chainId: ChainIdSchema,
+  chainId: OpenAPIChainIdSchema,
   limit: z.coerce.number().int().min(1).max(100).default(50).openapi({
     description: "The number of channels to return",
   }),

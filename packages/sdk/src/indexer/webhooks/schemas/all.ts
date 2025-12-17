@@ -27,7 +27,7 @@ import { TestEvents, TestEventSchema } from "./test.js";
 /**
  * All events schema.
  */
-export const AllEventsSchema = z.discriminatedUnion("event", [
+export const AllEventsSchema = z.union([
   ApprovalAddedEventSchema,
   ApprovalRemovedEventSchema,
   ChannelCreatedEventSchema,

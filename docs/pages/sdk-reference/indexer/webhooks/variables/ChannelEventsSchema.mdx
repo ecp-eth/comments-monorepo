@@ -85,6 +85,7 @@ const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
@@ -192,6 +193,7 @@ const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
@@ -287,6 +289,7 @@ const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
@@ -436,6 +439,7 @@ const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
@@ -543,6 +547,7 @@ const ChannelEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;

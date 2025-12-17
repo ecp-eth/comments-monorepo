@@ -7,48 +7,47 @@
 # Variable: ApprovalEventsSchema
 
 ```ts
-const ApprovalEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
+const ApprovalEventsSchema: ZodUnion<[ZodDiscriminatedUnion<"version", [ZodObject<{
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
   data: ZodObject<{
      approval: ZodObject<{
-        app: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
-        author: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
-        createdAt: ZodEffects<ZodString, Date, string>;
-        id: ZodString;
-        updatedAt: ZodEffects<ZodString, Date, string>;
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        id: ...;
+        updatedAt: ...;
       }, "strip", ZodTypeAny, {
-        app: `0x${string}`;
-        author: `0x${string}`;
-        createdAt: Date;
-        id: string;
-        updatedAt: Date;
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        id: ...;
+        updatedAt: ...;
       }, {
-        app: `0x${string}`;
-        author: `0x${string}`;
-        createdAt: string;
-        id: string;
-        updatedAt: string;
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        id: ...;
+        updatedAt: ...;
      }>;
    }, "strip", ZodTypeAny, {
      approval: {
-        app: `0x${string}`;
-        author: `0x${string}`;
+        app: `0x${(...)}`;
+        author: `0x${(...)}`;
         createdAt: Date;
         id: string;
         updatedAt: Date;
      };
    }, {
      approval: {
-        app: `0x${string}`;
-        author: `0x${string}`;
+        app: `0x${(...)}`;
+        author: `0x${(...)}`;
         createdAt: string;
         id: string;
         updatedAt: string;
      };
   }>;
   event: ZodLiteral<"approval:added">;
-} & {
-  blockNumber: ZodEffects<ZodString, bigint, string>;
-  chainId: ZodNumber;
   logIndex: ZodNumber;
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
@@ -91,6 +90,94 @@ const ApprovalEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
 }>, ZodObject<{
   data: ZodObject<{
      approval: ZodObject<{
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        expiresAt: ...;
+        id: ...;
+        updatedAt: ...;
+      }, "strip", ZodTypeAny, {
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        expiresAt: ...;
+        id: ...;
+        updatedAt: ...;
+      }, {
+        app: ...;
+        author: ...;
+        createdAt: ...;
+        expiresAt: ...;
+        id: ...;
+        updatedAt: ...;
+     }>;
+   }, "strip", ZodTypeAny, {
+     approval: {
+        app: `0x${(...)}`;
+        author: `0x${(...)}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+   }, {
+     approval: {
+        app: `0x${(...)}`;
+        author: `0x${(...)}`;
+        createdAt: string;
+        expiresAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  }>;
+  event: ZodLiteral<"approval:added">;
+  version: ZodLiteral<2>;
+} & {
+  blockNumber: ZodEffects<ZodString, bigint, string>;
+  chainId: ZodNumber;
+  logIndex: ZodNumber;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+} & {
+  uid: ZodString;
+}, "strip", ZodTypeAny, {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 2;
+}, {
+  blockNumber: string;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        expiresAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 2;
+}>]>, ZodObject<{
+  data: ZodObject<{
+     approval: ZodObject<{
         id: ZodString;
       }, "strip", ZodTypeAny, {
         id: string;
@@ -114,6 +201,7 @@ const ApprovalEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 }, "strip", ZodTypeAny, {
   blockNumber: bigint;
@@ -144,6 +232,6 @@ const ApprovalEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
 }>]>;
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:97](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L97)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L155)
 
 Approval events schema.

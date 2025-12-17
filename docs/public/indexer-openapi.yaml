@@ -10724,12 +10724,16 @@ paths:
                           type:
                             - string
                             - 'null'
+                          description: A date string in ISO 8601 format
                         chainId:
                           type: integer
                         txHash:
                           type: string
                           description: Hex format string, e.g. `0x1234567890abcdef`
                           pattern: ^0x[a-fA-F0-9]+$
+                        expiresAt:
+                          type: string
+                          description: A date string in ISO 8601 format
                       required:
                         - id
                         - app
@@ -10737,6 +10741,7 @@ paths:
                         - deletedAt
                         - chainId
                         - txHash
+                        - expiresAt
                   pagination:
                     type: object
                     properties:
@@ -15072,69 +15077,140 @@ paths:
                       eventUid:
                         type: string
                       payload:
-                        oneOf:
-                          - type: object
-                            properties:
-                              event:
-                                type: string
-                                enum:
-                                  - approval:added
-                              uid:
-                                type: string
-                              version:
-                                type: number
-                                enum:
-                                  - 1
-                              data:
-                                type: object
+                        anyOf:
+                          - oneOf:
+                              - type: object
                                 properties:
-                                  approval:
+                                  event:
+                                    type: string
+                                    enum:
+                                      - approval:added
+                                  uid:
+                                    type: string
+                                  version:
+                                    type: number
+                                    enum:
+                                      - 1
+                                  data:
                                     type: object
                                     properties:
-                                      id:
-                                        type: string
-                                      createdAt:
-                                        type: string
-                                        format: date-time
-                                      updatedAt:
-                                        type: string
-                                        format: date-time
-                                      author:
-                                        type: string
-                                        description: >-
-                                          Hex format string, e.g.
-                                          `0x1234567890abcdef`
-                                      app:
-                                        type: string
-                                        description: >-
-                                          Hex format string, e.g.
-                                          `0x1234567890abcdef`
+                                      approval:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                          createdAt:
+                                            type: string
+                                            format: date-time
+                                          updatedAt:
+                                            type: string
+                                            format: date-time
+                                          author:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          app:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                        required:
+                                          - id
+                                          - createdAt
+                                          - updatedAt
+                                          - author
+                                          - app
                                     required:
-                                      - id
-                                      - createdAt
-                                      - updatedAt
-                                      - author
-                                      - app
+                                      - approval
+                                  chainId:
+                                    type: integer
+                                  blockNumber:
+                                    type: string
+                                  logIndex:
+                                    type: integer
+                                  txHash:
+                                    type: string
+                                    description: >-
+                                      Hex format string, e.g.
+                                      `0x1234567890abcdef`
                                 required:
-                                  - approval
-                              chainId:
-                                type: integer
-                              blockNumber:
-                                type: string
-                              logIndex:
-                                type: integer
-                              txHash:
-                                type: string
-                                description: Hex format string, e.g. `0x1234567890abcdef`
-                            required:
-                              - event
-                              - uid
-                              - version
-                              - data
-                              - chainId
-                              - blockNumber
-                              - logIndex
-                              - txHash
+                                  - event
+                                  - uid
+                                  - version
+                                  - data
+                                  - chainId
+                                  - blockNumber
+                                  - logIndex
+                                  - txHash
+                              - type: object
+                                properties:
+                                  event:
+                                    type: string
+                                    enum:
+                                      - approval:added
+                                  uid:
+                                    type: string
+                                  version:
+                                    type: number
+                                    enum:
+                                      - 2
+                                  data:
+                                    type: object
+                                    properties:
+                                      approval:
+                                        type: object
+                                        properties:
+                                          id:
+                                            type: string
+                                          createdAt:
+                                            type: string
+                                            format: date-time
+                                          updatedAt:
+                                            type: string
+                                            format: date-time
+                                          author:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          app:
+                                            type: string
+                                            description: >-
+                                              Hex format string, e.g.
+                                              `0x1234567890abcdef`
+                                          expiresAt:
+                                            type: string
+                                            format: date-time
+                                        required:
+                                          - id
+                                          - createdAt
+                                          - updatedAt
+                                          - author
+                                          - app
+                                          - expiresAt
+                                    required:
+                                      - approval
+                                  chainId:
+                                    type: integer
+                                  blockNumber:
+                                    type: string
+                                  logIndex:
+                                    type: integer
+                                  txHash:
+                                    type: string
+                                    description: >-
+                                      Hex format string, e.g.
+                                      `0x1234567890abcdef`
+                                required:
+                                  - event
+                                  - uid
+                                  - version
+                                  - data
+                                  - chainId
+                                  - blockNumber
+                                  - logIndex
+                                  - txHash
                           - type: object
                             properties:
                               event:

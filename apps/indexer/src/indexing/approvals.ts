@@ -29,6 +29,7 @@ async function approvalAddedHandler({
         chainId: context.chain.id,
         txHash: event.transaction.hash,
         logIndex: event.log.logIndex,
+        expiresAt: new Date(Number(event.args.expiry) * 1000),
       })
       .onConflictDoUpdate({
         target: [schema.approval.id],
@@ -37,6 +38,7 @@ async function approvalAddedHandler({
           updatedAt: new Date(Number(event.block.timestamp) * 1000),
           txHash: event.transaction.hash,
           logIndex: event.log.logIndex,
+          expiresAt: new Date(Number(event.args.expiry) * 1000),
         },
       })
       .returning()
