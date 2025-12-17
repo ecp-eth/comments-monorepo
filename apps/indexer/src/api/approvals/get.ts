@@ -26,10 +26,10 @@ export const GetApprovalsQuerySchema = z
     }).optional(),
     chainId: OpenAPIChainIdSchema,
     limit: z.coerce.number().int().positive().max(100).default(50).openapi({
-      description: "The number of comments to return",
+      description: "The number of approvals to return",
     }),
     offset: z.coerce.number().int().min(0).default(0).openapi({
-      description: "The offset of the comments to return",
+      description: "The offset of the approvals to return",
     }),
   })
   .refine(

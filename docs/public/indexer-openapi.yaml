@@ -10683,7 +10683,7 @@ paths:
             exclusiveMinimum: 0
             maximum: 100
             default: 50
-            description: The number of comments to return
+            description: The number of approvals to return
           required: false
           name: limit
           in: query
@@ -10693,7 +10693,7 @@ paths:
               - 'null'
             minimum: 0
             default: 0
-            description: The offset of the comments to return
+            description: The offset of the approvals to return
           required: false
           name: offset
           in: query
