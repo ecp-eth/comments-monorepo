@@ -13,6 +13,7 @@ import type { Hex } from "@ecp.eth/sdk/core";
 import { eq } from "ponder";
 import { fetchCommentWithReplies } from "../../../fetchers";
 import { formatCommentWithRepliesResponse } from "../../../formatters";
+import { isEthAddress } from "../../../../../lib/utils";
 
 const getCommentsByPathRoute = createRoute({
   method: "get",
@@ -21,8 +22,16 @@ const getCommentsByPathRoute = createRoute({
   description: "Retrieve a single comment by path",
   request: {
     params: z.object({
-      authorShortId: z.string(),
-      commentShortId: z.string().regex(/^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$/),
+      authorShortId: z.string().openapi({
+        description: "The author short id, whole address or ENS name",
+      }),
+      commentShortId: z
+        .string()
+        .regex(/^0x[a-fA-F0-9]+(\.\.\.)?[a-fA-F0-9]+$/)
+        .transform((val) => val as `0x${string}...${string}` | Hex)
+        .openapi({
+          description: "The comment short id, whole address or ENS name",
+        }),
     }),
     query: GetCommentQuerySchema,
   },
@@ -60,34 +69,14 @@ export function setupGetCommentsByPath(app: OpenAPIHono) {
     const { viewer, chainId, mode, commentType, isReplyDeleted } =
       c.req.valid("query");
 
-    let path: string;
+    const commentPathId = await resolveCommentPathId(commentShortId);
+    const authorPathId = await resolveAuthorShortId(authorShortId);
 
-    // if the first path of path resembles ENS name, resolve it to an address
-    if (isEthName(authorShortId)) {
-      const ens = await ensByNameResolverService.load(authorShortId);
-
-      if (!ens) {
-        return c.json({ message: "Not found" }, 404);
-      }
-
-      // find author short id by address
-      const shortId = await db.query.authorShortIds.findFirst({
-        where(fields, operators) {
-          return operators.eq(
-            fields.authorAddress,
-            ens.address.toLowerCase() as Hex,
-          );
-        },
-      });
-
-      if (!shortId) {
-        return c.json({ message: "Not found" }, 404);
-      }
-
-      path = `${shortId.shortId}/${commentShortId}`;
-    } else {
-      path = `${authorShortId}/${commentShortId}`;
+    if (!commentPathId || !authorPathId) {
+      return c.json({ message: "Not found" }, 404);
     }
+
+    const path = `${authorPathId}/${commentPathId}`;
 
     const comment = await fetchCommentWithReplies(
       eq(schema.comment.path, path),
@@ -117,4 +106,56 @@ export function setupGetCommentsByPath(app: OpenAPIHono) {
   });
 
   return app;
+}
+
+async function resolveCommentPathId(
+  commentShortId: Hex | `0x${string}...${string}`,
+): Promise<`0x${string}...${string}` | Hex | undefined> {
+  if (commentShortId.includes("...")) {
+    return commentShortId as `0x${string}...${string}`;
+  }
+
+  const commentShortIdRow = await db.query.commentShortIds.findFirst({
+    where(fields, operators) {
+      return operators.eq(
+        fields.commentId,
+        commentShortId.toLowerCase() as Hex,
+      );
+    },
+  });
+
+  return commentShortIdRow?.shortId;
+}
+
+async function resolveAuthorShortId(
+  authorShortId: string | Hex | `0x${string}...${string}`,
+): Promise<Hex | `0x${string}...${string}` | undefined> {
+  if (isEthName(authorShortId)) {
+    const ens = await ensByNameResolverService.load(authorShortId);
+
+    if (!ens) {
+      return undefined;
+    }
+
+    return ens.address.toLowerCase() as Hex;
+  }
+
+  if (isEthAddress(authorShortId)) {
+    const shortId = await db.query.authorShortIds.findFirst({
+      where(fields, operators) {
+        return operators.eq(
+          fields.authorAddress,
+          authorShortId.toLowerCase() as Hex,
+        );
+      },
+    });
+
+    return shortId?.shortId;
+  }
+
+  if (authorShortId.includes("...")) {
+    return authorShortId as `0x${string}...${string}`;
+  }
+
+  return undefined;
 }
