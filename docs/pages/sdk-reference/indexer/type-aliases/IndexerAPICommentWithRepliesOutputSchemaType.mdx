@@ -44,6 +44,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -204,6 +205,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
+        path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
@@ -355,6 +357,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: string;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${(...)}`;
@@ -520,6 +523,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -663,7 +667,7 @@ type IndexerAPICommentWithRepliesOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:486](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L486)
+Defined in: [packages/sdk/src/indexer/schemas.ts:487](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L487)
 
 ## Type declaration
 
@@ -855,6 +859,12 @@ moderationStatusChangedAt: string = dateToString;
 parentId: null | `0x${string}`;
 ```
 
+### path
+
+```ts
+path: string;
+```
+
 ### reactionCounts
 
 ```ts
@@ -1028,6 +1038,7 @@ replies: {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     path: string;
      reactionCounts: Record<string, number>;
      references: (
         | {
@@ -1179,6 +1190,7 @@ replies: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: string;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${(...)}`;
@@ -1415,6 +1427,7 @@ results: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -1566,6 +1579,7 @@ results: {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${(...)}`;
@@ -1755,6 +1769,7 @@ viewerReactions: Record<string, {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;

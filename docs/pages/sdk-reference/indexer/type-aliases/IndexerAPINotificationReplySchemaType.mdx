@@ -59,6 +59,7 @@ type IndexerAPINotificationReplySchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -225,6 +226,7 @@ type IndexerAPINotificationReplySchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -358,7 +360,7 @@ type IndexerAPINotificationReplySchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:741](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L741)
+Defined in: [packages/sdk/src/indexer/schemas.ts:742](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L742)
 
 ## Type declaration
 
@@ -488,6 +490,7 @@ comment: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;
@@ -805,6 +808,12 @@ moderationStatusChangedAt: Date;
 parentId: null | `0x${string}`;
 ```
 
+#### comment.path
+
+```ts
+path: string;
+```
+
 #### comment.references
 
 ```ts
@@ -1014,6 +1023,7 @@ replyingTo: {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;
@@ -1329,6 +1339,12 @@ moderationStatusChangedAt: Date;
 
 ```ts
 parentId: null | `0x${string}`;
+```
+
+#### replyingTo.path
+
+```ts
+path: string;
 ```
 
 #### replyingTo.references

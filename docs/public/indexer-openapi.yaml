@@ -1281,6 +1281,8 @@ paths:
                             - position
                         - {}
                         - type: 'null'
+                  path:
+                    type: string
                   viewerReactions:
                     type: object
                     additionalProperties:
@@ -1820,6 +1822,8 @@ paths:
                                     - position
                                 - {}
                                 - type: 'null'
+                          path:
+                            type: string
                         required:
                           - app
                           - author
@@ -1845,6 +1849,7 @@ paths:
                           - revision
                           - zeroExSwap
                           - references
+                          - path
                   reactionCounts:
                     type: object
                     additionalProperties:
@@ -2409,6 +2414,8 @@ paths:
                                       - position
                                   - {}
                                   - type: 'null'
+                            path:
+                              type: string
                             viewerReactions:
                               type: object
                               additionalProperties:
@@ -2968,6 +2975,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -2993,6 +3002,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                             reactionCounts:
                               type: object
                               additionalProperties:
@@ -3022,6 +3032,7 @@ paths:
                             - revision
                             - zeroExSwap
                             - references
+                            - path
                             - viewerReactions
                             - reactionCounts
                       pagination:
@@ -3076,6 +3087,7 @@ paths:
                   - revision
                   - zeroExSwap
                   - references
+                  - path
                   - viewerReactions
                   - reactionCounts
                   - replies
@@ -3781,6 +3793,8 @@ paths:
                                   - position
                               - {}
                               - type: 'null'
+                        path:
+                          type: string
                         viewerReactions:
                           type: object
                           additionalProperties:
@@ -4330,6 +4344,8 @@ paths:
                                           - position
                                       - {}
                                       - type: 'null'
+                                path:
+                                  type: string
                               required:
                                 - app
                                 - author
@@ -4355,6 +4371,7 @@ paths:
                                 - revision
                                 - zeroExSwap
                                 - references
+                                - path
                         reactionCounts:
                           type: object
                           additionalProperties:
@@ -4931,6 +4948,8 @@ paths:
                                             - position
                                         - {}
                                         - type: 'null'
+                                  path:
+                                    type: string
                                   viewerReactions:
                                     type: object
                                     additionalProperties:
@@ -5490,6 +5509,8 @@ paths:
                                                     - position
                                                 - {}
                                                 - type: 'null'
+                                          path:
+                                            type: string
                                         required:
                                           - app
                                           - author
@@ -5515,6 +5536,7 @@ paths:
                                           - revision
                                           - zeroExSwap
                                           - references
+                                          - path
                                   reactionCounts:
                                     type: object
                                     additionalProperties:
@@ -5544,6 +5566,7 @@ paths:
                                   - revision
                                   - zeroExSwap
                                   - references
+                                  - path
                                   - viewerReactions
                                   - reactionCounts
                             pagination:
@@ -5598,6 +5621,7 @@ paths:
                         - revision
                         - zeroExSwap
                         - references
+                        - path
                         - viewerReactions
                         - reactionCounts
                         - replies
@@ -6237,6 +6261,8 @@ paths:
                             - position
                         - {}
                         - type: 'null'
+                  path:
+                    type: string
                   viewerReactions:
                     type: object
                     additionalProperties:
@@ -6776,6 +6802,8 @@ paths:
                                     - position
                                 - {}
                                 - type: 'null'
+                          path:
+                            type: string
                         required:
                           - app
                           - author
@@ -6801,6 +6829,7 @@ paths:
                           - revision
                           - zeroExSwap
                           - references
+                          - path
                   reactionCounts:
                     type: object
                     additionalProperties:
@@ -7365,6 +7394,8 @@ paths:
                                       - position
                                   - {}
                                   - type: 'null'
+                            path:
+                              type: string
                             viewerReactions:
                               type: object
                               additionalProperties:
@@ -7924,6 +7955,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -7949,6 +7982,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                             reactionCounts:
                               type: object
                               additionalProperties:
@@ -7978,6 +8012,7 @@ paths:
                             - revision
                             - zeroExSwap
                             - references
+                            - path
                             - viewerReactions
                             - reactionCounts
                       pagination:
@@ -8032,6 +8067,7 @@ paths:
                   - revision
                   - zeroExSwap
                   - references
+                  - path
                   - viewerReactions
                   - reactionCounts
                   - replies
@@ -8735,6 +8771,8 @@ paths:
                                   - position
                               - {}
                               - type: 'null'
+                        path:
+                          type: string
                         viewerReactions:
                           type: object
                           additionalProperties:
@@ -9284,6 +9322,8 @@ paths:
                                           - position
                                       - {}
                                       - type: 'null'
+                                path:
+                                  type: string
                               required:
                                 - app
                                 - author
@@ -9309,6 +9349,7 @@ paths:
                                 - revision
                                 - zeroExSwap
                                 - references
+                                - path
                         reactionCounts:
                           type: object
                           additionalProperties:
@@ -9885,6 +9926,8 @@ paths:
                                             - position
                                         - {}
                                         - type: 'null'
+                                  path:
+                                    type: string
                                   viewerReactions:
                                     type: object
                                     additionalProperties:
@@ -10444,6 +10487,8 @@ paths:
                                                     - position
                                                 - {}
                                                 - type: 'null'
+                                          path:
+                                            type: string
                                         required:
                                           - app
                                           - author
@@ -10469,6 +10514,7 @@ paths:
                                           - revision
                                           - zeroExSwap
                                           - references
+                                          - path
                                   reactionCounts:
                                     type: object
                                     additionalProperties:
@@ -10498,6 +10544,7 @@ paths:
                                   - revision
                                   - zeroExSwap
                                   - references
+                                  - path
                                   - viewerReactions
                                   - reactionCounts
                             pagination:
@@ -10552,6 +10599,7 @@ paths:
                         - revision
                         - zeroExSwap
                         - references
+                        - path
                         - viewerReactions
                         - reactionCounts
                         - replies
@@ -11488,6 +11536,8 @@ paths:
                                   - position
                               - {}
                               - type: 'null'
+                        path:
+                          type: string
                       required:
                         - app
                         - author
@@ -11513,6 +11563,7 @@ paths:
                         - revision
                         - zeroExSwap
                         - references
+                        - path
                   pagination:
                     type: object
                     properties:
@@ -12106,6 +12157,8 @@ paths:
                             - position
                         - {}
                         - type: 'null'
+                  path:
+                    type: string
                 required:
                   - app
                   - author
@@ -12131,6 +12184,7 @@ paths:
                   - revision
                   - zeroExSwap
                   - references
+                  - path
         '400':
           description: Bad request
           content:
@@ -12688,6 +12742,8 @@ paths:
                             - position
                         - {}
                         - type: 'null'
+                  path:
+                    type: string
                 required:
                   - app
                   - author
@@ -12713,6 +12769,7 @@ paths:
                   - revision
                   - zeroExSwap
                   - references
+                  - path
         '400':
           description: Bad request
           content:
@@ -19764,6 +19821,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -19789,6 +19848,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                 id:
                                   type: string
                                   description: A bigint string
@@ -20395,6 +20455,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -20420,6 +20482,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                   description: >-
                                     The comment that has been created by the
                                     author. This comment triggered the
@@ -21082,6 +21145,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -21107,6 +21172,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                   description: >-
                                     The comment that has been created by the
                                     author. This comment triggered the
@@ -21682,6 +21748,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -21707,6 +21775,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                 id:
                                   type: string
                                   description: A bigint string
@@ -22313,6 +22382,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -22338,6 +22409,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                   description: >-
                                     The comment that has been created by the
                                     author. This comment triggered the
@@ -22913,6 +22985,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -22938,6 +23012,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                 id:
                                   type: string
                                   description: A bigint string
@@ -23544,6 +23619,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -23569,6 +23646,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                                   description: >-
                                     The comment that has been created by the
                                     author. This comment triggered the
@@ -24324,6 +24402,8 @@ paths:
                                               - position
                                           - {}
                                           - type: 'null'
+                                    path:
+                                      type: string
                                   required:
                                     - app
                                     - author
@@ -24349,6 +24429,7 @@ paths:
                                     - revision
                                     - zeroExSwap
                                     - references
+                                    - path
                               required:
                                 - type
                                 - comment
@@ -24935,6 +25016,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -24960,6 +25043,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                           id:
                                             type: string
                                             description: A bigint string
@@ -25568,6 +25652,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -25593,6 +25679,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                             description: >-
                                               The comment that has been created by the
                                               author. This comment triggered the
@@ -26257,6 +26344,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -26282,6 +26371,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                             description: >-
                                               The comment that has been created by the
                                               author. This comment triggered the
@@ -26857,6 +26947,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -26882,6 +26974,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                           id:
                                             type: string
                                             description: A bigint string
@@ -27490,6 +27583,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -27515,6 +27610,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                             description: >-
                                               The comment that has been created by the
                                               author. This comment triggered the
@@ -28090,6 +28186,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -28115,6 +28213,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                           id:
                                             type: string
                                             description: A bigint string
@@ -28723,6 +28822,8 @@ paths:
                                                         - position
                                                     - {}
                                                     - type: 'null'
+                                              path:
+                                                type: string
                                             required:
                                               - app
                                               - author
@@ -28748,6 +28849,7 @@ paths:
                                               - revision
                                               - zeroExSwap
                                               - references
+                                              - path
                                             description: >-
                                               The comment that has been created by the
                                               author. This comment triggered the

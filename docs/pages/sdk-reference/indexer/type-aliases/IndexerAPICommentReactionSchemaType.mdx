@@ -44,6 +44,7 @@ type IndexerAPICommentReactionSchemaType = {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -195,6 +196,7 @@ type IndexerAPICommentReactionSchemaType = {
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -338,7 +340,7 @@ type IndexerAPICommentReactionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:437](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L437)
+Defined in: [packages/sdk/src/indexer/schemas.ts:438](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L438)
 
 ## Type declaration
 
@@ -530,6 +532,12 @@ moderationStatusChangedAt: Date;
 parentId: null | `0x${string}`;
 ```
 
+### path
+
+```ts
+path: string;
+```
+
 ### reactionCounts
 
 ```ts
@@ -714,6 +722,7 @@ viewerReactions: Record<string, {
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   references: (
      | {
      address: `0x${string}`;

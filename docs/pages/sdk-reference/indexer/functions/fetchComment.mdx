@@ -44,6 +44,7 @@ function fetchComment(options): Promise<{
   moderationStatus: "approved" | "pending" | "rejected";
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
+  path: string;
   reactionCounts: Record<string, number>;
   references: (
      | {
@@ -204,6 +205,7 @@ function fetchComment(options): Promise<{
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
@@ -352,6 +354,7 @@ function fetchComment(options): Promise<{
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: ...;
@@ -493,6 +496,7 @@ function fetchComment(options): Promise<{
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
+     path: string;
      references: (
         | {
         address: `0x${string}`;
@@ -682,6 +686,7 @@ Fetch one single comment from the Indexer API
   `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
   `moderationStatusChangedAt`: `Date`;
   `parentId`: `null` \| `` `0x${string}` ``;
+  `path`: `string`;
   `reactionCounts`: `Record`\<`string`, `number`\>;
   `references`: (
      \| \{
@@ -842,6 +847,7 @@ Fetch one single comment from the Indexer API
         `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
         `moderationStatusChangedAt`: `Date`;
         `parentId`: `null` \| `` `0x${string}` ``;
+        `path`: `string`;
         `reactionCounts`: `Record`\<`string`, `number`\>;
         `references`: (
            \| \{
@@ -990,6 +996,7 @@ Fetch one single comment from the Indexer API
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
+           `path`: `string`;
            `references`: (
               \| \{
               `address`: ...;
@@ -1131,6 +1138,7 @@ Fetch one single comment from the Indexer API
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
      `parentId`: `null` \| `` `0x${string}` ``;
+     `path`: `string`;
      `references`: (
         \| \{
         `address`: `` `0x${string}` ``;

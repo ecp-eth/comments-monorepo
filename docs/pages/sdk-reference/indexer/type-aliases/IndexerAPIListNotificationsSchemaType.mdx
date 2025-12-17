@@ -65,6 +65,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -225,6 +226,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -402,6 +404,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -594,6 +597,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -754,6 +758,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -931,6 +936,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -1091,6 +1097,7 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
+           path: string;
            references: (
               | {
               address: `0x${string}`;
@@ -1226,7 +1233,7 @@ type IndexerAPIListNotificationsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:821](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L821)
+Defined in: [packages/sdk/src/indexer/schemas.ts:822](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L822)
 
 The list notifications schema returned by fetchNotifications()
 
@@ -1303,6 +1310,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -1463,6 +1471,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -1640,6 +1649,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -1832,6 +1842,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -1992,6 +2003,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -2169,6 +2181,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
@@ -2329,6 +2342,7 @@ notifications: {
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
         parentId: null | `0x${string}`;
+        path: string;
         references: (
            | {
            address: `0x${string}`;
