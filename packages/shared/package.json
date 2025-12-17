@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/shared",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "type": "module",
   "license": "MIT",
   "main": "./dist/cjs/index.cjs",
@@ -128,7 +128,7 @@
     "use-debounce": "^10.0.4"
   },
   "peerDependencies": {
-    "@ecp.eth/sdk": ">=0.0.36",
+    "@ecp.eth/sdk": ">=0.0.37",
     "@ecp.eth/shared-signer": ">=0.0.2",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.5",

@@ -1,5 +1,12 @@
 # @ecp.eth/sdk
 
+## 0.0.37
+
+### Patch Changes
+
+- 7e71452: feat: add expiresAt to approvals
+- 37b2775: feat: comment short paths
+
 ## 0.0.36
 
 ### Patch Changes
