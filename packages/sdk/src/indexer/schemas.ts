@@ -411,6 +411,7 @@ export const IndexerAPICommentSchema = z.object({
   revision: z.number().int(),
   zeroExSwap: IndexerAPICommentZeroExSwapSchema.nullable(),
   references: IndexerAPICommentReferencesSchema,
+  path: z.string(),
 });
 
 export type IndexerAPICommentSchemaType = z.infer<
