@@ -13,7 +13,7 @@ import {
 } from "./comment/schemas.ts";
 import { TestEvents, TestEventDbToOpenApiSchema } from "./test/schemas.ts";
 
-export const AllEventsDbToOpenApiSchema = z.discriminatedUnion("event", [
+export const AllEventsDbToOpenApiSchema = z.union([
   ...ApprovalEventsFromDbToOpenApiSchema,
   ...ChannelEventsFromDbToOpenApiSchema,
   ...CommentEventsFromDbToOpenApiSchema,

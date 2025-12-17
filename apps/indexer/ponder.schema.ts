@@ -154,12 +154,14 @@ export const approval = onchainTable(
     txHash: t.hex().notNull(),
     logIndex: t.integer().notNull(),
     deletedAt: t.timestamp({ withTimezone: true }),
+    expiresAt: t.timestamp({ withTimezone: true }).notNull(),
   }),
   (table) => ({
     authorIdx: index().on(table.author),
     appIdx: index().on(table.app),
     chainIdIdx: index().on(table.chainId),
     deletedAtIdx: index().on(table.deletedAt),
+    expiresAtIdx: index().on(table.expiresAt),
   }),
 );
 

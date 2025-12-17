@@ -37,20 +37,25 @@ export const ISO8601DateSchema = z.string().transform((val, ctx) => {
   return result.data;
 });
 
-/**
- * Common schema for all v1 events.
- */
-export const EventV1Schema = z.object({
+export const EventBaseSchema = z.object({
   /**
    * Unique identifier for the event. You can use it to deduplicate events.
    * In case of retry attempts the id is the same.
    */
   uid: z.string(),
-  /**
-   * Version of the event
-   */
-  version: z.literal(1),
 });
+
+/**
+ * Common schema for all v1 events.
+ */
+export const EventV1Schema = EventBaseSchema.merge(
+  z.object({
+    /**
+     * Version of the event
+     */
+    version: z.literal(1),
+  }),
+);
 
 /**
  * Common schema for all events coming from a chain.

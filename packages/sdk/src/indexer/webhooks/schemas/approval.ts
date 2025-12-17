@@ -1,6 +1,7 @@
 import { z } from "zod/v3";
 import {
   EventFromChainSchema,
+  EventBaseSchema,
   EventV1Schema,
   ISO8601DateSchema,
 } from "./shared.js";
@@ -17,15 +18,16 @@ export const ApprovalEvents = [
   EVENT_APPROVAL_REMOVED,
 ] as const;
 
-/**
- * An event sent to webhook when an approval is added
- */
-export const ApprovalAddedEventSchema = z
+export const ApprovalAddedEventV1Schema = z
   .object({
     /**
      * Event type
      */
     event: z.literal(EVENT_APPROVAL_ADDED),
+    /**
+     * Version of the event
+     */
+    version: z.literal(1),
     /**
      * Data of the event
      */
@@ -59,6 +61,62 @@ export const ApprovalAddedEventSchema = z
   })
   .merge(EventFromChainSchema)
   .merge(EventV1Schema);
+
+export const ApprovalAddedEventV2Schema = z
+  .object({
+    /**
+     * Event type
+     */
+    event: z.literal(EVENT_APPROVAL_ADDED),
+    /**
+     * Version of the event
+     */
+    version: z.literal(2),
+    /**
+     * Data of the event
+     */
+    data: z.object({
+      /**
+       * Approval data
+       */
+      approval: z.object({
+        /**
+         * ID of the approval
+         */
+        id: z.string(),
+        /**
+         * Created at date. On wire it is a ISO 8601 date and time string.
+         */
+        createdAt: ISO8601DateSchema,
+        /**
+         * Updated at date. On wire it is a ISO 8601 date and time string.
+         */
+        updatedAt: ISO8601DateSchema,
+        /**
+         * Author address
+         */
+        author: HexSchema,
+        /**
+         * App address
+         */
+        app: HexSchema,
+        /**
+         * Expires at date. On wire it is a ISO 8601 date and time string.
+         */
+        expiresAt: ISO8601DateSchema,
+      }),
+    }),
+  })
+  .merge(EventFromChainSchema)
+  .merge(EventBaseSchema);
+
+/**
+ * An event sent to webhook when an approval is added
+ */
+export const ApprovalAddedEventSchema = z.discriminatedUnion("version", [
+  ApprovalAddedEventV1Schema,
+  ApprovalAddedEventV2Schema,
+]);
 
 export type ApprovalAddedEvent = z.infer<typeof ApprovalAddedEventSchema>;
 
@@ -94,7 +152,7 @@ export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
 /**
  * Approval events schema.
  */
-export const ApprovalEventsSchema = z.discriminatedUnion("event", [
+export const ApprovalEventsSchema = z.union([
   ApprovalAddedEventSchema,
   ApprovalRemovedEventSchema,
 ]);

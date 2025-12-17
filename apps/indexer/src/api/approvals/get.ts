@@ -1,13 +1,72 @@
-import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, z, type OpenAPIHono } from "@hono/zod-openapi";
 import { db } from "ponder:api";
 import schema from "ponder:schema";
 import { and, desc, eq, inArray } from "ponder";
 import {
   APIBadRequestResponseSchema,
   APIErrorResponseSchema,
-  GetApprovalsQuerySchema,
-  GetApprovalsResponseSchema,
+  OpenAPIChainIdSchema,
+  OpenAPIDateStringSchema,
+  OpenAPIHexSchema,
 } from "../../lib/schemas";
+import { IndexerAPIPaginationSchema } from "@ecp.eth/sdk/indexer/schemas";
+
+/**
+ * Query string schema for getting a list of approvals.
+ */
+export const GetApprovalsQuerySchema = z
+  .object({
+    author: OpenAPIHexSchema.openapi({
+      description:
+        "The author's address. Can be used to filter approvals by author. Either `author` or `app` must be provided or both.",
+    }).optional(),
+    app: OpenAPIHexSchema.openapi({
+      description:
+        "The address of the app signer. Can be used to filter approvals by app. Either `author` or `app` must be provided or both.",
+    }).optional(),
+    chainId: OpenAPIChainIdSchema,
+    limit: z.coerce.number().int().positive().max(100).default(50).openapi({
+      description: "The number of approvals to return",
+    }),
+    offset: z.coerce.number().int().min(0).default(0).openapi({
+      description: "The offset of the approvals to return",
+    }),
+  })
+  .refine(
+    (val) => {
+      if (val.author || val.app) {
+        return true;
+      }
+
+      return false;
+    },
+    {
+      message: "Either `author` or `app` must be provided or both.",
+    },
+  );
+
+/**
+ * Schema for a single approval.
+ */
+export const GetApprovalSchema = z.object({
+  id: z.string(),
+  app: OpenAPIHexSchema,
+  author: OpenAPIHexSchema,
+  deletedAt: OpenAPIDateStringSchema.nullable().openapi({
+    type: ["string", "null"],
+  }),
+  chainId: z.number().int(),
+  txHash: OpenAPIHexSchema,
+  expiresAt: OpenAPIDateStringSchema,
+});
+
+/**
+ * Response schema for getting a list of approvals.
+ */
+export const GetApprovalsResponseSchema = z.object({
+  results: z.array(GetApprovalSchema),
+  pagination: IndexerAPIPaginationSchema,
+});
 
 const getApprovalsRoute = createRoute({
   method: "get",

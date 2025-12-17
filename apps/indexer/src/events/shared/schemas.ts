@@ -21,6 +21,16 @@ export const dateToIsoStringSchema = z
   .date()
   .transform((val) => val.toISOString());
 
+export const EventV1Schema = z.object({
+  uid: z.string(),
+  version: z.literal(1),
+});
+
+export const EventV2Schema = z.object({
+  uid: z.string(),
+  version: z.literal(2),
+});
+
 export const EventFromChainSchema = z.object({
   chainId: z.number().int(),
   blockNumber: bigintToStringSchema,

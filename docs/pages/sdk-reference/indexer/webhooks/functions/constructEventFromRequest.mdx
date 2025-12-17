@@ -725,6 +725,25 @@ function constructEventFromRequest(options): Promise<
   chainId: number;
   data: {
      approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 2;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
         id: string;
      };
   };
@@ -1480,6 +1499,25 @@ The request to construct the event from.
   `txHash`: `` `0x${string}` ``;
   `uid`: `string`;
   `version`: `1`;
+\}
+  \| \{
+  `blockNumber`: `bigint`;
+  `chainId`: `number`;
+  `data`: \{
+     `approval`: \{
+        `app`: `` `0x${string}` ``;
+        `author`: `` `0x${string}` ``;
+        `createdAt`: `Date`;
+        `expiresAt`: `Date`;
+        `id`: `string`;
+        `updatedAt`: `Date`;
+     \};
+  \};
+  `event`: `"approval:added"`;
+  `logIndex`: `number`;
+  `txHash`: `` `0x${string}` ``;
+  `uid`: `string`;
+  `version`: `2`;
 \}
   \| \{
   `blockNumber`: `bigint`;

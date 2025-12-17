@@ -7,7 +7,8 @@
 # Type Alias: ApprovalAddedEvent
 
 ```ts
-type ApprovalAddedEvent = {
+type ApprovalAddedEvent = 
+  | {
   blockNumber: bigint;
   chainId: number;
   data: {
@@ -24,14 +25,54 @@ type ApprovalAddedEvent = {
   txHash: `0x${string}`;
   uid: string;
   version: 1;
+}
+  | {
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 2;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:63](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L63)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:121](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L121)
 
 An event sent to webhook when an approval is added
 
 ## Type declaration
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 1;
+}
+```
 
 ### blockNumber
 
@@ -156,6 +197,165 @@ In case of retry attempts the id is the same.
 
 ```ts
 version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  blockNumber: bigint;
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:added";
+  logIndex: number;
+  txHash: `0x${string}`;
+  uid: string;
+  version: 2;
+}
+```
+
+### blockNumber
+
+```ts
+blockNumber: bigint = StringBigintSchema;
+```
+
+Block number. On wire it is a stringified bigint.
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID
+
+### data
+
+```ts
+data: {
+  approval: {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     createdAt: Date;
+     expiresAt: Date;
+     id: string;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.approval
+
+```ts
+approval: {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  createdAt: Date;
+  expiresAt: Date;
+  id: string;
+  updatedAt: Date;
+};
+```
+
+Approval data
+
+#### data.approval.app
+
+```ts
+app: `0x${string}` = HexSchema;
+```
+
+App address
+
+#### data.approval.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+Author address
+
+#### data.approval.createdAt
+
+```ts
+createdAt: Date = ISO8601DateSchema;
+```
+
+Created at date. On wire it is a ISO 8601 date and time string.
+
+#### data.approval.expiresAt
+
+```ts
+expiresAt: Date = ISO8601DateSchema;
+```
+
+Expires at date. On wire it is a ISO 8601 date and time string.
+
+#### data.approval.id
+
+```ts
+id: string;
+```
+
+ID of the approval
+
+#### data.approval.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+### event
+
+```ts
+event: "approval:added";
+```
+
+Event type
+
+### logIndex
+
+```ts
+logIndex: number;
+```
+
+Log index
+
+### txHash
+
+```ts
+txHash: `0x${string}` = HexSchema;
+```
+
+Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 2;
 ```
 
 Version of the event

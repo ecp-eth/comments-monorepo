@@ -196,6 +196,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   event: ZodLiteral<"comment:added">;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 } & {
   blockNumber: ZodEffects<ZodString, bigint, string>;
@@ -785,6 +786,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   event: ZodLiteral<"comment:hook:metadata:set">;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 } & {
   blockNumber: ZodEffects<ZodString, bigint, string>;
@@ -886,6 +888,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
   event: ZodLiteral<"comment:deleted">;
 } & {
   uid: ZodString;
+} & {
   version: ZodLiteral<1>;
 } & {
   blockNumber: ZodEffects<ZodString, bigint, string>;
