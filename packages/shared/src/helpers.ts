@@ -198,6 +198,7 @@ export function insertPendingCommentToPage(
     viewerReactions: {},
     reactionCounts: {},
     pendingOperation,
+    path: `${response.data.author.toLowerCase()}/${response.data.id.toLowerCase()}`,
   });
 
   return queryData;

@@ -159,6 +159,7 @@ function insertPendingReactionToPage(
     moderationClassifierScore: 0,
     zeroExSwap: zeroExSwap ?? null,
     references: [],
+    path: `${response.data.author.toLowerCase()}/${response.data.id.toLowerCase()}`,
   };
 
   // Initialize viewerReactions if it doesn't exist and add the reaction

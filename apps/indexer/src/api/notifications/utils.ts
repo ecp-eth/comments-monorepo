@@ -37,6 +37,8 @@ export function convertJsonCommentToCommentSelectType(
       jsonComment.references_resolution_status_changed_at
         ? new Date(jsonComment.references_resolution_status_changed_at)
         : null,
-    path: jsonComment.path || "",
+    path:
+      jsonComment.path ||
+      `${jsonComment.author.toLowerCase()}/${jsonComment.id.toLowerCase()}`,
   };
 }
