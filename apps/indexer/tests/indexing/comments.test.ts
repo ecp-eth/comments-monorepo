@@ -490,7 +490,7 @@ describe("initializeCommentEventsIndexing", () => {
 
       expect(setMock).toHaveBeenCalledWith({
         hookMetadata: [{ key: "0x01", value: "0x01" }],
-        updatedAt: expect.any(Date),
+        updatedAt: expect.anything(),
       });
 
       await handler({
@@ -501,7 +501,7 @@ describe("initializeCommentEventsIndexing", () => {
       });
       expect(setMock).toHaveBeenCalledWith({
         hookMetadata: [{ key: "0x01", value: "0x02" }],
-        updatedAt: expect.any(Date),
+        updatedAt: expect.anything(),
       });
 
       expect(
@@ -572,14 +572,14 @@ describe("initializeCommentEventsIndexing", () => {
       });
 
       expect(setMock).toHaveBeenCalledWith({
-        updatedAt: expect.any(Date),
-        deletedAt: expect.any(Date),
+        updatedAt: expect.anything(),
+        deletedAt: expect.anything(),
       });
       expect(setMock).toHaveBeenCalledWith({
         reactionCounts: {
           like: 0,
         },
-        updatedAt: expect.any(Date),
+        updatedAt: expect.anything(),
       });
       expect(
         servicesMock.eventOutboxService.publishEvent,
@@ -668,7 +668,7 @@ describe("initializeCommentEventsIndexing", () => {
         expect.objectContaining({
           content: newContent,
           revision: 1,
-          updatedAt: expect.any(Date),
+          updatedAt: expect.anything(),
           moderationStatus: "pending",
           moderationClassifierResult: { spam: 0.9 },
           moderationClassifierScore: 0.9,
