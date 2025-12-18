@@ -13,7 +13,7 @@ import {
   ponderEventToUpdateChannelMetadataEvent,
   ponderEventToUpdateChannelTransferEvent,
 } from "../events/channel/index.ts";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { MetadataSetOperation } from "../events/shared/schemas.ts";
 import { wrapServiceWithTracing } from "../telemetry.ts";
 
@@ -21,15 +21,12 @@ async function channelCreatedHandler({
   event,
   context,
 }: IndexingFunctionArgs<"CommentsV1ChannelManager:ChannelCreated">) {
-  const createdAt = new Date(Number(event.block.timestamp) * 1000);
-  const updatedAt = new Date(Number(event.block.timestamp) * 1000);
-
   await db.transaction(async (tx) => {
     await tx
       .insert(schema.channel)
       .values({
-        createdAt,
-        updatedAt,
+        createdAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
         owner: event.args.owner,
         id: event.args.channelId,
         name: event.args.name,
@@ -60,7 +57,7 @@ async function channelUpdatedHandler({
     await tx
       .update(schema.channel)
       .set({
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
         name: event.args.name,
         description: event.args.description,
         metadata: event.args.metadata.slice(),
@@ -89,7 +86,7 @@ async function channelHookStatusUpdatedHandler({
       .update(schema.channel)
       .set({
         hook: event.args.enabled ? event.args.hook : null,
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.channel.id, event.args.channelId))
       .execute();
@@ -173,7 +170,7 @@ async function channelMetadataSetHandler({
       .update(schema.channel)
       .set({
         metadata,
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.channel.id, event.args.channelId))
       .execute();
@@ -219,7 +216,7 @@ async function channelTransferHandler({
       .update(schema.channel)
       .set({
         owner: event.args.to,
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.channel.id, event.args.tokenId))
       .execute();

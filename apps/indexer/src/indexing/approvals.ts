@@ -8,7 +8,7 @@ import {
   ponderEventToApprovalRemovedEvent,
 } from "../events/approval/index.ts";
 import { schema } from "../../schema.ts";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { wrapServiceWithTracing } from "../telemetry.ts";
 
 async function approvalAddedHandler({
@@ -22,23 +22,23 @@ async function approvalAddedHandler({
       .insert(schema.approval)
       .values({
         id,
-        createdAt: new Date(Number(event.block.timestamp) * 1000),
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        createdAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
         author: event.args.author,
         app: event.args.app,
         chainId: context.chain.id,
         txHash: event.transaction.hash,
         logIndex: event.log.logIndex,
-        expiresAt: new Date(Number(event.args.expiry) * 1000),
+        expiresAt: sql`to_timestamp(${event.args.expiry})::timestamptz`,
       })
       .onConflictDoUpdate({
         target: [schema.approval.id],
         set: {
           deletedAt: null,
-          updatedAt: new Date(Number(event.block.timestamp) * 1000),
+          updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
           txHash: event.transaction.hash,
           logIndex: event.log.logIndex,
-          expiresAt: new Date(Number(event.args.expiry) * 1000),
+          expiresAt: sql`to_timestamp(${event.args.expiry})::timestamptz`,
         },
       })
       .returning()
@@ -71,8 +71,8 @@ async function approvalRemovedHandler({
     const [approval] = await tx
       .update(schema.approval)
       .set({
-        deletedAt: new Date(Number(event.block.timestamp) * 1000),
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        deletedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.approval.id, id))
       .returning()

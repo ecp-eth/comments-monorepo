@@ -21,7 +21,7 @@ import { isSameHex } from "@ecp.eth/shared/helpers";
 import { zeroExSwapResolver } from "../lib/0x-swap-resolver.ts";
 import { COMMENT_TYPE_REACTION } from "@ecp.eth/sdk";
 import { env } from "../env.ts";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import {
   ponderEventToCommentAddedEvent,
   ponderEventToCommentDeletedEvent,
@@ -86,9 +86,6 @@ async function commentsAddedHandler({
   });
 
   await db.transaction(async (tx) => {
-    const createdAt = new Date(Number(event.args.createdAt) * 1000);
-    const updatedAt = new Date(Number(event.args.createdAt) * 1000);
-
     const parentId = transformCommentParentId(event.args.parentId);
     let rootCommentId: Hex | null = null;
     const notifications: Notifications[] = [];
@@ -114,8 +111,7 @@ async function commentsAddedHandler({
               author: event.args.author,
               txHash: event.transaction.hash,
               logIndex: event.log.logIndex,
-              createdAt,
-              updatedAt,
+              createdAt: event.args.createdAt.toString(),
               parentCommentId: event.args.parentId,
             },
           },
@@ -222,8 +218,8 @@ async function commentsAddedHandler({
           rootCommentId,
           author: event.args.author,
           txHash: event.transaction.hash,
-          createdAt,
-          updatedAt,
+          createdAt: sql`to_timestamp(${event.args.createdAt})::timestamptz`,
+          updatedAt: sql`to_timestamp(${event.args.createdAt})::timestamptz`,
           chainId: context.chain.id,
           app: event.args.app,
           logIndex: event.log.logIndex,
@@ -353,7 +349,7 @@ async function commentHookMetadataSetHandler({
       .update(schema.comment)
       .set({
         hookMetadata,
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.comment.id, event.args.commentId))
       .execute();
@@ -388,8 +384,8 @@ async function commentDeletedHandler({
     await tx
       .update(schema.comment)
       .set({
-        updatedAt: new Date(Number(event.block.timestamp) * 1000),
-        deletedAt: new Date(Number(event.block.timestamp) * 1000),
+        updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
+        deletedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
       })
       .where(eq(schema.comment.id, event.args.commentId))
       .execute();
@@ -429,7 +425,7 @@ async function commentDeletedHandler({
         .update(schema.comment)
         .set({
           reactionCounts,
-          updatedAt: new Date(Number(event.block.timestamp) * 1000),
+          updatedAt: sql`to_timestamp(${event.block.timestamp})::timestamptz`,
         })
         .where(eq(schema.comment.id, existingComment.parentId))
         .returning()
@@ -483,7 +479,6 @@ async function commentEditedHandler({
       return;
     }
 
-    const updatedAt = new Date(Number(event.args.updatedAt) * 1000);
     const newCommentRevision = existingComment.revision + 1;
 
     const referencesResolutionResult =
@@ -517,7 +512,7 @@ async function commentEditedHandler({
       .set({
         content: event.args.content,
         revision: newCommentRevision,
-        updatedAt,
+        updatedAt: sql`to_timestamp(${event.args.updatedAt})::timestamptz`,
         references: referencesResolutionResult.references,
         referencesResolutionStatus: referencesResolutionResult.status,
         referencesResolutionStatusChangedAt: new Date(),
