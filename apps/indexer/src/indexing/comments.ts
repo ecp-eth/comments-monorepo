@@ -47,6 +47,8 @@ import type { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer
 import { commentByIdResolverService } from "../services/comment-by-id-resolver.ts";
 import { wrapServiceWithTracing } from "../telemetry.ts";
 import { generateAuthorShortId, generateCommentShortId } from "./helpers.ts";
+import type { CommentSelectType } from "ponder:schema";
+import { DatabaseError } from "pg";
 
 async function commentsAddedHandler({
   event,
@@ -205,41 +207,61 @@ async function commentsAddedHandler({
     );
     const authorShortId = await generateAuthorShortId(event.args.author, tx);
 
-    const [insertedComment] = await tx
-      .insert(schema.comment)
-      .values({
-        id: event.args.commentId,
-        content: event.args.content,
-        metadata: event.args.metadata.slice(),
-        hookMetadata: [], // Hook metadata still comes from separate events
-        targetUri,
-        parentId,
-        rootCommentId,
-        author: event.args.author,
-        txHash: event.transaction.hash,
-        createdAt,
-        updatedAt,
-        chainId: context.chain.id,
-        app: event.args.app,
-        logIndex: event.log.logIndex,
-        channelId: event.args.channelId,
-        commentType: event.args.commentType,
-        moderationStatus: moderationResult.result.status,
-        moderationStatusChangedAt: moderationResult.result.changedAt,
-        moderationClassifierResult: moderationResult.result.classifier.labels,
-        moderationClassifierScore: moderationResult.result.classifier.score,
-        zeroExSwap,
-        references: referencesResolutionResult.references,
-        referencesResolutionStatus: referencesResolutionResult.status,
-        referencesResolutionStatusChangedAt: new Date(),
-        reactionCounts: {},
-        path: `${authorShortId}/${commentShortId}`,
-      })
-      .returning()
-      .execute();
+    let insertedComment: CommentSelectType;
 
-    if (!insertedComment) {
-      throw new Error("Failed to insert comment");
+    try {
+      insertedComment = await tx
+        .insert(schema.comment)
+        .values({
+          id: event.args.commentId,
+          content: event.args.content,
+          metadata: event.args.metadata.slice(),
+          hookMetadata: [], // Hook metadata still comes from separate events
+          targetUri,
+          parentId,
+          rootCommentId,
+          author: event.args.author,
+          txHash: event.transaction.hash,
+          createdAt,
+          updatedAt,
+          chainId: context.chain.id,
+          app: event.args.app,
+          logIndex: event.log.logIndex,
+          channelId: event.args.channelId,
+          commentType: event.args.commentType,
+          moderationStatus: moderationResult.result.status,
+          moderationStatusChangedAt: moderationResult.result.changedAt,
+          moderationClassifierResult: moderationResult.result.classifier.labels,
+          moderationClassifierScore: moderationResult.result.classifier.score,
+          zeroExSwap,
+          references: referencesResolutionResult.references,
+          referencesResolutionStatus: referencesResolutionResult.status,
+          referencesResolutionStatusChangedAt: new Date(),
+          reactionCounts: {},
+          path: `${authorShortId}/${commentShortId}`,
+        })
+        .returning()
+        .execute()
+        .then((result) => {
+          if (result[0]) {
+            return result[0];
+          }
+
+          throw new Error("Failed to insert comment");
+        });
+    } catch (error) {
+      if (
+        error instanceof DatabaseError &&
+        error.code === "23505" &&
+        error.constraint === "comment_pkey"
+      ) {
+        console.info(
+          `Comment ${event.args.commentId} already exists, moving to next comment...`,
+        );
+        return;
+      }
+
+      throw error;
     }
 
     await moderationResult.saveAndNotify();
