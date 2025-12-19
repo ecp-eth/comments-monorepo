@@ -130,6 +130,12 @@ async function resolveCommentPathId(
 async function resolveAuthorShortId(
   authorShortId: string | Hex | `0x${string}...${string}`,
 ): Promise<Hex | `0x${string}...${string}` | undefined> {
+  if (authorShortId.includes("...")) {
+    return authorShortId.toLowerCase() as `0x${string}...${string}`;
+  }
+
+  let resolvedAddress: Hex;
+
   if (isEthName(authorShortId)) {
     const ens = await ensByNameResolverService.load(authorShortId);
 
@@ -137,25 +143,21 @@ async function resolveAuthorShortId(
       return undefined;
     }
 
-    return ens.address.toLowerCase() as Hex;
+    resolvedAddress = ens.address;
+  } else if (isEthAddress(authorShortId)) {
+    resolvedAddress = authorShortId;
+  } else {
+    return undefined;
   }
 
-  if (isEthAddress(authorShortId)) {
-    const shortId = await db.query.authorShortIds.findFirst({
-      where(fields, operators) {
-        return operators.eq(
-          fields.authorAddress,
-          authorShortId.toLowerCase() as Hex,
-        );
-      },
-    });
+  const shortId = await db.query.authorShortIds.findFirst({
+    where(fields, operators) {
+      return operators.eq(
+        fields.authorAddress,
+        resolvedAddress.toLowerCase() as Hex,
+      );
+    },
+  });
 
-    return shortId?.shortId;
-  }
-
-  if (authorShortId.includes("...")) {
-    return authorShortId.toLowerCase() as `0x${string}...${string}`;
-  }
-
-  return undefined;
+  return shortId?.shortId;
 }
