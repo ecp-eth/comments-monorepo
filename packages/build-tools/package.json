@@ -11,7 +11,6 @@
     "replace-workspace-version": "./bin/replace-workspace-version.js",
     "merge-json": "./bin/merge-json.js",
     "backup-nuke-restore": "./bin/backup-nuke-restore.sh",
-    "rivet": "./bin/rivet.sh",
     "sync-react-editor": "./bin/sync-react-editor.js"
   },
   "scripts": {

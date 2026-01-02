@@ -43,6 +43,7 @@
     "solady": "^0.1.14"
   },
   "devDependencies": {
+    "@ecp.eth/rivet": "^1.0.0",
     "dotenv-cli": "^8.0.0"
   }
 }
