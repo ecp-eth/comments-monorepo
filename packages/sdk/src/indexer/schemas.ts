@@ -487,15 +487,14 @@ export const IndexerAPICommentWithRepliesSchema =
     replies: z.object({
       extra: IndexerAPIExtraSchema,
       pagination: IndexerAPICursorRepliesPaginationSchema,
-      results: z.lazy(
-        (): z.ZodArray<
-          z.ZodType<
+      results: z.array(
+        z.lazy(
+          (): z.ZodType<
             IndexerAPICommentWithRepliesSchemaType,
             z.ZodTypeDef,
             IndexerAPICommentWithRepliesSchemaInputType
-          >,
-          "many"
-        > => IndexerAPICommentWithRepliesSchema.array(),
+          > => IndexerAPICommentWithRepliesSchema,
+        ),
       ),
     }),
   });
@@ -518,15 +517,14 @@ export const IndexerAPICommentWithRepliesOutputSchema =
     replies: z.object({
       extra: IndexerAPIExtraSchema,
       pagination: IndexerAPICursorRepliesPaginationSchema,
-      results: z.lazy(
-        (): z.ZodArray<
-          z.ZodType<
+      results: z.array(
+        z.lazy(
+          (): z.ZodType<
             IndexerAPICommentWithRepliesOutputSchemaType,
             z.ZodTypeDef,
             IndexerAPICommentWithRepliesSchemaType
-          >,
-          "many"
-        > => IndexerAPICommentWithRepliesOutputSchema.array(),
+          > => IndexerAPICommentWithRepliesOutputSchema,
+        ),
       ),
     }),
   });

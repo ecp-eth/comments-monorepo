@@ -20,7 +20,7 @@ type FetchCommentOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:52](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L52)
+Defined in: [packages/sdk/src/indexer/api.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L50)
 
 ## Properties
 
@@ -30,7 +30,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:52](https://github.com/ecp-eth/comm
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:87](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L87)
+Defined in: [packages/sdk/src/indexer/api.ts:85](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L85)
 
 URL on which /api/comments endpoint will be called
 
@@ -48,7 +48,7 @@ URL on which /api/comments endpoint will be called
 chainId: number | number[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:60](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L60)
+Defined in: [packages/sdk/src/indexer/api.ts:58](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L58)
 
 Filter comment and replies by chain ID(s). If the comment is not available on given chain(s) the function will throw a ResponseError.
 
@@ -60,7 +60,7 @@ Filter comment and replies by chain ID(s). If the comment is not available on gi
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:56](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L56)
+Defined in: [packages/sdk/src/indexer/api.ts:54](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L54)
 
 The ID of the comment to fetch
 
@@ -72,7 +72,7 @@ The ID of the comment to fetch
 optional commentType: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L81)
+Defined in: [packages/sdk/src/indexer/api.ts:79](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L79)
 
 Filter replies by comment type
 
@@ -84,7 +84,7 @@ Filter replies by comment type
 optional isReplyDeleted: boolean;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:77](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L77)
+Defined in: [packages/sdk/src/indexer/api.ts:75](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L75)
 
 Whether to return only deleted replies or only undeleted replies.
 If omitted it will return both deleted and undeleted replies.
@@ -97,7 +97,7 @@ If omitted it will return both deleted and undeleted replies.
 optional mode: IndexerAPICommentListModeSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:72](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L72)
+Defined in: [packages/sdk/src/indexer/api.ts:70](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L70)
 
 The mode to fetch replies, by default it returns only the first level of replies.
 - "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
@@ -117,7 +117,7 @@ The mode to fetch replies, by default it returns only the first level of replies
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:97](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L97)
+Defined in: [packages/sdk/src/indexer/api.ts:95](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L95)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -135,7 +135,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:91](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L91)
+Defined in: [packages/sdk/src/indexer/api.ts:89](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L89)
 
 The signal to abort the request
 
@@ -147,6 +147,6 @@ The signal to abort the request
 optional viewer: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:64](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L64)
+Defined in: [packages/sdk/src/indexer/api.ts:62](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L62)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.

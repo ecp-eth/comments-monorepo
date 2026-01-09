@@ -212,7 +212,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/react-editor</loc>
-    <lastmod>2025-12-09T09:59:38.000Z</lastmod>
+    <lastmod>2025-12-11T08:55:02.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -2948,13 +2948,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/convertIndexerMetadataToRecord</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/convertRecordToIndexerMetadata</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -2984,31 +2984,31 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/fetchComment</loc>
-    <lastmod>2025-11-17T14:00:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/fetchCommentReplies</loc>
-    <lastmod>2025-11-17T14:00:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/fetchComments</loc>
-    <lastmod>2025-11-17T14:00:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/fetchGroupedNotifications</loc>
-    <lastmod>2025-11-17T14:00:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/functions/fetchNotifications</loc>
-    <lastmod>2025-11-17T14:00:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3128,25 +3128,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIAutocompleteENSSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIAutocompleteERC20SchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIAutocompleteFarcasterSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIAutocompleteSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3176,13 +3176,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentOutputSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentReactionSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3253,20 +3247,32 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaInputType</loc>
+    <lastmod>2026-01-09T14:58:46.501Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentWithRepliesOutputSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentWithRepliesSchemaInputType</loc>
+    <lastmod>2026-01-09T14:58:46.502Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICommentWithRepliesSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3283,8 +3289,14 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPICursorRepliesPaginationSchemaType</loc>
+    <lastmod>2026-01-09T14:58:46.503Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIExtraSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3296,7 +3308,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIGetAutocompleteOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3313,44 +3325,32 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListCommentRepliesOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListCommentRepliesSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsOutputSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListCommentsSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListGroupedNotificationsSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIListNotificationsSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIMarkNotificationsAsSeenSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3368,13 +3368,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIModerationChangeModerationStatusOnCommentOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIModerationChangeModerationStatusOnCommentSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3386,79 +3386,79 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIModerationGetPendingCommentsOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIModerationGetPendingCommentsSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationMentionSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationQuoteSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationReactionSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationReplySchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPINotificationTypeSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIPaginationSchemaType</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIReportOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIReportSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIReportsListPendingOutputSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/type-aliases/IndexerAPIReportsListPendingSchemaType</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3500,25 +3500,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIAutocompleteENSSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIAutocompleteERC20Schema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIAutocompleteFarcasterSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIAutocompleteSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3548,19 +3548,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentOutputSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentReactionOutputSchema</loc>
-    <lastmod>2025-10-24T15:19:20.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentReactionSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3638,13 +3626,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentWithRepliesOutputSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPICommentWithRepliesSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3668,7 +3656,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIExtraSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3680,7 +3668,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIGetAutocompleteOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3697,44 +3685,32 @@
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListCommentRepliesOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListCommentRepliesSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListCommentsOutputSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListCommentsSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListGroupedNotificationsSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIListNotificationsSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIMarkNotificationsAsSeenSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3752,13 +3728,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIModerationChangeModerationStatusOnCommentOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIModerationChangeModerationStatusOnCommentSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3770,91 +3746,91 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIModerationGetPendingCommentsOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIModerationGetPendingCommentsSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationBaseSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationMentionSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationQuoteSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationReactionSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationReplySchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPINotificationTypeSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIPaginationSchema</loc>
-    <lastmod>2025-10-22T07:55:10.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIReportOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIReportSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIReportsListPendingOutputSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIReportsListPendingSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/variables/IndexerAPIReportStatusSchema</loc>
-    <lastmod>2025-11-12T12:38:05.000Z</lastmod>
+    <lastmod>2025-12-17T13:55:08.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3884,7 +3860,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3908,25 +3884,25 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/functions/constructEvent</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/functions/constructEventFromRequest</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ApprovalAddedEvent</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ApprovalRemovedEvent</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4010,7 +3986,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ConstructEventResult</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4028,31 +4004,43 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/AllEventsSchema</loc>
-    <lastmod>2025-11-13T10:16:25.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventSchema</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventV1Schema</loc>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventV2Schema</loc>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalEvents</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalEventsSchema</loc>
-    <lastmod>2025-10-29T15:24:13.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalRemovedEventSchema</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4070,7 +4058,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ChannelEventsSchema</loc>
-    <lastmod>2025-10-29T15:24:13.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4124,7 +4112,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/CommentEventsSchema</loc>
-    <lastmod>2025-10-29T15:24:13.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4160,13 +4148,13 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EVENT_APPROVAL_ADDED</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EVENT_APPROVAL_REMOVED</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4249,14 +4237,20 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EventBaseSchema</loc>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EventFromChainSchema</loc>
-    <lastmod>2025-10-24T15:19:20.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EventV1Schema</loc>
-    <lastmod>2025-09-19T10:33:41.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4268,7 +4262,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/MetadataSetOperationSchema</loc>
-    <lastmod>2025-10-24T15:19:20.000Z</lastmod>
+    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>

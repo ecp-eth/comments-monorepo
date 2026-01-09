@@ -21,7 +21,7 @@ type MarkNotificationsAsSeenOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1547](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1547)
+Defined in: [packages/sdk/src/indexer/api.ts:1545](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1545)
 
 ## Properties
 
@@ -31,7 +31,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:1547](https://github.com/ecp-eth/co
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1553](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1553)
+Defined in: [packages/sdk/src/indexer/api.ts:1551](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1551)
 
 URL on which /api/notifications/seen endpoint will be called
 
@@ -51,7 +51,7 @@ optional app:
   | Hex[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1566](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1566)
+Defined in: [packages/sdk/src/indexer/api.ts:1564](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1564)
 
 The app signers to mark notifications as seen for
 
@@ -63,7 +63,7 @@ The app signers to mark notifications as seen for
 appSecretKey: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1558](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1558)
+Defined in: [packages/sdk/src/indexer/api.ts:1556](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1556)
 
 App secret key to authenticate the request.
 Can be found in the https://dashboard.ethcomments.xyz after creating an app.
@@ -76,7 +76,7 @@ Can be found in the https://dashboard.ethcomments.xyz after creating an app.
 optional lastSeenNotificationDate: Date;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1570](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1570)
+Defined in: [packages/sdk/src/indexer/api.ts:1568](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1568)
 
 The date of the last seen notification, will mark as seen notifications created after this date
 
@@ -88,7 +88,7 @@ The date of the last seen notification, will mark as seen notifications created 
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1582](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1582)
+Defined in: [packages/sdk/src/indexer/api.ts:1580](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1580)
 
 Number of times to retry the request in case of failure (non‑parsing/network errors).
 
@@ -106,7 +106,7 @@ Number of times to retry the request in case of failure (non‑parsing/network e
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1586](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1586)
+Defined in: [packages/sdk/src/indexer/api.ts:1584](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1584)
 
 The signal to abort the request
 
@@ -120,7 +120,7 @@ optional type:
   | IndexerAPINotificationTypeSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1574](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1574)
+Defined in: [packages/sdk/src/indexer/api.ts:1572](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1572)
 
 The types of notifications to mark as seen
 
@@ -132,6 +132,6 @@ The types of notifications to mark as seen
 user: Hex | string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1562](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1562)
+Defined in: [packages/sdk/src/indexer/api.ts:1560](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1560)
 
 The user to mark notifications as seen for, either ETH address or ENS name

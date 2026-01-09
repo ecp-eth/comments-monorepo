@@ -28,6 +28,9 @@ overrides:
   vite: 6.3.5
 
 patchedDependencies:
+  '@asteasolutions/zod-to-openapi@7.3.2':
+    hash: 5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3
+    path: patches/@asteasolutions__zod-to-openapi@7.3.2.patch
   '@hono/otel@1.0.1':
     hash: dfb997fcdc9c740ca42f9c57fdf2bf8868265f25737b2f6f333422435b1d42b4
     path: patches/@hono__otel@1.0.1.patch
@@ -13382,7 +13385,7 @@ snapshots:
 
   '@antfu/utils@8.1.1': {}
 
-  '@asteasolutions/zod-to-openapi@7.3.2(zod@3.25.76)':
+  '@asteasolutions/zod-to-openapi@7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)':
     dependencies:
       openapi3-ts: 4.5.0
       zod: 3.25.76
@@ -14436,14 +14439,14 @@ snapshots:
 
   '@hono/zod-openapi@0.18.4(hono@4.10.7)(zod@3.25.76)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 7.3.2(zod@3.25.76)
+      '@asteasolutions/zod-to-openapi': 7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)
       '@hono/zod-validator': 0.4.3(hono@4.10.7)(zod@3.25.76)
       hono: 4.10.7
       zod: 3.25.76
 
   '@hono/zod-openapi@1.1.0(hono@4.10.7)(zod@3.25.76)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 7.3.2(zod@3.25.76)
+      '@asteasolutions/zod-to-openapi': 7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)
       '@hono/zod-validator': 0.7.2(hono@4.10.7)(zod@3.25.76)
       hono: 4.10.7
       openapi3-ts: 4.5.0
