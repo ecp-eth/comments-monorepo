@@ -1,13 +1,15 @@
 import {
   IndexerAPIAuthorDataSchema,
   IndexerAPICommentReferencesSchema,
-  IndexerAPICommentSchema,
-  type IndexerAPICommentSchemaType,
   IndexerAPICommentZeroExSwapSchema,
-  IndexerAPICursorPaginationSchema,
-  type IndexerAPICursorPaginationSchemaType,
   IndexerAPIExtraSchema,
   type IndexerAPIExtraSchemaType,
+  IndexerAPICursorRepliesPaginationSchema,
+  type IndexerAPICursorRepliesPaginationSchemaType,
+  IndexerAPIListCommentsSchema,
+  IndexerAPICommentWithRepliesSchema,
+  type IndexerAPICommentWithRepliesSchemaType,
+  type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { z } from "zod/v3";
@@ -110,59 +112,66 @@ export const PendingCommentOperationSchema = z.discriminatedUnion("action", [
   PendingEditCommentOperationSchema,
 ]);
 
+export type PendingCommentOperationSchemaInputType = z.input<
+  typeof PendingCommentOperationSchema
+>;
+
 export type PendingCommentOperationSchemaType = z.infer<
   typeof PendingCommentOperationSchema
 >;
 
-type CommentSchemaType = IndexerAPICommentSchemaType & {
+type CommentSchemaType = Omit<
+  IndexerAPICommentWithRepliesSchemaType,
+  "replies"
+> & {
   pendingOperation?: PendingCommentOperationSchemaType;
-  replies?: {
+  replies: {
     extra: IndexerAPIExtraSchemaType;
     results: CommentSchemaType[];
-    pagination: IndexerAPICursorPaginationSchemaType;
+    pagination: IndexerAPICursorRepliesPaginationSchemaType;
   };
-  viewerReactions?: Record<string, IndexerAPICommentSchemaType[]>;
-  reactionCounts?: Record<string, number>;
 };
 
-type CommentSchemaInputType = IndexerAPICommentSchemaType & {
-  pendingOperation?: z.input<typeof PendingCommentOperationSchema>;
-  replies?: {
+type CommentSchemaInputType = Omit<
+  IndexerAPICommentWithRepliesSchemaType,
+  "replies"
+> & {
+  pendingOperation?: PendingCommentOperationSchemaInputType;
+  replies: {
     extra: IndexerAPIExtraSchemaType;
     results: CommentSchemaInputType[];
-    pagination: IndexerAPICursorPaginationSchemaType;
+    pagination: IndexerAPICursorRepliesPaginationSchemaType;
   };
-  viewerReactions?: Record<string, IndexerAPICommentSchemaType[]>;
-  reactionCounts?: Record<string, number>;
 };
 
-export const CommentSchema: z.ZodType<
-  CommentSchemaType,
-  z.ZodTypeDef,
-  CommentSchemaInputType
-> = IndexerAPICommentSchema.extend({
-  replies: z
-    .object({
-      extra: IndexerAPIExtraSchema,
-      results: z.lazy(() => CommentSchema.array()),
-      pagination: IndexerAPICursorPaginationSchema,
-    })
-    .optional(),
-  viewerReactions: z.record(z.array(IndexerAPICommentSchema)).optional(),
-  reactionCounts: z.record(z.number()).optional(),
+export const CommentSchema = IndexerAPICommentWithRepliesSchema.omit({
+  replies: true,
+}).extend({
   pendingOperation: PendingCommentOperationSchema.optional(),
+  replies: z.object({
+    extra: IndexerAPIExtraSchema,
+    results: z.lazy(
+      (): z.ZodArray<
+        z.ZodType<CommentSchemaType, z.ZodTypeDef, CommentSchemaInputType>,
+        "many"
+      > => CommentSchema.array(),
+    ),
+    pagination: IndexerAPICursorRepliesPaginationSchema,
+  }),
 });
 
 export type Comment = z.infer<typeof CommentSchema>;
+
+export type Reaction = IndexerAPICommentSchemaType;
 
 export type PendingComment = Omit<Comment, "pendingOperation"> & {
   pendingOperation: PendingCommentOperationSchemaType;
 };
 
-export const CommentPageSchema = z.object({
-  extra: IndexerAPIExtraSchema,
+export const CommentPageSchema = IndexerAPIListCommentsSchema.omit({
+  results: true,
+}).extend({
   results: CommentSchema.array(),
-  pagination: IndexerAPICursorPaginationSchema,
 });
 
 export type CommentPageSchemaType = z.infer<typeof CommentPageSchema>;

@@ -17,7 +17,7 @@ export function useGaslessDeleteComment() {
       comment,
       gasSponsorship,
     }: {
-      comment: Comment;
+      comment: Pick<Comment, "id">;
       gasSponsorship: "gasless-preapproved" | "gasless-not-preapproved";
     }) => {
       const connectedAddress = await connectAccount();

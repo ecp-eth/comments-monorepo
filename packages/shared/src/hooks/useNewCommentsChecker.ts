@@ -7,10 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { hasNewComments } from "../helpers.js";
-import type {
-  IndexerAPIListCommentRepliesSchemaType,
-  IndexerAPIListCommentsSchemaType,
-} from "@ecp.eth/sdk/indexer/schemas";
+import type { IndexerAPIListCommentsSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 
 /**
@@ -43,9 +40,7 @@ export function useNewCommentsChecker({
   fetchComments: (options: {
     cursor: Hex | undefined;
     signal: AbortSignal;
-  }) => Promise<
-    IndexerAPIListCommentsSchemaType | IndexerAPIListCommentRepliesSchemaType
-  >;
+  }) => Promise<IndexerAPIListCommentsSchemaType>;
   /**
    * @default 60000
    */

@@ -3,7 +3,7 @@ import {
   ListCommentsQueryDataSchema,
   ListCommentsQueryPageParamsSchemaType,
   type ListCommentsQueryDataSchemaType,
-  type Comment,
+  type Reaction,
 } from "../schemas.js";
 import {
   InfiniteData,
@@ -43,7 +43,7 @@ type ReactionRemovalAPI = {
 export function useReactionRemoval(reactionType: string): ReactionRemovalAPI {
   const client = useQueryClient();
   // Store removed reactions to restore them if the operation fails
-  const removedReactions = useRef<Map<Hex, Comment>>(new Map());
+  const removedReactions = useRef<Map<Hex, Reaction>>(new Map());
 
   const start = useCallback<OnReactionRemovalStart>(
     ({ queryKey, reactionId, parentCommentId }) => {
@@ -123,7 +123,7 @@ function removeReactionFromPage(
   reactionId: Hex,
   parentCommentId: Hex,
   reactionType: string,
-  removedReactions: Map<Hex, Comment>,
+  removedReactions: Map<Hex, Reaction>,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   // Find the parent comment that contains this reaction
   const parentComment = queryData.pages
@@ -179,7 +179,7 @@ function revertReactionRemovalWhenFailed(
   reactionId: Hex,
   parentCommentId: Hex,
   reactionType: string,
-  removedReactions: Map<Hex, Comment>,
+  removedReactions: Map<Hex, Reaction>,
 ): InfiniteData<CommentPageSchemaType, ListCommentsQueryPageParamsSchemaType> {
   // Find the parent comment that should contain this reaction
   const parentComment = queryData.pages
