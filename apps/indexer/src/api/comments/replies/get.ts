@@ -13,7 +13,7 @@ import {
   inArray,
   isNotNull,
 } from "ponder";
-import { IndexerAPIListCommentRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPIListCommentsOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import { resolveUserDataAndFormatListCommentsResponse } from "../../../lib/response-formatters";
 import {
@@ -44,7 +44,7 @@ const getCommentsRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: IndexerAPIListCommentRepliesOutputSchema,
+          schema: IndexerAPIListCommentsOutputSchema,
         },
       },
       description: "Retrieve replies to the specified comment",
@@ -260,7 +260,7 @@ export default (app: OpenAPIHono) => {
       });
 
     return c.json(
-      IndexerAPIListCommentRepliesOutputSchema.parse(formattedComments),
+      IndexerAPIListCommentsOutputSchema.parse(formattedComments),
       200,
     );
   });
