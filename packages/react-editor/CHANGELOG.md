@@ -1,5 +1,13 @@
 # @ecp.eth/react-editor
 
+## 0.0.22
+
+### Patch Changes
+
+- fee084e: chore: consolidate indexer api schemas
+- Updated dependencies [fee084e]
+  - @ecp.eth/shared@0.0.21
+
 ## 0.0.21
 
 ### Patch Changes
