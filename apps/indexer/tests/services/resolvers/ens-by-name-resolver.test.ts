@@ -15,11 +15,11 @@ describe("ENSByNameResolver", () => {
       timeout: 10000,
     },
     async () => {
-      const result = await resolver.load("df.me.eth.id");
+      const result = await resolver.load("furlong.eth");
 
       expect(result).toEqual({
         address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
-        name: "df.me.eth.id",
+        name: "furlong.eth",
         avatarUrl: expect.toBeOneOf([null, expect.any(String)]),
         url: expect.stringMatching(
           /^https:\/\/app\.ens\.domains\/0x[0-9a-fA-F]{40}$/,
@@ -30,7 +30,7 @@ describe("ENSByNameResolver", () => {
 
   // TODO: investigate and fix this
   it.skip(
-    "should resolve base ens name",
+    "should resolve base/id ens name",
     {
       retry: 3,
       timeout: 10000,
