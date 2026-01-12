@@ -1,5 +1,11 @@
 # @ecp.eth/shared
 
+## 0.0.21
+
+### Patch Changes
+
+- fee084e: chore: consolidate indexer api schemas
+
 ## 0.0.20
 
 ### Patch Changes
