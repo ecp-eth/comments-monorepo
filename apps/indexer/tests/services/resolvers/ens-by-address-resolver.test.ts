@@ -13,20 +13,24 @@ const resolver = new ENSByAddressResolver({
 });
 
 describe("ENSByAddressResolver", () => {
-  it("should resolve address to ens name", async () => {
-    const result = await resolver.load(
-      "0xdAa83039ACA9a33b2e54bb2acC9f9c3A99357618",
-    );
+  it(
+    "should resolve address to primary ens name",
+    { timeout: 30_000 },
+    async () => {
+      const result = await resolver.load(
+        "0xDF8EE3E1948C62F6362816f45Bde84F501A45F5b",
+      );
 
-    expect(result).toEqual({
-      address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
-      name: "df.me.eth.id",
-      avatarUrl: expect.toBeOneOf([null, expect.any(String)]),
-      url: expect.stringMatching(
-        /^https:\/\/app\.ens\.domains\/0x[0-9a-fA-F]{40}$/,
-      ),
-    });
-  });
+      expect(result).toEqual({
+        address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
+        name: "furlong.eth",
+        avatarUrl: expect.toBeOneOf([null, expect.any(String)]),
+        url: expect.stringMatching(
+          /^https:\/\/app\.ens\.domains\/0x[0-9a-fA-F]{40}$/,
+        ),
+      });
+    },
+  );
 
   it.skip("should resolve address to base name", async () => {
     const result = await resolver.load(
@@ -54,7 +58,7 @@ describe("ENSByAddressResolver", () => {
         //  byAddr3,
         //  byAddr4
       ] = await Promise.all([
-        resolver.load("0xdAa83039ACA9a33b2e54bb2acC9f9c3A99357618"),
+        resolver.load("0xDF8EE3E1948C62F6362816f45Bde84F501A45F5b"),
         resolver.load("0xC506739D39cBf1D94E2510bfcA64Cb6015F4Bb1B"),
         resolver.load("0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"),
         // basename on ensnode graphql is broken and ens on subgraph is partial broken, so commenting out for now
@@ -64,7 +68,7 @@ describe("ENSByAddressResolver", () => {
 
       expect(byAddr0).toEqual({
         address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
-        name: "df.me.eth.id",
+        name: "furlong.eth",
         avatarUrl: expect.toBeOneOf([null, expect.any(String)]),
         url: expect.stringMatching(
           /^https:\/\/app\.ens\.domains\/0x[0-9a-fA-F]{40}$/,
