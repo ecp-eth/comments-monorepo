@@ -33,21 +33,6 @@ Hide generated proxy packages `package.json` files from vscode editor and git.
 pnpm proxy-package hide
 ```
 
-### `rivet.sh`
-
-**Foundry version manager and wrapper script**
-
-- Automatically installs foundry if not present
-- Pins foundry to version specified in `.foundry-version` file
-- Searches for `.foundry-version` file in current directory and parent directories
-- Passes all arguments to the appropriate foundry command (forge, cast, anvil, chisel)
-- Exits with error if no `.foundry-version` file is found
-
-```bash
-pnpm rivet forge build
-pnpm rivet cast call 0x123...
-```
-
 ### `backup-nuke-restore.sh`
 
 **Safe folder cleanup with backup and restore**
