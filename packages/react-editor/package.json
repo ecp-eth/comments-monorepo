@@ -90,7 +90,7 @@
     "tippy.js": "^6.3.7"
   },
   "peerDependencies": {
-    "@ecp.eth/sdk": ">=0.0.37",
+    "@ecp.eth/sdk": ">=0.0.38",
     "@ecp.eth/shared": ">=0.0.20",
     "@gorhom/portal": ">=1.0.14",
     "@tanstack/react-query": ">=5.0.0",

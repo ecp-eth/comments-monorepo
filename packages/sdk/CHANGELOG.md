@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.38
+
+### Patch Changes
+
+- 871eff5: chore: consolidate indexer api comment replies schemas
+
 ## 0.0.37
 
 ### Patch Changes
