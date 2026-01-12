@@ -7,9 +7,798 @@
 # Variable: IndexerAPICommentOutputSchema
 
 ```ts
-const IndexerAPICommentOutputSchema: ZodObject<IndexerAPICommentOutputSchemaType>;
+const IndexerAPICommentOutputSchema: ZodObject<{
+  app: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+  author: ZodObject<{
+     address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     ens: ZodOptional<ZodObject<{
+        avatarUrl: ZodNullable<ZodString>;
+        name: ZodString;
+      }, "strip", ZodTypeAny, {
+        avatarUrl: null | string;
+        name: string;
+      }, {
+        avatarUrl: null | string;
+        name: string;
+     }>>;
+     farcaster: ZodOptional<ZodObject<{
+        displayName: ZodOptional<ZodString>;
+        fid: ZodNumber;
+        pfpUrl: ZodOptional<ZodString>;
+        username: ZodString;
+      }, "strip", ZodTypeAny, {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+      }, {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     }>>;
+   }, "strip", ZodTypeAny, {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+   }, {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+  }>;
+  chainId: ZodNumber;
+  commentType: ZodNumber;
+  content: ZodString;
+  cursor: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+  hookMetadata: ZodArray<ZodObject<{
+     key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+   }, "strip", ZodTypeAny, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+   }, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }>, "many">;
+  id: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+  logIndex: ZodNullable<ZodNumber>;
+  metadata: ZodArray<ZodObject<{
+     key: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+     value: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+   }, "strip", ZodTypeAny, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+   }, {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }>, "many">;
+  moderationClassifierResult: ZodRecord<ZodUnion<[ZodEnum<["llm_generated", "spam", "sexual", "hate", "violence", "harassment", "self_harm", "sexual_minors", "hate_threatening", "violence_graphic"]>, ZodString]>, ZodNumber>;
+  moderationClassifierScore: ZodNumber;
+  moderationStatus: ZodEnum<["approved", "rejected", "pending"]>;
+  parentId: ZodNullable<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
+  path: ZodString;
+  references: ZodType<(
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
+   })[], ZodTypeDef, (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: ... | ...;
+        dimension: {
+           height: ...;
+           width: ...;
+        };
+     }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
+  })[]>;
+  revision: ZodNumber;
+  targetUri: ZodString;
+  txHash: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+  zeroExSwap: ZodNullable<ZodObject<{
+     from: ZodObject<{
+        address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
+        amount: ZodString;
+        symbol: ZodString;
+      }, "strip", ZodTypeAny, {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+      }, {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     }>;
+     to: ZodObject<{
+        address: ZodUnion<[ZodEffects<..., ..., ...>, ZodLiteral<...>]>;
+        amount: ZodUnion<[ZodString, ZodLiteral<...>]>;
+        symbol: ZodString;
+      }, "strip", ZodTypeAny, {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+      }, {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   }, {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+  }>>;
+} & {
+  channelId: ZodEffects<ZodBigInt, string, bigint>;
+  createdAt: ZodEffects<ZodDate, string, Date>;
+  deletedAt: ZodNullable<ZodEffects<ZodDate, string, Date>>;
+  moderationStatusChangedAt: ZodEffects<ZodDate, string, Date>;
+  updatedAt: ZodEffects<ZodDate, string, Date>;
+} & {
+  reactionCounts: ZodRecord<ZodString, ZodNumber>;
+  replies: ZodObject<{
+     extra: ZodObject<{
+        moderationEnabled: ZodBoolean;
+        moderationKnownReactions: ZodArray<ZodString, "many">;
+      }, "strip", ZodTypeAny, {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+      }, {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     }>;
+     pagination: ZodObject<{
+        endCursor: ZodOptional<ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>>;
+        hasNext: ZodBoolean;
+        hasPrevious: ZodBoolean;
+        limit: ZodNumber;
+        startCursor: ZodOptional<ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>>;
+      } & {
+        count: ZodNumber;
+      }, "strip", ZodTypeAny, {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+      }, {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     }>;
+     results: ZodArray<ZodLazy<ZodType<IndexerAPICommentOutputSchemaType, ZodTypeDef, IndexerAPICommentSchemaType>>, "many">;
+   }, "strip", ZodTypeAny, {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentOutputSchemaType[];
+   }, {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentSchemaType[];
+  }>;
+  viewerReactions: ZodRecord<ZodString, ZodArray<ZodLazy<ZodType<IndexerAPICommentOutputSchemaType, ZodTypeDef, IndexerAPICommentSchemaType>>, "many">>;
+}, "strip", ZodTypeAny, {
+  app: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  channelId: string;
+  commentType: number;
+  content: string;
+  createdAt: string;
+  cursor: `0x${string}`;
+  deletedAt: null | string;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: string;
+  parentId: null | `0x${string}`;
+  path: string;
+  reactionCounts: Record<string, number>;
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
+  })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentOutputSchemaType[];
+  };
+  revision: number;
+  targetUri: string;
+  txHash: `0x${string}`;
+  updatedAt: string;
+  viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
+}, {
+  app: `0x${string}`;
+  author: {
+     address: `0x${string}`;
+     ens?: {
+        avatarUrl: null | string;
+        name: string;
+     };
+     farcaster?: {
+        displayName?: string;
+        fid: number;
+        pfpUrl?: string;
+        username: string;
+     };
+  };
+  chainId: number;
+  channelId: bigint;
+  commentType: number;
+  content: string;
+  createdAt: Date;
+  cursor: `0x${string}`;
+  deletedAt: null | Date;
+  hookMetadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  id: `0x${string}`;
+  logIndex: null | number;
+  metadata: {
+     key: `0x${string}`;
+     value: `0x${string}`;
+  }[];
+  moderationClassifierResult: Record<string, number>;
+  moderationClassifierScore: number;
+  moderationStatus: "approved" | "pending" | "rejected";
+  moderationStatusChangedAt: Date;
+  parentId: null | `0x${string}`;
+  path: string;
+  reactionCounts: Record<string, number>;
+  references: (
+     | {
+     address: `0x${string}`;
+     avatarUrl: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "ens";
+     url: string;
+   }
+     | {
+     address: `0x${string}`;
+     displayName: null | string;
+     fid: number;
+     fname: string;
+     pfpUrl: null | string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "farcaster";
+     url: string;
+     username: string;
+   }
+     | {
+     address: `0x${string}`;
+     chainId: null | number;
+     chains: {
+        caip: string;
+        chainId: number;
+     }[];
+     decimals: number;
+     logoURI: null | string;
+     name: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     symbol: string;
+     type: "erc20";
+   }
+     | {
+     description: null | string;
+     favicon: null | string;
+     mediaType: string;
+     opengraph:   | null
+        | {
+        description: null | string;
+        image: string;
+        title: string;
+        url: string;
+      };
+     position: {
+        end: number;
+        start: number;
+     };
+     title: string;
+     type: "webpage";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "file";
+     url: string;
+   }
+     | {
+     dimension?: {
+        height: number;
+        width: number;
+     };
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "image";
+     url: string;
+   }
+     | {
+     mediaType: string;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "video";
+     url: string;
+     videoTracks?: {
+        codec?: string;
+        dimension: {
+           height: number;
+           width: number;
+        };
+     }[];
+   }
+     | {
+     chainId: number;
+     id: `0x${string}`;
+     position: {
+        end: number;
+        start: number;
+     };
+     type: "quoted_comment";
+  })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentSchemaType[];
+  };
+  revision: number;
+  targetUri: string;
+  txHash: `0x${string}`;
+  updatedAt: Date;
+  viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
+  zeroExSwap:   | null
+     | {
+     from: {
+        address: `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+     to: {
+        address: "" | `0x${string}`;
+        amount: string;
+        symbol: string;
+     };
+   };
+}>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:432](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L432)
-
-Converts the comment internal representation to the output wire representation
+Defined in: [packages/sdk/src/indexer/schemas.ts:521](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L521)

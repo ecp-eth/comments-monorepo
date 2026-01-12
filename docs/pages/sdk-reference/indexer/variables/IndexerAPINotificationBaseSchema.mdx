@@ -67,29 +67,29 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      author: ZodObject<{
         address: ZodEffects<ZodString, `0x${string}`, `0x${string}`>;
         ens: ZodOptional<ZodObject<{
-           avatarUrl: ZodNullable<ZodString>;
+           avatarUrl: ZodNullable<...>;
            name: ZodString;
          }, "strip", ZodTypeAny, {
-           avatarUrl: null | string;
+           avatarUrl: ... | ...;
            name: string;
          }, {
-           avatarUrl: null | string;
+           avatarUrl: ... | ...;
            name: string;
         }>>;
         farcaster: ZodOptional<ZodObject<{
-           displayName: ZodOptional<ZodString>;
+           displayName: ZodOptional<...>;
            fid: ZodNumber;
-           pfpUrl: ZodOptional<ZodString>;
+           pfpUrl: ZodOptional<...>;
            username: ZodString;
          }, "strip", ZodTypeAny, {
-           displayName?: string;
+           displayName?: ... | ...;
            fid: number;
-           pfpUrl?: string;
+           pfpUrl?: ... | ...;
            username: string;
          }, {
-           displayName?: string;
+           displayName?: ... | ...;
            fid: number;
-           pfpUrl?: string;
+           pfpUrl?: ... | ...;
            username: string;
         }>>;
       }, "strip", ZodTypeAny, {
@@ -182,8 +182,8 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         address: `0x${string}`;
         chainId: null | number;
         chains: {
-           caip: string;
-           chainId: number;
+           caip: ...;
+           chainId: ...;
         }[];
         decimals: number;
         logoURI: null | string;
@@ -201,10 +201,10 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         mediaType: string;
         opengraph:   | null
            | {
-           description: ... | ...;
-           image: string;
-           title: string;
-           url: string;
+           description: ...;
+           image: ...;
+           title: ...;
+           url: ...;
          };
         position: {
            end: number;
@@ -225,8 +225,8 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
       }
         | {
         dimension?: {
-           height: number;
-           width: number;
+           height: ...;
+           width: ...;
         };
         mediaType: string;
         position: {
@@ -244,10 +244,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "video";
         url: string;
-        videoTracks?: {
-           codec?: ...;
-           dimension: ...;
-        }[];
+        videoTracks?: ...[];
       }
         | {
         chainId: number;
@@ -287,8 +284,8 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         address: `0x${string}`;
         chainId: null | number;
         chains: {
-           caip: string;
-           chainId: number;
+           caip: ...;
+           chainId: ...;
         }[];
         decimals: number;
         logoURI: null | string;
@@ -306,10 +303,10 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         mediaType: string;
         opengraph:   | null
            | {
-           description: ... | ...;
-           image: string;
-           title: string;
-           url: string;
+           description: ...;
+           image: ...;
+           title: ...;
+           url: ...;
          };
         position: {
            end: number;
@@ -330,8 +327,8 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
       }
         | {
         dimension?: {
-           height: number;
-           width: number;
+           height: ...;
+           width: ...;
         };
         mediaType: string;
         position: {
@@ -349,10 +346,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "video";
         url: string;
-        videoTracks?: {
-           codec?: ...;
-           dimension: ...;
-        }[];
+        videoTracks?: ...[];
       }
         | {
         chainId: number;
@@ -369,28 +363,28 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      updatedAt: ZodDate;
      zeroExSwap: ZodNullable<ZodObject<{
         from: ZodObject<{
-           address: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+           address: ZodEffects<..., ..., ...>;
            amount: ZodString;
            symbol: ZodString;
          }, "strip", ZodTypeAny, {
-           address: `0x${string}`;
+           address: `0x${(...)}`;
            amount: string;
            symbol: string;
          }, {
-           address: `0x${string}`;
+           address: `0x${(...)}`;
            amount: string;
            symbol: string;
         }>;
         to: ZodObject<{
-           address: ZodUnion<[..., ...]>;
-           amount: ZodUnion<[..., ...]>;
+           address: ZodUnion<...>;
+           amount: ZodUnion<...>;
            symbol: ZodString;
          }, "strip", ZodTypeAny, {
-           address: "" | `0x${(...)}`;
+           address: ... | ...;
            amount: string;
            symbol: string;
          }, {
-           address: "" | `0x${(...)}`;
+           address: ... | ...;
            amount: string;
            symbol: string;
         }>;
@@ -401,7 +395,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: "" | `0x${string}`;
+           address: "" | `0x${(...)}`;
            amount: string;
            symbol: string;
         };
@@ -412,11 +406,78 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
            symbol: string;
         };
         to: {
-           address: "" | `0x${string}`;
+           address: "" | `0x${(...)}`;
            amount: string;
            symbol: string;
         };
      }>>;
+   } & {
+     reactionCounts: ZodRecord<ZodString, ZodNumber>;
+     replies: ZodObject<{
+        extra: ZodObject<{
+           moderationEnabled: ZodBoolean;
+           moderationKnownReactions: ZodArray<ZodString, "many">;
+         }, "strip", ZodTypeAny, {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+         }, {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        }>;
+        pagination: ZodObject<{
+           endCursor: ZodOptional<...>;
+           hasNext: ZodBoolean;
+           hasPrevious: ZodBoolean;
+           limit: ZodNumber;
+           startCursor: ZodOptional<...>;
+         } & {
+           count: ZodNumber;
+         }, "strip", ZodTypeAny, {
+           count: number;
+           endCursor?: `0x${(...)}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${(...)}`;
+         }, {
+           count: number;
+           endCursor?: `0x${(...)}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${(...)}`;
+        }>;
+        results: ZodArray<ZodLazy<ZodType<IndexerAPICommentSchemaType, ZodTypeDef, IndexerAPICommentSchemaInputType>>, "many">;
+      }, "strip", ZodTypeAny, {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaType[];
+      }, {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaInputType[];
+     }>;
+     viewerReactions: ZodRecord<ZodString, ZodArray<ZodLazy<ZodType<IndexerAPICommentSchemaType, ZodTypeDef, IndexerAPICommentSchemaInputType>>, "many">>;
    }, "strip", ZodTypeAny, {
      app: `0x${string}`;
      author: {
@@ -455,6 +516,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -564,10 +626,26 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -619,6 +697,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -728,10 +807,26 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaInputType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, IndexerAPICommentSchemaInputType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -803,6 +898,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -912,10 +1008,26 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -987,6 +1099,7 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -1096,10 +1209,26 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaInputType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, IndexerAPICommentSchemaInputType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -1121,4 +1250,4 @@ const IndexerAPINotificationBaseSchema: ZodObject<{
 }>;
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:743](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L743)
+Defined in: [packages/sdk/src/indexer/schemas.ts:761](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L761)

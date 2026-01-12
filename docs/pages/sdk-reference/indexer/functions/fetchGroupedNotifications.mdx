@@ -54,6 +54,7 @@ function fetchGroupedNotifications(options): Promise<{
               moderationStatusChangedAt: Date;
               parentId: null | `0x${string}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (
                  | {
                  address: `0x${(...)}`;
@@ -145,10 +146,26 @@ function fetchGroupedNotifications(options): Promise<{
                  };
                  type: "quoted_comment";
               })[];
+              replies: {
+                 extra: {
+                    moderationEnabled: boolean;
+                    moderationKnownReactions: string[];
+                 };
+                 pagination: {
+                    count: number;
+                    endCursor?: `0x${(...)}`;
+                    hasNext: boolean;
+                    hasPrevious: boolean;
+                    limit: number;
+                    startCursor?: `0x${(...)}`;
+                 };
+                 results: IndexerAPICommentSchemaType[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
               zeroExSwap:   | null
                  | {
                  from: {
@@ -203,11 +220,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               createdAt: Date;
@@ -236,11 +260,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               seen: boolean;
@@ -278,11 +309,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               createdAt: Date;
@@ -327,11 +365,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               createdAt: Date;
@@ -360,11 +405,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               seen: boolean;
@@ -402,11 +454,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               createdAt: Date;
@@ -435,11 +494,18 @@ function fetchGroupedNotifications(options): Promise<{
                  moderationStatusChangedAt: Date;
                  parentId: ... | ...;
                  path: string;
+                 reactionCounts: Record<..., ...>;
                  references: ...[];
+                 replies: {
+                    extra: ...;
+                    pagination: ...;
+                    results: ...;
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${(...)}`;
                  updatedAt: Date;
+                 viewerReactions: Record<..., ...>;
                  zeroExSwap: ... | ...;
               };
               seen: boolean;
@@ -523,6 +589,7 @@ Fetch grouped notifications from the Indexer API
               `moderationStatusChangedAt`: `Date`;
               `parentId`: `null` \| `` `0x${string}` ``;
               `path`: `string`;
+              `reactionCounts`: `Record`\<`string`, `number`\>;
               `references`: (
                  \| \{
                  `address`: `` `0x${(...)}` ``;
@@ -614,10 +681,26 @@ Fetch grouped notifications from the Indexer API
                  \};
                  `type`: `"quoted_comment"`;
               \})[];
+              `replies`: \{
+                 `extra`: \{
+                    `moderationEnabled`: `boolean`;
+                    `moderationKnownReactions`: `string`[];
+                 \};
+                 `pagination`: \{
+                    `count`: `number`;
+                    `endCursor?`: `` `0x${(...)}` ``;
+                    `hasNext`: `boolean`;
+                    `hasPrevious`: `boolean`;
+                    `limit`: `number`;
+                    `startCursor?`: `` `0x${(...)}` ``;
+                 \};
+                 `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+              \};
               `revision`: `number`;
               `targetUri`: `string`;
               `txHash`: `` `0x${string}` ``;
               `updatedAt`: `Date`;
+              `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
               `zeroExSwap`:   \| `null`
                  \| \{
                  `from`: \{
@@ -672,11 +755,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `createdAt`: `Date`;
@@ -705,11 +795,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `seen`: `boolean`;
@@ -747,11 +844,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `createdAt`: `Date`;
@@ -796,11 +900,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `createdAt`: `Date`;
@@ -829,11 +940,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `seen`: `boolean`;
@@ -871,11 +989,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `createdAt`: `Date`;
@@ -904,11 +1029,18 @@ Fetch grouped notifications from the Indexer API
                  `moderationStatusChangedAt`: `Date`;
                  `parentId`: ... \| ...;
                  `path`: `string`;
+                 `reactionCounts`: `Record`\<..., ...\>;
                  `references`: ...[];
+                 `replies`: \{
+                    `extra`: ...;
+                    `pagination`: ...;
+                    `results`: ...;
+                 \};
                  `revision`: `number`;
                  `targetUri`: `string`;
                  `txHash`: `` `0x${(...)}` ``;
                  `updatedAt`: `Date`;
+                 `viewerReactions`: `Record`\<..., ...\>;
                  `zeroExSwap`: ... \| ...;
               \};
               `seen`: `boolean`;

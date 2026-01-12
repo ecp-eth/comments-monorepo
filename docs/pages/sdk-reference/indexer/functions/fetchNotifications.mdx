@@ -66,6 +66,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -157,10 +158,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -215,6 +232,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -306,10 +324,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -381,6 +415,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -472,10 +507,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -562,6 +613,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -653,10 +705,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -711,6 +779,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -802,10 +871,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -877,6 +962,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -968,10 +1054,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -1026,6 +1128,7 @@ function fetchNotifications(options): Promise<{
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${(...)}`;
@@ -1117,10 +1220,26 @@ function fetchNotifications(options): Promise<{
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${(...)}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${(...)}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -1220,6 +1339,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -1311,10 +1431,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -1369,6 +1505,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -1460,10 +1597,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -1535,6 +1688,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -1626,10 +1780,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -1716,6 +1886,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -1807,10 +1978,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -1865,6 +2052,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -1956,10 +2144,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -2031,6 +2235,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -2122,10 +2327,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{
@@ -2180,6 +2401,7 @@ Fetch notifications from the Indexer API
            `moderationStatusChangedAt`: `Date`;
            `parentId`: `null` \| `` `0x${string}` ``;
            `path`: `string`;
+           `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
               \| \{
               `address`: `` `0x${(...)}` ``;
@@ -2271,10 +2493,26 @@ Fetch notifications from the Indexer API
               \};
               `type`: `"quoted_comment"`;
            \})[];
+           `replies`: \{
+              `extra`: \{
+                 `moderationEnabled`: `boolean`;
+                 `moderationKnownReactions`: `string`[];
+              \};
+              `pagination`: \{
+                 `count`: `number`;
+                 `endCursor?`: `` `0x${(...)}` ``;
+                 `hasNext`: `boolean`;
+                 `hasPrevious`: `boolean`;
+                 `limit`: `number`;
+                 `startCursor?`: `` `0x${(...)}` ``;
+              \};
+              `results`: [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[];
+           \};
            `revision`: `number`;
            `targetUri`: `string`;
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
+           `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
            `zeroExSwap`:   \| `null`
               \| \{
               `from`: \{

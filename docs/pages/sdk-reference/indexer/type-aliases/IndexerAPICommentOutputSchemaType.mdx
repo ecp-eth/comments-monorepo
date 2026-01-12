@@ -7,526 +7,57 @@
 # Type Alias: IndexerAPICommentOutputSchemaType
 
 ```ts
-type IndexerAPICommentOutputSchemaType = {
-  app: `0x${string}`;
-  author: {
-     address: `0x${string}`;
-     ens?: {
-        avatarUrl: null | string;
-        name: string;
-     };
-     farcaster?: {
-        displayName?: string;
-        fid: number;
-        pfpUrl?: string;
-        username: string;
-     };
+type IndexerAPICommentOutputSchemaType = BaseIndexerAPICommentOutputSchemaType & {
+  reactionCounts: Record<string, number>;
+  replies: {
+     extra: IndexerAPIExtraSchemaType;
+     pagination: IndexerAPICursorRepliesPaginationSchemaType;
+     results: IndexerAPICommentOutputSchemaType[];
   };
-  chainId: number;
-  channelId: string;
-  commentType: number;
-  content: string;
-  createdAt: string;
-  cursor: `0x${string}`;
-  deletedAt: null | string;
-  hookMetadata: {
-     key: `0x${string}`;
-     value: `0x${string}`;
-  }[];
-  id: `0x${string}`;
-  logIndex: null | number;
-  metadata: {
-     key: `0x${string}`;
-     value: `0x${string}`;
-  }[];
-  moderationClassifierResult: Record<string, number>;
-  moderationClassifierScore: number;
-  moderationStatus: "approved" | "pending" | "rejected";
-  moderationStatusChangedAt: string;
-  parentId: null | `0x${string}`;
-  path: string;
-  references: (
-     | {
-     address: `0x${string}`;
-     avatarUrl: null | string;
-     name: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "ens";
-     url: string;
-   }
-     | {
-     address: `0x${string}`;
-     displayName: null | string;
-     fid: number;
-     fname: string;
-     pfpUrl: null | string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "farcaster";
-     url: string;
-     username: string;
-   }
-     | {
-     address: `0x${string}`;
-     chainId: null | number;
-     chains: {
-        caip: string;
-        chainId: number;
-     }[];
-     decimals: number;
-     logoURI: null | string;
-     name: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     symbol: string;
-     type: "erc20";
-   }
-     | {
-     description: null | string;
-     favicon: null | string;
-     mediaType: string;
-     opengraph:   | null
-        | {
-        description: null | string;
-        image: string;
-        title: string;
-        url: string;
-      };
-     position: {
-        end: number;
-        start: number;
-     };
-     title: string;
-     type: "webpage";
-     url: string;
-   }
-     | {
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "file";
-     url: string;
-   }
-     | {
-     dimension?: {
-        height: number;
-        width: number;
-     };
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "image";
-     url: string;
-   }
-     | {
-     mediaType: string;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "video";
-     url: string;
-     videoTracks?: {
-        codec?: string;
-        dimension: {
-           height: number;
-           width: number;
-        };
-     }[];
-   }
-     | {
-     chainId: number;
-     id: `0x${string}`;
-     position: {
-        end: number;
-        start: number;
-     };
-     type: "quoted_comment";
-  })[];
-  revision: number;
-  targetUri: string;
-  txHash: `0x${string}`;
-  updatedAt: string;
-  zeroExSwap:   | null
-     | {
-     from: {
-        address: `0x${string}`;
-        amount: string;
-        symbol: string;
-     };
-     to: {
-        address: "" | `0x${string}`;
-        amount: string;
-        symbol: string;
-     };
-   };
+  viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:440](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L440)
-
-Converts the comment internal representation to the output wire representation
+Defined in: [packages/sdk/src/indexer/schemas.ts:510](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L510)
 
 ## Type declaration
 
-### app
+### reactionCounts
 
 ```ts
-app: `0x${string}` = HexSchema;
+reactionCounts: Record<string, number>;
 ```
 
-### author
+### replies
 
 ```ts
-author: {
-  address: `0x${string}`;
-  ens?: {
-     avatarUrl: null | string;
-     name: string;
-  };
-  farcaster?: {
-     displayName?: string;
-     fid: number;
-     pfpUrl?: string;
-     username: string;
-  };
-} = IndexerAPIAuthorDataSchema;
-```
-
-#### author.address
-
-```ts
-address: `0x${string}` = HexSchema;
-```
-
-#### author.ens?
-
-```ts
-optional ens: {
-  avatarUrl: null | string;
-  name: string;
+replies: {
+  extra: IndexerAPIExtraSchemaType;
+  pagination: IndexerAPICursorRepliesPaginationSchemaType;
+  results: IndexerAPICommentOutputSchemaType[];
 };
 ```
 
-#### author.ens.avatarUrl
+#### replies.extra
 
 ```ts
-avatarUrl: null | string;
+extra: IndexerAPIExtraSchemaType;
 ```
 
-#### author.ens.name
+#### replies.pagination
 
 ```ts
-name: string;
+pagination: IndexerAPICursorRepliesPaginationSchemaType;
 ```
 
-#### author.farcaster?
+#### replies.results
 
 ```ts
-optional farcaster: {
-  displayName?: string;
-  fid: number;
-  pfpUrl?: string;
-  username: string;
-};
+results: IndexerAPICommentOutputSchemaType[];
 ```
 
-#### author.farcaster.displayName?
+### viewerReactions
 
 ```ts
-optional displayName: string;
-```
-
-#### author.farcaster.fid
-
-```ts
-fid: number;
-```
-
-#### author.farcaster.pfpUrl?
-
-```ts
-optional pfpUrl: string;
-```
-
-#### author.farcaster.username
-
-```ts
-username: string;
-```
-
-### chainId
-
-```ts
-chainId: number;
-```
-
-### channelId
-
-```ts
-channelId: string = bigintToString;
-```
-
-### commentType
-
-```ts
-commentType: number;
-```
-
-### content
-
-```ts
-content: string;
-```
-
-### createdAt
-
-```ts
-createdAt: string = dateToString;
-```
-
-### cursor
-
-```ts
-cursor: `0x${string}` = HexSchema;
-```
-
-### deletedAt
-
-```ts
-deletedAt: null | string;
-```
-
-### hookMetadata
-
-```ts
-hookMetadata: {
-  key: `0x${string}`;
-  value: `0x${string}`;
-}[] = IndexerAPIMetadataSchema;
-```
-
-### id
-
-```ts
-id: `0x${string}` = HexSchema;
-```
-
-### logIndex
-
-```ts
-logIndex: null | number;
-```
-
-### metadata
-
-```ts
-metadata: {
-  key: `0x${string}`;
-  value: `0x${string}`;
-}[] = IndexerAPIMetadataSchema;
-```
-
-### moderationClassifierResult
-
-```ts
-moderationClassifierResult: Record<string, number>;
-```
-
-### moderationClassifierScore
-
-```ts
-moderationClassifierScore: number;
-```
-
-### moderationStatus
-
-```ts
-moderationStatus: "approved" | "pending" | "rejected" = IndexerAPICommentModerationStatusSchema;
-```
-
-### moderationStatusChangedAt
-
-```ts
-moderationStatusChangedAt: string = dateToString;
-```
-
-### parentId
-
-```ts
-parentId: null | `0x${string}`;
-```
-
-### path
-
-```ts
-path: string;
-```
-
-### references
-
-```ts
-references: (
-  | {
-  address: `0x${string}`;
-  avatarUrl: null | string;
-  name: string;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "ens";
-  url: string;
-}
-  | {
-  address: `0x${string}`;
-  displayName: null | string;
-  fid: number;
-  fname: string;
-  pfpUrl: null | string;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "farcaster";
-  url: string;
-  username: string;
-}
-  | {
-  address: `0x${string}`;
-  chainId: null | number;
-  chains: {
-     caip: string;
-     chainId: number;
-  }[];
-  decimals: number;
-  logoURI: null | string;
-  name: string;
-  position: {
-     end: number;
-     start: number;
-  };
-  symbol: string;
-  type: "erc20";
-}
-  | {
-  description: null | string;
-  favicon: null | string;
-  mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
-     image: string;
-     title: string;
-     url: string;
-   };
-  position: {
-     end: number;
-     start: number;
-  };
-  title: string;
-  type: "webpage";
-  url: string;
-}
-  | {
-  mediaType: string;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "file";
-  url: string;
-}
-  | {
-  dimension?: {
-     height: number;
-     width: number;
-  };
-  mediaType: string;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "image";
-  url: string;
-}
-  | {
-  mediaType: string;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "video";
-  url: string;
-  videoTracks?: {
-     codec?: string;
-     dimension: {
-        height: number;
-        width: number;
-     };
-  }[];
-}
-  | {
-  chainId: number;
-  id: `0x${string}`;
-  position: {
-     end: number;
-     start: number;
-  };
-  type: "quoted_comment";
-})[] = IndexerAPICommentReferencesSchema;
-```
-
-### revision
-
-```ts
-revision: number;
-```
-
-### targetUri
-
-```ts
-targetUri: string;
-```
-
-### txHash
-
-```ts
-txHash: `0x${string}` = HexSchema;
-```
-
-### updatedAt
-
-```ts
-updatedAt: string = dateToString;
-```
-
-### zeroExSwap
-
-```ts
-zeroExSwap: 
-  | null
-  | {
-  from: {
-     address: `0x${string}`;
-     amount: string;
-     symbol: string;
-  };
-  to: {
-     address: "" | `0x${string}`;
-     amount: string;
-     symbol: string;
-  };
-};
+viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
 ```

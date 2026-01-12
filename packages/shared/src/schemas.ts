@@ -7,8 +7,7 @@ import {
   IndexerAPICursorRepliesPaginationSchema,
   type IndexerAPICursorRepliesPaginationSchemaType,
   IndexerAPIListCommentsSchema,
-  IndexerAPICommentWithRepliesSchema,
-  type IndexerAPICommentWithRepliesSchemaType,
+  IndexerAPICommentSchema,
   type IndexerAPICommentSchemaType,
 } from "@ecp.eth/sdk/indexer/schemas";
 import { HexSchema } from "@ecp.eth/sdk/core/schemas";
@@ -120,10 +119,7 @@ export type PendingCommentOperationSchemaType = z.infer<
   typeof PendingCommentOperationSchema
 >;
 
-type CommentSchemaType = Omit<
-  IndexerAPICommentWithRepliesSchemaType,
-  "replies"
-> & {
+type CommentSchemaType = Omit<IndexerAPICommentSchemaType, "replies"> & {
   pendingOperation?: PendingCommentOperationSchemaType;
   replies: {
     extra: IndexerAPIExtraSchemaType;
@@ -132,10 +128,7 @@ type CommentSchemaType = Omit<
   };
 };
 
-type CommentSchemaInputType = Omit<
-  IndexerAPICommentWithRepliesSchemaType,
-  "replies"
-> & {
+type CommentSchemaInputType = Omit<IndexerAPICommentSchemaType, "replies"> & {
   pendingOperation?: PendingCommentOperationSchemaInputType;
   replies: {
     extra: IndexerAPIExtraSchemaType;
@@ -144,7 +137,7 @@ type CommentSchemaInputType = Omit<
   };
 };
 
-export const CommentSchema = IndexerAPICommentWithRepliesSchema.omit({
+export const CommentSchema = IndexerAPICommentSchema.omit({
   replies: true,
 }).extend({
   pendingOperation: PendingCommentOperationSchema.optional(),

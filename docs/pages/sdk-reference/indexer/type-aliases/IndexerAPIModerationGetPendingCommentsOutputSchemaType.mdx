@@ -53,6 +53,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
      moderationStatusChangedAt: string;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -162,10 +163,26 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentOutputSchemaType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: string;
+     viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -183,7 +200,7 @@ type IndexerAPIModerationGetPendingCommentsOutputSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:568](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L568)
+Defined in: [packages/sdk/src/indexer/schemas.ts:586](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L586)
 
 ## Type declaration
 
@@ -270,6 +287,7 @@ results: {
   moderationStatusChangedAt: string;
   parentId: null | `0x${string}`;
   path: string;
+  reactionCounts: Record<string, number>;
   references: (
      | {
      address: `0x${string}`;
@@ -379,10 +397,26 @@ results: {
      };
      type: "quoted_comment";
   })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentOutputSchemaType[];
+  };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: string;
+  viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
   zeroExSwap:   | null
      | {
      from: {

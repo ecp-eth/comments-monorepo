@@ -60,6 +60,7 @@ type IndexerAPINotificationMentionSchemaType = {
      moderationStatusChangedAt: Date;
      parentId: null | `0x${string}`;
      path: string;
+     reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
@@ -169,10 +170,26 @@ type IndexerAPINotificationMentionSchemaType = {
         };
         type: "quoted_comment";
      })[];
+     replies: {
+        extra: {
+           moderationEnabled: boolean;
+           moderationKnownReactions: string[];
+        };
+        pagination: {
+           count: number;
+           endCursor?: `0x${string}`;
+           hasNext: boolean;
+           hasPrevious: boolean;
+           limit: number;
+           startCursor?: `0x${string}`;
+        };
+        results: IndexerAPICommentSchemaType[];
+     };
      revision: number;
      targetUri: string;
      txHash: `0x${string}`;
      updatedAt: Date;
+     viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
      zeroExSwap:   | null
         | {
         from: {
@@ -208,7 +225,7 @@ type IndexerAPINotificationMentionSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:769](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L769)
+Defined in: [packages/sdk/src/indexer/schemas.ts:787](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L787)
 
 ## Type declaration
 
@@ -339,6 +356,7 @@ comment: {
   moderationStatusChangedAt: Date;
   parentId: null | `0x${string}`;
   path: string;
+  reactionCounts: Record<string, number>;
   references: (
      | {
      address: `0x${string}`;
@@ -448,10 +466,26 @@ comment: {
      };
      type: "quoted_comment";
   })[];
+  replies: {
+     extra: {
+        moderationEnabled: boolean;
+        moderationKnownReactions: string[];
+     };
+     pagination: {
+        count: number;
+        endCursor?: `0x${string}`;
+        hasNext: boolean;
+        hasPrevious: boolean;
+        limit: number;
+        startCursor?: `0x${string}`;
+     };
+     results: IndexerAPICommentSchemaType[];
+  };
   revision: number;
   targetUri: string;
   txHash: `0x${string}`;
   updatedAt: Date;
+  viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
   zeroExSwap:   | null
      | {
      from: {
@@ -662,6 +696,12 @@ parentId: null | `0x${string}`;
 path: string;
 ```
 
+#### comment.reactionCounts
+
+```ts
+reactionCounts: Record<string, number>;
+```
+
 #### comment.references
 
 ```ts
@@ -776,6 +816,102 @@ references: (
 })[] = IndexerAPICommentReferencesSchema;
 ```
 
+#### comment.replies
+
+```ts
+replies: {
+  extra: {
+     moderationEnabled: boolean;
+     moderationKnownReactions: string[];
+  };
+  pagination: {
+     count: number;
+     endCursor?: `0x${string}`;
+     hasNext: boolean;
+     hasPrevious: boolean;
+     limit: number;
+     startCursor?: `0x${string}`;
+  };
+  results: IndexerAPICommentSchemaType[];
+};
+```
+
+#### comment.replies.extra
+
+```ts
+extra: {
+  moderationEnabled: boolean;
+  moderationKnownReactions: string[];
+} = IndexerAPIExtraSchema;
+```
+
+#### comment.replies.extra.moderationEnabled
+
+```ts
+moderationEnabled: boolean;
+```
+
+#### comment.replies.extra.moderationKnownReactions
+
+```ts
+moderationKnownReactions: string[];
+```
+
+#### comment.replies.pagination
+
+```ts
+pagination: {
+  count: number;
+  endCursor?: `0x${string}`;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  limit: number;
+  startCursor?: `0x${string}`;
+} = IndexerAPICursorRepliesPaginationSchema;
+```
+
+#### comment.replies.pagination.count
+
+```ts
+count: number;
+```
+
+#### comment.replies.pagination.endCursor?
+
+```ts
+optional endCursor: `0x${string}`;
+```
+
+#### comment.replies.pagination.hasNext
+
+```ts
+hasNext: boolean;
+```
+
+#### comment.replies.pagination.hasPrevious
+
+```ts
+hasPrevious: boolean;
+```
+
+#### comment.replies.pagination.limit
+
+```ts
+limit: number;
+```
+
+#### comment.replies.pagination.startCursor?
+
+```ts
+optional startCursor: `0x${string}`;
+```
+
+#### comment.replies.results
+
+```ts
+results: IndexerAPICommentSchemaType[];
+```
+
 #### comment.revision
 
 ```ts
@@ -798,6 +934,12 @@ txHash: `0x${string}` = HexSchema;
 
 ```ts
 updatedAt: Date;
+```
+
+#### comment.viewerReactions
+
+```ts
+viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
 ```
 
 #### comment.zeroExSwap

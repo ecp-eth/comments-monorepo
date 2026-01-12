@@ -160,6 +160,21 @@ function insertPendingReactionToPage(
     zeroExSwap: zeroExSwap ?? null,
     references: [],
     path: `${response.data.author.toLowerCase()}/${response.data.id.toLowerCase()}`,
+    reactionCounts: {},
+    viewerReactions: {},
+    replies: {
+      extra: {
+        moderationEnabled: false,
+        moderationKnownReactions: [],
+      },
+      results: [],
+      pagination: {
+        hasNext: false,
+        hasPrevious: false,
+        count: 0,
+        limit: 1,
+      },
+    },
   };
 
   // Initialize viewerReactions if it doesn't exist and add the reaction

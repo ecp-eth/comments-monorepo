@@ -1,6 +1,6 @@
 import schema from "ponder:schema";
 import { eq } from "ponder";
-import { IndexerAPICommentWithRepliesOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
+import { IndexerAPICommentOutputSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { createRoute, type OpenAPIHono } from "@hono/zod-openapi";
 import {
   APIBadRequestResponseSchema,
@@ -24,7 +24,7 @@ const getCommentRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: IndexerAPICommentWithRepliesOutputSchema,
+          schema: IndexerAPICommentOutputSchema,
         },
       },
       description: "A single comment",
@@ -81,10 +81,7 @@ export const setupGetComment = (app: OpenAPIHono) => {
       isReplyDeleted,
     });
 
-    return c.json(
-      IndexerAPICommentWithRepliesOutputSchema.parse(formattedComment),
-      200,
-    );
+    return c.json(IndexerAPICommentOutputSchema.parse(formattedComment), 200);
   });
 
   return app;
