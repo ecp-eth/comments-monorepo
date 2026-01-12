@@ -24,7 +24,7 @@ type FetchGroupedNotificationsOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1389](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1389)
+Defined in: [packages/sdk/src/indexer/api.ts:1387](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1387)
 
 The options for `fetchGroupedNotifications()`
 
@@ -36,7 +36,7 @@ The options for `fetchGroupedNotifications()`
 optional after: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1422](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1422)
+Defined in: [packages/sdk/src/indexer/api.ts:1420](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1420)
 
 After cursor to fetch grouped notifications from (older grouped notifications)
 
@@ -48,7 +48,7 @@ After cursor to fetch grouped notifications from (older grouped notifications)
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1395](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1395)
+Defined in: [packages/sdk/src/indexer/api.ts:1393](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1393)
 
 URL on which /api/notifications/grouped endpoint will be called
 
@@ -68,7 +68,7 @@ optional app:
   | Hex[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1408](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1408)
+Defined in: [packages/sdk/src/indexer/api.ts:1406](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1406)
 
 The app signers to fetch grouped notifications for
 
@@ -80,7 +80,7 @@ The app signers to fetch grouped notifications for
 appSecretKey: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1400](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1400)
+Defined in: [packages/sdk/src/indexer/api.ts:1398](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1398)
 
 App secret key to authenticate the request.
 Can be found in the https://dashboard.ethcomments.xyz after creating an app.
@@ -93,7 +93,7 @@ Can be found in the https://dashboard.ethcomments.xyz after creating an app.
 optional before: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1418](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1418)
+Defined in: [packages/sdk/src/indexer/api.ts:1416](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1416)
 
 Before cursor to fetch grouped notifications from (newer grouped notifications)
 
@@ -105,7 +105,7 @@ Before cursor to fetch grouped notifications from (newer grouped notifications)
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1434](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1434)
+Defined in: [packages/sdk/src/indexer/api.ts:1432](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1432)
 
 The number of grouped notifications to fetch
 
@@ -123,7 +123,7 @@ The number of grouped notifications to fetch
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1440](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1440)
+Defined in: [packages/sdk/src/indexer/api.ts:1438](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1438)
 
 Number of times to retry the request in case of failure (non‑parsing/network errors).
 
@@ -141,7 +141,7 @@ Number of times to retry the request in case of failure (non‑parsing/network e
 optional seen: boolean;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1428](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1428)
+Defined in: [packages/sdk/src/indexer/api.ts:1426](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1426)
 
 Whether to fetch only seen or unseen notifications
 
@@ -159,7 +159,7 @@ undefined - fetches all grouped notifications
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1444](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1444)
+Defined in: [packages/sdk/src/indexer/api.ts:1442](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1442)
 
 The signal to abort the request
 
@@ -173,7 +173,7 @@ optional type:
   | IndexerAPINotificationTypeSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1412](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1412)
+Defined in: [packages/sdk/src/indexer/api.ts:1410](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1410)
 
 The types of grouped notifications to fetch
 
@@ -185,6 +185,6 @@ The types of grouped notifications to fetch
 user: Hex | string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1404](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1404)
+Defined in: [packages/sdk/src/indexer/api.ts:1402](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1402)
 
 The user to fetch grouped notifications for, either ETH address or ENS name

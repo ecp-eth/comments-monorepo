@@ -2,12 +2,13 @@
 
 ***
 
-[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICursorPaginationSchemaType
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICursorRepliesPaginationSchemaType
 
-# Type Alias: IndexerAPICursorPaginationSchemaType
+# Type Alias: IndexerAPICursorRepliesPaginationSchemaType
 
 ```ts
-type IndexerAPICursorPaginationSchemaType = {
+type IndexerAPICursorRepliesPaginationSchemaType = {
+  count: number;
   endCursor?: `0x${string}`;
   hasNext: boolean;
   hasPrevious: boolean;
@@ -16,9 +17,15 @@ type IndexerAPICursorPaginationSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:50](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L50)
+Defined in: [packages/sdk/src/indexer/schemas.ts:46](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L46)
 
 ## Type declaration
+
+### count
+
+```ts
+count: number;
+```
 
 ### endCursor?
 

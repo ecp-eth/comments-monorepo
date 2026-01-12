@@ -43,6 +43,10 @@ export const IndexerAPICursorRepliesPaginationSchema =
     count: z.number().int().nonnegative(),
   });
 
+export type IndexerAPICursorRepliesPaginationSchemaType = z.infer<
+  typeof IndexerAPICursorRepliesPaginationSchema
+>;
+
 export type IndexerAPICursorPaginationSchemaType = z.infer<
   typeof IndexerAPICursorPaginationSchema
 >;
@@ -383,7 +387,7 @@ export type IndexerAPICommentReferencesSchemaInputType = z.input<
   typeof IndexerAPICommentReferencesSchema
 >;
 
-export const IndexerAPICommentSchema = z.object({
+const BaseIndexerAPICommentSchema = z.object({
   app: HexSchema,
   author: IndexerAPIAuthorDataSchema,
   id: HexSchema,
@@ -414,11 +418,18 @@ export const IndexerAPICommentSchema = z.object({
   path: z.string(),
 });
 
-export type IndexerAPICommentSchemaType = z.infer<
-  typeof IndexerAPICommentSchema
+type BaseIndexerAPICommentSchemaInputType = z.input<
+  typeof BaseIndexerAPICommentSchema
 >;
 
-export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
+type BaseIndexerAPICommentSchemaType = z.infer<
+  typeof BaseIndexerAPICommentSchema
+>;
+
+/**
+ * Converts the comment internal representation to the output wire representation
+ */
+const BaseIndexerAPICommentOutputSchema = BaseIndexerAPICommentSchema.extend({
   channelId: bigintToString,
   createdAt: dateToString,
   updatedAt: dateToString,
@@ -426,24 +437,9 @@ export const IndexerAPICommentOutputSchema = IndexerAPICommentSchema.extend({
   deletedAt: dateToString.nullable(),
 });
 
-export type IndexerAPICommentOutputSchemaType = z.infer<
-  typeof IndexerAPICommentOutputSchema
+type BaseIndexerAPICommentOutputSchemaType = z.infer<
+  typeof BaseIndexerAPICommentOutputSchema
 >;
-
-export const IndexerAPICommentReactionSchema = IndexerAPICommentSchema.extend({
-  viewerReactions: z.record(z.array(IndexerAPICommentSchema)),
-  reactionCounts: z.record(z.number()),
-});
-
-export type IndexerAPICommentReactionSchemaType = z.infer<
-  typeof IndexerAPICommentReactionSchema
->;
-
-export const IndexerAPICommentReactionOutputSchema =
-  IndexerAPICommentOutputSchema.extend({
-    viewerReactions: z.record(z.array(IndexerAPICommentOutputSchema)),
-    reactionCounts: z.record(z.number()),
-  });
 
 export const IndexerAPIPaginationSchema = z.object({
   limit: z.number().int(),
@@ -462,34 +458,97 @@ export const IndexerAPIExtraSchema = z.object({
 
 export type IndexerAPIExtraSchemaType = z.infer<typeof IndexerAPIExtraSchema>;
 
-export const IndexerAPICommentWithRepliesSchema =
-  IndexerAPICommentReactionSchema.extend({
+export type IndexerAPICommentSchemaType = BaseIndexerAPICommentSchemaType & {
+  viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
+  reactionCounts: Record<string, number>;
+  replies: {
+    extra: IndexerAPIExtraSchemaType;
+    pagination: IndexerAPICursorRepliesPaginationSchemaType;
+    results: IndexerAPICommentSchemaType[];
+  };
+};
+
+export type IndexerAPICommentSchemaInputType =
+  BaseIndexerAPICommentSchemaInputType & {
+    viewerReactions: Record<string, IndexerAPICommentSchemaInputType[]>;
+    reactionCounts: Record<string, number>;
+    replies: {
+      extra: IndexerAPIExtraSchemaType;
+      pagination: IndexerAPICursorRepliesPaginationSchemaType;
+      results: IndexerAPICommentSchemaInputType[];
+    };
+  };
+
+export const IndexerAPICommentSchema = BaseIndexerAPICommentSchema.extend({
+  viewerReactions: z.record(
+    z.array(
+      z.lazy(
+        (): z.ZodType<
+          IndexerAPICommentSchemaType,
+          z.ZodTypeDef,
+          IndexerAPICommentSchemaInputType
+        > => IndexerAPICommentSchema,
+      ),
+    ),
+  ),
+  reactionCounts: z.record(z.number()),
+  replies: z.object({
+    extra: IndexerAPIExtraSchema,
+    pagination: IndexerAPICursorRepliesPaginationSchema,
+    results: z.array(
+      z.lazy(
+        (): z.ZodType<
+          IndexerAPICommentSchemaType,
+          z.ZodTypeDef,
+          IndexerAPICommentSchemaInputType
+        > => IndexerAPICommentSchema,
+      ),
+    ),
+  }),
+});
+
+export type IndexerAPICommentOutputSchemaType =
+  BaseIndexerAPICommentOutputSchemaType & {
+    viewerReactions: Record<string, IndexerAPICommentOutputSchemaType[]>;
+    reactionCounts: Record<string, number>;
+    replies: {
+      extra: IndexerAPIExtraSchemaType;
+      pagination: IndexerAPICursorRepliesPaginationSchemaType;
+      results: IndexerAPICommentOutputSchemaType[];
+    };
+  };
+
+export const IndexerAPICommentOutputSchema =
+  BaseIndexerAPICommentOutputSchema.extend({
+    viewerReactions: z.record(
+      z.array(
+        z.lazy(
+          (): z.ZodType<
+            IndexerAPICommentOutputSchemaType,
+            z.ZodTypeDef,
+            IndexerAPICommentSchemaType
+          > => IndexerAPICommentOutputSchema,
+        ),
+      ),
+    ),
+    reactionCounts: z.record(z.number()),
     replies: z.object({
       extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentReactionSchema),
       pagination: IndexerAPICursorRepliesPaginationSchema,
+      results: z.array(
+        z.lazy(
+          (): z.ZodType<
+            IndexerAPICommentOutputSchemaType,
+            z.ZodTypeDef,
+            IndexerAPICommentSchemaType
+          > => IndexerAPICommentOutputSchema,
+        ),
+      ),
     }),
   });
-
-export type IndexerAPICommentWithRepliesSchemaType = z.infer<
-  typeof IndexerAPICommentWithRepliesSchema
->;
-
-export const IndexerAPICommentWithRepliesOutputSchema =
-  IndexerAPICommentReactionOutputSchema.extend({
-    replies: z.object({
-      extra: IndexerAPIExtraSchema,
-      results: z.array(IndexerAPICommentReactionOutputSchema),
-      pagination: IndexerAPICursorRepliesPaginationSchema,
-    }),
-  });
-
-export type IndexerAPICommentWithRepliesOutputSchemaType = z.infer<
-  typeof IndexerAPICommentWithRepliesOutputSchema
->;
 
 export const IndexerAPIListCommentsSchema = z.object({
-  results: z.array(IndexerAPICommentWithRepliesSchema),
+  results: z.array(IndexerAPICommentSchema),
   pagination: IndexerAPICursorPaginationSchema,
   extra: IndexerAPIExtraSchema,
 });
@@ -500,37 +559,13 @@ export type IndexerAPIListCommentsSchemaType = z.infer<
 
 export const IndexerAPIListCommentsOutputSchema =
   IndexerAPIListCommentsSchema.extend({
-    results: z.array(IndexerAPICommentWithRepliesOutputSchema),
+    results: z.array(IndexerAPICommentOutputSchema),
     pagination: IndexerAPICursorPaginationSchema,
     extra: IndexerAPIExtraSchema,
   });
 
 export type IndexerAPIListCommentsOutputSchemaType = z.infer<
   typeof IndexerAPIListCommentsOutputSchema
->;
-
-/**
- * @deprecated Use IndexerAPIListCommentsSchema instead
- */
-export const IndexerAPIListCommentRepliesSchema = z.object({
-  results: z.array(IndexerAPICommentWithRepliesSchema),
-  pagination: IndexerAPICursorPaginationSchema,
-  extra: IndexerAPIExtraSchema,
-});
-
-export type IndexerAPIListCommentRepliesSchemaType = z.infer<
-  typeof IndexerAPIListCommentRepliesSchema
->;
-
-export const IndexerAPIListCommentRepliesOutputSchema =
-  IndexerAPIListCommentRepliesSchema.extend({
-    results: z.array(IndexerAPICommentWithRepliesOutputSchema),
-    pagination: IndexerAPICursorPaginationSchema,
-    extra: IndexerAPIExtraSchema,
-  });
-
-export type IndexerAPIListCommentRepliesOutputSchemaType = z.infer<
-  typeof IndexerAPIListCommentRepliesOutputSchema
 >;
 
 export const IndexerAPIModerationGetPendingCommentsSchema = z.object({

@@ -25,7 +25,7 @@ type FetchNotificationsOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1211](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1211)
+Defined in: [packages/sdk/src/indexer/api.ts:1209](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1209)
 
 The options for `fetchNotifications()`
 
@@ -37,7 +37,7 @@ The options for `fetchNotifications()`
 optional after: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1244](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1244)
+Defined in: [packages/sdk/src/indexer/api.ts:1242](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1242)
 
 After cursor to fetch notifications from (older notifications)
 
@@ -49,7 +49,7 @@ After cursor to fetch notifications from (older notifications)
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1217](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1217)
+Defined in: [packages/sdk/src/indexer/api.ts:1215](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1215)
 
 URL on which /api/notifications endpoint will be called
 
@@ -69,7 +69,7 @@ optional app:
   | Hex[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1230](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1230)
+Defined in: [packages/sdk/src/indexer/api.ts:1228](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1228)
 
 The app signers to fetch notifications for
 
@@ -81,7 +81,7 @@ The app signers to fetch notifications for
 appSecretKey: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1222](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1222)
+Defined in: [packages/sdk/src/indexer/api.ts:1220](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1220)
 
 App secret key to authenticate the request.
 Can be found in the https://dashboard.ethcomments.xyz after creating an app.
@@ -94,7 +94,7 @@ Can be found in the https://dashboard.ethcomments.xyz after creating an app.
 optional before: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1240](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1240)
+Defined in: [packages/sdk/src/indexer/api.ts:1238](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1238)
 
 Before cursor to fetch notifications from (newer notifications)
 
@@ -106,7 +106,7 @@ Before cursor to fetch notifications from (newer notifications)
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1260](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1260)
+Defined in: [packages/sdk/src/indexer/api.ts:1258](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1258)
 
 The number of notifications to fetch
 
@@ -124,7 +124,7 @@ The number of notifications to fetch
 optional parentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1248](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1248)
+Defined in: [packages/sdk/src/indexer/api.ts:1246](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1246)
 
 Fetch notifications for a specific parent id
 
@@ -136,7 +136,7 @@ Fetch notifications for a specific parent id
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1266](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1266)
+Defined in: [packages/sdk/src/indexer/api.ts:1264](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1264)
 
 Number of times to retry the request in case of failure (non‑parsing/network errors).
 
@@ -154,7 +154,7 @@ Number of times to retry the request in case of failure (non‑parsing/network e
 optional seen: boolean;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1254](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1254)
+Defined in: [packages/sdk/src/indexer/api.ts:1252](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1252)
 
 Whether to fetch only seen or unseen notifications
 
@@ -172,7 +172,7 @@ undefined - fetches all notifications
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1270](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1270)
+Defined in: [packages/sdk/src/indexer/api.ts:1268](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1268)
 
 The signal to abort the request
 
@@ -186,7 +186,7 @@ optional type:
   | IndexerAPINotificationTypeSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1234](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1234)
+Defined in: [packages/sdk/src/indexer/api.ts:1232](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1232)
 
 The types of notifications to fetch
 
@@ -198,6 +198,6 @@ The types of notifications to fetch
 user: Hex | string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:1226](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1226)
+Defined in: [packages/sdk/src/indexer/api.ts:1224](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L1224)
 
 The user to fetch notifications for, either ETH address or ENS name

@@ -174,6 +174,7 @@ export function CommentItem({
                   hasNext: false,
                   hasPrevious: false,
                   limit: 0,
+                  count: 0,
                 },
                 results: [],
               },

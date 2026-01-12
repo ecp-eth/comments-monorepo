@@ -1,0 +1,63 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [indexer](/sdk-reference/indexer/index.mdx) / IndexerAPICommentSchemaInputType
+
+# Type Alias: IndexerAPICommentSchemaInputType
+
+```ts
+type IndexerAPICommentSchemaInputType = BaseIndexerAPICommentSchemaInputType & {
+  reactionCounts: Record<string, number>;
+  replies: {
+     extra: IndexerAPIExtraSchemaType;
+     pagination: IndexerAPICursorRepliesPaginationSchemaType;
+     results: IndexerAPICommentSchemaInputType[];
+  };
+  viewerReactions: Record<string, IndexerAPICommentSchemaInputType[]>;
+};
+```
+
+Defined in: [packages/sdk/src/indexer/schemas.ts:471](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L471)
+
+## Type declaration
+
+### reactionCounts
+
+```ts
+reactionCounts: Record<string, number>;
+```
+
+### replies
+
+```ts
+replies: {
+  extra: IndexerAPIExtraSchemaType;
+  pagination: IndexerAPICursorRepliesPaginationSchemaType;
+  results: IndexerAPICommentSchemaInputType[];
+};
+```
+
+#### replies.extra
+
+```ts
+extra: IndexerAPIExtraSchemaType;
+```
+
+#### replies.pagination
+
+```ts
+pagination: IndexerAPICursorRepliesPaginationSchemaType;
+```
+
+#### replies.results
+
+```ts
+results: IndexerAPICommentSchemaInputType[];
+```
+
+### viewerReactions
+
+```ts
+viewerReactions: Record<string, IndexerAPICommentSchemaInputType[]>;
+```

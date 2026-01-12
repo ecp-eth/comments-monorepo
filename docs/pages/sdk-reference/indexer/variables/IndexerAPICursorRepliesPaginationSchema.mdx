@@ -7,29 +7,7 @@
 # Variable: IndexerAPICursorRepliesPaginationSchema
 
 ```ts
-const IndexerAPICursorRepliesPaginationSchema: ZodObject<{
-  endCursor: ZodOptional<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
-  hasNext: ZodBoolean;
-  hasPrevious: ZodBoolean;
-  limit: ZodNumber;
-  startCursor: ZodOptional<ZodEffects<ZodString, `0x${string}`, `0x${string}`>>;
-} & {
-  count: ZodNumber;
-}, "strip", ZodTypeAny, {
-  count: number;
-  endCursor?: `0x${string}`;
-  hasNext: boolean;
-  hasPrevious: boolean;
-  limit: number;
-  startCursor?: `0x${string}`;
-}, {
-  count: number;
-  endCursor?: `0x${string}`;
-  hasNext: boolean;
-  hasPrevious: boolean;
-  limit: number;
-  startCursor?: `0x${string}`;
-}>;
+const IndexerAPICursorRepliesPaginationSchema: ZodObject<IndexerAPICursorRepliesPaginationSchemaType>;
 ```
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:41](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L41)

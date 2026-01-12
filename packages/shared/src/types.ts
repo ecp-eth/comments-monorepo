@@ -3,10 +3,7 @@ import type {
   Comment,
   PendingPostCommentOperationSchemaType,
 } from "./schemas.js";
-import type {
-  IndexerAPICommentSchemaType,
-  IndexerAPICommentWithRepliesSchemaType,
-} from "@ecp.eth/sdk/indexer/schemas";
+import type { IndexerAPICommentSchemaType } from "@ecp.eth/sdk/indexer/schemas";
 
 export type OnDeleteComment = (id: Hex) => void;
 export type OnRetryPostComment = (
@@ -17,9 +14,7 @@ export type OnRetryPostComment = (
 export type OnSubmitSuccessFunction = () => void;
 
 // used only within this module, do not export
-type AllowedCommentTypes =
-  | IndexerAPICommentSchemaType
-  | IndexerAPICommentWithRepliesSchemaType;
+type AllowedCommentTypes = IndexerAPICommentSchemaType;
 
 export type AuthorType = AllowedCommentTypes["author"];
 

@@ -18,7 +18,6 @@ import { z } from "zod/v3";
 import { twMerge } from "tailwind-merge";
 import {
   getCommentCursor,
-  type IndexerAPIListCommentRepliesSchemaType,
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIExtraSchemaType,
 } from "@ecp.eth/sdk/indexer";
@@ -46,9 +45,7 @@ export function getCommentAuthorNameOrAddress(author: AuthorType): string {
 
 export function hasNewComments(
   oldQueryData: InfiniteData<CommentPageSchemaType>,
-  newCommentsPage:
-    | IndexerAPIListCommentsSchemaType
-    | IndexerAPIListCommentRepliesSchemaType,
+  newCommentsPage: IndexerAPIListCommentsSchemaType,
 ) {
   if (newCommentsPage.results.length === 0) {
     return false;
@@ -193,6 +190,7 @@ export function insertPendingCommentToPage(
         hasPrevious: false,
         hasNext: false,
         limit: 3,
+        count: 0,
       },
     },
     viewerReactions: {},

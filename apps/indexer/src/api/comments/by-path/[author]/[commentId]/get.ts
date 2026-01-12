@@ -1,4 +1,4 @@
-import { IndexerAPICommentWithRepliesOutputSchema } from "@ecp.eth/sdk/indexer";
+import { IndexerAPICommentOutputSchema } from "@ecp.eth/sdk/indexer";
 import { createRoute, type OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   APIBadRequestResponseSchema,
@@ -39,7 +39,7 @@ const getCommentsByPathRoute = createRoute({
     200: {
       content: {
         "application/json": {
-          schema: IndexerAPICommentWithRepliesOutputSchema,
+          schema: IndexerAPICommentOutputSchema,
         },
       },
       description: "A single comment",
@@ -99,10 +99,7 @@ export function setupGetCommentsByPath(app: OpenAPIHono) {
       isReplyDeleted,
     });
 
-    return c.json(
-      IndexerAPICommentWithRepliesOutputSchema.parse(formattedComment),
-      200,
-    );
+    return c.json(IndexerAPICommentOutputSchema.parse(formattedComment), 200);
   });
 
   return app;

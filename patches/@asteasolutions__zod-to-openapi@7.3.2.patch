@@ -1,0 +1,51 @@
+diff --git a/dist/index.cjs b/dist/index.cjs
+index 45d4d5b710d9d188d27ef3614a80f808b98b4fb8..27ea5202fe47e7019a172e828309d09d5856dc8d 100644
+--- a/dist/index.cjs
++++ b/dist/index.cjs
+@@ -759,7 +759,7 @@ class UnionTransformer {
+ }
+ 
+ class OpenApiTransformer {
+-    constructor(versionSpecifics) {
++    constructor(versionSpecifics, openApiGenerator) {
+         this.versionSpecifics = versionSpecifics;
+         this.objectTransformer = new ObjectTransformer();
+         this.stringTransformer = new StringTransformer();
+@@ -774,6 +774,8 @@ class OpenApiTransformer {
+         this.intersectionTransformer = new IntersectionTransformer();
+         this.recordTransformer = new RecordTransformer();
+         this.tupleTransformer = new TupleTransformer(versionSpecifics);
++        this.openApiGenerator = openApiGenerator;
++        this.lazyCount = 0;
+     }
+     transform(zodSchema, isNullable, mapItem, generateSchemaRef, defaultValue) {
+         if (isZodType(zodSchema, 'ZodNull')) {
+@@ -836,6 +838,19 @@ class OpenApiTransformer {
+         if (isZodType(zodSchema, 'ZodDate')) {
+             return this.versionSpecifics.mapNullableType('string', isNullable);
+         }
++        if (isZodType(zodSchema, 'ZodLazy')) {
++            const schema = zodSchema.schema;
++
++            if (!('_lazyRefId' in zodSchema)) {
++                zodSchema._lazyRefId = `object_${this.lazyCount + 1}`;
++                this.lazyCount++;
++                this.openApiGenerator.schemaRefs[zodSchema._lazyRefId] = this.openApiGenerator.generateSimpleSchema(
++                    schema.openapi(zodSchema._lazyRefId)
++                );
++            }
++
++            return this.openApiGenerator.schemaRefs[zodSchema._lazyRefId];
++        }
+         const refId = Metadata.getRefId(zodSchema);
+         throw new UnknownZodTypeError({
+             currentSchema: zodSchema._def,
+@@ -852,7 +867,7 @@ class OpenAPIGenerator {
+         this.paramRefs = {};
+         this.pathRefs = {};
+         this.rawComponents = [];
+-        this.openApiTransformer = new OpenApiTransformer(versionSpecifics);
++        this.openApiTransformer = new OpenApiTransformer(versionSpecifics, this);
+         this.sortDefinitions();
+     }
+     generateDocumentData() {

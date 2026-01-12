@@ -54,6 +54,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${string}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (
                  | {
                  address: `0x${string}`;
@@ -157,10 +158,26 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  };
                  type: "quoted_comment";
               })[];
+              replies: {
+                 extra: {
+                    moderationEnabled: boolean;
+                    moderationKnownReactions: string[];
+                 };
+                 pagination: {
+                    count: number;
+                    endCursor?: `0x${string}`;
+                    hasNext: boolean;
+                    hasPrevious: boolean;
+                    limit: number;
+                    startCursor?: `0x${string}`;
+                 };
+                 results: IndexerAPICommentSchemaType[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
               zeroExSwap:   | null
                  | {
                  from: {
@@ -229,11 +246,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -272,11 +306,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -332,11 +383,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -407,11 +475,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -450,11 +535,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -510,11 +612,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -553,11 +672,28 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationStatusChangedAt: Date;
                  parentId: null | `0x${(...)}`;
                  path: string;
+                 reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+                 replies: {
+                    extra: {
+                       moderationEnabled: ...;
+                       moderationKnownReactions: ...;
+                    };
+                    pagination: {
+                       count: ...;
+                       endCursor?: ...;
+                       hasNext: ...;
+                       hasPrevious: ...;
+                       limit: ...;
+                       startCursor?: ...;
+                    };
+                    results: ...[];
+                 };
                  revision: number;
                  targetUri: string;
                  txHash: `0x${string}`;
                  updatedAt: Date;
+                 viewerReactions: Record<string, ...[]>;
                  zeroExSwap:   | null
                     | {
                     from: ...;
@@ -586,7 +722,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/schemas.ts:854](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L854)
+Defined in: [packages/sdk/src/indexer/schemas.ts:889](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L889)
 
 The list grouped notifications schema returned by fetchGroupedNotifications()
 
@@ -652,6 +788,7 @@ notifications: {
            moderationStatusChangedAt: Date;
            parentId: null | `0x${string}`;
            path: string;
+           reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
@@ -755,10 +892,26 @@ notifications: {
               };
               type: "quoted_comment";
            })[];
+           replies: {
+              extra: {
+                 moderationEnabled: boolean;
+                 moderationKnownReactions: string[];
+              };
+              pagination: {
+                 count: number;
+                 endCursor?: `0x${string}`;
+                 hasNext: boolean;
+                 hasPrevious: boolean;
+                 limit: number;
+                 startCursor?: `0x${string}`;
+              };
+              results: IndexerAPICommentSchemaType[];
+           };
            revision: number;
            targetUri: string;
            txHash: `0x${string}`;
            updatedAt: Date;
+           viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
            zeroExSwap:   | null
               | {
               from: {
@@ -827,11 +980,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -870,11 +1040,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -930,11 +1117,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -1005,11 +1209,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -1048,11 +1269,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -1108,11 +1346,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;
@@ -1151,11 +1406,28 @@ notifications: {
               moderationStatusChangedAt: Date;
               parentId: null | `0x${(...)}`;
               path: string;
+              reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
+              replies: {
+                 extra: {
+                    moderationEnabled: ...;
+                    moderationKnownReactions: ...;
+                 };
+                 pagination: {
+                    count: ...;
+                    endCursor?: ...;
+                    hasNext: ...;
+                    hasPrevious: ...;
+                    limit: ...;
+                    startCursor?: ...;
+                 };
+                 results: ...[];
+              };
               revision: number;
               targetUri: string;
               txHash: `0x${string}`;
               updatedAt: Date;
+              viewerReactions: Record<string, ...[]>;
               zeroExSwap:   | null
                  | {
                  from: ...;

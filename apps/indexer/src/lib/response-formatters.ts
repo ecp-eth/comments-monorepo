@@ -135,7 +135,9 @@ export function createUserDataAndFormatSingleCommentResponseResolver({
   resolvedAuthorsFarcasterData: (ResolvedFarcasterData | Error | null)[];
   replyCounts: Record<LowercasedHex, number>;
 }) {
-  return (comment: CommentFromDB) => {
+  return (
+    comment: CommentFromDB,
+  ): IndexerAPIListCommentsSchemaType["results"][number] => {
     const {
       replies: nestedReplies,
       flatReplies,
@@ -195,6 +197,13 @@ export function createUserDataAndFormatSingleCommentResponseResolver({
                 limit: 0,
                 hasNext: false,
                 hasPrevious: false,
+                count: 0,
+              },
+              extra: {
+                moderationEnabled: env.MODERATION_ENABLED,
+                moderationKnownReactions: Array.from(
+                  env.MODERATION_KNOWN_REACTIONS,
+                ),
               },
             },
           };
@@ -288,11 +297,27 @@ function formatViewerReactions(
   return (
     viewerReactions?.reduce(
       (acc, reaction) => {
-        const reactionFormatted = {
+        const reactionFormatted: IndexerAPICommentSchemaType = {
           ...formatComment(reaction, undefined),
           author: {
             address: reaction.author,
           },
+          replies: {
+            extra: {
+              moderationEnabled: env.MODERATION_ENABLED,
+              moderationKnownReactions: Array.from(
+                env.MODERATION_KNOWN_REACTIONS,
+              ),
+            },
+            pagination: {
+              limit: 0,
+              hasNext: false,
+              hasPrevious: false,
+              count: 0,
+            },
+            results: [],
+          },
+          viewerReactions: {},
         };
 
         const container = (acc[reaction.content] = acc[reaction.content] ?? []);
@@ -338,6 +363,19 @@ export async function resolveAuthorDataAndFormatCommentChangeModerationStatusRes
       resolvedEnsData,
       resolvedFarcasterData,
     ),
+    replies: {
+      extra: {
+        moderationEnabled: env.MODERATION_ENABLED,
+        moderationKnownReactions: Array.from(env.MODERATION_KNOWN_REACTIONS),
+      },
+      pagination: {
+        limit: 0,
+        hasNext: false,
+        hasPrevious: false,
+        count: 0,
+      },
+      results: [],
+    },
   };
 }
 

@@ -1,8 +1,7 @@
 import { runAsync } from "../core/utils.js";
 import { HexSchema, type Hex } from "../core/schemas.js";
 import {
-  IndexerAPIListCommentRepliesSchema,
-  type IndexerAPIListCommentRepliesSchemaType,
+  type IndexerAPICommentSchemaType,
   IndexerAPIListCommentsSchema,
   type IndexerAPIListCommentsSchemaType,
   type IndexerAPIAuthorDataSchemaType,
@@ -21,8 +20,7 @@ import {
   type IndexerAPIGetAutocompleteOutputSchemaType,
   IndexerAPIModerationClassificationLabelSchema,
   type IndexerAPIModerationClassificationLabelSchemaType,
-  IndexerAPICommentWithRepliesSchema,
-  type IndexerAPICommentWithRepliesSchemaType,
+  IndexerAPICommentSchema,
   IndexerAPINotificationTypeSchema,
   type IndexerAPINotificationTypeSchemaType,
   IndexerAPIListNotificationsSchema,
@@ -110,7 +108,7 @@ void ({} as FetchCommentOptions satisfies z.input<
  */
 export async function fetchComment(
   options: FetchCommentOptions,
-): Promise<IndexerAPICommentWithRepliesSchemaType> {
+): Promise<IndexerAPICommentSchemaType> {
   const {
     commentId,
     chainId,
@@ -171,7 +169,7 @@ export async function fetchComment(
     { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
-  return IndexerAPICommentWithRepliesSchema.parse(responseData);
+  return IndexerAPICommentSchema.parse(responseData);
 }
 
 /**
@@ -564,7 +562,7 @@ void ({} as FetchCommentRepliesOptions satisfies z.input<
  */
 export async function fetchCommentReplies(
   options: FetchCommentRepliesOptions,
-): Promise<IndexerAPIListCommentRepliesSchemaType> {
+): Promise<IndexerAPIListCommentsSchemaType> {
   const {
     chainId,
     apiUrl,
@@ -669,7 +667,7 @@ export async function fetchCommentReplies(
     { signal, retries, retryCondition: indexerApiRetryCondition },
   );
 
-  return IndexerAPIListCommentRepliesSchema.parse(responseData);
+  return IndexerAPIListCommentsSchema.parse(responseData);
 }
 
 /**

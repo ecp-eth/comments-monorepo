@@ -29,7 +29,7 @@ type FetchCommentRepliesOptions = {
 };
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:438](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L438)
+Defined in: [packages/sdk/src/indexer/api.ts:436](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L436)
 
 The options for `fetchCommentReplies()`
 
@@ -41,7 +41,7 @@ The options for `fetchCommentReplies()`
 optional apiUrl: string;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:461](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L461)
+Defined in: [packages/sdk/src/indexer/api.ts:459](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L459)
 
 URL on which /api/comments/$commentId/replies endpoint will be called
 
@@ -59,7 +59,7 @@ URL on which /api/comments/$commentId/replies endpoint will be called
 optional app: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:465](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L465)
+Defined in: [packages/sdk/src/indexer/api.ts:463](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L463)
 
 Filters to only comments sent using this app signer key.
 
@@ -71,7 +71,7 @@ Filters to only comments sent using this app signer key.
 chainId: number | number[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:446](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L446)
+Defined in: [packages/sdk/src/indexer/api.ts:444](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L444)
 
 Filter replies by chain ID(s)
 
@@ -83,7 +83,7 @@ Filter replies by chain ID(s)
 optional channelId: bigint;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:522](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L522)
+Defined in: [packages/sdk/src/indexer/api.ts:520](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L520)
 
 Filter replies by channel ID
 
@@ -95,7 +95,7 @@ Filter replies by channel ID
 commentId: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:442](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L442)
+Defined in: [packages/sdk/src/indexer/api.ts:440](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L440)
 
 The ID of the comment to fetch replies for
 
@@ -107,7 +107,7 @@ The ID of the comment to fetch replies for
 optional commentType: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:491](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L491)
+Defined in: [packages/sdk/src/indexer/api.ts:489](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L489)
 
 Filter replies by comment type
 
@@ -119,7 +119,7 @@ Filter replies by comment type
 optional cursor: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:475](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L475)
+Defined in: [packages/sdk/src/indexer/api.ts:473](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L473)
 
 The cursor to fetch comments from
 
@@ -131,7 +131,7 @@ The cursor to fetch comments from
 optional excludeByModerationLabels: IndexerAPIModerationClassificationLabelSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:518](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L518)
+Defined in: [packages/sdk/src/indexer/api.ts:516](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L516)
 
 Filter replies by moderation labels.
 
@@ -147,7 +147,7 @@ if the premoderation is enabled.
 optional isReplyDeleted: boolean;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:451](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L451)
+Defined in: [packages/sdk/src/indexer/api.ts:449](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L449)
 
 Whether to return only deleted replies or only undeleted replies.
 If omitted it will return both deleted and undeleted replies.
@@ -160,7 +160,7 @@ If omitted it will return both deleted and undeleted replies.
 optional limit: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:526](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L526)
+Defined in: [packages/sdk/src/indexer/api.ts:524](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L524)
 
 #### Default
 
@@ -176,7 +176,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:526](https://github.com/ecp-eth/com
 optional mode: IndexerAPICommentListModeSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:487](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L487)
+Defined in: [packages/sdk/src/indexer/api.ts:485](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L485)
 
 The mode to fetch replies, by default it returns only the first level of replies.
 - "flat" mode returns all replies (no matter the nesting level) sorted by timestamp in descending order.
@@ -196,7 +196,7 @@ The mode to fetch replies, by default it returns only the first level of replies
 optional moderationScore: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:510](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L510)
+Defined in: [packages/sdk/src/indexer/api.ts:508](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L508)
 
 Filter replies by moderation score.
 
@@ -214,7 +214,7 @@ optional moderationStatus:
   | IndexerAPICommentModerationStatusSchemaType[];
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:500](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L500)
+Defined in: [packages/sdk/src/indexer/api.ts:498](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L498)
 
 Filter replies by moderation status.
 
@@ -231,7 +231,7 @@ If moderation is disabled, this parameter is ignored.
 optional retries: number;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:471](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L471)
+Defined in: [packages/sdk/src/indexer/api.ts:469](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L469)
 
 Number of times to retry the signing operation in case of failure.
 
@@ -249,7 +249,7 @@ Number of times to retry the signing operation in case of failure.
 optional signal: AbortSignal;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:527](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L527)
+Defined in: [packages/sdk/src/indexer/api.ts:525](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L525)
 
 ***
 
@@ -259,7 +259,7 @@ Defined in: [packages/sdk/src/indexer/api.ts:527](https://github.com/ecp-eth/com
 optional sort: IndexerAPISortSchemaType;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:479](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L479)
+Defined in: [packages/sdk/src/indexer/api.ts:477](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L477)
 
 #### Default
 
@@ -275,6 +275,6 @@ Defined in: [packages/sdk/src/indexer/api.ts:479](https://github.com/ecp-eth/com
 optional viewer: Hex;
 ```
 
-Defined in: [packages/sdk/src/indexer/api.ts:455](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L455)
+Defined in: [packages/sdk/src/indexer/api.ts:453](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/api.ts#L453)
 
 The viewer's address. This is useful when the content moderation is enabled on the indexer.
