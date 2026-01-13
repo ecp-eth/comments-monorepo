@@ -1,3 +1,16 @@
+diff --git a/build/cjs/sdk/initOtel.js b/build/cjs/sdk/initOtel.js
+index ec65d50f18ae1c4b47c517d942f0ddaf274d5404..85eaacb2af602a1bd836edadfd0c252ba82c7022 100644
+--- a/build/cjs/sdk/initOtel.js
++++ b/build/cjs/sdk/initOtel.js
+@@ -97,7 +97,7 @@ function setupOtel(client, options = {}) {
+   // Create and configure NodeTracerProvider
+   const provider = new sdkTraceBase.BasicTracerProvider({
+     sampler: new opentelemetry.SentrySampler(client),
+-    resource: new resources.Resource({
++    resource: resources.resourceFromAttributes({
+       [semanticConventions.ATTR_SERVICE_NAME]: 'node',
+       // eslint-disable-next-line deprecation/deprecation
+       [semanticConventions.SEMRESATTRS_SERVICE_NAMESPACE]: 'sentry',
 diff --git a/build/esm/sdk/initOtel.js b/build/esm/sdk/initOtel.js
 index 388bbe031a821b32fdf8c8b75090528bff238982..8f6948e67e384c3537b449c7b620ae60f6daedc1 100644
 --- a/build/esm/sdk/initOtel.js
