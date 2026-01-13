@@ -613,7 +613,7 @@ export async function fetchCommentReplies(
       }
 
       if (isReplyDeleted != null) {
-        url.searchParams.set("isReplyDeleted", isReplyDeleted ? "1" : "0");
+        url.searchParams.set("isDeleted", isReplyDeleted ? "1" : "0");
       }
 
       // channelId can be 0
