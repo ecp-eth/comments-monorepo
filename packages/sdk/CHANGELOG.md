@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.39
+
+### Patch Changes
+
+- be0998b: fix: use correct query param to manage deleted replies when fetching them
+
 ## 0.0.38
 
 ### Patch Changes
