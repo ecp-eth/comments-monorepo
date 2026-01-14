@@ -3,6 +3,7 @@ import {
   ApprovalAddedEventSchema,
   ApprovalEvents,
   ApprovalRemovedEventSchema,
+  ApprovalExpiredEventSchema,
 } from "./approval.js";
 import {
   ChannelCreatedEventSchema,
@@ -30,6 +31,7 @@ import { TestEvents, TestEventSchema } from "./test.js";
 export const AllEventsSchema = z.union([
   ApprovalAddedEventSchema,
   ApprovalRemovedEventSchema,
+  ApprovalExpiredEventSchema,
   ChannelCreatedEventSchema,
   ChannelHookStatusUpdatedEventSchema,
   ChannelMetadataSetEventSchema,
