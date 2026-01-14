@@ -154,13 +154,13 @@ async function processApprovalExpirations() {
 
 // Handle graceful shutdown
 process.on("SIGINT", () => {
-  console.log("\\nReceived SIGINT, shutting down gracefully...");
+  console.log("Received SIGINT, shutting down gracefully...");
   abortController.abort();
   process.exit(0);
 });
 
 process.on("SIGTERM", () => {
-  console.log("\\nReceived SIGTERM, shutting down gracefully...");
+  console.log("Received SIGTERM, shutting down gracefully...");
   abortController.abort();
   process.exit(0);
 });
