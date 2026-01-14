@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22 <23"
+    "node": ">=22.22 <23"
   },
   "scripts": {
     "predev": "pnpm db:migrate:up",
