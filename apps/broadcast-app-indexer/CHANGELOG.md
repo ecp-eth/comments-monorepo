@@ -1,5 +1,13 @@
 # @ecp.eth/broadcast-app-indexer
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [90dfa35]
+  - @ecp.eth/sdk@0.0.41
+  - @ecp.eth/shared@0.0.21
+
 ## 0.0.18
 
 ### Patch Changes
