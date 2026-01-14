@@ -766,6 +766,22 @@ type ConstructEventResult =
   version: 1;
 }
   | {
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:expired";
+  uid: string;
+  version: 1;
+}
+  | {
   appId: string;
   data: {
      message: string;
@@ -4742,6 +4758,138 @@ txHash: `0x${string}` = HexSchema;
 ```
 
 Transaction hash
+
+### uid
+
+```ts
+uid: string;
+```
+
+Unique identifier for the event. You can use it to deduplicate events.
+In case of retry attempts the id is the same.
+
+### version
+
+```ts
+version: 1;
+```
+
+Version of the event
+
+```ts
+{
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:expired";
+  uid: string;
+  version: 1;
+}
+```
+
+### chainId
+
+```ts
+chainId: number;
+```
+
+Chain ID where the approval exists
+
+### data
+
+```ts
+data: {
+  approval: {
+     app: `0x${string}`;
+     author: `0x${string}`;
+     createdAt: Date;
+     expiresAt: Date;
+     id: string;
+     updatedAt: Date;
+  };
+};
+```
+
+Data of the event
+
+#### data.approval
+
+```ts
+approval: {
+  app: `0x${string}`;
+  author: `0x${string}`;
+  createdAt: Date;
+  expiresAt: Date;
+  id: string;
+  updatedAt: Date;
+};
+```
+
+Approval data
+
+#### data.approval.app
+
+```ts
+app: `0x${string}` = HexSchema;
+```
+
+App address
+
+#### data.approval.author
+
+```ts
+author: `0x${string}` = HexSchema;
+```
+
+Author address of the approval
+
+#### data.approval.createdAt
+
+```ts
+createdAt: Date = ISO8601DateSchema;
+```
+
+Created at date. On wire it is a ISO 8601 date and time string.
+
+#### data.approval.expiresAt
+
+```ts
+expiresAt: Date = ISO8601DateSchema;
+```
+
+Expires at date. On wire it is a ISO 8601 date and time string.
+
+#### data.approval.id
+
+```ts
+id: string;
+```
+
+ID of the approval that expired
+
+#### data.approval.updatedAt
+
+```ts
+updatedAt: Date = ISO8601DateSchema;
+```
+
+Updated at date. On wire it is a ISO 8601 date and time string.
+
+### event
+
+```ts
+event: "approval:expired";
+```
+
+Event type
 
 ### uid
 
