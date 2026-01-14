@@ -68,8 +68,8 @@ const CRON_PROCESSES = [
   },
   {
     name: "cron:approval-expiration-checker",
-    // run every 5 minutes for near real-time expiration checks
-    cron: "*/5 * * * *",
+    // run every 1 minutes for near real-time expiration checks
+    cron: "*/1 * * * *",
     command: "pnpm",
     args: [
       "run",
