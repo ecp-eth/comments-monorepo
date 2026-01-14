@@ -66,6 +66,18 @@ const CRON_PROCESSES = [
     command: "pnpm",
     args: ["run", "cron:delete-users", "--indexer-url", INDEXER_URL],
   },
+  {
+    name: "cron:approval-expiration-checker",
+    // run every 1 minutes for near real-time expiration checks
+    cron: "*/1 * * * *",
+    command: "pnpm",
+    args: [
+      "run",
+      "cron:approval-expiration-checker",
+      "--indexer-url",
+      INDEXER_URL,
+    ],
+  },
 ];
 
 const children = new Map<string, ChildProcess>();

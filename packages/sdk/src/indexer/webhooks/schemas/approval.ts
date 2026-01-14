@@ -9,6 +9,7 @@ import { HexSchema } from "../../../core/schemas.js";
 
 export const EVENT_APPROVAL_ADDED = "approval:added" as const;
 export const EVENT_APPROVAL_REMOVED = "approval:removed" as const;
+export const EVENT_APPROVAL_EXPIRED = "approval:expired" as const;
 
 /**
  * Approval events.
@@ -16,6 +17,7 @@ export const EVENT_APPROVAL_REMOVED = "approval:removed" as const;
 export const ApprovalEvents = [
   EVENT_APPROVAL_ADDED,
   EVENT_APPROVAL_REMOVED,
+  EVENT_APPROVAL_EXPIRED,
 ] as const;
 
 export const ApprovalAddedEventV1Schema = z
@@ -150,9 +152,62 @@ export const ApprovalRemovedEventSchema = z
 export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
 
 /**
+ * An event sent to webhook when an approval expires
+ */
+export const ApprovalExpiredEventSchema = z
+  .object({
+    /**
+     * Event type
+     */
+    event: z.literal(EVENT_APPROVAL_EXPIRED),
+    /**
+     * Chain ID where the approval exists
+     */
+    chainId: z.number().int(),
+    /**
+     * Data of the event
+     */
+    data: z.object({
+      /**
+       * Approval data
+       */
+      approval: z.object({
+        /**
+         * ID of the approval that expired
+         */
+        id: z.string(),
+        /**
+         * Created at date. On wire it is a ISO 8601 date and time string.
+         */
+        createdAt: ISO8601DateSchema,
+        /**
+         * Updated at date. On wire it is a ISO 8601 date and time string.
+         */
+        updatedAt: ISO8601DateSchema,
+        /**
+         * Author address of the approval
+         */
+        author: HexSchema,
+        /**
+         * App address
+         */
+        app: HexSchema,
+        /**
+         * Expires at date. On wire it is a ISO 8601 date and time string.
+         */
+        expiresAt: ISO8601DateSchema,
+      }),
+    }),
+  })
+  .merge(EventV1Schema);
+
+export type ApprovalExpiredEvent = z.infer<typeof ApprovalExpiredEventSchema>;
+
+/**
  * Approval events schema.
  */
 export const ApprovalEventsSchema = z.union([
   ApprovalAddedEventSchema,
   ApprovalRemovedEventSchema,
+  ApprovalExpiredEventSchema,
 ]);

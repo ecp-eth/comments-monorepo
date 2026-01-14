@@ -9,6 +9,7 @@ import type {
 import type {
   ApprovalAddedEvent,
   ApprovalRemovedEvent,
+  ApprovalExpiredEvent,
   ApprovalEvent,
 } from "./approval/schemas.ts";
 import type {
@@ -31,6 +32,7 @@ export type Events =
   | ChannelTransferEvent
   | ApprovalAddedEvent
   | ApprovalRemovedEvent
+  | ApprovalExpiredEvent
   | CommentAddedEvent
   | CommentHookMetadataSetEvent
   | CommentDeletedEvent

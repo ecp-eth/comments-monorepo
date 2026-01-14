@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  version: 0.0.36
+  version: 0.0.37
   title: Indexer Restful API
 servers:
   - url: https://api.ethcomments.xyz
@@ -10959,6 +10959,7 @@ paths:
                     enum: &ref_18
                       - approval:added
                       - approval:removed
+                      - approval:expired
                       - channel:created
                       - channel:updated
                       - channel:hook:status:updated
@@ -12165,6 +12166,62 @@ paths:
                               - blockNumber
                               - logIndex
                               - txHash
+                              - uid
+                              - version
+                          - type: object
+                            properties:
+                              event:
+                                type: string
+                                enum:
+                                  - approval:expired
+                              chainId:
+                                type: integer
+                              data:
+                                type: object
+                                properties:
+                                  approval:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: string
+                                      createdAt:
+                                        type: string
+                                        format: date-time
+                                      updatedAt:
+                                        type: string
+                                        format: date-time
+                                      author:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      app:
+                                        type: string
+                                        description: >-
+                                          Hex format string, e.g.
+                                          `0x1234567890abcdef`
+                                      expiresAt:
+                                        type: string
+                                        format: date-time
+                                    required:
+                                      - id
+                                      - createdAt
+                                      - updatedAt
+                                      - author
+                                      - app
+                                      - expiresAt
+                                required:
+                                  - approval
+                              uid:
+                                type: string
+                              version:
+                                type: number
+                                enum:
+                                  - 1
+                            required:
+                              - event
+                              - chainId
+                              - data
                               - uid
                               - version
                           - type: object
