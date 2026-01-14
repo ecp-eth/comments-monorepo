@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.40
+
+### Patch Changes
+
+- a1f9f31: feat(sdk): add approval expired events
+
 ## 0.0.39
 
 ### Patch Changes

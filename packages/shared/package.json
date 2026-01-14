@@ -128,7 +128,7 @@
     "use-debounce": "^10.0.4"
   },
   "peerDependencies": {
-    "@ecp.eth/sdk": ">=0.0.39",
+    "@ecp.eth/sdk": ">=0.0.40",
     "@ecp.eth/shared-signer": ">=0.0.2",
     "@neynar/nodejs-sdk": "^2.13.1",
     "@rainbow-me/rainbowkit": "^2.2.5",

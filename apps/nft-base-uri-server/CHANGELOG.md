@@ -1,5 +1,12 @@
 # @ecp.eth/nft-base-uri-server
 
+## 0.1.25
+
+### Patch Changes
+
+- Updated dependencies [a1f9f31]
+  - @ecp.eth/sdk@0.0.40
+
 ## 0.1.24
 
 ### Patch Changes
