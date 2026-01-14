@@ -134,6 +134,13 @@
       "when": 1765898370652,
       "tag": "0018_lumpy_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1768376460238,
+      "tag": "0019_stormy_cerise",
+      "breakpoints": true
     }
   ]
 }
