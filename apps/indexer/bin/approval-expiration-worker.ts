@@ -43,10 +43,11 @@ if (options.waitForIndexer) {
 }
 
 async function findNewlyExpiredApprovals(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
   lastCheckedAt: Date,
   currentTime: Date,
 ) {
-  return db
+  return tx
     .select()
     .from(schema.approval)
     .where(
@@ -80,6 +81,7 @@ async function processApprovalExpirations() {
 
     // Find newly expired approvals
     const expiredApprovals = await findNewlyExpiredApprovals(
+      tx,
       lastCheckedAt,
       currentTime,
     );
