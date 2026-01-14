@@ -229,9 +229,88 @@ const ApprovalEventsSchema: ZodUnion<[ZodDiscriminatedUnion<"version", [ZodObjec
   txHash: `0x${string}`;
   uid: string;
   version: 1;
+}>, ZodObject<{
+  chainId: ZodNumber;
+  data: ZodObject<{
+     approval: ZodObject<{
+        app: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        author: ZodEffects<ZodString, `0x${(...)}`, `0x${(...)}`>;
+        createdAt: ZodEffects<ZodString, Date, string>;
+        expiresAt: ZodEffects<ZodString, Date, string>;
+        id: ZodString;
+        updatedAt: ZodEffects<ZodString, Date, string>;
+      }, "strip", ZodTypeAny, {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+      }, {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        expiresAt: string;
+        id: string;
+        updatedAt: string;
+     }>;
+   }, "strip", ZodTypeAny, {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+   }, {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        expiresAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  }>;
+  event: ZodLiteral<"approval:expired">;
+} & {
+  uid: ZodString;
+} & {
+  version: ZodLiteral<1>;
+}, "strip", ZodTypeAny, {
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:expired";
+  uid: string;
+  version: 1;
+}, {
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: string;
+        expiresAt: string;
+        id: string;
+        updatedAt: string;
+     };
+  };
+  event: "approval:expired";
+  uid: string;
+  version: 1;
 }>]>;
 ```
 
-Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:155](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L155)
+Defined in: [packages/sdk/src/indexer/webhooks/schemas/approval.ts:209](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/approval.ts#L209)
 
 Approval events schema.
