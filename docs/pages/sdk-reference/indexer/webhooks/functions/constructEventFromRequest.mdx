@@ -754,6 +754,22 @@ function constructEventFromRequest(options): Promise<
   version: 1;
 }
   | {
+  chainId: number;
+  data: {
+     approval: {
+        app: `0x${string}`;
+        author: `0x${string}`;
+        createdAt: Date;
+        expiresAt: Date;
+        id: string;
+        updatedAt: Date;
+     };
+  };
+  event: "approval:expired";
+  uid: string;
+  version: 1;
+}
+  | {
   appId: string;
   data: {
      message: string;
@@ -1530,6 +1546,22 @@ The request to construct the event from.
   `event`: `"approval:removed"`;
   `logIndex`: `number`;
   `txHash`: `` `0x${string}` ``;
+  `uid`: `string`;
+  `version`: `1`;
+\}
+  \| \{
+  `chainId`: `number`;
+  `data`: \{
+     `approval`: \{
+        `app`: `` `0x${string}` ``;
+        `author`: `` `0x${string}` ``;
+        `createdAt`: `Date`;
+        `expiresAt`: `Date`;
+        `id`: `string`;
+        `updatedAt`: `Date`;
+     \};
+  \};
+  `event`: `"approval:expired"`;
   `uid`: `string`;
   `version`: `1`;
 \}
