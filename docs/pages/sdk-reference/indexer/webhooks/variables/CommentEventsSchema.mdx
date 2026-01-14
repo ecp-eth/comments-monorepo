@@ -129,8 +129,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
         type: "reply";
         updatedAt: Date;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${(...)}`;
            amount: string;
@@ -141,7 +140,8 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
    }, {
      comment:   | {
         app: `0x${string}`;
@@ -179,8 +179,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
         type: "reply";
         updatedAt: string;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${(...)}`;
            amount: string;
@@ -191,7 +190,8 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   }>;
   event: ZodLiteral<"comment:added">;
 } & {
@@ -423,8 +423,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
         type: "reply";
         updatedAt: Date;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -435,7 +434,8 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   };
   event: "comment:added";
   logIndex: number;
@@ -662,8 +662,7 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
         type: "reply";
         updatedAt: string;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -674,7 +673,8 @@ const CommentEventsSchema: ZodDiscriminatedUnion<"event", [ZodObject<{
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   };
   event: "comment:added";
   logIndex: number;

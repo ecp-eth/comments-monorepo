@@ -1,8 +1,8 @@
 diff --git a/dist/index.js b/dist/index.js
-index fc7f634a8c499b1c8a62daa3d69e96a2e8e3786b..290f99a816044ee9366c55052578ac1a00ab7c5d 100644
+index 51df031744cf6bc40996f5c17abdde84a90244f1..f7e364ac0708e67731eaef9994a3ae444924ff4a 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -5870,6 +5870,13 @@ function WalletButton({
+@@ -5802,6 +5802,13 @@ function WalletButton({
        } else {
          window.location.href = mobileUri;
        }
@@ -10,8 +10,8 @@ index fc7f634a8c499b1c8a62daa3d69e96a2e8e3786b..290f99a816044ee9366c55052578ac1a
 +      if (window.parent) {
 +        window.parent.postMessage({
 +          type: "rainbowkit-wallet-button-mobile-clicked",
-+          uri: mobileUri
-+        }, "*");
++          uri: mobileUri,
++        }, '*');
 +      }
      };
      if (id !== "walletConnect") onMobileUri();

@@ -12,13 +12,13 @@ index b17e7f902ccc26f54c7fb7ae53f3c329b7aec3ae..3b9c1b684ab08b8016b72d6742f45547
   * Collector Trace Exporter for Node with protobuf
   */
 diff --git a/package.json b/package.json
-index f2775dd9e802f63b65ded3e8479dbdbb55075931..c483da497441c873a3b550bd52e7ae1549791571 100644
+index 088383273125fa611c0b3c314cfca8761a8055f3..302035be5cabea73165af78a55f3aebbb783b8a6 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/exporter-trace-otlp-proto",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
    "main": "build/src/index.js",

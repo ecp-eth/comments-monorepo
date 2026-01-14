@@ -28,7 +28,7 @@ type ConstructEventResult =
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -39,10 +39,10 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -53,13 +53,13 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -69,16 +69,16 @@ type ConstructEventResult =
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -152,7 +152,7 @@ type ConstructEventResult =
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -163,10 +163,10 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -177,13 +177,13 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -193,16 +193,16 @@ type ConstructEventResult =
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -258,8 +258,7 @@ type ConstructEventResult =
         type: "reply";
         updatedAt: Date;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -270,7 +269,8 @@ type ConstructEventResult =
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   };
   event: "comment:added";
   logIndex: number;
@@ -338,7 +338,7 @@ type ConstructEventResult =
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -349,10 +349,10 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -363,13 +363,13 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -379,16 +379,16 @@ type ConstructEventResult =
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
-              description: null | string;
+           opengraph:   | {
+              description: string | null;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -483,7 +483,7 @@ type ConstructEventResult =
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -494,10 +494,10 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -508,13 +508,13 @@ type ConstructEventResult =
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -524,16 +524,16 @@ type ConstructEventResult =
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
-              description: null | string;
+           opengraph:   | {
+              description: string | null;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -605,7 +605,7 @@ type ConstructEventResult =
         chainId: number;
         createdAt: Date;
         description: string;
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         metadata: {
            key: `0x${string}`;
@@ -648,7 +648,7 @@ type ConstructEventResult =
   chainId: number;
   data: {
      channel: {
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         updatedAt: Date;
      };
@@ -797,7 +797,7 @@ Defined in: [packages/sdk/src/indexer/webhooks/utils.ts:5](https://github.com/ec
 
 All events schema.
 
-## Type declaration
+## Type Declaration
 
 ```ts
 {
@@ -820,7 +820,7 @@ All events schema.
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -831,10 +831,10 @@ All events schema.
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -845,13 +845,13 @@ All events schema.
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -861,16 +861,16 @@ All events schema.
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -944,7 +944,7 @@ All events schema.
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -955,10 +955,10 @@ All events schema.
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -969,13 +969,13 @@ All events schema.
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -985,16 +985,16 @@ All events schema.
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -1050,8 +1050,7 @@ All events schema.
         type: "reply";
         updatedAt: Date;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -1062,7 +1061,8 @@ All events schema.
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   };
   event: "comment:added";
   logIndex: number;
@@ -1108,7 +1108,7 @@ data: {
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -1119,10 +1119,10 @@ data: {
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -1133,13 +1133,13 @@ data: {
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -1149,16 +1149,16 @@ data: {
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
+        opengraph:   | {
            description: ... | ...;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -1232,7 +1232,7 @@ data: {
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -1243,10 +1243,10 @@ data: {
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -1257,13 +1257,13 @@ data: {
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -1273,16 +1273,16 @@ data: {
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
+        opengraph:   | {
            description: ... | ...;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -1338,8 +1338,7 @@ data: {
      type: "reply";
      updatedAt: Date;
    };
-  zeroExSwap:   | null
-     | {
+  zeroExSwap:   | {
      from: {
         address: `0x${string}`;
         amount: string;
@@ -1350,7 +1349,8 @@ data: {
         amount: string;
         symbol: string;
      };
-   };
+   }
+     | null;
 };
 ```
 
@@ -1376,7 +1376,7 @@ comment:
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -1387,10 +1387,10 @@ comment:
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -1401,13 +1401,13 @@ comment:
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -1417,16 +1417,16 @@ comment:
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
+     opengraph:   | {
         description: ... | ...;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -1500,7 +1500,7 @@ comment:
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -1511,10 +1511,10 @@ comment:
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -1525,13 +1525,13 @@ comment:
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -1541,16 +1541,16 @@ comment:
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
+     opengraph:   | {
         description: ... | ...;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -1610,7 +1610,7 @@ comment:
 
 Comment data
 
-##### Type declaration
+##### Type Declaration
 
 ```ts
 {
@@ -1629,7 +1629,7 @@ Comment data
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -1640,10 +1640,10 @@ Comment data
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -1654,13 +1654,13 @@ Comment data
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -1670,16 +1670,16 @@ Comment data
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
+     opengraph:   | {
         description: ... | ...;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -1756,7 +1756,7 @@ Comment data
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -1767,10 +1767,10 @@ Comment data
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -1781,13 +1781,13 @@ Comment data
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -1797,16 +1797,16 @@ Comment data
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
+     opengraph:   | {
         description: ... | ...;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -1868,7 +1868,6 @@ Comment data
 
 ```ts
 zeroExSwap: 
-  | null
   | {
   from: {
      address: `0x${string}`;
@@ -1880,7 +1879,8 @@ zeroExSwap:
      amount: string;
      symbol: string;
   };
-};
+}
+  | null;
 ```
 
 ZeroEx swap data
@@ -2252,7 +2252,7 @@ Version of the event
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -2263,10 +2263,10 @@ Version of the event
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -2277,13 +2277,13 @@ Version of the event
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -2293,16 +2293,16 @@ Version of the event
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
-              description: null | string;
+           opengraph:   | {
+              description: string | null;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -2396,7 +2396,7 @@ data: {
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -2407,10 +2407,10 @@ data: {
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -2421,13 +2421,13 @@ data: {
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -2437,16 +2437,16 @@ data: {
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
-           description: null | string;
+        opengraph:   | {
+           description: string | null;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -2519,7 +2519,7 @@ comment: {
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -2530,10 +2530,10 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -2544,13 +2544,13 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -2560,16 +2560,16 @@ comment: {
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
-        description: null | string;
+     opengraph:   | {
+        description: string | null;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -2661,7 +2661,7 @@ Moderation status of the comment
 references: (
   | {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   position: {
      end: number;
@@ -2672,10 +2672,10 @@ references: (
 }
   | {
   address: `0x${string}`;
-  displayName: null | string;
+  displayName: string | null;
   fid: number;
   fname: string;
-  pfpUrl: null | string;
+  pfpUrl: string | null;
   position: {
      end: number;
      start: number;
@@ -2686,13 +2686,13 @@ references: (
 }
   | {
   address: `0x${string}`;
-  chainId: null | number;
+  chainId: number | null;
   chains: {
      caip: string;
      chainId: number;
   }[];
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   position: {
      end: number;
@@ -2702,16 +2702,16 @@ references: (
   type: "erc20";
 }
   | {
-  description: null | string;
-  favicon: null | string;
+  description: string | null;
+  favicon: string | null;
   mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
+  opengraph:   | {
+     description: string | null;
      image: string;
      title: string;
      url: string;
-   };
+   }
+     | null;
   position: {
      end: number;
      start: number;
@@ -2997,7 +2997,7 @@ Version of the event
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -3008,10 +3008,10 @@ Version of the event
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -3022,13 +3022,13 @@ Version of the event
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -3038,16 +3038,16 @@ Version of the event
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
-              description: null | string;
+           opengraph:   | {
+              description: string | null;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -3122,7 +3122,7 @@ data: {
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -3133,10 +3133,10 @@ data: {
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -3147,13 +3147,13 @@ data: {
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -3163,16 +3163,16 @@ data: {
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
-           description: null | string;
+        opengraph:   | {
+           description: string | null;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -3242,7 +3242,7 @@ comment: {
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -3253,10 +3253,10 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -3267,13 +3267,13 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -3283,16 +3283,16 @@ comment: {
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
-        description: null | string;
+     opengraph:   | {
+        description: string | null;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -3365,7 +3365,7 @@ id: `0x${string}` = HexSchema;
 references: (
   | {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   position: {
      end: number;
@@ -3376,10 +3376,10 @@ references: (
 }
   | {
   address: `0x${string}`;
-  displayName: null | string;
+  displayName: string | null;
   fid: number;
   fname: string;
-  pfpUrl: null | string;
+  pfpUrl: string | null;
   position: {
      end: number;
      start: number;
@@ -3390,13 +3390,13 @@ references: (
 }
   | {
   address: `0x${string}`;
-  chainId: null | number;
+  chainId: number | null;
   chains: {
      caip: string;
      chainId: number;
   }[];
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   position: {
      end: number;
@@ -3406,16 +3406,16 @@ references: (
   type: "erc20";
 }
   | {
-  description: null | string;
-  favicon: null | string;
+  description: string | null;
+  favicon: string | null;
   mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
+  opengraph:   | {
+     description: string | null;
      image: string;
      title: string;
      url: string;
-   };
+   }
+     | null;
   position: {
      end: number;
      start: number;
@@ -3517,7 +3517,7 @@ Version of the event
         chainId: number;
         createdAt: Date;
         description: string;
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         metadata: {
            key: `0x${string}`;
@@ -3560,7 +3560,7 @@ data: {
      chainId: number;
      createdAt: Date;
      description: string;
-     hook: null | `0x${string}`;
+     hook: `0x${string}` | null;
      id: bigint;
      metadata: {
         key: `0x${string}`;
@@ -3582,7 +3582,7 @@ channel: {
   chainId: number;
   createdAt: Date;
   description: string;
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: bigint;
   metadata: {
      key: `0x${string}`;
@@ -3621,7 +3621,7 @@ Description of the channel
 #### data.channel.hook
 
 ```ts
-hook: null | `0x${string}`;
+hook: `0x${string}` | null;
 ```
 
 Hook address
@@ -3876,7 +3876,7 @@ Version of the event
   chainId: number;
   data: {
      channel: {
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         updatedAt: Date;
      };
@@ -3914,7 +3914,7 @@ Chain ID
 ```ts
 data: {
   channel: {
-     hook: null | `0x${string}`;
+     hook: `0x${string}` | null;
      id: bigint;
      updatedAt: Date;
   };
@@ -3931,7 +3931,7 @@ Data of the event
 
 ```ts
 channel: {
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: bigint;
   updatedAt: Date;
 };
@@ -3942,7 +3942,7 @@ Updated channel data
 #### data.channel.hook
 
 ```ts
-hook: null | `0x${string}`;
+hook: `0x${string}` | null;
 ```
 
 Hook address

@@ -10,7 +10,7 @@
 type IndexerAPIAutocompleteSchemaType = 
   | {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   type: "ens";
   url: string;
@@ -21,7 +21,7 @@ type IndexerAPIAutocompleteSchemaType =
   caip19: string;
   chainId: number;
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   symbol: string;
   type: "erc20";
@@ -29,10 +29,10 @@ type IndexerAPIAutocompleteSchemaType =
 }
   | {
   address: `0x${string}`;
-  displayName?: null | string;
+  displayName?: string | null;
   fid: number;
   fname: string;
-  pfpUrl?: null | string;
+  pfpUrl?: string | null;
   type: "farcaster";
   url: string;
   username: string;

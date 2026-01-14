@@ -24,7 +24,7 @@ function fetchComments(options): Promise<{
      author: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -40,13 +40,13 @@ function fetchComments(options): Promise<{
      content: string;
      createdAt: Date;
      cursor: `0x${string}`;
-     deletedAt: null | Date;
+     deletedAt: Date | null;
      hookMetadata: {
         key: `0x${string}`;
         value: `0x${string}`;
      }[];
      id: `0x${string}`;
-     logIndex: null | number;
+     logIndex: number | null;
      metadata: {
         key: `0x${string}`;
         value: `0x${string}`;
@@ -55,13 +55,13 @@ function fetchComments(options): Promise<{
      moderationClassifierScore: number;
      moderationStatus: "approved" | "pending" | "rejected";
      moderationStatusChangedAt: Date;
-     parentId: null | `0x${string}`;
+     parentId: `0x${string}` | null;
      path: string;
      reactionCounts: Record<string, number>;
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -72,10 +72,10 @@ function fetchComments(options): Promise<{
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -86,13 +86,13 @@ function fetchComments(options): Promise<{
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -102,16 +102,16 @@ function fetchComments(options): Promise<{
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
-           description: null | string;
+        opengraph:   | {
+           description: string | null;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -187,8 +187,7 @@ function fetchComments(options): Promise<{
      txHash: `0x${string}`;
      updatedAt: Date;
      viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -199,7 +198,8 @@ function fetchComments(options): Promise<{
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   }[];
 }>;
 ```
@@ -233,7 +233,7 @@ Fetch comments from the Indexer API
      `author`: \{
         `address`: `` `0x${string}` ``;
         `ens?`: \{
-           `avatarUrl`: `null` \| `string`;
+           `avatarUrl`: `string` \| `null`;
            `name`: `string`;
         \};
         `farcaster?`: \{
@@ -249,13 +249,13 @@ Fetch comments from the Indexer API
      `content`: `string`;
      `createdAt`: `Date`;
      `cursor`: `` `0x${string}` ``;
-     `deletedAt`: `null` \| `Date`;
+     `deletedAt`: `Date` \| `null`;
      `hookMetadata`: \{
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
      \}[];
      `id`: `` `0x${string}` ``;
-     `logIndex`: `null` \| `number`;
+     `logIndex`: `number` \| `null`;
      `metadata`: \{
         `key`: `` `0x${string}` ``;
         `value`: `` `0x${string}` ``;
@@ -264,13 +264,13 @@ Fetch comments from the Indexer API
      `moderationClassifierScore`: `number`;
      `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
      `moderationStatusChangedAt`: `Date`;
-     `parentId`: `null` \| `` `0x${string}` ``;
+     `parentId`: `` `0x${string}` `` \| `null`;
      `path`: `string`;
      `reactionCounts`: `Record`\<`string`, `number`\>;
      `references`: (
         \| \{
         `address`: `` `0x${string}` ``;
-        `avatarUrl`: `null` \| `string`;
+        `avatarUrl`: `string` \| `null`;
         `name`: `string`;
         `position`: \{
            `end`: `number`;
@@ -281,10 +281,10 @@ Fetch comments from the Indexer API
       \}
         \| \{
         `address`: `` `0x${string}` ``;
-        `displayName`: `null` \| `string`;
+        `displayName`: `string` \| `null`;
         `fid`: `number`;
         `fname`: `string`;
-        `pfpUrl`: `null` \| `string`;
+        `pfpUrl`: `string` \| `null`;
         `position`: \{
            `end`: `number`;
            `start`: `number`;
@@ -295,13 +295,13 @@ Fetch comments from the Indexer API
       \}
         \| \{
         `address`: `` `0x${string}` ``;
-        `chainId`: `null` \| `number`;
+        `chainId`: `number` \| `null`;
         `chains`: \{
            `caip`: `string`;
            `chainId`: `number`;
         \}[];
         `decimals`: `number`;
-        `logoURI`: `null` \| `string`;
+        `logoURI`: `string` \| `null`;
         `name`: `string`;
         `position`: \{
            `end`: `number`;
@@ -311,16 +311,16 @@ Fetch comments from the Indexer API
         `type`: `"erc20"`;
       \}
         \| \{
-        `description`: `null` \| `string`;
-        `favicon`: `null` \| `string`;
+        `description`: `string` \| `null`;
+        `favicon`: `string` \| `null`;
         `mediaType`: `string`;
-        `opengraph`:   \| `null`
-           \| \{
-           `description`: `null` \| `string`;
+        `opengraph`:   \| \{
+           `description`: `string` \| `null`;
            `image`: `string`;
            `title`: `string`;
            `url`: `string`;
-         \};
+         \}
+           \| `null`;
         `position`: \{
            `end`: `number`;
            `start`: `number`;
@@ -396,8 +396,7 @@ Fetch comments from the Indexer API
      `txHash`: `` `0x${string}` ``;
      `updatedAt`: `Date`;
      `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-     `zeroExSwap`:   \| `null`
-        \| \{
+     `zeroExSwap`:   \| \{
         `from`: \{
            `address`: `` `0x${string}` ``;
            `amount`: `string`;
@@ -408,7 +407,8 @@ Fetch comments from the Indexer API
            `amount`: `string`;
            `symbol`: `string`;
         \};
-      \};
+      \}
+        \| `null`;
   \}[];
 \}\>
 

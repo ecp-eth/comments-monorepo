@@ -19,7 +19,7 @@ type IndexerAPIListChannelsSchemaType = {
      chainId: number;
      createdAt: Date;
      description: string;
-     hook: null | `0x${string}`;
+     hook: `0x${string}` | null;
      id: bigint;
      metadata: {
         key: `0x${string}`;
@@ -34,7 +34,7 @@ type IndexerAPIListChannelsSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:100](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L100)
 
-## Type declaration
+## Type Declaration
 
 ### pagination
 
@@ -85,7 +85,7 @@ results: {
   chainId: number;
   createdAt: Date;
   description: string;
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: bigint;
   metadata: {
      key: `0x${string}`;

@@ -12,13 +12,13 @@ index 8f6facfad17fb72e738514cb16c5759b01c03990..be7890d9f4c5ab53edd18ec1d89c3201
   * OTLP Log Protobuf Exporter for Node.js
   */
 diff --git a/package.json b/package.json
-index 5db42e6d6cbc18ed9f1d4c9918779ccef4f33cae..b76f4babe43a24137770f24094399052c378a86e 100644
+index a6c09704d1b7186edb69ff4a821a125a446070be..417f5f4761dfad82b944bca2147e7ee570931ccf 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/exporter-logs-otlp-proto",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "An OTLP exporter to send logs using protobuf over HTTP",
    "main": "build/src/index.js",

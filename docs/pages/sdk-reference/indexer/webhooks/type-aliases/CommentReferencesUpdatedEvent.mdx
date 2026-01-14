@@ -14,7 +14,7 @@ type CommentReferencesUpdatedEvent = {
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -25,10 +25,10 @@ type CommentReferencesUpdatedEvent = {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -39,13 +39,13 @@ type CommentReferencesUpdatedEvent = {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -55,16 +55,16 @@ type CommentReferencesUpdatedEvent = {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
-              description: null | string;
+           opengraph:   | {
+              description: string | null;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -132,7 +132,7 @@ type CommentReferencesUpdatedEvent = {
 
 Defined in: [packages/sdk/src/indexer/webhooks/schemas/comment.ts:340](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/webhooks/schemas/comment.ts#L340)
 
-## Type declaration
+## Type Declaration
 
 ### data
 
@@ -143,7 +143,7 @@ data: {
      references: (
         | {
         address: `0x${string}`;
-        avatarUrl: null | string;
+        avatarUrl: string | null;
         name: string;
         position: {
            end: number;
@@ -154,10 +154,10 @@ data: {
       }
         | {
         address: `0x${string}`;
-        displayName: null | string;
+        displayName: string | null;
         fid: number;
         fname: string;
-        pfpUrl: null | string;
+        pfpUrl: string | null;
         position: {
            end: number;
            start: number;
@@ -168,13 +168,13 @@ data: {
       }
         | {
         address: `0x${string}`;
-        chainId: null | number;
+        chainId: number | null;
         chains: {
            caip: string;
            chainId: number;
         }[];
         decimals: number;
-        logoURI: null | string;
+        logoURI: string | null;
         name: string;
         position: {
            end: number;
@@ -184,16 +184,16 @@ data: {
         type: "erc20";
       }
         | {
-        description: null | string;
-        favicon: null | string;
+        description: string | null;
+        favicon: string | null;
         mediaType: string;
-        opengraph:   | null
-           | {
-           description: null | string;
+        opengraph:   | {
+           description: string | null;
            image: string;
            title: string;
            url: string;
-         };
+         }
+           | null;
         position: {
            end: number;
            start: number;
@@ -263,7 +263,7 @@ comment: {
   references: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      position: {
         end: number;
@@ -274,10 +274,10 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     displayName: null | string;
+     displayName: string | null;
      fid: number;
      fname: string;
-     pfpUrl: null | string;
+     pfpUrl: string | null;
      position: {
         end: number;
         start: number;
@@ -288,13 +288,13 @@ comment: {
    }
      | {
      address: `0x${string}`;
-     chainId: null | number;
+     chainId: number | null;
      chains: {
         caip: string;
         chainId: number;
      }[];
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      position: {
         end: number;
@@ -304,16 +304,16 @@ comment: {
      type: "erc20";
    }
      | {
-     description: null | string;
-     favicon: null | string;
+     description: string | null;
+     favicon: string | null;
      mediaType: string;
-     opengraph:   | null
-        | {
-        description: null | string;
+     opengraph:   | {
+        description: string | null;
         image: string;
         title: string;
         url: string;
-      };
+      }
+        | null;
      position: {
         end: number;
         start: number;
@@ -386,7 +386,7 @@ id: `0x${string}` = HexSchema;
 references: (
   | {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   position: {
      end: number;
@@ -397,10 +397,10 @@ references: (
 }
   | {
   address: `0x${string}`;
-  displayName: null | string;
+  displayName: string | null;
   fid: number;
   fname: string;
-  pfpUrl: null | string;
+  pfpUrl: string | null;
   position: {
      end: number;
      start: number;
@@ -411,13 +411,13 @@ references: (
 }
   | {
   address: `0x${string}`;
-  chainId: null | number;
+  chainId: number | null;
   chains: {
      caip: string;
      chainId: number;
   }[];
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   position: {
      end: number;
@@ -427,16 +427,16 @@ references: (
   type: "erc20";
 }
   | {
-  description: null | string;
-  favicon: null | string;
+  description: string | null;
+  favicon: string | null;
   mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
+  opengraph:   | {
+     description: string | null;
      image: string;
      title: string;
      url: string;
-   };
+   }
+     | null;
   position: {
      end: number;
      start: number;

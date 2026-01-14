@@ -11,7 +11,7 @@ type IndexerAPIChannelSchemaType = {
   chainId: number;
   createdAt: Date;
   description: string;
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: bigint;
   metadata: {
      key: `0x${string}`;
@@ -25,7 +25,7 @@ type IndexerAPIChannelSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:81](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L81)
 
-## Type declaration
+## Type Declaration
 
 ### chainId
 
@@ -48,7 +48,7 @@ description: string;
 ### hook
 
 ```ts
-hook: null | `0x${string}`;
+hook: `0x${string}` | null;
 ```
 
 ### id

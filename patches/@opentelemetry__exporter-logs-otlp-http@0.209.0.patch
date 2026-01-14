@@ -12,7 +12,7 @@ index 0d5ba863297f50ed0b5b16cad0e20fa6e539ed0b..9c6a6857129cafd7c28948c197dea474
   * Collector Logs Exporter for Node
   */
 diff --git a/package.json b/package.json
-index 1faf753c3d089d9b0220d1db854548e1b07a7a82..b3254c43117b38297ebe7aea95fc1575ea0da3c5 100644
+index df589cd620ef10cf7853b0030edc7baaa86058b6..264b84753f62422058bd9712d54ce4729bc96a29 100644
 --- a/package.json
 +++ b/package.json
 @@ -4,6 +4,7 @@

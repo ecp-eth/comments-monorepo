@@ -10,7 +10,7 @@
 type IndexerAPIAuthorDataSchemaType = {
   address: `0x${string}`;
   ens?: {
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
   };
   farcaster?: {
@@ -24,7 +24,7 @@ type IndexerAPIAuthorDataSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:140](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L140)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -36,7 +36,7 @@ address: `0x${string}` = HexSchema;
 
 ```ts
 optional ens: {
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
 };
 ```
@@ -44,7 +44,7 @@ optional ens: {
 #### ens.avatarUrl
 
 ```ts
-avatarUrl: null | string;
+avatarUrl: string | null;
 ```
 
 #### ens.name

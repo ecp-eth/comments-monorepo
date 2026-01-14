@@ -18,7 +18,7 @@ type IndexerAPIListNotificationsSchemaType = {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -33,7 +33,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -49,13 +49,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -64,13 +64,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -81,10 +81,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -95,13 +95,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -111,16 +111,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -190,8 +190,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -202,7 +201,8 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -211,7 +211,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -227,13 +227,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -242,13 +242,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -259,10 +259,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -273,13 +273,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -289,16 +289,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -368,8 +368,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -380,10 +379,11 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "reply";
       }
         | {
@@ -391,7 +391,7 @@ type IndexerAPIListNotificationsSchemaType = {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -406,7 +406,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -422,13 +422,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -437,13 +437,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -454,10 +454,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -468,13 +468,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -484,16 +484,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -563,8 +563,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -575,14 +574,15 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
         mentionedUser: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -593,7 +593,7 @@ type IndexerAPIListNotificationsSchemaType = {
            };
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "mention";
       }
         | {
@@ -601,7 +601,7 @@ type IndexerAPIListNotificationsSchemaType = {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -616,7 +616,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -632,13 +632,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -647,13 +647,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -664,10 +664,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -678,13 +678,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -694,16 +694,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -773,8 +773,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -785,7 +784,8 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -794,7 +794,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -810,13 +810,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -825,13 +825,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -842,10 +842,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -856,13 +856,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -872,16 +872,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -951,8 +951,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -963,10 +962,11 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "reaction";
       }
         | {
@@ -974,7 +974,7 @@ type IndexerAPIListNotificationsSchemaType = {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -989,7 +989,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -1005,13 +1005,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -1020,13 +1020,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -1037,10 +1037,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -1051,13 +1051,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -1067,16 +1067,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -1146,8 +1146,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -1158,7 +1157,8 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -1167,7 +1167,7 @@ type IndexerAPIListNotificationsSchemaType = {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -1183,13 +1183,13 @@ type IndexerAPIListNotificationsSchemaType = {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -1198,13 +1198,13 @@ type IndexerAPIListNotificationsSchemaType = {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -1215,10 +1215,10 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -1229,13 +1229,13 @@ type IndexerAPIListNotificationsSchemaType = {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -1245,16 +1245,16 @@ type IndexerAPIListNotificationsSchemaType = {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -1324,8 +1324,7 @@ type IndexerAPIListNotificationsSchemaType = {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -1336,10 +1335,11 @@ type IndexerAPIListNotificationsSchemaType = {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "quote";
       };
   }[];
@@ -1356,7 +1356,7 @@ Defined in: [packages/sdk/src/indexer/schemas.ts:857](https://github.com/ecp-eth
 
 The list notifications schema returned by fetchNotifications()
 
-## Type declaration
+## Type Declaration
 
 ### extra
 
@@ -1382,7 +1382,7 @@ notifications: {
      author: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -1397,7 +1397,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -1413,13 +1413,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -1428,13 +1428,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -1445,10 +1445,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -1459,13 +1459,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -1475,16 +1475,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -1554,8 +1554,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -1566,7 +1565,8 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      createdAt: Date;
      id: bigint;
@@ -1575,7 +1575,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -1591,13 +1591,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -1606,13 +1606,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -1623,10 +1623,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -1637,13 +1637,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -1653,16 +1653,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -1732,8 +1732,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -1744,10 +1743,11 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      seen: boolean;
-     seenAt: null | Date;
+     seenAt: Date | null;
      type: "reply";
    }
      | {
@@ -1755,7 +1755,7 @@ notifications: {
      author: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -1770,7 +1770,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -1786,13 +1786,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -1801,13 +1801,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -1818,10 +1818,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -1832,13 +1832,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -1848,16 +1848,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -1927,8 +1927,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -1939,14 +1938,15 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      createdAt: Date;
      id: bigint;
      mentionedUser: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -1957,7 +1957,7 @@ notifications: {
         };
      };
      seen: boolean;
-     seenAt: null | Date;
+     seenAt: Date | null;
      type: "mention";
    }
      | {
@@ -1965,7 +1965,7 @@ notifications: {
      author: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -1980,7 +1980,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -1996,13 +1996,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -2011,13 +2011,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -2028,10 +2028,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -2042,13 +2042,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -2058,16 +2058,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -2137,8 +2137,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -2149,7 +2148,8 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      createdAt: Date;
      id: bigint;
@@ -2158,7 +2158,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -2174,13 +2174,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -2189,13 +2189,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -2206,10 +2206,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -2220,13 +2220,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -2236,16 +2236,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -2315,8 +2315,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -2327,10 +2326,11 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      seen: boolean;
-     seenAt: null | Date;
+     seenAt: Date | null;
      type: "reaction";
    }
      | {
@@ -2338,7 +2338,7 @@ notifications: {
      author: {
         address: `0x${string}`;
         ens?: {
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
         };
         farcaster?: {
@@ -2353,7 +2353,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -2369,13 +2369,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -2384,13 +2384,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -2401,10 +2401,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -2415,13 +2415,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -2431,16 +2431,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -2510,8 +2510,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -2522,7 +2521,8 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      createdAt: Date;
      id: bigint;
@@ -2531,7 +2531,7 @@ notifications: {
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -2547,13 +2547,13 @@ notifications: {
         content: string;
         createdAt: Date;
         cursor: `0x${string}`;
-        deletedAt: null | Date;
+        deletedAt: Date | null;
         hookMetadata: {
            key: `0x${string}`;
            value: `0x${string}`;
         }[];
         id: `0x${string}`;
-        logIndex: null | number;
+        logIndex: number | null;
         metadata: {
            key: `0x${string}`;
            value: `0x${string}`;
@@ -2562,13 +2562,13 @@ notifications: {
         moderationClassifierScore: number;
         moderationStatus: "approved" | "pending" | "rejected";
         moderationStatusChangedAt: Date;
-        parentId: null | `0x${string}`;
+        parentId: `0x${string}` | null;
         path: string;
         reactionCounts: Record<string, number>;
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -2579,10 +2579,10 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -2593,13 +2593,13 @@ notifications: {
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -2609,16 +2609,16 @@ notifications: {
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -2688,8 +2688,7 @@ notifications: {
         txHash: `0x${string}`;
         updatedAt: Date;
         viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-        zeroExSwap:   | null
-           | {
+        zeroExSwap:   | {
            from: {
               address: `0x${string}`;
               amount: string;
@@ -2700,10 +2699,11 @@ notifications: {
               amount: string;
               symbol: string;
            };
-         };
+         }
+           | null;
      };
      seen: boolean;
-     seenAt: null | Date;
+     seenAt: Date | null;
      type: "quote";
    };
 }[];

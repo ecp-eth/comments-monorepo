@@ -9,13 +9,13 @@
 ```ts
 type IndexerAPICommentReferenceERC20SchemaType = {
   address: `0x${string}`;
-  chainId: null | number;
+  chainId: number | null;
   chains: {
      caip: string;
      chainId: number;
   }[];
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   position: {
      end: number;
@@ -28,7 +28,7 @@ type IndexerAPICommentReferenceERC20SchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:250](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L250)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -39,7 +39,7 @@ address: `0x${string}` = HexSchema;
 ### chainId
 
 ```ts
-chainId: null | number;
+chainId: number | null;
 ```
 
 ### chains
@@ -60,7 +60,7 @@ decimals: number;
 ### logoURI
 
 ```ts
-logoURI: null | string;
+logoURI: string | null;
 ```
 
 ### name

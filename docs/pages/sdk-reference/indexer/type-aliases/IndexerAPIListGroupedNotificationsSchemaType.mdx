@@ -21,7 +21,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               author: {
                  address: `0x${string}`;
                  ens?: {
-                    avatarUrl: null | string;
+                    avatarUrl: string | null;
                     name: string;
                  };
                  farcaster?: {
@@ -37,13 +37,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: `0x${string}`;
                  value: `0x${string}`;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: `0x${string}`;
                  value: `0x${string}`;
@@ -52,13 +52,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${string}`;
+              parentId: `0x${string}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (
                  | {
                  address: `0x${string}`;
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
                  position: {
                     end: number;
@@ -69,10 +69,10 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                }
                  | {
                  address: `0x${string}`;
-                 displayName: null | string;
+                 displayName: string | null;
                  fid: number;
                  fname: string;
-                 pfpUrl: null | string;
+                 pfpUrl: string | null;
                  position: {
                     end: number;
                     start: number;
@@ -83,13 +83,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                }
                  | {
                  address: `0x${string}`;
-                 chainId: null | number;
+                 chainId: number | null;
                  chains: {
                     caip: ...;
                     chainId: ...;
                  }[];
                  decimals: number;
-                 logoURI: null | string;
+                 logoURI: string | null;
                  name: string;
                  position: {
                     end: number;
@@ -99,16 +99,16 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  type: "erc20";
                }
                  | {
-                 description: null | string;
-                 favicon: null | string;
+                 description: string | null;
+                 favicon: string | null;
                  mediaType: string;
-                 opengraph:   | null
-                    | {
+                 opengraph:   | {
                     description: ...;
                     image: ...;
                     title: ...;
                     url: ...;
-                  };
+                  }
+                    | null;
                  position: {
                     end: number;
                     start: number;
@@ -178,8 +178,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: {
                     address: `0x${string}`;
                     amount: string;
@@ -190,7 +189,8 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                     amount: string;
                     symbol: string;
                  };
-               };
+               }
+                 | null;
            };
            type: "comment";
         };
@@ -229,13 +229,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -244,7 +244,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -268,11 +268,11 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               createdAt: Date;
               id: bigint;
@@ -289,13 +289,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -304,7 +304,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -328,14 +328,14 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               seen: boolean;
-              seenAt: null | Date;
+              seenAt: Date | null;
               type: "reply";
             }
               | {
@@ -366,13 +366,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -381,7 +381,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -405,11 +405,11 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               createdAt: Date;
               id: bigint;
@@ -427,7 +427,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  };
               };
               seen: boolean;
-              seenAt: null | Date;
+              seenAt: Date | null;
               type: "mention";
             }
               | {
@@ -458,13 +458,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -473,7 +473,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -497,11 +497,11 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               createdAt: Date;
               id: bigint;
@@ -518,13 +518,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -533,7 +533,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -557,14 +557,14 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               seen: boolean;
-              seenAt: null | Date;
+              seenAt: Date | null;
               type: "reaction";
             }
               | {
@@ -595,13 +595,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -610,7 +610,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -634,11 +634,11 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               createdAt: Date;
               id: bigint;
@@ -655,13 +655,13 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  content: string;
                  createdAt: Date;
                  cursor: `0x${string}`;
-                 deletedAt: null | Date;
+                 deletedAt: Date | null;
                  hookMetadata: {
                     key: ...;
                     value: ...;
                  }[];
                  id: `0x${string}`;
-                 logIndex: null | number;
+                 logIndex: number | null;
                  metadata: {
                     key: ...;
                     value: ...;
@@ -670,7 +670,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  moderationClassifierScore: number;
                  moderationStatus: "approved" | "pending" | "rejected";
                  moderationStatusChangedAt: Date;
-                 parentId: null | `0x${(...)}`;
+                 parentId: `0x${(...)}` | null;
                  path: string;
                  reactionCounts: Record<string, number>;
                  references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -694,14 +694,14 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
                  txHash: `0x${string}`;
                  updatedAt: Date;
                  viewerReactions: Record<string, ...[]>;
-                 zeroExSwap:   | null
-                    | {
+                 zeroExSwap:   | {
                     from: ...;
                     to: ...;
-                  };
+                  }
+                    | null;
               };
               seen: boolean;
-              seenAt: null | Date;
+              seenAt: Date | null;
               type: "quote";
             };
         }[];
@@ -726,7 +726,7 @@ Defined in: [packages/sdk/src/indexer/schemas.ts:889](https://github.com/ecp-eth
 
 The list grouped notifications schema returned by fetchGroupedNotifications()
 
-## Type declaration
+## Type Declaration
 
 ### extra
 
@@ -755,7 +755,7 @@ notifications: {
            author: {
               address: `0x${string}`;
               ens?: {
-                 avatarUrl: null | string;
+                 avatarUrl: string | null;
                  name: string;
               };
               farcaster?: {
@@ -771,13 +771,13 @@ notifications: {
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -786,13 +786,13 @@ notifications: {
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
               | {
               address: `0x${string}`;
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
               position: {
                  end: number;
@@ -803,10 +803,10 @@ notifications: {
             }
               | {
               address: `0x${string}`;
-              displayName: null | string;
+              displayName: string | null;
               fid: number;
               fname: string;
-              pfpUrl: null | string;
+              pfpUrl: string | null;
               position: {
                  end: number;
                  start: number;
@@ -817,13 +817,13 @@ notifications: {
             }
               | {
               address: `0x${string}`;
-              chainId: null | number;
+              chainId: number | null;
               chains: {
                  caip: ...;
                  chainId: ...;
               }[];
               decimals: number;
-              logoURI: null | string;
+              logoURI: string | null;
               name: string;
               position: {
                  end: number;
@@ -833,16 +833,16 @@ notifications: {
               type: "erc20";
             }
               | {
-              description: null | string;
-              favicon: null | string;
+              description: string | null;
+              favicon: string | null;
               mediaType: string;
-              opengraph:   | null
-                 | {
+              opengraph:   | {
                  description: ...;
                  image: ...;
                  title: ...;
                  url: ...;
-               };
+               }
+                 | null;
               position: {
                  end: number;
                  start: number;
@@ -912,8 +912,7 @@ notifications: {
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${string}`;
                  amount: string;
@@ -924,7 +923,8 @@ notifications: {
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         type: "comment";
      };
@@ -963,13 +963,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -978,7 +978,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1002,11 +1002,11 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            createdAt: Date;
            id: bigint;
@@ -1023,13 +1023,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1038,7 +1038,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1062,14 +1062,14 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            seen: boolean;
-           seenAt: null | Date;
+           seenAt: Date | null;
            type: "reply";
          }
            | {
@@ -1100,13 +1100,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1115,7 +1115,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1139,11 +1139,11 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            createdAt: Date;
            id: bigint;
@@ -1161,7 +1161,7 @@ notifications: {
               };
            };
            seen: boolean;
-           seenAt: null | Date;
+           seenAt: Date | null;
            type: "mention";
          }
            | {
@@ -1192,13 +1192,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1207,7 +1207,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1231,11 +1231,11 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            createdAt: Date;
            id: bigint;
@@ -1252,13 +1252,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1267,7 +1267,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1291,14 +1291,14 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            seen: boolean;
-           seenAt: null | Date;
+           seenAt: Date | null;
            type: "reaction";
          }
            | {
@@ -1329,13 +1329,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1344,7 +1344,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1368,11 +1368,11 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            createdAt: Date;
            id: bigint;
@@ -1389,13 +1389,13 @@ notifications: {
               content: string;
               createdAt: Date;
               cursor: `0x${string}`;
-              deletedAt: null | Date;
+              deletedAt: Date | null;
               hookMetadata: {
                  key: ...;
                  value: ...;
               }[];
               id: `0x${string}`;
-              logIndex: null | number;
+              logIndex: number | null;
               metadata: {
                  key: ...;
                  value: ...;
@@ -1404,7 +1404,7 @@ notifications: {
               moderationClassifierScore: number;
               moderationStatus: "approved" | "pending" | "rejected";
               moderationStatusChangedAt: Date;
-              parentId: null | `0x${(...)}`;
+              parentId: `0x${(...)}` | null;
               path: string;
               reactionCounts: Record<string, number>;
               references: (... | ... | ... | ... | ... | ... | ... | ...)[];
@@ -1428,14 +1428,14 @@ notifications: {
               txHash: `0x${string}`;
               updatedAt: Date;
               viewerReactions: Record<string, ...[]>;
-              zeroExSwap:   | null
-                 | {
+              zeroExSwap:   | {
                  from: ...;
                  to: ...;
-               };
+               }
+                 | null;
            };
            seen: boolean;
-           seenAt: null | Date;
+           seenAt: Date | null;
            type: "quote";
          };
      }[];

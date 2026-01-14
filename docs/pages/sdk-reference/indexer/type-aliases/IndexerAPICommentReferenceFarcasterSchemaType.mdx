@@ -9,10 +9,10 @@
 ```ts
 type IndexerAPICommentReferenceFarcasterSchemaType = {
   address: `0x${string}`;
-  displayName: null | string;
+  displayName: string | null;
   fid: number;
   fname: string;
-  pfpUrl: null | string;
+  pfpUrl: string | null;
   position: {
      end: number;
      start: number;
@@ -25,7 +25,7 @@ type IndexerAPICommentReferenceFarcasterSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:225](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L225)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -36,7 +36,7 @@ address: `0x${string}` = HexSchema;
 ### displayName
 
 ```ts
-displayName: null | string;
+displayName: string | null;
 ```
 
 ### fid
@@ -54,7 +54,7 @@ fname: string;
 ### pfpUrl
 
 ```ts
-pfpUrl: null | string;
+pfpUrl: string | null;
 ```
 
 ### position

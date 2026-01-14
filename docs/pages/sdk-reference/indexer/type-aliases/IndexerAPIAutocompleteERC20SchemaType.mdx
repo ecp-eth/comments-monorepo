@@ -12,7 +12,7 @@ type IndexerAPIAutocompleteERC20SchemaType = {
   caip19: string;
   chainId: number;
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   symbol: string;
   type: "erc20";
@@ -22,7 +22,7 @@ type IndexerAPIAutocompleteERC20SchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:674](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L674)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -51,7 +51,7 @@ decimals: number;
 ### logoURI
 
 ```ts
-logoURI: null | string;
+logoURI: string | null;
 ```
 
 ### name

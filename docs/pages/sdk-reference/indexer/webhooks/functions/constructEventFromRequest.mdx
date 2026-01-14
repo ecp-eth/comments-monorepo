@@ -28,7 +28,7 @@ function constructEventFromRequest(options): Promise<
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -39,10 +39,10 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -53,13 +53,13 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -69,16 +69,16 @@ function constructEventFromRequest(options): Promise<
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -149,7 +149,7 @@ function constructEventFromRequest(options): Promise<
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -160,10 +160,10 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -174,13 +174,13 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: ...;
               chainId: ...;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -190,16 +190,16 @@ function constructEventFromRequest(options): Promise<
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ...;
               image: ...;
               title: ...;
               url: ...;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -252,8 +252,7 @@ function constructEventFromRequest(options): Promise<
         type: "reply";
         updatedAt: Date;
       };
-     zeroExSwap:   | null
-        | {
+     zeroExSwap:   | {
         from: {
            address: `0x${string}`;
            amount: string;
@@ -264,7 +263,8 @@ function constructEventFromRequest(options): Promise<
            amount: string;
            symbol: string;
         };
-      };
+      }
+        | null;
   };
   event: "comment:added";
   logIndex: number;
@@ -332,7 +332,7 @@ function constructEventFromRequest(options): Promise<
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -343,10 +343,10 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -357,13 +357,13 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -373,16 +373,16 @@ function constructEventFromRequest(options): Promise<
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -474,7 +474,7 @@ function constructEventFromRequest(options): Promise<
         references: (
            | {
            address: `0x${string}`;
-           avatarUrl: null | string;
+           avatarUrl: string | null;
            name: string;
            position: {
               end: number;
@@ -485,10 +485,10 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           displayName: null | string;
+           displayName: string | null;
            fid: number;
            fname: string;
-           pfpUrl: null | string;
+           pfpUrl: string | null;
            position: {
               end: number;
               start: number;
@@ -499,13 +499,13 @@ function constructEventFromRequest(options): Promise<
          }
            | {
            address: `0x${string}`;
-           chainId: null | number;
+           chainId: number | null;
            chains: {
               caip: string;
               chainId: number;
            }[];
            decimals: number;
-           logoURI: null | string;
+           logoURI: string | null;
            name: string;
            position: {
               end: number;
@@ -515,16 +515,16 @@ function constructEventFromRequest(options): Promise<
            type: "erc20";
          }
            | {
-           description: null | string;
-           favicon: null | string;
+           description: string | null;
+           favicon: string | null;
            mediaType: string;
-           opengraph:   | null
-              | {
+           opengraph:   | {
               description: ... | ...;
               image: string;
               title: string;
               url: string;
-            };
+            }
+              | null;
            position: {
               end: number;
               start: number;
@@ -593,7 +593,7 @@ function constructEventFromRequest(options): Promise<
         chainId: number;
         createdAt: Date;
         description: string;
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         metadata: {
            key: `0x${string}`;
@@ -636,7 +636,7 @@ function constructEventFromRequest(options): Promise<
   chainId: number;
   data: {
      channel: {
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         updatedAt: Date;
      };
@@ -824,7 +824,7 @@ The request to construct the event from.
         `references`: (
            \| \{
            `address`: `` `0x${string}` ``;
-           `avatarUrl`: `null` \| `string`;
+           `avatarUrl`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -835,10 +835,10 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `displayName`: `null` \| `string`;
+           `displayName`: `string` \| `null`;
            `fid`: `number`;
            `fname`: `string`;
-           `pfpUrl`: `null` \| `string`;
+           `pfpUrl`: `string` \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -849,13 +849,13 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `chainId`: `null` \| `number`;
+           `chainId`: `number` \| `null`;
            `chains`: \{
               `caip`: ...;
               `chainId`: ...;
            \}[];
            `decimals`: `number`;
-           `logoURI`: `null` \| `string`;
+           `logoURI`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -865,16 +865,16 @@ The request to construct the event from.
            `type`: `"erc20"`;
          \}
            \| \{
-           `description`: `null` \| `string`;
-           `favicon`: `null` \| `string`;
+           `description`: `string` \| `null`;
+           `favicon`: `string` \| `null`;
            `mediaType`: `string`;
-           `opengraph`:   \| `null`
-              \| \{
+           `opengraph`:   \| \{
               `description`: ...;
               `image`: ...;
               `title`: ...;
               `url`: ...;
-            \};
+            \}
+              \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -945,7 +945,7 @@ The request to construct the event from.
         `references`: (
            \| \{
            `address`: `` `0x${string}` ``;
-           `avatarUrl`: `null` \| `string`;
+           `avatarUrl`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -956,10 +956,10 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `displayName`: `null` \| `string`;
+           `displayName`: `string` \| `null`;
            `fid`: `number`;
            `fname`: `string`;
-           `pfpUrl`: `null` \| `string`;
+           `pfpUrl`: `string` \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -970,13 +970,13 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `chainId`: `null` \| `number`;
+           `chainId`: `number` \| `null`;
            `chains`: \{
               `caip`: ...;
               `chainId`: ...;
            \}[];
            `decimals`: `number`;
-           `logoURI`: `null` \| `string`;
+           `logoURI`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -986,16 +986,16 @@ The request to construct the event from.
            `type`: `"erc20"`;
          \}
            \| \{
-           `description`: `null` \| `string`;
-           `favicon`: `null` \| `string`;
+           `description`: `string` \| `null`;
+           `favicon`: `string` \| `null`;
            `mediaType`: `string`;
-           `opengraph`:   \| `null`
-              \| \{
+           `opengraph`:   \| \{
               `description`: ...;
               `image`: ...;
               `title`: ...;
               `url`: ...;
-            \};
+            \}
+              \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -1048,8 +1048,7 @@ The request to construct the event from.
         `type`: `"reply"`;
         `updatedAt`: `Date`;
       \};
-     `zeroExSwap`:   \| `null`
-        \| \{
+     `zeroExSwap`:   \| \{
         `from`: \{
            `address`: `` `0x${string}` ``;
            `amount`: `string`;
@@ -1060,7 +1059,8 @@ The request to construct the event from.
            `amount`: `string`;
            `symbol`: `string`;
         \};
-      \};
+      \}
+        \| `null`;
   \};
   `event`: `"comment:added"`;
   `logIndex`: `number`;
@@ -1128,7 +1128,7 @@ The request to construct the event from.
         `references`: (
            \| \{
            `address`: `` `0x${string}` ``;
-           `avatarUrl`: `null` \| `string`;
+           `avatarUrl`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -1139,10 +1139,10 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `displayName`: `null` \| `string`;
+           `displayName`: `string` \| `null`;
            `fid`: `number`;
            `fname`: `string`;
-           `pfpUrl`: `null` \| `string`;
+           `pfpUrl`: `string` \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -1153,13 +1153,13 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `chainId`: `null` \| `number`;
+           `chainId`: `number` \| `null`;
            `chains`: \{
               `caip`: `string`;
               `chainId`: `number`;
            \}[];
            `decimals`: `number`;
-           `logoURI`: `null` \| `string`;
+           `logoURI`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -1169,16 +1169,16 @@ The request to construct the event from.
            `type`: `"erc20"`;
          \}
            \| \{
-           `description`: `null` \| `string`;
-           `favicon`: `null` \| `string`;
+           `description`: `string` \| `null`;
+           `favicon`: `string` \| `null`;
            `mediaType`: `string`;
-           `opengraph`:   \| `null`
-              \| \{
+           `opengraph`:   \| \{
               `description`: ... \| ...;
               `image`: `string`;
               `title`: `string`;
               `url`: `string`;
-            \};
+            \}
+              \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -1270,7 +1270,7 @@ The request to construct the event from.
         `references`: (
            \| \{
            `address`: `` `0x${string}` ``;
-           `avatarUrl`: `null` \| `string`;
+           `avatarUrl`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -1281,10 +1281,10 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `displayName`: `null` \| `string`;
+           `displayName`: `string` \| `null`;
            `fid`: `number`;
            `fname`: `string`;
-           `pfpUrl`: `null` \| `string`;
+           `pfpUrl`: `string` \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -1295,13 +1295,13 @@ The request to construct the event from.
          \}
            \| \{
            `address`: `` `0x${string}` ``;
-           `chainId`: `null` \| `number`;
+           `chainId`: `number` \| `null`;
            `chains`: \{
               `caip`: `string`;
               `chainId`: `number`;
            \}[];
            `decimals`: `number`;
-           `logoURI`: `null` \| `string`;
+           `logoURI`: `string` \| `null`;
            `name`: `string`;
            `position`: \{
               `end`: `number`;
@@ -1311,16 +1311,16 @@ The request to construct the event from.
            `type`: `"erc20"`;
          \}
            \| \{
-           `description`: `null` \| `string`;
-           `favicon`: `null` \| `string`;
+           `description`: `string` \| `null`;
+           `favicon`: `string` \| `null`;
            `mediaType`: `string`;
-           `opengraph`:   \| `null`
-              \| \{
+           `opengraph`:   \| \{
               `description`: ... \| ...;
               `image`: `string`;
               `title`: `string`;
               `url`: `string`;
-            \};
+            \}
+              \| `null`;
            `position`: \{
               `end`: `number`;
               `start`: `number`;
@@ -1389,7 +1389,7 @@ The request to construct the event from.
         `chainId`: `number`;
         `createdAt`: `Date`;
         `description`: `string`;
-        `hook`: `null` \| `` `0x${string}` ``;
+        `hook`: `` `0x${string}` `` \| `null`;
         `id`: `bigint`;
         `metadata`: \{
            `key`: `` `0x${string}` ``;
@@ -1432,7 +1432,7 @@ The request to construct the event from.
   `chainId`: `number`;
   `data`: \{
      `channel`: \{
-        `hook`: `null` \| `` `0x${string}` ``;
+        `hook`: `` `0x${string}` `` \| `null`;
         `id`: `bigint`;
         `updatedAt`: `Date`;
      \};

@@ -11,7 +11,7 @@ function fetchChannel(options): Promise<{
   chainId: number;
   createdAt: string;
   description: string;
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: string;
   metadata: {
      key: `0x${string}`;
@@ -39,7 +39,7 @@ Fetch a single channel by ID from the Indexer API
   `chainId`: `number`;
   `createdAt`: `string`;
   `description`: `string`;
-  `hook`: `null` \| `` `0x${string}` ``;
+  `hook`: `` `0x${string}` `` \| `null`;
   `id`: `string`;
   `metadata`: \{
      `key`: `` `0x${string}` ``;

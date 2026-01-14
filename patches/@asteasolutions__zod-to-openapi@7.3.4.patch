@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 45d4d5b710d9d188d27ef3614a80f808b98b4fb8..27ea5202fe47e7019a172e828309d09d5856dc8d 100644
+index ad67f5561ae09a571a66b7ea8aeb6751e8dc2083..3d3bf904b185a1b342a47a6b15d663e5faee88cf 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -759,7 +759,7 @@ class UnionTransformer {
@@ -28,8 +28,8 @@ index 45d4d5b710d9d188d27ef3614a80f808b98b4fb8..27ea5202fe47e7019a172e828309d09d
 +            const schema = zodSchema.schema;
 +
 +            if (!('_lazyRefId' in zodSchema)) {
-+                zodSchema._lazyRefId = `object_${this.lazyCount + 1}`;
 +                this.lazyCount++;
++                zodSchema._lazyRefId = `object_${this.lazyCount}`;
 +                this.openApiGenerator.schemaRefs[zodSchema._lazyRefId] = this.openApiGenerator.generateSimpleSchema(
 +                    schema.openapi(zodSchema._lazyRefId)
 +                );

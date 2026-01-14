@@ -15,7 +15,7 @@ type ChannelCreatedEvent = {
         chainId: number;
         createdAt: Date;
         description: string;
-        hook: null | `0x${string}`;
+        hook: `0x${string}` | null;
         id: bigint;
         metadata: {
            key: `0x${string}`;
@@ -38,7 +38,7 @@ Defined in: [packages/sdk/src/indexer/webhooks/schemas/channel.ts:86](https://gi
 
 An event sent to webhook when a channel is created.
 
-## Type declaration
+## Type Declaration
 
 ### blockNumber
 
@@ -64,7 +64,7 @@ data: {
      chainId: number;
      createdAt: Date;
      description: string;
-     hook: null | `0x${string}`;
+     hook: `0x${string}` | null;
      id: bigint;
      metadata: {
         key: `0x${string}`;
@@ -86,7 +86,7 @@ channel: {
   chainId: number;
   createdAt: Date;
   description: string;
-  hook: null | `0x${string}`;
+  hook: `0x${string}` | null;
   id: bigint;
   metadata: {
      key: `0x${string}`;
@@ -125,7 +125,7 @@ Description of the channel
 #### data.channel.hook
 
 ```ts
-hook: null | `0x${string}`;
+hook: `0x${string}` | null;
 ```
 
 Hook address

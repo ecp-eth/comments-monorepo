@@ -11,7 +11,7 @@ function fetchAutocomplete(options): Promise<{
   results: (
      | {
      address: `0x${string}`;
-     avatarUrl: null | string;
+     avatarUrl: string | null;
      name: string;
      type: "ens";
      url: string;
@@ -22,7 +22,7 @@ function fetchAutocomplete(options): Promise<{
      caip19: string;
      chainId: number;
      decimals: number;
-     logoURI: null | string;
+     logoURI: string | null;
      name: string;
      symbol: string;
      type: "erc20";
@@ -30,10 +30,10 @@ function fetchAutocomplete(options): Promise<{
    }
      | {
      address: `0x${string}`;
-     displayName?: null | string;
+     displayName?: string | null;
      fid: number;
      fname: string;
-     pfpUrl?: null | string;
+     pfpUrl?: string | null;
      type: "farcaster";
      url: string;
      username: string;
@@ -58,7 +58,7 @@ Fetch autocomplete suggestions from the Indexer API
   `results`: (
      \| \{
      `address`: `` `0x${string}` ``;
-     `avatarUrl`: `null` \| `string`;
+     `avatarUrl`: `string` \| `null`;
      `name`: `string`;
      `type`: `"ens"`;
      `url`: `string`;
@@ -69,7 +69,7 @@ Fetch autocomplete suggestions from the Indexer API
      `caip19`: `string`;
      `chainId`: `number`;
      `decimals`: `number`;
-     `logoURI`: `null` \| `string`;
+     `logoURI`: `string` \| `null`;
      `name`: `string`;
      `symbol`: `string`;
      `type`: `"erc20"`;
@@ -77,10 +77,10 @@ Fetch autocomplete suggestions from the Indexer API
    \}
      \| \{
      `address`: `` `0x${string}` ``;
-     `displayName?`: `null` \| `string`;
+     `displayName?`: `string` \| `null`;
      `fid`: `number`;
      `fname`: `string`;
-     `pfpUrl?`: `null` \| `string`;
+     `pfpUrl?`: `string` \| `null`;
      `type`: `"farcaster"`;
      `url`: `string`;
      `username`: `string`;

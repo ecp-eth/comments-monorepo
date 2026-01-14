@@ -1,0 +1,22 @@
+diff --git a/dist/esm/walletConnect.js b/dist/esm/walletConnect.js
+index ecdf481534f65b8ce88dc5050ec8353ce1cbb3b0..2ffe1caea7105f77d108e151a81d7373b4b97346 100644
+--- a/dist/esm/walletConnect.js
++++ b/dist/esm/walletConnect.js
+@@ -1,6 +1,8 @@
+ import { ChainNotConfiguredError, createConnector, extractRpcUrls, ProviderNotFoundError, } from '@wagmi/core';
+ import { getAddress, numberToHex, SwitchChainError, UserRejectedRequestError, } from 'viem';
+ walletConnect.type = 'walletConnect';
++let provider_;
++let providerPromise;
+ /**
+  * @deprecated **NOTE: This connector uses a vulnerable dependency downstream** (`@walletconnect/ethereum-provider@2.21.1` > `@reown/appkit@1.8.9` > `@reown/appkit-utils@1.8.9` > `@walletconnect/logger@2.1.2` > `pino@7.11.0`). You should override `pino` to a secure version via your package manager:
+  *
+@@ -50,8 +52,6 @@ walletConnect.type = 'walletConnect';
+  */
+ export function walletConnect(parameters) {
+     const isNewChainsStale = parameters.isNewChainsStale ?? true;
+-    let provider_;
+-    let providerPromise;
+     const NAMESPACE = 'eip155';
+     let accountsChanged;
+     let chainChanged;

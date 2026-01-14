@@ -8,16 +8,16 @@
 
 ```ts
 type IndexerAPICommentReferenceURLWebPageSchemaType = {
-  description: null | string;
-  favicon: null | string;
+  description: string | null;
+  favicon: string | null;
   mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
+  opengraph:   | {
+     description: string | null;
      image: string;
      title: string;
      url: string;
-   };
+   }
+     | null;
   position: {
      end: number;
      start: number;
@@ -30,18 +30,18 @@ type IndexerAPICommentReferenceURLWebPageSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:272](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L272)
 
-## Type declaration
+## Type Declaration
 
 ### description
 
 ```ts
-description: null | string;
+description: string | null;
 ```
 
 ### favicon
 
 ```ts
-favicon: null | string;
+favicon: string | null;
 ```
 
 ### mediaType
@@ -54,13 +54,13 @@ mediaType: string;
 
 ```ts
 opengraph: 
-  | null
   | {
-  description: null | string;
+  description: string | null;
   image: string;
   title: string;
   url: string;
-};
+}
+  | null;
 ```
 
 ### position

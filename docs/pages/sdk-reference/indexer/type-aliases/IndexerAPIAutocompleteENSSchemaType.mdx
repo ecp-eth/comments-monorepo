@@ -9,7 +9,7 @@
 ```ts
 type IndexerAPIAutocompleteENSSchemaType = {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   type: "ens";
   url: string;
@@ -19,7 +19,7 @@ type IndexerAPIAutocompleteENSSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:654](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L654)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -30,7 +30,7 @@ address: `0x${string}` = HexSchema;
 ### avatarUrl
 
 ```ts
-avatarUrl: null | string;
+avatarUrl: string | null;
 ```
 
 ### name

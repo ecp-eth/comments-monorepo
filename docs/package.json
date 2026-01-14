@@ -57,7 +57,7 @@
     "@ecp.eth/build-tools": "workspace:^",
     "@ecp.eth/indexer": "workspace:*",
     "@ecp.eth/solidity-docgen": "~0.5.21",
-    "@hono/zod-openapi": "^0.18.4",
+    "@hono/zod-openapi": "0.19.10",
     "@types/react": "~19.1.2",
     "@types/react-dom": "~19.1.2",
     "@types/swagger-ui-react": "^5.18.0",

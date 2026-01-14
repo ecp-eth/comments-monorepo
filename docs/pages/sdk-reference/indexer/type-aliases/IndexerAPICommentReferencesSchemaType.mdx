@@ -10,7 +10,7 @@
 type IndexerAPICommentReferencesSchemaType = (
   | {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   position: {
      end: number;
@@ -21,10 +21,10 @@ type IndexerAPICommentReferencesSchemaType = (
 }
   | {
   address: `0x${string}`;
-  displayName: null | string;
+  displayName: string | null;
   fid: number;
   fname: string;
-  pfpUrl: null | string;
+  pfpUrl: string | null;
   position: {
      end: number;
      start: number;
@@ -35,13 +35,13 @@ type IndexerAPICommentReferencesSchemaType = (
 }
   | {
   address: `0x${string}`;
-  chainId: null | number;
+  chainId: number | null;
   chains: {
      caip: string;
      chainId: number;
   }[];
   decimals: number;
-  logoURI: null | string;
+  logoURI: string | null;
   name: string;
   position: {
      end: number;
@@ -51,16 +51,16 @@ type IndexerAPICommentReferencesSchemaType = (
   type: "erc20";
 }
   | {
-  description: null | string;
-  favicon: null | string;
+  description: string | null;
+  favicon: string | null;
   mediaType: string;
-  opengraph:   | null
-     | {
-     description: null | string;
+  opengraph:   | {
+     description: string | null;
      image: string;
      title: string;
      url: string;
-   };
+   }
+     | null;
   position: {
      end: number;
      start: number;

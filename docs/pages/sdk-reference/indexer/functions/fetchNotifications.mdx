@@ -18,7 +18,7 @@ function fetchNotifications(options): Promise<{
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -49,13 +49,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -64,7 +64,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -178,8 +178,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -190,7 +189,8 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -215,13 +215,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -230,7 +230,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -344,8 +344,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -356,10 +355,11 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "reply";
       }
         | {
@@ -367,7 +367,7 @@ function fetchNotifications(options): Promise<{
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -398,13 +398,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -413,7 +413,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -527,8 +527,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -539,14 +538,15 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
         mentionedUser: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -557,7 +557,7 @@ function fetchNotifications(options): Promise<{
            };
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "mention";
       }
         | {
@@ -565,7 +565,7 @@ function fetchNotifications(options): Promise<{
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -596,13 +596,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -611,7 +611,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -725,8 +725,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -737,7 +736,8 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -762,13 +762,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -777,7 +777,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -891,8 +891,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -903,10 +902,11 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "reaction";
       }
         | {
@@ -914,7 +914,7 @@ function fetchNotifications(options): Promise<{
         author: {
            address: `0x${string}`;
            ens?: {
-              avatarUrl: null | string;
+              avatarUrl: string | null;
               name: string;
            };
            farcaster?: {
@@ -945,13 +945,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -960,7 +960,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -1074,8 +1074,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -1086,7 +1085,8 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         createdAt: Date;
         id: bigint;
@@ -1111,13 +1111,13 @@ function fetchNotifications(options): Promise<{
            content: string;
            createdAt: Date;
            cursor: `0x${string}`;
-           deletedAt: null | Date;
+           deletedAt: Date | null;
            hookMetadata: {
               key: `0x${string}`;
               value: `0x${string}`;
            }[];
            id: `0x${string}`;
-           logIndex: null | number;
+           logIndex: number | null;
            metadata: {
               key: `0x${string}`;
               value: `0x${string}`;
@@ -1126,7 +1126,7 @@ function fetchNotifications(options): Promise<{
            moderationClassifierScore: number;
            moderationStatus: "approved" | "pending" | "rejected";
            moderationStatusChangedAt: Date;
-           parentId: null | `0x${string}`;
+           parentId: `0x${string}` | null;
            path: string;
            reactionCounts: Record<string, number>;
            references: (
@@ -1240,8 +1240,7 @@ function fetchNotifications(options): Promise<{
            txHash: `0x${string}`;
            updatedAt: Date;
            viewerReactions: Record<string, IndexerAPICommentSchemaType[]>;
-           zeroExSwap:   | null
-              | {
+           zeroExSwap:   | {
               from: {
                  address: `0x${(...)}`;
                  amount: string;
@@ -1252,10 +1251,11 @@ function fetchNotifications(options): Promise<{
                  amount: string;
                  symbol: string;
               };
-            };
+            }
+              | null;
         };
         seen: boolean;
-        seenAt: null | Date;
+        seenAt: Date | null;
         type: "quote";
       };
   }[];
@@ -1291,7 +1291,7 @@ Fetch notifications from the Indexer API
         `author`: \{
            `address`: `` `0x${string}` ``;
            `ens?`: \{
-              `avatarUrl`: `null` \| `string`;
+              `avatarUrl`: `string` \| `null`;
               `name`: `string`;
            \};
            `farcaster?`: \{
@@ -1322,13 +1322,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -1337,7 +1337,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -1451,8 +1451,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -1463,7 +1462,8 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `createdAt`: `Date`;
         `id`: `bigint`;
@@ -1488,13 +1488,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -1503,7 +1503,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -1617,8 +1617,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -1629,10 +1628,11 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `seen`: `boolean`;
-        `seenAt`: `null` \| `Date`;
+        `seenAt`: `Date` \| `null`;
         `type`: `"reply"`;
       \}
         \| \{
@@ -1640,7 +1640,7 @@ Fetch notifications from the Indexer API
         `author`: \{
            `address`: `` `0x${string}` ``;
            `ens?`: \{
-              `avatarUrl`: `null` \| `string`;
+              `avatarUrl`: `string` \| `null`;
               `name`: `string`;
            \};
            `farcaster?`: \{
@@ -1671,13 +1671,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -1686,7 +1686,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -1800,8 +1800,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -1812,14 +1811,15 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `createdAt`: `Date`;
         `id`: `bigint`;
         `mentionedUser`: \{
            `address`: `` `0x${string}` ``;
            `ens?`: \{
-              `avatarUrl`: `null` \| `string`;
+              `avatarUrl`: `string` \| `null`;
               `name`: `string`;
            \};
            `farcaster?`: \{
@@ -1830,7 +1830,7 @@ Fetch notifications from the Indexer API
            \};
         \};
         `seen`: `boolean`;
-        `seenAt`: `null` \| `Date`;
+        `seenAt`: `Date` \| `null`;
         `type`: `"mention"`;
       \}
         \| \{
@@ -1838,7 +1838,7 @@ Fetch notifications from the Indexer API
         `author`: \{
            `address`: `` `0x${string}` ``;
            `ens?`: \{
-              `avatarUrl`: `null` \| `string`;
+              `avatarUrl`: `string` \| `null`;
               `name`: `string`;
            \};
            `farcaster?`: \{
@@ -1869,13 +1869,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -1884,7 +1884,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -1998,8 +1998,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -2010,7 +2009,8 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `createdAt`: `Date`;
         `id`: `bigint`;
@@ -2035,13 +2035,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -2050,7 +2050,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -2164,8 +2164,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -2176,10 +2175,11 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `seen`: `boolean`;
-        `seenAt`: `null` \| `Date`;
+        `seenAt`: `Date` \| `null`;
         `type`: `"reaction"`;
       \}
         \| \{
@@ -2187,7 +2187,7 @@ Fetch notifications from the Indexer API
         `author`: \{
            `address`: `` `0x${string}` ``;
            `ens?`: \{
-              `avatarUrl`: `null` \| `string`;
+              `avatarUrl`: `string` \| `null`;
               `name`: `string`;
            \};
            `farcaster?`: \{
@@ -2218,13 +2218,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -2233,7 +2233,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -2347,8 +2347,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -2359,7 +2358,8 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `createdAt`: `Date`;
         `id`: `bigint`;
@@ -2384,13 +2384,13 @@ Fetch notifications from the Indexer API
            `content`: `string`;
            `createdAt`: `Date`;
            `cursor`: `` `0x${string}` ``;
-           `deletedAt`: `null` \| `Date`;
+           `deletedAt`: `Date` \| `null`;
            `hookMetadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
            \}[];
            `id`: `` `0x${string}` ``;
-           `logIndex`: `null` \| `number`;
+           `logIndex`: `number` \| `null`;
            `metadata`: \{
               `key`: `` `0x${string}` ``;
               `value`: `` `0x${string}` ``;
@@ -2399,7 +2399,7 @@ Fetch notifications from the Indexer API
            `moderationClassifierScore`: `number`;
            `moderationStatus`: `"approved"` \| `"pending"` \| `"rejected"`;
            `moderationStatusChangedAt`: `Date`;
-           `parentId`: `null` \| `` `0x${string}` ``;
+           `parentId`: `` `0x${string}` `` \| `null`;
            `path`: `string`;
            `reactionCounts`: `Record`\<`string`, `number`\>;
            `references`: (
@@ -2513,8 +2513,7 @@ Fetch notifications from the Indexer API
            `txHash`: `` `0x${string}` ``;
            `updatedAt`: `Date`;
            `viewerReactions`: `Record`\<`string`, [`IndexerAPICommentSchemaType`](/sdk-reference/indexer/type-aliases/IndexerAPICommentSchemaType.mdx)[]\>;
-           `zeroExSwap`:   \| `null`
-              \| \{
+           `zeroExSwap`:   \| \{
               `from`: \{
                  `address`: `` `0x${(...)}` ``;
                  `amount`: `string`;
@@ -2525,10 +2524,11 @@ Fetch notifications from the Indexer API
                  `amount`: `string`;
                  `symbol`: `string`;
               \};
-            \};
+            \}
+              \| `null`;
         \};
         `seen`: `boolean`;
-        `seenAt`: `null` \| `Date`;
+        `seenAt`: `Date` \| `null`;
         `type`: `"quote"`;
       \};
   \}[];

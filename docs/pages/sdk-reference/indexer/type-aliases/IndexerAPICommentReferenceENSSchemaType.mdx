@@ -9,7 +9,7 @@
 ```ts
 type IndexerAPICommentReferenceENSSchemaType = {
   address: `0x${string}`;
-  avatarUrl: null | string;
+  avatarUrl: string | null;
   name: string;
   position: {
      end: number;
@@ -22,7 +22,7 @@ type IndexerAPICommentReferenceENSSchemaType = {
 
 Defined in: [packages/sdk/src/indexer/schemas.ts:209](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/indexer/schemas.ts#L209)
 
-## Type declaration
+## Type Declaration
 
 ### address
 
@@ -33,7 +33,7 @@ address: `0x${string}` = HexSchema;
 ### avatarUrl
 
 ```ts
-avatarUrl: null | string;
+avatarUrl: string | null;
 ```
 
 ### name
