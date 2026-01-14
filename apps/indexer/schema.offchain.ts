@@ -96,6 +96,20 @@ export const commentReferenceResolutionResults = offchainSchema.table(
 export type CommentReferenceResolutionResultsSelectType =
   typeof commentReferenceResolutionResults.$inferSelect;
 
+export const approvalExpirationCheckState = offchainSchema.table(
+  "approval_expiration_check_state",
+  {
+    id: text().notNull().primaryKey().default("singleton"), // Ensures single row
+    lastCheckedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("approval_expiration_check_state_last_checked_idx").on(
+      table.lastCheckedAt,
+    ),
+  ],
+);
+
 export const commentModerationStatuses = offchainSchema.table(
   "comment_moderation_statuses",
   {

@@ -10,14 +10,17 @@ import { HexSchema } from "@ecp.eth/sdk/core/schemas";
 import {
   EVENT_APPROVAL_ADDED,
   EVENT_APPROVAL_REMOVED,
+  EVENT_APPROVAL_EXPIRED,
   type ApprovalAddedEventSchema as OutputApprovalAddedEventSchema,
   type ApprovalRemovedEventSchema as OutputApprovalRemovedEventSchema,
+  type ApprovalExpiredEventSchema as OutputApprovalExpiredEventSchema,
   type ApprovalEvents as SDKApprovalEvents,
 } from "@ecp.eth/sdk/indexer/webhooks/schemas";
 
 export const ApprovalEvents = [
   EVENT_APPROVAL_ADDED,
   EVENT_APPROVAL_REMOVED,
+  EVENT_APPROVAL_EXPIRED,
 ] as const;
 
 export type ApprovalEvent = (typeof ApprovalEvents)[number];
@@ -147,12 +150,63 @@ export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
   typeof ApprovalRemovedEventDbToOpenApiSchema
 > satisfies ApprovalRemovedEvent;
 
+export const ApprovalExpiredEventSchema = z
+  .object({
+    event: z.literal(EVENT_APPROVAL_EXPIRED satisfies ApprovalEvent),
+    chainId: z.number().int(),
+    data: z.object({
+      approval: z.object({
+        id: z.string(),
+        createdAt: dateToIsoStringSchema,
+        updatedAt: dateToIsoStringSchema,
+        author: HexSchema,
+        app: HexSchema,
+        expiresAt: dateToIsoStringSchema,
+      }),
+    }),
+  })
+  .merge(EventV1Schema);
+
+export const ApprovalExpiredEventDbToOpenApiSchema = z
+  .object({
+    event: z.literal(EVENT_APPROVAL_EXPIRED satisfies ApprovalEvent),
+    chainId: z.number().int(),
+    data: z.object({
+      approval: z.object({
+        id: z.string(),
+        createdAt: z.string().datetime(),
+        updatedAt: z.string().datetime(),
+        author: HexSchema,
+        app: HexSchema,
+        expiresAt: z.string().datetime(),
+      }),
+    }),
+  })
+  .merge(EventV1Schema);
+
+export type ApprovalExpiredEventInput = z.input<
+  typeof ApprovalExpiredEventSchema
+>;
+
+export type ApprovalExpiredEvent = z.infer<typeof ApprovalExpiredEventSchema>;
+
+({}) as unknown as z.input<
+  typeof ApprovalExpiredEventDbToOpenApiSchema
+> satisfies ApprovalExpiredEvent;
+
+({}) as unknown as z.infer<
+  typeof ApprovalExpiredEventDbToOpenApiSchema
+> satisfies ApprovalExpiredEvent;
+
 // assert that the schema output is the same as input to sdk
 ({}) as unknown as ApprovalAddedEvent satisfies z.input<
   typeof OutputApprovalAddedEventSchema
 >;
 ({}) as unknown as ApprovalRemovedEvent satisfies z.input<
   typeof OutputApprovalRemovedEventSchema
+>;
+({}) as unknown as ApprovalExpiredEvent satisfies z.input<
+  typeof OutputApprovalExpiredEventSchema
 >;
 ({}) as unknown as typeof SDKApprovalEvents satisfies typeof ApprovalEvents;
 
@@ -163,4 +217,5 @@ export type ApprovalRemovedEvent = z.infer<typeof ApprovalRemovedEventSchema>;
 export const ApprovalEventsFromDbToOpenApiSchema = [
   ApprovalAddedEventDbToOpenApiSchema,
   ApprovalRemovedEventDbToOpenApiSchema,
+  ApprovalExpiredEventDbToOpenApiSchema,
 ] as const;

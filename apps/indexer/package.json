@@ -27,7 +27,8 @@
     "worker:notification-fan-out": "dotenvx run --convention nextjs -- tsx ./bin/notification-fan-out-worker.ts",
     "worker:webhook-event-delivery": "dotenvx run --convention nextjs -- tsx ./bin/webhook-event-delivery-worker.ts",
     "cron:comment-references-refresher": "dotenvx run --convention nextjs -- tsx ./bin/comment-references-refresher-worker.ts",
-    "cron:delete-users": "dotenvx run --convention nextjs -- tsx ./bin/delete-users-worker.ts"
+    "cron:delete-users": "dotenvx run --convention nextjs -- tsx ./bin/delete-users-worker.ts",
+    "cron:approval-expiration-checker": "dotenvx run --convention nextjs -- tsx ./bin/approval-expiration-worker.ts"
   },
   "dependencies": {
     "@0x/0x-parser": "2.10.3",

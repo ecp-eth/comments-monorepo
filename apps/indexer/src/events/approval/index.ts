@@ -6,6 +6,9 @@ import {
   ApprovalRemovedEventSchema,
   type ApprovalRemovedEventInput,
   type ApprovalRemovedEvent,
+  type ApprovalExpiredEvent,
+  ApprovalExpiredEventSchema,
+  type ApprovalExpiredEventInput,
 } from "./schemas.ts";
 import type { ApprovalSelectType } from "ponder:schema";
 
@@ -53,4 +56,27 @@ export function ponderEventToApprovalRemovedEvent({
       approval,
     },
   } satisfies ApprovalRemovedEventInput);
+}
+
+export function createApprovalExpiredEvent(
+  approval: ApprovalSelectType,
+): ApprovalExpiredEvent {
+  const uid = `approval:expired:${approval.chainId}:${approval.txHash}:${approval.logIndex}:${approval.id}`;
+
+  return ApprovalExpiredEventSchema.parse({
+    event: "approval:expired",
+    uid,
+    version: 1,
+    chainId: approval.chainId,
+    data: {
+      approval: {
+        id: approval.id,
+        createdAt: approval.createdAt,
+        updatedAt: approval.updatedAt,
+        author: approval.author,
+        app: approval.app,
+        expiresAt: approval.expiresAt!,
+      },
+    },
+  } satisfies ApprovalExpiredEventInput);
 }
