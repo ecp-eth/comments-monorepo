@@ -1,0 +1,48 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 5d591b0b8ab09e60ab7ceda3b91bbaf4b59e26c7..0000000000000000000000000000000000000000
+diff --git a/dist/index.js b/dist/index.js
+index ed72ce9ff0db7e5ec018e11de842c60121bf9f30..76bf117c995fa75188e9122145616286fb3dec9e 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -2,7 +2,7 @@ import { SpanKind, SpanStatusCode, ValueType, context, metrics, propagation, tra
+ import { ATTR_HTTP_REQUEST_HEADER, ATTR_HTTP_REQUEST_METHOD, ATTR_HTTP_RESPONSE_HEADER, ATTR_HTTP_RESPONSE_STATUS_CODE, ATTR_HTTP_ROUTE, ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION, ATTR_URL_FULL } from "@opentelemetry/semantic-conventions";
+ import { createMiddleware } from "hono/factory";
+ import { routePath } from "hono/route";
+-import { METRIC_HTTP_SERVER_ACTIVE_REQUESTS, METRIC_HTTP_SERVER_REQUEST_DURATION } from "@opentelemetry/semantic-conventions/incubating";
++import { METRIC_HTTP_SERVER_ACTIVE_REQUESTS, METRIC_HTTP_SERVER_REQUEST_DURATION } from "@opentelemetry/semantic-conventions/build/src/index-incubating.js";
+ 
+ //#region package.json
+ var name = "@hono/otel";
+diff --git a/package.json b/package.json
+index 63049713821118df2e93adb07c0a210adec49109..df6c99a6207f39bd5f9bca8b0a56ae2de01f3e87 100644
+--- a/package.json
++++ b/package.json
+@@ -2,7 +2,7 @@
+   "name": "@hono/otel",
+   "version": "1.1.0",
+   "description": "OpenTelemetry middleware for Hono",
+-  "type": "module",
++  "type": "commonjs",
+   "module": "dist/index.js",
+   "types": "dist/index.d.ts",
+   "files": [
+@@ -16,18 +16,6 @@
+     "test": "vitest",
+     "version:jsr": "yarn version:set $npm_package_version"
+   },
+-  "exports": {
+-    ".": {
+-      "import": {
+-        "types": "./dist/index.d.ts",
+-        "default": "./dist/index.js"
+-      },
+-      "require": {
+-        "types": "./dist/index.d.cts",
+-        "default": "./dist/index.cjs"
+-      }
+-    }
+-  },
+   "license": "MIT",
+   "publishConfig": {
+     "registry": "https://registry.npmjs.org",
