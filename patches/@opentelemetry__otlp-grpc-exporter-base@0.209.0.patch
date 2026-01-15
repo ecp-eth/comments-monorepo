@@ -12,13 +12,13 @@ index 292df421ecb48c44ca6b12ac251fa8f0fa0c275e..3a64dbc2cfdf0da5a38345dd7933ef6a
  const path = require("path");
  const api_1 = require("@opentelemetry/api");
 diff --git a/package.json b/package.json
-index cb65ac4a5a498eeb6c917dea75d5f34befb29b02..50fe10582f67f48637102c33d9394c188865ac0d 100644
+index bca93abaf28fbd127c97ca40b73e5ec25c05a066..c56828cee9d25476f7d8c749cc95357b1383d45a 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/otlp-grpc-exporter-base",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
    "main": "build/src/index.js",

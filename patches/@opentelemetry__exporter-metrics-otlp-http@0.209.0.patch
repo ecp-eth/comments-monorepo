@@ -12,13 +12,13 @@ index 13ea3433ef067d107392e11f2354aa597f29c88f..d20beb9c1c1742f2fd51e2ad86338f4c
   * OTLP Metric Exporter for Node.js
   */
 diff --git a/package.json b/package.json
-index 0806ebd51e3ed059bcc87fa89d4ced7d07be163b..c7bef9244398c49d6899055f81578cad6a55f11f 100644
+index e98eaa8ccb901b61e981ff2f6d4eff3084eecf13..7fe2f623df50c5adece8c348512eb34d8421b730 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/exporter-metrics-otlp-http",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
    "main": "build/src/index.js",
