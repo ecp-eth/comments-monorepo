@@ -6,6 +6,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import setupRestAPI from "./setupRestAPI";
 import { HTTPException } from "hono/http-exception";
 import * as Sentry from "@sentry/node";
+import pkg from "../../package.json";
 
 import { useSentry } from "@envelop/sentry";
 
@@ -68,9 +69,9 @@ app.use("/api/*", cors());
 
 // The OpenAPI documentation will be available at /docs
 app.doc("/docs", {
-  openapi: "3.0.0",
+  openapi: "3.1.0",
   info: {
-    version: "1.0.0",
+    version: pkg.version,
     title: "Ethereum comments protocol indexer API",
   },
 });

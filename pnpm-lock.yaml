@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@hono/zod-openapi>@asteasolutions/zod-to-openapi': ^7.3.0
+  '@hono/zod-openapi>@asteasolutions/zod-to-openapi': 7.3.4
   '@hpke/core': ^1.7.5
   '@react-native-async-storage/async-storage': ^2.1.2
   '@opentelemetry/api': 1.9.0
@@ -28,9 +28,9 @@ overrides:
   vite: 6.3.5
 
 patchedDependencies:
-  '@asteasolutions/zod-to-openapi@7.3.2':
-    hash: 5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3
-    path: patches/@asteasolutions__zod-to-openapi@7.3.2.patch
+  '@asteasolutions/zod-to-openapi@7.3.4':
+    hash: 9f1661d9fa8490d6e50a93ba3a43c0e059ed94ad87fb0317791f99d65f0f2b4f
+    path: patches/@asteasolutions__zod-to-openapi@7.3.4.patch
   '@hono/otel@1.0.1':
     hash: dfb997fcdc9c740ca42f9c57fdf2bf8868265f25737b2f6f333422435b1d42b4
     path: patches/@hono__otel@1.0.1.patch
@@ -1796,8 +1796,8 @@ packages:
   '@antfu/utils@8.1.1':
     resolution: {integrity: sha512-Mex9nXf9vR6AhcXmMrlz/HVgYYZpVGJ6YlPgwl7UnaFpnshXs6EK/oa5Gpf3CzENMjkvEx2tQtntGnb7UtSTOQ==}
 
-  '@asteasolutions/zod-to-openapi@7.3.2':
-    resolution: {integrity: sha512-Wvl+jHwSgYrRc3tQLMG7Qxq6wn0WjDk8E9ZA0lAyW73FqK18XPHVIKpk0lA6L0S+zmzzNKTndeV2v/Or0LyfHQ==}
+  '@asteasolutions/zod-to-openapi@7.3.4':
+    resolution: {integrity: sha512-/2rThQ5zPi9OzVwes6U7lK1+Yvug0iXu25olp7S0XsYmOqnyMfxH7gdSQjn/+DSOHRg7wnotwGJSyL+fBKdnEA==}
     peerDependencies:
       zod: ^3.25.76
 
@@ -13393,7 +13393,7 @@ snapshots:
 
   '@antfu/utils@8.1.1': {}
 
-  '@asteasolutions/zod-to-openapi@7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)':
+  '@asteasolutions/zod-to-openapi@7.3.4(patch_hash=9f1661d9fa8490d6e50a93ba3a43c0e059ed94ad87fb0317791f99d65f0f2b4f)(zod@3.25.76)':
     dependencies:
       openapi3-ts: 4.5.0
       zod: 3.25.76
@@ -14449,14 +14449,14 @@ snapshots:
 
   '@hono/zod-openapi@0.18.4(hono@4.10.7)(zod@3.25.76)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)
+      '@asteasolutions/zod-to-openapi': 7.3.4(patch_hash=9f1661d9fa8490d6e50a93ba3a43c0e059ed94ad87fb0317791f99d65f0f2b4f)(zod@3.25.76)
       '@hono/zod-validator': 0.4.3(hono@4.10.7)(zod@3.25.76)
       hono: 4.10.7
       zod: 3.25.76
 
   '@hono/zod-openapi@1.1.0(hono@4.10.7)(zod@3.25.76)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 7.3.2(patch_hash=5ed98a8668523c8fb45cf8058a62a399d300dcd65de745fac4bce581830ed0b3)(zod@3.25.76)
+      '@asteasolutions/zod-to-openapi': 7.3.4(patch_hash=9f1661d9fa8490d6e50a93ba3a43c0e059ed94ad87fb0317791f99d65f0f2b4f)(zod@3.25.76)
       '@hono/zod-validator': 0.7.2(hono@4.10.7)(zod@3.25.76)
       hono: 4.10.7
       openapi3-ts: 4.5.0
@@ -21742,7 +21742,7 @@ snapshots:
       eslint: 9.32.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.32.0(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.32.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react-hooks: 5.2.0(eslint@9.32.0(jiti@2.6.1))
@@ -21762,7 +21762,7 @@ snapshots:
       eslint: 9.32.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.32.0(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.32.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react-hooks: 5.2.0(eslint@9.32.0(jiti@2.6.1))
@@ -21779,7 +21779,7 @@ snapshots:
       eslint: 9.32.0(jiti@2.6.1)
       eslint-import-resolver-node: 0.3.9
       eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.32.0(jiti@2.6.1))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.32.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react: 7.37.5(eslint@9.32.0(jiti@2.6.1))
       eslint-plugin-react-hooks: 7.0.1(eslint@9.32.0(jiti@2.6.1))
@@ -21816,7 +21816,7 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.7.9
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.32.0(jiti@2.6.1))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -21831,7 +21831,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.32.0(jiti@2.6.1)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.46.2(eslint@9.32.0(jiti@2.6.1))(typescript@5.8.3))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)))(eslint@9.32.0(jiti@2.6.1)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
