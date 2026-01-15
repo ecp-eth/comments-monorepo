@@ -63,7 +63,7 @@
       "vite": "6.3.5"
     },
     "patchedDependencies": {
-      "@walletconnect/keyvaluestorage": "patches/@walletconnect__keyvaluestorage.patch",
+      "@walletconnect/keyvaluestorage@1.1.1": "patches/@walletconnect__keyvaluestorage@1.1.1.patch",
       "@wagmi/connectors": "patches/@wagmi__connectors.patch",
       "@rainbow-me/rainbowkit": "patches/@rainbow-me__rainbowkit.patch",
       "ponder": "patches/ponder.patch",
