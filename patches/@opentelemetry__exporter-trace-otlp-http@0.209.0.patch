@@ -12,13 +12,13 @@ index 2acd49b9a63b9cad6108176a519382528819925f..f02af256b9240ddd3ddebde9f66a4791
   * Collector Trace Exporter for Node
   */
 diff --git a/package.json b/package.json
-index a57ed331ea12b10f7ff3fed699a1073f2b27a341..ed3fbaa25d3dad832649035d7ae491370147e504 100644
+index b4d952dee85e5172ff409053fc76309a93cab602..36ed93b2eb12df8ecb050365b7d32b489af23eb2 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/exporter-trace-otlp-http",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "OpenTelemetry Collector Trace Exporter allows user to send collected traces to the OpenTelemetry Collector",
    "main": "build/src/index.js",

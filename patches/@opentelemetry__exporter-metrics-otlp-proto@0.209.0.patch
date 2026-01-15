@@ -12,13 +12,13 @@ index 15d7b2c0e7f2066edceecdc8081d48c675130bdf..d78ef9c23d35a7945fc00c64be512854
      constructor(config) {
          super((0, node_http_1.createOtlpHttpExportDelegate)((0, node_http_1.convertLegacyHttpOptions)(config ?? {}, 'METRICS', 'v1/metrics', {
 diff --git a/package.json b/package.json
-index 535e980756bd0710cfc6a5462bed2743dad2673b..e82e3605b68770f8f252ae1050559d060f659d60 100644
+index a16e622465740b658a4570d53501a59389e964bf..b68b033ce9c42ecf59e71ed493d11c4f6b6573f1 100644
 --- a/package.json
 +++ b/package.json
 @@ -1,6 +1,7 @@
  {
    "name": "@opentelemetry/exporter-metrics-otlp-proto",
-   "version": "0.208.0",
+   "version": "0.209.0",
 +  "type": "commonjs",
    "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector using protobuf over HTTP",
    "main": "build/src/index.js",
