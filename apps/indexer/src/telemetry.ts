@@ -24,6 +24,15 @@ if (env.OPENTELEMETRY_GRAFANA_TEMPO_URL) {
       new OTLPTraceExporter({
         url: env.OPENTELEMETRY_GRAFANA_TEMPO_URL,
       }),
+      {
+        exportTimeoutMillis:
+          env.OPENTELEMETRY_BATCH_PROCESSOR_EXPORT_TIMEOUT_MS,
+        maxQueueSize: env.OPENTELEMETRY_BATCH_PROCESSOR_MAX_QUEUE_SIZE,
+        scheduledDelayMillis:
+          env.OPENTELEMETRY_BATCH_PROCESSOR_SCHEDULED_DELAY_MS,
+        maxExportBatchSize:
+          env.OPENTELEMETRY_BATCH_PROCESSOR_MAX_EXPORT_BATCH_SIZE,
+      },
     ),
   );
 }

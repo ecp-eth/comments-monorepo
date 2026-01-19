@@ -86,6 +86,14 @@ const EnvSchema = z
     DATABASE_SCHEMA: z.string().optional(),
     NEYNAR_API_KEY: z.string().min(1),
     SENTRY_DSN: z.string().optional(),
+    SENTRY_PROFILING_ENABLED: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
+    SENTRY_TRACING_ENABLED: z
+      .enum(["0", "1"])
+      .default("0")
+      .transform((val) => val === "1"),
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
@@ -227,6 +235,26 @@ const EnvSchema = z
       .enum(["0", "1", "yes", "no", "true", "false"])
       .default("false")
       .transform((val) => val === "1" || val === "yes" || val === "true"),
+    OPENTELEMETRY_BATCH_PROCESSOR_EXPORT_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(5000),
+    OPENTELEMETRY_BATCH_PROCESSOR_MAX_QUEUE_SIZE: z.coerce
+      .number()
+      .int()
+      .positive()
+      .optional(),
+    OPENTELEMETRY_BATCH_PROCESSOR_SCHEDULED_DELAY_MS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .optional(),
+    OPENTELEMETRY_BATCH_PROCESSOR_MAX_EXPORT_BATCH_SIZE: z.coerce
+      .number()
+      .int()
+      .positive()
+      .optional(),
   })
   .superRefine((vars, ctx) => {
     if (
