@@ -38,7 +38,6 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
   const safeArea = useSafeAreaInsets();
   const { keyboardHeight, keyboardTopY } = useKeyboardDimensions();
   const screenHeight = Dimensions.get("screen").height;
-  // const windowHeight = Dimensions.get("window").height;
 
   // we can't trust the inputRect retrieved from noLayout directly.
   // cuz the input be can placed into a KeyboardStickyView, which presumably using translateY to push
