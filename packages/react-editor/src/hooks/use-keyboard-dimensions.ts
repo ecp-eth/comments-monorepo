@@ -20,7 +20,7 @@ import { useSafeAreaFrame } from "react-native-safe-area-context";
 export const useKeyboardDimensions = () => {
   const { height } = useSafeAreaFrame();
   const [state, setState] = React.useState({
-    keyboardEndPositionY: height,
+    keyboardTopY: height,
     keyboardHeight: 0,
   });
 
@@ -28,19 +28,19 @@ export const useKeyboardDimensions = () => {
     const handleDimensionsChange = ({ window }: { window: ScaledSize }) =>
       setState((current) => ({
         ...current,
-        keyboardEndPositionY: window.height,
+        keyboardTopY: window.height,
       }));
 
     const resetKeyboardDimensions = () =>
       setState({
-        keyboardEndPositionY: height,
+        keyboardTopY: height,
         keyboardHeight: 0,
       });
 
     const updateKeyboardDimensions = (event: KeyboardEvent) =>
       setState((current) => {
-        const { screenY: keyboardEndPositionY } = event.endCoordinates;
-        const keyboardHeight = height - keyboardEndPositionY;
+        const { screenY: keyboardTopY } = event.endCoordinates;
+        const keyboardHeight = height - keyboardTopY;
 
         if (keyboardHeight === current.keyboardHeight) {
           return current;
@@ -63,7 +63,7 @@ export const useKeyboardDimensions = () => {
         }
 
         return {
-          keyboardEndPositionY,
+          keyboardTopY,
           keyboardHeight,
         };
       });

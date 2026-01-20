@@ -36,16 +36,33 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
   onDismiss,
 }: Props) {
   const safeArea = useSafeAreaInsets();
-  const { keyboardHeight, keyboardEndPositionY } = useKeyboardDimensions();
+  const { keyboardHeight, keyboardTopY } = useKeyboardDimensions();
   const screenHeight = Dimensions.get("screen").height;
+  // const windowHeight = Dimensions.get("window").height;
+
+  // we can't trust the inputRect retrieved from noLayout directly.
+  // cuz the input be can placed into a KeyboardStickyView, which presumably using translateY to push
+  // the input up. translated location is not retrievable using onLayout or measureInWindow.
+  // if the virtual keyboard is visible (not using physical keyboard), normally the input should be pushed up by the keyboard.
+  // so if the input goes beyond the keyboard top border, we can infer that the input is translated.
+  const isInputLocationTranslated =
+    keyboardHeight > 0 && inputRect.bottom > screenHeight - keyboardHeight;
+
+  // if the input is translated, figure out the translated Y positions
+  const inputRectBottom = isInputLocationTranslated
+    ? keyboardTopY - (screenHeight - inputRect.bottom)
+    : inputRect.bottom;
+  const inputRectTop = isInputLocationTranslated
+    ? keyboardTopY - (screenHeight - inputRect.top)
+    : inputRect.top;
+
   // if the topLimiter is above of mid of available space, we make the layer underneath the input
   // otherwise, we make the layer above the input
   const popAbove =
-    inputRect.bottom + gap >
-    Math.abs((keyboardEndPositionY - safeArea.top) / 2);
-  const topLimit = popAbove ? 0 : inputRect.bottom + gap;
+    inputRectBottom + gap > Math.abs((keyboardTopY - safeArea.top) / 2);
+  const topLimit = popAbove ? 0 : inputRectBottom + gap;
   const bottomLimit = popAbove
-    ? screenHeight - (inputRect.top - gap)
+    ? screenHeight - (inputRectTop - gap)
     : keyboardHeight;
   const translateY = useSharedValue(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -63,7 +80,7 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
     }
 
     setIsAnimating(true);
-    translateY.value = keyboardEndPositionY - safeArea.top;
+    translateY.value = keyboardTopY - safeArea.top;
     translateY.value = withTiming(
       0,
       {
@@ -74,7 +91,7 @@ export const KeyboardAvoidPopUpView = memo(function KeyboardAccessoryView({
         scheduleOnRN(setIsAnimating, false);
       },
     );
-  }, [enabled, keyboardEndPositionY, safeArea.top, translateY]);
+  }, [enabled, keyboardTopY, safeArea.top, translateY]);
 
   if (!enabled) {
     return null;
