@@ -79,13 +79,13 @@ export function Editor({
       HardBreak,
       Link.configure({
         HTMLAttributes: {
-          class: theme?.link?.classNames ?? defaultTheme.link.classNames,
+          class: theme?.link?.className ?? defaultTheme.link.className,
         },
       }),
       Placeholder.configure({
         placeholder,
         emptyEditorClass:
-          theme?.placeholder?.classNames ?? defaultTheme.placeholder.classNames,
+          theme?.placeholder?.className ?? defaultTheme.placeholder.className,
       }),
       // ens, farcaster, erc20, address mentions
       MentionExtension.configure({
@@ -105,10 +105,10 @@ export function Editor({
     editorProps: {
       attributes: {
         class: cn(
-          theme?.editor?.classNames ?? defaultTheme.editor.classNames,
+          theme?.editor?.className ?? defaultTheme.editor.className,
           disabled &&
-            (theme?.editor_disabled?.classNames ??
-              defaultTheme.editor_disabled.classNames),
+            (theme?.editor_disabled?.className ??
+              defaultTheme.editor_disabled.className),
         ),
       },
       handleKeyPress(view, event) {
@@ -260,11 +260,11 @@ export function Editor({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        theme?.editorContainer?.classNames ??
-          defaultTheme.editorContainer.classNames,
+        theme?.editorContainer?.className ??
+          defaultTheme.editorContainer.className,
         isDropping &&
-          (theme?.editorContainer_dropTarget?.classNames ??
-            defaultTheme.editorContainer_dropTarget.classNames),
+          (theme?.editorContainer_dropTarget?.className ??
+            defaultTheme.editorContainer_dropTarget.className),
       )}
     >
       <EditorContent editor={editor} />

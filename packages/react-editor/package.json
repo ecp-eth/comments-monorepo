@@ -94,6 +94,7 @@
     "@ecp.eth/shared": ">=0.0.21",
     "@gorhom/portal": ">=1.0.14",
     "@tanstack/react-query": ">=5.0.0",
+    "nativewind": ">=4.2.1",
     "pinata": "^2.5.0",
     "react": "18 || 19",
     "react-dom": "18 || 19",
@@ -125,6 +126,9 @@
     },
     "react-native-worklets": {
       "optional": true
+    },
+    "nativewind": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -142,6 +146,7 @@
     "autoprefixer": "^10.4.21",
     "blo-png": "^1.0.3",
     "eslint": "^9.19.0",
+    "nativewind": "^4.2.1",
     "pinata": "^2.5.0",
     "postcss": "^8",
     "react": "~19.1.2",

@@ -28,6 +28,7 @@ import {
 import { Suggestions } from "./extensions/components/suggestions.native";
 import { MentionItem } from "./types";
 import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
+import { cssInterop } from "nativewind";
 
 export type { EditorProps, EditorRef } from "./editor.type.js";
 
@@ -38,167 +39,179 @@ type EditorNativeProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-export function Editor(props: EditorProps & EditorNativeProps) {
-  const webViewContainerViewRef = useRef<View>(null);
-  const webViewRef = useRef<WebView>(null);
-  const webViewComRef = useRef<Remote<IWebViewExposedCom>>(null);
-  const [isWebViewReady, setIsWebViewReady] = useState(false);
-  const [notifiedHeight, setNotifiedHeight] = useState(0);
-  const { onLayout: webViewOnLayout, layout: webViewLayout } = useClientRect();
-  const [mentionSuggestionProps, setMentionSuggestionProps] = useState<{
-    items: MentionItem[];
-    query: string;
-    clientRect: DOMRect;
-  }>({
-    items: [],
-    query: "",
-    clientRect: new DOMRect(0, 0, 0, 0),
-  });
-  const [suggestionsEnabled, setSuggestionsEnabled] = useState(false);
-  const freshProps = useFreshRef(props);
-  const freshWebViewLayout = useFreshRef(webViewLayout);
-  const {
-    endpoint: nativeMessageEventEndpoint,
-    clearListeners: clearNativeMessageEventListeners,
-    emitMessage: emitMessageToNative,
-  } = useNativeMessageEventEndpoint(webViewRef);
-  useSyncRef(props, webViewComRef, nativeMessageEventEndpoint);
+export const Editor = cssInterop(
+  function Editor(props: EditorProps & EditorNativeProps) {
+    const webViewContainerViewRef = useRef<View>(null);
+    const webViewRef = useRef<WebView>(null);
+    const webViewComRef = useRef<Remote<IWebViewExposedCom>>(null);
+    const [isWebViewReady, setIsWebViewReady] = useState(false);
+    const [notifiedHeight, setNotifiedHeight] = useState(0);
+    const { onLayout: webViewOnLayout, layout: webViewLayout } =
+      useClientRect();
+    const [mentionSuggestionProps, setMentionSuggestionProps] = useState<{
+      items: MentionItem[];
+      query: string;
+      clientRect: DOMRect;
+    }>({
+      items: [],
+      query: "",
+      clientRect: new DOMRect(0, 0, 0, 0),
+    });
+    const [suggestionsEnabled, setSuggestionsEnabled] = useState(false);
+    const freshProps = useFreshRef(props);
+    const freshWebViewLayout = useFreshRef(webViewLayout);
+    const {
+      endpoint: nativeMessageEventEndpoint,
+      clearListeners: clearNativeMessageEventListeners,
+      emitMessage: emitMessageToNative,
+    } = useNativeMessageEventEndpoint(webViewRef);
 
-  // sync props to webview when webview is ready
-  useEffect(() => {
-    if (!isWebViewReady) {
-      return;
-    }
+    useSyncRef(props, webViewComRef, nativeMessageEventEndpoint);
 
-    // we don't want to pass ref to the webview, it will be handled by useSyncRef
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { ref: _, ...rest } = props;
-    webViewComRef.current?.setProps(rest);
-  }, [isWebViewReady, props]);
+    // sync props to webview when webview is ready
+    useEffect(() => {
+      if (!isWebViewReady) {
+        return;
+      }
 
-  useEffect(() => {
-    expose(
-      {
-        setViewportHeight: (height: number) => {
-          setNotifiedHeight(height);
-        },
-        log: (message: string) => {
-          console.log("[Editor]:", message);
-        },
-        onWebViewReady: () => {
-          console.log("onWebViewReady");
-          setIsWebViewReady(true);
-        },
-        onEditorCreated: () => {
-          freshProps.current.onCreate?.();
-        },
-        onEditorUpdated: () => {
-          freshProps.current.onUpdate?.();
-        },
-        onEditorBlurred: () => {
-          freshProps.current.onBlur?.();
-          setSuggestionsEnabled(false);
-        },
-        onEditorEscapePressed: () => {
-          freshProps.current.onEscapePress?.();
-          setSuggestionsEnabled(false);
-        },
-        async searchSuggestions(query: string, char: "@" | "$") {
-          return await freshProps.current.suggestions.search(query, char);
-        },
-        onMentionSuggestionStart: ({ items, query, clientRect }) => {
-          setSuggestionsEnabled(true);
+      // we don't want to pass ref to the webview, it will be handled by useSyncRef
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { ref: _, ...rest } = props;
+      webViewComRef.current?.setProps(rest);
+    }, [isWebViewReady, props]);
 
-          webViewContainerViewRef.current?.measureInWindow((x, y) => {
-            setMentionSuggestionProps({
-              items,
-              query,
-              clientRect: DOMRect.fromRect({
-                x: x + freshWebViewLayout.current.x + clientRect.x,
-                y: y + freshWebViewLayout.current.y + clientRect.y,
-                height: clientRect.height,
-                width: clientRect.width,
-              }),
-            });
-          });
-        },
-        onMentionSuggestionUpdate: ({ items, query, clientRect }) => {
-          webViewContainerViewRef.current?.measureInWindow((x, y) => {
-            setMentionSuggestionProps((prev) => ({
-              ...prev,
-              items,
-              query,
-              ...(clientRect
-                ? {
-                    clientRect: DOMRect.fromRect({
-                      x: x + freshWebViewLayout.current.x + clientRect.x,
-                      y: y + freshWebViewLayout.current.y + clientRect.y,
-                      height: clientRect.height,
-                      width: clientRect.width,
-                    }),
-                  }
-                : {}),
-            }));
-          });
-        },
-        onMentionSuggestionExit: () => {
-          setSuggestionsEnabled(false);
-        },
-      } satisfies INativeExposedCom,
-      nativeMessageEventEndpoint,
-    );
-
-    return () => {
-      // comlink didn't provide a way to unexpose, so we need to manually remove the subscriptions
-      clearNativeMessageEventListeners();
-    };
-  }, [
-    freshProps,
-    freshWebViewLayout,
-    nativeMessageEventEndpoint,
-    clearNativeMessageEventListeners,
-  ]);
-
-  return (
-    <>
-      <View
-        ref={webViewContainerViewRef}
-        style={[
-          {
-            // the height should be dictated by the editor content
-            height: notifiedHeight,
-            minHeight: 20,
-            minWidth: 20,
+    useEffect(() => {
+      expose(
+        {
+          setViewportHeight: (height: number) => {
+            setNotifiedHeight(height);
           },
-          props.style,
-        ]}
-      >
-        <WebView
-          ref={webViewRef}
-          style={{ flex: 1 }}
-          originWhitelist={["*"]}
-          scrollEnabled={false}
-          webviewDebuggingEnabled={__DEV__}
-          onMessage={(event) => {
-            emitMessageToNative(JSON.parse(event.nativeEvent.data));
+          log: (message: string) => {
+            console.log("[Editor]:", message);
+          },
+          onWebViewReady: () => {
+            console.log("onWebViewReady");
+            setIsWebViewReady(true);
+          },
+          onEditorCreated: () => {
+            freshProps.current.onCreate?.();
+          },
+          onEditorUpdated: () => {
+            freshProps.current.onUpdate?.();
+          },
+          onEditorBlurred: () => {
+            freshProps.current.onBlur?.();
+            setSuggestionsEnabled(false);
+          },
+          onEditorEscapePressed: () => {
+            freshProps.current.onEscapePress?.();
+            setSuggestionsEnabled(false);
+          },
+          async searchSuggestions(query: string, char: "@" | "$") {
+            return await freshProps.current.suggestions.search(query, char);
+          },
+          onMentionSuggestionStart: ({ items, query, clientRect }) => {
+            setSuggestionsEnabled(true);
+
+            webViewContainerViewRef.current?.measureInWindow((x, y) => {
+              setMentionSuggestionProps({
+                items,
+                query,
+                clientRect: DOMRect.fromRect({
+                  x: x + freshWebViewLayout.current.x + clientRect.x,
+                  y: y + freshWebViewLayout.current.y + clientRect.y,
+                  height: clientRect.height,
+                  width: clientRect.width,
+                }),
+              });
+            });
+          },
+          onMentionSuggestionUpdate: ({ items, query, clientRect }) => {
+            webViewContainerViewRef.current?.measureInWindow((x, y) => {
+              setMentionSuggestionProps((prev) => ({
+                ...prev,
+                items,
+                query,
+                ...(clientRect
+                  ? {
+                      clientRect: DOMRect.fromRect({
+                        x: x + freshWebViewLayout.current.x + clientRect.x,
+                        y: y + freshWebViewLayout.current.y + clientRect.y,
+                        height: clientRect.height,
+                        width: clientRect.width,
+                      }),
+                    }
+                  : {}),
+              }));
+            });
+          },
+          onMentionSuggestionExit: () => {
+            setSuggestionsEnabled(false);
+          },
+        } satisfies INativeExposedCom,
+        nativeMessageEventEndpoint,
+      );
+
+      return () => {
+        // comlink didn't provide a way to unexpose, so we need to manually remove the subscriptions
+        clearNativeMessageEventListeners();
+      };
+    }, [
+      freshProps,
+      freshWebViewLayout,
+      nativeMessageEventEndpoint,
+      clearNativeMessageEventListeners,
+    ]);
+
+    return (
+      <>
+        <View
+          ref={webViewContainerViewRef}
+          style={[
+            {
+              // the height should be dictated by the editor content
+              height: notifiedHeight,
+              minHeight: 20,
+              minWidth: 20,
+            },
+            props.style,
+          ]}
+        >
+          <WebView
+            ref={webViewRef}
+            style={{ flex: 1 }}
+            originWhitelist={["*"]}
+            scrollEnabled={false}
+            webviewDebuggingEnabled={__DEV__}
+            onMessage={(event) => {
+              emitMessageToNative(JSON.parse(event.nativeEvent.data));
+            }}
+            source={{ html: `${editorHtml}` }}
+            onLayout={webViewOnLayout}
+          />
+        </View>
+        <Suggestions
+          enabled={suggestionsEnabled}
+          onDismiss={() => {
+            setSuggestionsEnabled(false);
           }}
-          source={{ html: `${editorHtml}` }}
-          onLayout={webViewOnLayout}
+          command={(item: MentionItem) => {
+            webViewComRef.current?.invokeMentionCommand(item);
+          }}
+          theme={props.theme}
+          className={props.theme?.suggestions?.className}
+          separatorClassName={
+            props.theme?.suggestions_item_separator?.className
+          }
+          {...mentionSuggestionProps}
         />
-      </View>
-      <Suggestions
-        enabled={suggestionsEnabled}
-        onDismiss={() => {
-          setSuggestionsEnabled(false);
-        }}
-        command={(item: MentionItem) => {
-          webViewComRef.current?.invokeMentionCommand(item);
-        }}
-        {...mentionSuggestionProps}
-      />
-    </>
-  );
-}
+      </>
+    );
+  },
+  {
+    className: "style",
+  },
+);
 
 function useSyncRef(
   props: EditorProps,
