@@ -49,22 +49,37 @@ export type EditorTheme = {
    */
   styleSheetText?: string;
   editorContainer?: {
-    classNames?: string;
+    className?: string;
   };
   editorContainer_dropTarget?: {
-    classNames?: string;
+    className?: string;
   };
   editor?: {
-    classNames?: string;
+    className?: string;
   };
   editor_disabled?: {
-    classNames?: string;
+    className?: string;
   };
   link?: {
-    classNames?: string;
+    className?: string;
   };
   placeholder?: {
-    classNames?: string;
+    className?: string;
+  };
+  suggestions?: {
+    className?: string;
+  };
+  suggestions_item?: {
+    className?: string;
+  };
+  suggestions_item_separator?: {
+    className?: string;
+  };
+  suggestions_item_title?: {
+    className?: string;
+  };
+  suggestions_item_subtitle?: {
+    className?: string;
   };
 };
 

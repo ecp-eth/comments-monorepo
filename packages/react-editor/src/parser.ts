@@ -182,7 +182,7 @@ export function parse(
           {
             type: "link",
             attrs: {
-              class: theme?.link?.classNames ?? "",
+              class: theme?.link?.className ?? "",
               href: urlMatch[0],
               target: "_blank",
               rel: "noopener noreferrer",

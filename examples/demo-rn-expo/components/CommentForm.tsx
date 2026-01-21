@@ -151,7 +151,7 @@ export function CommentForm({
       }
       `,
       editor: {
-        classNames:
+        className:
           "editor placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring md:text-sm",
       },
     };

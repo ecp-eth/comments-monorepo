@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useContext,
+} from "react";
 import {
   View,
   Text,
@@ -6,6 +12,8 @@ import {
   FlatList,
   Image,
   ImageSourcePropType,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import Animated, {
   useSharedValue,
@@ -24,7 +32,15 @@ import { MINIMUM_QUERY_LENGTH } from "../../constants.js";
 import { KeyboardAvoidPopUpView } from "../../components/KeyboardAvoidPopUpView.js";
 import blo from "blo-png";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { INativeExposedComSuggestionProps } from "../../editor.type.js";
+import {
+  EditorTheme,
+  INativeExposedComSuggestionProps,
+} from "../../editor.type.js";
+import {
+  themeContext,
+  ThemeContextProvider,
+} from "../../components/ThemeContextProvider.js";
+import { cssInterop } from "nativewind";
 
 // TODO: should we configure native wind for all sizes?
 const ICON_SIZE = 24;
@@ -38,246 +54,279 @@ export type SuggestionsProps = INativeExposedComSuggestionProps & {
   command: (item: MentionItem) => void;
   enabled: boolean;
   onDismiss: () => void;
+  style?: StyleProp<ViewStyle>;
+  separatorStyle?: StyleProp<ViewStyle>;
+  theme?: EditorTheme;
 };
 
-export function Suggestions({
-  items,
-  query,
-  clientRect,
-  command,
-  enabled,
-  onDismiss,
-}: SuggestionsProps) {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
+export const Suggestions = cssInterop(
+  function Suggestions({
+    items,
+    query,
+    clientRect,
+    command,
+    enabled,
+    onDismiss,
+    style,
+    separatorStyle,
+    theme,
+  }: SuggestionsProps) {
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const flatListRef = useRef<FlatList>(null);
 
-  const selectItem = (index: number) => {
-    const item = items[index];
-    if (item) {
-      command(item);
-    }
-  };
+    const selectItem = (index: number) => {
+      const item = items[index];
+      if (item) {
+        command(item);
+      }
+    };
 
-  useEffect(() => setSelectedIndex(0), [items]);
+    useEffect(() => setSelectedIndex(0), [items]);
 
-  // Scroll selected item into view
-  useEffect(() => {
-    if (items.length > 0 && selectedIndex < items.length) {
-      flatListRef.current?.scrollToIndex({
-        index: selectedIndex,
-        animated: true,
-        viewPosition: 0.5,
-      });
-    }
-  }, [selectedIndex, items.length]);
+    // Scroll selected item into view
+    useEffect(() => {
+      if (items.length > 0 && selectedIndex < items.length) {
+        flatListRef.current?.scrollToIndex({
+          index: selectedIndex,
+          animated: true,
+          viewPosition: 0.5,
+        });
+      }
+    }, [selectedIndex, items.length]);
 
-  const enableContent =
-    isValidQuery(query, MINIMUM_QUERY_LENGTH) && items.length > 0 && enabled;
+    const enableContent =
+      isValidQuery(query, MINIMUM_QUERY_LENGTH) && items.length > 0 && enabled;
 
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: MentionItem;
-    index: number;
-  }) => {
+    const renderItem = ({
+      item,
+      index,
+    }: {
+      item: MentionItem;
+      index: number;
+    }) => {
+      return (
+        <TouchableOpacity
+          onPress={() => selectItem(index)}
+          style={{
+            padding: 4,
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          {(() => {
+            const itemType = item.type;
+            switch (itemType) {
+              case "ens":
+              case "farcaster":
+                return (
+                  <AccountSuggestion
+                    index={index}
+                    address={item.address}
+                    avatarUrl={
+                      item.type === "farcaster" ? item.pfpUrl : item.avatarUrl
+                    }
+                    name={
+                      item.type === "farcaster"
+                        ? item.displayName || item.username
+                        : item.name
+                    }
+                    handle={item.type === "farcaster" ? item.fname : item.name}
+                  />
+                );
+
+              case "erc20":
+                return <ERC20TokenSuggestion index={index} suggestion={item} />;
+              default:
+                itemType satisfies never;
+            }
+          })()}
+        </TouchableOpacity>
+      );
+    };
+
     return (
-      <TouchableOpacity
-        onPress={() => selectItem(index)}
-        style={{
-          padding: 4,
-          alignItems: "center",
-          gap: 8,
-        }}
+      <KeyboardAvoidPopUpView
+        enabled={enableContent}
+        inputRect={clientRect}
+        gap={GAP_DROPDOWN_FROM_INPUT_BOTTOM}
+        onDismiss={onDismiss}
       >
-        {(() => {
-          const itemType = item.type;
-          switch (itemType) {
-            case "ens":
-            case "farcaster":
-              return (
-                <AccountSuggestion
-                  index={index}
-                  address={item.address}
-                  avatarUrl={
-                    item.type === "farcaster" ? item.pfpUrl : item.avatarUrl
-                  }
-                  name={
-                    item.type === "farcaster"
-                      ? item.displayName || item.username
-                      : item.name
-                  }
-                  handle={item.type === "farcaster" ? item.fname : item.name}
-                />
-              );
+        {({ popAbove, maxHeight }) => {
+          return enableContent ? (
+            <ThemeContextProvider value={theme ?? {}}>
+              <View
+                style={[
+                  {
+                    flex: 1,
 
-            case "erc20":
-              return <ERC20TokenSuggestion index={index} suggestion={item} />;
-            default:
-              itemType satisfies never;
-          }
-        })()}
-      </TouchableOpacity>
+                    borderBottomWidth: 1,
+                    borderTopWidth: 1,
+                    borderColor: "#EFEFEF",
+
+                    backgroundColor: "#FFF",
+                  },
+                  style,
+                ]}
+              >
+                {items.length <= 0 ? null : (
+                  <FlatList
+                    ref={flatListRef}
+                    data={items}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => `${query}-${item.address}`}
+                    style={{
+                      flex: 1,
+                      flexShrink: 1,
+                      maxHeight,
+                    }}
+                    horizontal={false}
+                    onScrollToIndexFailed={(info) => {
+                      // Fallback if scroll fails
+                      setTimeout(() => {
+                        flatListRef.current?.scrollToIndex({
+                          index: info.index,
+                          animated: true,
+                        });
+                      }, 100);
+                    }}
+                    ItemSeparatorComponent={
+                      separatorStyle
+                        ? () => <View style={separatorStyle} />
+                        : undefined
+                    }
+                    inverted={popAbove}
+                  />
+                )}
+              </View>
+            </ThemeContextProvider>
+          ) : null;
+        }}
+      </KeyboardAvoidPopUpView>
     );
-  };
-
-  return (
-    <KeyboardAvoidPopUpView
-      enabled={enableContent}
-      inputRect={clientRect}
-      gap={GAP_DROPDOWN_FROM_INPUT_BOTTOM}
-      onDismiss={onDismiss}
-    >
-      {({ popAbove, maxHeight }) => {
-        return enableContent ? (
-          <View
-            style={{
-              flex: 1,
-
-              borderBottomWidth: 1,
-              borderTopWidth: 1,
-              borderColor: "#EFEFEF",
-
-              backgroundColor: "#FFF",
-            }}
-          >
-            {items.length <= 0 ? null : (
-              <FlatList
-                ref={flatListRef}
-                data={items}
-                renderItem={renderItem}
-                keyExtractor={(item) => `${query}-${item.address}`}
-                style={{
-                  flex: 1,
-                  flexShrink: 1,
-                  maxHeight,
-                }}
-                horizontal={false}
-                onScrollToIndexFailed={(info) => {
-                  // Fallback if scroll fails
-                  setTimeout(() => {
-                    flatListRef.current?.scrollToIndex({
-                      index: info.index,
-                      animated: true,
-                    });
-                  }, 100);
-                }}
-                inverted={popAbove}
-              />
-            )}
-          </View>
-        ) : null;
-      }}
-    </KeyboardAvoidPopUpView>
-  );
-}
+  },
+  {
+    className: "style",
+    separatorClassName: "separatorStyle",
+  },
+);
 
 const ANIMATION_DURATION = 300;
 const ANIMATION_DELAY_PER_ITEM = 50;
 const SLIDE_DISTANCE = 0; // disabled for now according to discussion
 
-function SuggestionItem({
-  source,
-  title,
-  subtitle,
-  index,
-}: {
-  source: ImageSourcePropType;
-  title: React.ReactNode;
-  subtitle: React.ReactNode;
-  index: number;
-}) {
-  const { left, right } = useSafeAreaInsets();
-  const opacity = useSharedValue(0);
-  const translateX = useSharedValue(SLIDE_DISTANCE);
-  const [hasAnimated, setHasAnimated] = useState(false);
+const SuggestionItem = cssInterop(
+  function SuggestionItem({
+    source,
+    title,
+    subtitle,
+    index,
+    style,
+    titleStyle,
+    subtitleStyle,
+  }: {
+    source: ImageSourcePropType;
+    title: React.ReactNode;
+    subtitle: React.ReactNode;
+    index: number;
+    style?: StyleProp<ViewStyle>;
+    titleStyle?: StyleProp<ViewStyle>;
+    subtitleStyle?: StyleProp<ViewStyle>;
+  }) {
+    const { left, right } = useSafeAreaInsets();
+    const opacity = useSharedValue(0);
+    const translateX = useSharedValue(SLIDE_DISTANCE);
+    const [hasAnimated, setHasAnimated] = useState(false);
 
-  const handleLayout = useCallback(() => {
-    if (hasAnimated) return;
-    setHasAnimated(true);
+    const handleLayout = useCallback(() => {
+      if (hasAnimated) return;
+      setHasAnimated(true);
 
-    const delay = index * ANIMATION_DELAY_PER_ITEM;
+      const delay = index * ANIMATION_DELAY_PER_ITEM;
 
-    opacity.value = withDelay(
-      delay,
-      withTiming(1, {
-        duration: ANIMATION_DURATION,
-        easing: Easing.out(Easing.ease),
-      }),
-    );
-    translateX.value = withDelay(
-      delay,
-      withTiming(0, {
-        duration: ANIMATION_DURATION,
-        easing: Easing.out(Easing.ease),
-      }),
-    );
-  }, [hasAnimated, index, opacity, translateX]);
+      opacity.value = withDelay(
+        delay,
+        withTiming(1, {
+          duration: ANIMATION_DURATION,
+          easing: Easing.out(Easing.ease),
+        }),
+      );
+      translateX.value = withDelay(
+        delay,
+        withTiming(0, {
+          duration: ANIMATION_DURATION,
+          easing: Easing.out(Easing.ease),
+        }),
+      );
+    }, [hasAnimated, index, opacity, translateX]);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ translateX: translateX.value }],
-    };
-  });
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        opacity: opacity.value,
+        transform: [{ translateX: translateX.value }],
+      };
+    });
 
-  return (
-    <Animated.View
-      onLayout={handleLayout}
-      style={[
-        {
-          marginLeft: left,
-          marginRight: right,
-          flex: 1,
-          flexDirection: "row",
-          flexGrow: 1,
-          flexShrink: 0,
-          alignItems: "center",
-          justifyContent: "flex-start",
-          gap: GAP,
-          paddingVertical: PADDING_VERTICAL,
-          paddingHorizontal: PADDING_HORIZONTAL,
-          overflow: "hidden",
-        },
-        animatedStyle,
-      ]}
-    >
-      <Image
-        source={source}
-        style={{
-          width: ICON_SIZE,
-          height: ICON_SIZE,
-          borderRadius: ICON_SIZE / 2,
-          backgroundColor: "#f3f4f6",
-        }}
-      />
-      <View
-        style={{
-          flex: 1,
-          minWidth: 0,
-        }}
+    return (
+      <Animated.View
+        onLayout={handleLayout}
+        style={[
+          {
+            marginLeft: left,
+            marginRight: right,
+            flex: 1,
+            flexDirection: "row",
+            flexGrow: 1,
+            flexShrink: 0,
+            alignItems: "center",
+            justifyContent: "flex-start",
+            gap: GAP,
+            paddingVertical: PADDING_VERTICAL,
+            paddingHorizontal: PADDING_HORIZONTAL,
+            overflow: "hidden",
+          },
+          animatedStyle,
+          style,
+        ]}
       >
-        <Text
+        <Image
+          source={source}
           style={{
-            fontSize: FONT_SIZE,
-            fontWeight: "500",
+            width: ICON_SIZE,
+            height: ICON_SIZE,
+            borderRadius: ICON_SIZE / 2,
+            backgroundColor: "#f3f4f6",
           }}
-          numberOfLines={1}
-          ellipsizeMode="tail"
+        />
+        <View
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
         >
-          {title}
-        </Text>
-        <Text
-          style={{ fontSize: FONT_SIZE, color: "#6b7280" }}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {subtitle}
-        </Text>
-      </View>
-    </Animated.View>
-  );
-}
+          <Text
+            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, titleStyle]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {title}
+          </Text>
+          <Text
+            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, subtitleStyle]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {subtitle}
+          </Text>
+        </View>
+      </Animated.View>
+    );
+  },
+  {
+    className: "style",
+    titleClassName: "titleStyle",
+    subtitleClassName: "subtitleStyle",
+  },
+);
 
 type AccountSuggestionProps = {
   index: number;
@@ -294,12 +343,16 @@ function AccountSuggestion({
   name,
   handle,
 }: AccountSuggestionProps) {
+  const theme = useContext(themeContext);
   return (
     <SuggestionItem
       index={index}
       source={{ uri: avatarUrl ?? blo(address, 24) }}
       title={name}
       subtitle={handle}
+      className={theme?.suggestions_item?.className}
+      titleClassName={theme?.suggestions_item_title?.className}
+      subtitleClassName={theme?.suggestions_item_subtitle?.className}
     />
   );
 }
@@ -313,6 +366,7 @@ function ERC20TokenSuggestion({
   index,
   suggestion,
 }: ERC20TokenSuggestionProps) {
+  const theme = useContext(themeContext);
   const chainName =
     getChainById(suggestion.chainId, Object.values(chains))?.name ??
     "Unknown Chain";
@@ -323,6 +377,9 @@ function ERC20TokenSuggestion({
       source={{ uri: suggestion.logoURI ?? blo(suggestion.address, 24) }}
       title={"$" + suggestion.symbol}
       subtitle={chainName}
+      className={theme?.suggestions_item?.className}
+      titleClassName={theme?.suggestions_item_title?.className}
+      subtitleClassName={theme?.suggestions_item_subtitle?.className}
     />
   );
 }

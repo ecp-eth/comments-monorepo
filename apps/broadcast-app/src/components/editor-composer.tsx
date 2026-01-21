@@ -363,10 +363,10 @@ export function EditorComposer({
   const editorTheme = useMemo(() => {
     return {
       editorContainer: {
-        classNames: cn(defaultTheme.editorContainer.classNames, "flex-1"),
+        className: cn(defaultTheme.editorContainer.className, "flex-1"),
       },
       editor: {
-        classNames: cn(defaultTheme.editor.classNames, "min-h-4 px-2 py-2"),
+        className: cn(defaultTheme.editor.className, "min-h-4 px-2 py-2"),
       },
     };
   }, []);
