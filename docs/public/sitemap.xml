@@ -3830,7 +3830,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3854,25 +3854,31 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/functions/constructEvent</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T11:10:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/functions/constructEventFromRequest</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T11:10:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ApprovalAddedEvent</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ApprovalExpiredEvent</loc>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ApprovalRemovedEvent</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3956,7 +3962,7 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/type-aliases/ConstructEventResult</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T11:10:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -3968,49 +3974,55 @@
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/AllEvents</loc>
-    <lastmod>2025-10-31T08:49:17.000Z</lastmod>
+    <lastmod>2026-01-14T11:10:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/AllEventsSchema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T11:10:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventSchema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventV1Schema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalAddedEventV2Schema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalEvents</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalEventsSchema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalExpiredEventSchema</loc>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/ApprovalRemovedEventSchema</loc>
-    <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -4119,6 +4131,12 @@
   <url>
     <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EVENT_APPROVAL_ADDED</loc>
     <lastmod>2025-12-17T14:36:39.000Z</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://docs.ethcomments.xyz/sdk-reference/indexer/webhooks/variables/EVENT_APPROVAL_EXPIRED</loc>
+    <lastmod>2026-01-14T09:34:18.000Z</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
