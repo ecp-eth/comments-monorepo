@@ -278,8 +278,8 @@ function BaseCommentForm({
   const editorTheme = useMemo(() => {
     return {
       editor: {
-        classNames: cn(
-          defaultTheme.editor.classNames,
+        className: cn(
+          defaultTheme.editor.className,
           "w-full p-2 border border-gray-300 rounded",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
@@ -287,7 +287,7 @@ function BaseCommentForm({
         ),
       },
       editor_disabled: {
-        classNames: cn(defaultTheme.editor_disabled.classNames, "opacity-50"),
+        className: cn(defaultTheme.editor_disabled.className, "opacity-50"),
       },
     };
   }, [submitMutation.error]);
