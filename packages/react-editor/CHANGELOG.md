@@ -1,5 +1,13 @@
 # @ecp.eth/react-editor
 
+## 0.0.23
+
+### Patch Changes
+
+- 4e4bc0c: feat(react-editor): support nativewind/tailwind for native components
+- efab864: fix(react-editor): incorrect pop up location when KeyboardStickyView used
+- 4e4bc0c: fix(react-editor): update `classNames` to be singular to be consistent with the prop name in react
+
 ## 0.0.22
 
 ### Patch Changes
