@@ -29,6 +29,12 @@ import { Suggestions } from "./extensions/components/suggestions.native";
 import { MentionItem } from "./types";
 import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
 import { cssInterop } from "nativewind";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
 export type { EditorProps, EditorRef } from "./editor.type.js";
 
@@ -65,6 +71,7 @@ export const Editor = cssInterop(
       clearListeners: clearNativeMessageEventListeners,
       emitMessage: emitMessageToNative,
     } = useNativeMessageEventEndpoint(webViewRef);
+    const opacity = useSharedValue(0);
 
     useSyncRef(props, webViewComRef, nativeMessageEventEndpoint);
 
@@ -94,6 +101,10 @@ export const Editor = cssInterop(
             setIsWebViewReady(true);
           },
           onEditorCreated: () => {
+            opacity.value = withTiming(1, {
+              duration: 150,
+              easing: Easing.inOut(Easing.ease),
+            });
             freshProps.current.onCreate?.();
           },
           onEditorUpdated: () => {
@@ -165,7 +176,7 @@ export const Editor = cssInterop(
 
     return (
       <>
-        <View
+        <Animated.View
           ref={webViewContainerViewRef}
           style={[
             {
@@ -173,6 +184,9 @@ export const Editor = cssInterop(
               height: notifiedHeight,
               minHeight: 20,
               minWidth: 20,
+            },
+            {
+              opacity,
             },
             props.style,
           ]}
@@ -189,7 +203,7 @@ export const Editor = cssInterop(
             source={{ html: `${editorHtml}` }}
             onLayout={webViewOnLayout}
           />
-        </View>
+        </Animated.View>
         <Suggestions
           enabled={suggestionsEnabled}
           onDismiss={() => {
