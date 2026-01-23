@@ -14,7 +14,7 @@
     "api:schema:sync": "scripts/sync-api-schemas.sh"
   },
   "dependencies": {
-    "@ecp.eth/react-editor": "~0.0.23",
+    "@ecp.eth/react-editor": "~0.0.24",
     "@ecp.eth/sdk": "~0.0.41",
     "@ecp.eth/shared": "~0.0.21",
     "@ecp.eth/shared-signer": "~0.0.2",
