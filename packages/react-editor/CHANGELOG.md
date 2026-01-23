@@ -1,5 +1,11 @@
 # @ecp.eth/react-editor
 
+## 0.0.24
+
+### Patch Changes
+
+- 257ebe7: fix(react-editor): avoid background flashing on editor load
+
 ## 0.0.23
 
 ### Patch Changes
