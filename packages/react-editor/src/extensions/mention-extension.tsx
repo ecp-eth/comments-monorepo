@@ -191,18 +191,23 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   renderText({ node }) {
     const attrs = node.attrs as MentionItem;
 
-    switch (attrs.type) {
-      case "erc20":
-        // erc20 token as caip19
-        return attrs.caip19;
-      case "ens":
-        return `@${attrs.name}`;
-      case "farcaster":
-        return `@${attrs.fname}`;
-      default:
-        attrs satisfies never;
-        throw new Error("Invalid type");
-    }
+    const text = (() => {
+      switch (attrs.type) {
+        case "erc20":
+          // erc20 token as caip19
+          return attrs.caip19;
+        case "ens":
+          return `@${attrs.name}`;
+        case "farcaster":
+          return `@${attrs.fname}`;
+        default:
+          attrs satisfies never;
+          throw new Error("Invalid type");
+      }
+    })();
+
+    // adding a space after the mention to avoid the mention being merged with the next character
+    return text + " ";
   },
   renderHTML({ node, HTMLAttributes }) {
     const attrs = node.attrs as MentionItem;

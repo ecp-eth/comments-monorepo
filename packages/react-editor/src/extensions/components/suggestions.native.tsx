@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   useContext,
+  useMemo,
 } from "react";
 import {
   View,
@@ -22,7 +23,7 @@ import Animated, {
   withDelay,
   Easing,
 } from "react-native-reanimated";
-import type { Hex } from "viem";
+import { createPublicClient, http, type Hex, type PublicClient } from "viem";
 import * as chains from "viem/chains";
 import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
 import { getChainById } from "@ecp.eth/shared/helpers";
@@ -43,13 +44,12 @@ import {
 import { cssInterop } from "nativewind";
 import FastImage from "react-native-fast-image";
 
-// TODO: should we configure native wind for all sizes?
 const ICON_SIZE = 24;
 const FONT_SIZE = 12;
 const GAP = 8;
 const PADDING_VERTICAL = 12;
 const PADDING_HORIZONTAL = 20;
-const GAP_DROPDOWN_FROM_INPUT_BOTTOM = 8;
+const GAP_DROPDOWN_FROM_INPUT_BOTTOM = 14;
 
 export type SuggestionsProps = INativeExposedComSuggestionProps & {
   command: (item: MentionItem) => void;
@@ -58,6 +58,7 @@ export type SuggestionsProps = INativeExposedComSuggestionProps & {
   style?: StyleProp<ViewStyle>;
   separatorStyle?: StyleProp<ViewStyle>;
   theme?: EditorTheme;
+  ensRPC?: string;
 };
 
 export const Suggestions = cssInterop(
@@ -71,6 +72,7 @@ export const Suggestions = cssInterop(
     style,
     separatorStyle,
     theme,
+    ensRPC,
   }: SuggestionsProps) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const flatListRef = useRef<FlatList>(null);
@@ -94,6 +96,15 @@ export const Suggestions = cssInterop(
         });
       }
     }, [selectedIndex, items.length]);
+
+    const publicClient = useMemo(
+      () =>
+        createPublicClient({
+          chain: chains.mainnet,
+          transport: http(ensRPC),
+        }),
+      [ensRPC],
+    );
 
     const enableContent =
       isValidQuery(query, MINIMUM_QUERY_LENGTH) && items.length > 0 && enabled;
@@ -134,6 +145,7 @@ export const Suggestions = cssInterop(
                     handle={
                       item.type === "farcaster" ? item.fname : item.address
                     }
+                    client={publicClient}
                   />
                 );
 
@@ -229,7 +241,11 @@ const SuggestionItem = cssInterop(
     avatarStyle,
     address,
   }: {
-    source: {
+    /**
+     * when `source` is not provided, it is considered the source is still being loaded
+     * if `source` is provided, but uri is undefined, it is considered "no source" and a `blo` will be used
+     */
+    source?: {
       uri?: string;
     };
     title: React.ReactNode;
@@ -251,9 +267,9 @@ const SuggestionItem = cssInterop(
     const translateX = useSharedValue(SLIDE_DISTANCE);
     const [hasAnimated, setHasAnimated] = useState(false);
     const [hasImageError, setHasImageError] = useState(false);
-    const sourceURI =
-      source.uri ??
-      blo(
+
+    const getBlo = useCallback(() => {
+      return blo(
         address,
         (typeof avatarStyle === "object" &&
           avatarStyle !== null &&
@@ -265,10 +281,7 @@ const SuggestionItem = cssInterop(
           Math.max(avatarStyle.width, avatarStyle.height)) ||
           ICON_SIZE,
       );
-
-    useEffect(() => {
-      setHasImageError(false);
-    }, [source]);
+    }, [address, avatarStyle]);
 
     const handleLayout = useCallback(() => {
       if (hasAnimated) return;
@@ -323,10 +336,22 @@ const SuggestionItem = cssInterop(
       >
         {hasImageError ? (
           <ImageErrorIcon avatarStyle={avatarStyle} />
+        ) : source === undefined ? (
+          <View
+            style={[
+              {
+                width: ICON_SIZE,
+                height: ICON_SIZE,
+                borderRadius: ICON_SIZE / 2,
+                backgroundColor: "#f3f4f6",
+              },
+              avatarStyle,
+            ]}
+          />
         ) : (
           <FastImage
             source={{
-              uri: sourceURI,
+              uri: source.uri ?? getBlo(),
             }}
             style={[
               {
@@ -337,6 +362,9 @@ const SuggestionItem = cssInterop(
               },
               avatarStyle,
             ]}
+            onLoadStart={() => {
+              setHasImageError(false);
+            }}
             onError={() => {
               setHasImageError(true);
             }}
@@ -380,6 +408,7 @@ type AccountSuggestionProps = {
   avatarUrl: string | null | undefined;
   name: string;
   handle: string;
+  client: PublicClient;
 };
 
 function AccountSuggestion({
@@ -388,12 +417,32 @@ function AccountSuggestion({
   avatarUrl,
   name,
   handle,
+  client,
 }: AccountSuggestionProps) {
   const theme = useContext(themeContext);
+  const [source, setSource] = useState<{
+    uri?: string;
+  }>();
+
+  useEffect(() => {
+    if (avatarUrl) {
+      setSource({
+        uri: avatarUrl,
+      });
+      return;
+    }
+
+    client.getEnsAvatar({ name }).then((avatar) => {
+      setSource({
+        uri: avatar ?? undefined,
+      });
+    });
+  }, [client, avatarUrl, name]);
+
   return (
     <SuggestionItem
       index={index}
-      source={{ uri: avatarUrl ?? undefined }}
+      source={source}
       title={name}
       subtitle={handle}
       className={theme?.suggestions_item?.className}

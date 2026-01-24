@@ -19,7 +19,6 @@ const cacheMap = new LRUCache<
 
 export const ensByQueryResolverService = wrapServiceWithTracing(
   new ENSByQueryResolver({
-    chainRpcUrl: env.ENS_RPC_URL,
     subgraphUrl: env.ENSNODE_SUBGRAPH_URL,
     cacheMap,
     metrics,

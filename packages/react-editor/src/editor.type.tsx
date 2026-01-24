@@ -118,6 +118,7 @@ export type EditorProps = {
    */
   fileComponent?: UploadTrackerFileComponent;
   theme?: EditorTheme;
+  ensRPC?: string;
 };
 
 /**

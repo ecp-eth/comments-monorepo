@@ -217,6 +217,7 @@ export const Editor = cssInterop(
           separatorClassName={
             props.theme?.suggestions_item_separator?.className
           }
+          ensRPC={props.ensRPC}
           {...mentionSuggestionProps}
         />
       </>

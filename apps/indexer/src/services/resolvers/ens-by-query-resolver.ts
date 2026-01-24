@@ -5,8 +5,6 @@ import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
-import { createPublicClient, http, type PublicClient } from "viem";
-import { mainnet } from "viem/chains";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;
@@ -19,10 +17,6 @@ export type ENSByQueryResolverOptions = {
    * If not provided, the resolver will return null for all queries
    */
   subgraphUrl: string | null | undefined;
-  /**
-   * The RPC URL of the chain to use for the resolver
-   */
-  chainRpcUrl: string;
 } & Omit<
   DataLoaderOptions<ENSByQueryResolverKey, ResolvedENSData[] | null>,
   "name"
@@ -33,7 +27,6 @@ export class ENSByQueryResolver extends DataLoader<
   ResolvedENSData[] | null
 > {
   constructor({
-    chainRpcUrl,
     subgraphUrl,
     ...dataLoaderOptions
   }: ENSByQueryResolverOptions) {
@@ -42,11 +35,6 @@ export class ENSByQueryResolver extends DataLoader<
         if (!subgraphUrl) {
           return queries.map(() => null);
         }
-
-        const publicClient = createPublicClient({
-          chain: mainnet,
-          transport: http(chainRpcUrl),
-        });
 
         const fullAddresses: Hex[] = [];
         const fullAddressesDeferred: Deferred<ResolvedENSData[] | null>[] = [];
@@ -61,7 +49,7 @@ export class ENSByQueryResolver extends DataLoader<
             return deferred.promise;
           }
 
-          return searchEns(query, subgraphUrl, publicClient);
+          return searchEns(query, subgraphUrl);
         });
 
         if (fullAddresses.length > 0) {
@@ -262,7 +250,6 @@ const searchByExactAddressQueryContainerTemplate = `
 async function searchEns(
   query: string,
   subgraphUrl: string,
-  client: PublicClient,
 ): Promise<ResolvedENSData[] | null> {
   if (query.startsWith(".")) {
     return null;
@@ -323,9 +310,7 @@ async function searchEns(
       .map(async (domain) => ({
         address: domain.resolvedAddress.id,
         name: domain.name,
-        avatarUrl:
-          domain.avatarUrl ??
-          (await client.getEnsAvatar({ name: domain.name }).catch(() => null)),
+        avatarUrl: domain.avatarUrl,
         url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
       })),
   );
