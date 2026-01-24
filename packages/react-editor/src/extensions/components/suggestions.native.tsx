@@ -129,7 +129,9 @@ export const Suggestions = cssInterop(
                         ? item.displayName || item.username
                         : item.name
                     }
-                    handle={item.type === "farcaster" ? item.fname : item.name}
+                    handle={
+                      item.type === "farcaster" ? item.fname : item.address
+                    }
                   />
                 );
 
