@@ -432,11 +432,18 @@ function AccountSuggestion({
       return;
     }
 
-    client.getEnsAvatar({ name }).then((avatar) => {
-      setSource({
-        uri: avatar ?? undefined,
+    client
+      .getEnsAvatar({ name })
+      .then((avatar) => {
+        setSource({
+          uri: avatar ?? undefined,
+        });
+      })
+      .catch(() => {
+        setSource({
+          uri: undefined,
+        });
       });
-    });
   }, [client, avatarUrl, name]);
 
   return (
