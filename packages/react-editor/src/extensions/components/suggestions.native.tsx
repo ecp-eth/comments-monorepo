@@ -10,8 +10,6 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  Image,
-  ImageSourcePropType,
   StyleProp,
   ViewStyle,
 } from "react-native";
@@ -41,6 +39,7 @@ import {
   ThemeContextProvider,
 } from "../../components/ThemeContextProvider.js";
 import { cssInterop } from "nativewind";
+import FastImage from "react-native-fast-image";
 
 // TODO: should we configure native wind for all sizes?
 const ICON_SIZE = 24;
@@ -224,7 +223,9 @@ const SuggestionItem = cssInterop(
     titleStyle,
     subtitleStyle,
   }: {
-    source: ImageSourcePropType;
+    source: {
+      uri: string;
+    };
     title: React.ReactNode;
     subtitle: React.ReactNode;
     index: number;
@@ -236,6 +237,7 @@ const SuggestionItem = cssInterop(
     const opacity = useSharedValue(0);
     const translateX = useSharedValue(SLIDE_DISTANCE);
     const [hasAnimated, setHasAnimated] = useState(false);
+    const [hasImageError, setHasImageError] = useState(false);
 
     const handleLayout = useCallback(() => {
       if (hasAnimated) return;
@@ -288,15 +290,22 @@ const SuggestionItem = cssInterop(
           style,
         ]}
       >
-        <Image
-          source={source}
-          style={{
-            width: ICON_SIZE,
-            height: ICON_SIZE,
-            borderRadius: ICON_SIZE / 2,
-            backgroundColor: "#f3f4f6",
-          }}
-        />
+        {hasImageError ? (
+          <ImageErrorIcon />
+        ) : (
+          <FastImage
+            source={source}
+            style={{
+              width: ICON_SIZE,
+              height: ICON_SIZE,
+              borderRadius: ICON_SIZE / 2,
+              backgroundColor: "#f3f4f6",
+            }}
+            onError={() => {
+              setHasImageError(true);
+            }}
+          />
+        )}
         <View
           style={{
             flex: 1,
@@ -374,12 +383,51 @@ function ERC20TokenSuggestion({
   return (
     <SuggestionItem
       index={index}
-      source={{ uri: suggestion.logoURI ?? blo(suggestion.address, 24) }}
+      source={{
+        uri: suggestion.logoURI ?? blo(suggestion.address, 24),
+      }}
       title={"$" + suggestion.symbol}
       subtitle={chainName}
       className={theme?.suggestions_item?.className}
       titleClassName={theme?.suggestions_item_title?.className}
       subtitleClassName={theme?.suggestions_item_subtitle?.className}
     />
+  );
+}
+
+function ImageErrorIcon() {
+  return (
+    <View
+      style={{
+        width: ICON_SIZE,
+        height: ICON_SIZE,
+        borderRadius: ICON_SIZE / 2,
+        backgroundColor: "#f3f4f6",
+        position: "relative",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <View
+        style={{
+          position: "absolute",
+          width: 15,
+          height: 2,
+          borderRadius: 1,
+          backgroundColor: "red",
+          transform: [{ rotate: "45deg" }],
+        }}
+      />
+      <View
+        style={{
+          position: "absolute",
+          width: 15,
+          height: 2,
+          borderRadius: 1,
+          backgroundColor: "red",
+          transform: [{ rotate: "-45deg" }],
+        }}
+      />
+    </View>
   );
 }
