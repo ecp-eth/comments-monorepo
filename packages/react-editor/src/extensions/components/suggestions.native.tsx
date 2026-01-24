@@ -12,6 +12,8 @@ import {
   FlatList,
   StyleProp,
   ViewStyle,
+  Animated as RNAnimated,
+  OpaqueColorValue,
 } from "react-native";
 import Animated, {
   useSharedValue,
@@ -224,9 +226,11 @@ const SuggestionItem = cssInterop(
     style,
     titleStyle,
     subtitleStyle,
+    avatarStyle,
+    address,
   }: {
     source: {
-      uri: string;
+      uri?: string;
     };
     title: React.ReactNode;
     subtitle: React.ReactNode;
@@ -234,12 +238,33 @@ const SuggestionItem = cssInterop(
     style?: StyleProp<ViewStyle>;
     titleStyle?: StyleProp<ViewStyle>;
     subtitleStyle?: StyleProp<ViewStyle>;
+    avatarStyle?: StyleProp<{
+      [K in keyof ViewStyle]: Exclude<
+        ViewStyle[K],
+        string | RNAnimated.AnimatedNode | OpaqueColorValue
+      >;
+    }>;
+    address: Hex;
   }) {
     const { left, right } = useSafeAreaInsets();
     const opacity = useSharedValue(0);
     const translateX = useSharedValue(SLIDE_DISTANCE);
     const [hasAnimated, setHasAnimated] = useState(false);
     const [hasImageError, setHasImageError] = useState(false);
+    const sourceURI =
+      source.uri ??
+      blo(
+        address,
+        (typeof avatarStyle === "object" &&
+          avatarStyle !== null &&
+          "width" in avatarStyle &&
+          typeof avatarStyle.width === "number" &&
+          avatarStyle.width > 0 &&
+          "height" in avatarStyle &&
+          typeof avatarStyle.height === "number" &&
+          Math.max(avatarStyle.width, avatarStyle.height)) ||
+          ICON_SIZE,
+      );
 
     useEffect(() => {
       setHasImageError(false);
@@ -297,16 +322,21 @@ const SuggestionItem = cssInterop(
         ]}
       >
         {hasImageError ? (
-          <ImageErrorIcon />
+          <ImageErrorIcon avatarStyle={avatarStyle} />
         ) : (
           <FastImage
-            source={source}
-            style={{
-              width: ICON_SIZE,
-              height: ICON_SIZE,
-              borderRadius: ICON_SIZE / 2,
-              backgroundColor: "#f3f4f6",
+            source={{
+              uri: sourceURI,
             }}
+            style={[
+              {
+                width: ICON_SIZE,
+                height: ICON_SIZE,
+                borderRadius: ICON_SIZE / 2,
+                backgroundColor: "#f3f4f6",
+              },
+              avatarStyle,
+            ]}
             onError={() => {
               setHasImageError(true);
             }}
@@ -340,6 +370,7 @@ const SuggestionItem = cssInterop(
     className: "style",
     titleClassName: "titleStyle",
     subtitleClassName: "subtitleStyle",
+    avatarClassName: "avatarStyle",
   },
 );
 
@@ -362,12 +393,14 @@ function AccountSuggestion({
   return (
     <SuggestionItem
       index={index}
-      source={{ uri: avatarUrl ?? blo(address, 24) }}
+      source={{ uri: avatarUrl ?? undefined }}
       title={name}
       subtitle={handle}
       className={theme?.suggestions_item?.className}
       titleClassName={theme?.suggestions_item_title?.className}
       subtitleClassName={theme?.suggestions_item_subtitle?.className}
+      avatarClassName={theme?.suggestions_item_avatar?.className}
+      address={address}
     />
   );
 }
@@ -390,29 +423,38 @@ function ERC20TokenSuggestion({
     <SuggestionItem
       index={index}
       source={{
-        uri: suggestion.logoURI ?? blo(suggestion.address, 24),
+        uri: suggestion.logoURI ?? undefined,
       }}
       title={"$" + suggestion.symbol}
       subtitle={chainName}
       className={theme?.suggestions_item?.className}
       titleClassName={theme?.suggestions_item_title?.className}
       subtitleClassName={theme?.suggestions_item_subtitle?.className}
+      avatarClassName={theme?.suggestions_item_avatar?.className}
+      address={suggestion.address}
     />
   );
 }
 
-function ImageErrorIcon() {
+function ImageErrorIcon({
+  avatarStyle,
+}: {
+  avatarStyle?: StyleProp<ViewStyle>;
+}) {
   return (
     <View
-      style={{
-        width: ICON_SIZE,
-        height: ICON_SIZE,
-        borderRadius: ICON_SIZE / 2,
-        backgroundColor: "#f3f4f6",
-        position: "relative",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={[
+        {
+          width: ICON_SIZE,
+          height: ICON_SIZE,
+          borderRadius: ICON_SIZE / 2,
+          backgroundColor: "#f3f4f6",
+          position: "relative",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        avatarStyle,
+      ]}
     >
       <View
         style={{
