@@ -17,6 +17,7 @@ import type {
 } from "./types.js";
 import type { SearchSuggestionsFunction } from "./types.js";
 import { MINIMUM_QUERY_LENGTH } from "../constants.js";
+import { DOMOutputSpec } from "prosemirror-model";
 
 type SuggestionItem = MentionItem;
 
@@ -191,23 +192,18 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
   renderText({ node }) {
     const attrs = node.attrs as MentionItem;
 
-    const text = (() => {
-      switch (attrs.type) {
-        case "erc20":
-          // erc20 token as caip19
-          return attrs.caip19;
-        case "ens":
-          return `@${attrs.name}`;
-        case "farcaster":
-          return `@${attrs.fname}`;
-        default:
-          attrs satisfies never;
-          throw new Error("Invalid type");
-      }
-    })();
-
-    // adding a space after the mention to avoid the mention being merged with the next character
-    return text + " ";
+    switch (attrs.type) {
+      case "erc20":
+        // erc20 token as caip19
+        return attrs.caip19;
+      case "ens":
+        return `@${attrs.name}`;
+      case "farcaster":
+        return `@${attrs.fname}`;
+      default:
+        attrs satisfies never;
+        throw new Error("Invalid type");
+    }
   },
   renderHTML({ node, HTMLAttributes }) {
     const attrs = node.attrs as MentionItem;
@@ -267,6 +263,14 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         char: "@",
         startOfLine: false,
         command: ({ editor, range, props }) => {
+          // Check if there's already a space after the insertion point
+          const nodeAfter = editor.view.state.selection.$to.nodeAfter;
+          const overrideSpace = nodeAfter?.text?.startsWith(" ") ?? false;
+
+          if (overrideSpace) {
+            range.to += 1;
+          }
+
           editor
             .chain()
             .focus()
@@ -274,6 +278,10 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               {
                 type: this.name,
                 attrs: props,
+              },
+              {
+                type: "text",
+                text: " ",
               },
             ])
             .run();
