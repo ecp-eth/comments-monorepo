@@ -57,8 +57,9 @@ async function resolveEnsData(
   return {
     address,
     name: normalizedName,
-    avatarUrl:
-      avatarUrl ?? (await client.getEnsAvatar({ name: normalizedName })),
+    // ensByQueryResolver will try to query avatar url using RPC if ensnode didnt return it
+    // so we don't have to here
+    avatarUrl: avatarUrl ?? null,
     url: url ?? `https://app.ens.domains/${address}`,
   };
 }
