@@ -241,6 +241,10 @@ const SuggestionItem = cssInterop(
     const [hasAnimated, setHasAnimated] = useState(false);
     const [hasImageError, setHasImageError] = useState(false);
 
+    useEffect(() => {
+      setHasImageError(false);
+    }, [source]);
+
     const handleLayout = useCallback(() => {
       if (hasAnimated) return;
       setHasAnimated(true);

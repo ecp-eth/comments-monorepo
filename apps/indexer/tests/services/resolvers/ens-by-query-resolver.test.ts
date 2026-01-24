@@ -4,6 +4,7 @@ import { ENSByQueryResolver } from "../../../src/services/resolvers/ens-by-query
 import { metrics } from "../../../src/services/metrics";
 
 const resolver = new ENSByQueryResolver({
+  chainRpcUrl: "https://mainnet.infura.io/v3/1234567890",
   subgraphUrl: "https://api.alpha.ensnode.io/subgraph",
   metrics,
 });

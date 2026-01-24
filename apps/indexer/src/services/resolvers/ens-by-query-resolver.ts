@@ -222,11 +222,13 @@ const searchByNameQuery = gql`
           { name_not_ends_with: "].eth" }
           { name_not_starts_with: "test.[" }
         ]
-        or: {
-          expiryDate_gte: $expiryDateGte
-          # some sub domains even they are active they don't have an expiry date from ensnode
-          expiryDate: null
-        }
+        or: [
+          { expiryDate_gte: $expiryDateGte }
+          {
+            # some sub domains even they are active they don't have an expiry date from ensnode
+            expiryDate: null
+          }
+        ]
       }
       first: 20
     ) {
