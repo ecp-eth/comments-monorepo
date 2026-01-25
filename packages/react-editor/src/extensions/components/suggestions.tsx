@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   useCallback,
+  Fragment,
 } from "react";
 import * as chains from "viem/chains";
 import { createPublicClient, http, type Hex, type PublicClient } from "viem";
@@ -117,7 +118,7 @@ export const Suggestions = forwardRef(function Suggestions(
     children = (
       <>
         {items.map((item, index) => (
-          <>
+          <Fragment key={`${query}-${index}`}>
             <button
               ref={index === selectedIndex ? selectedItemRef : null}
               className={cn(
@@ -130,7 +131,6 @@ export const Suggestions = forwardRef(function Suggestions(
                     )
                   : "",
               )}
-              key={`${query}-${index}`}
               onClick={() => selectItem(index)}
             >
               {item.type === "ens" ? (
@@ -180,7 +180,7 @@ export const Suggestions = forwardRef(function Suggestions(
                   )}
                 />
               )}
-          </>
+          </Fragment>
         ))}
       </>
     );

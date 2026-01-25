@@ -48,6 +48,7 @@ const GAP = 8;
 const PADDING_VERTICAL = 12;
 const PADDING_HORIZONTAL = 20;
 const GAP_DROPDOWN_FROM_INPUT_BOTTOM = 14;
+const DEFAULT_TEXT_COLOR = "#6b7280";
 
 export type SuggestionsProps = INativeExposedComSuggestionProps & {
   command: (item: MentionItem) => void;
@@ -86,6 +87,7 @@ const CSSInteroppedSuggestions = cssInterop(
   }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const flatListRef = useRef<FlatList>(null);
+    const [ellipsisDots, setEllipsisDots] = useState(1);
 
     const selectItem = (index: number) => {
       const item = items[index];
@@ -120,6 +122,20 @@ const CSSInteroppedSuggestions = cssInterop(
     const shouldShowPopup = enabled && query.length >= 0;
     const hasValidQuery = isValidQuery(query, MINIMUM_QUERY_LENGTH);
     const showContinueTyping = !hasValidQuery;
+
+    // Animate ellipsis dots when query.length > 0
+    useEffect(() => {
+      if (!showContinueTyping || query.length === 0) {
+        setEllipsisDots(1);
+        return;
+      }
+
+      const interval = setInterval(() => {
+        setEllipsisDots((prev) => (prev >= 3 ? 1 : prev + 1));
+      }, 200);
+
+      return () => clearInterval(interval);
+    }, [showContinueTyping, query.length]);
 
     const renderItem = ({
       item,
@@ -202,17 +218,30 @@ const CSSInteroppedSuggestions = cssInterop(
                       paddingHorizontal: PADDING_HORIZONTAL,
                       alignItems: "center",
                       justifyContent: "center",
+                      position: "relative",
                     }}
                   >
                     <Text
                       style={{
                         fontSize: FONT_SIZE,
-                        color: "#6b7280",
+                        color: DEFAULT_TEXT_COLOR,
                       }}
                       className={theme?.suggestionsContinueTypingClassName}
                     >
                       Continue typing to see ENS name suggestions
                     </Text>
+                    {query.length > 0 && (
+                      <View style={{ position: "absolute", left: "100%" }}>
+                        <Text
+                          style={{
+                            fontSize: FONT_SIZE,
+                            color: DEFAULT_TEXT_COLOR,
+                          }}
+                        >
+                          {".".repeat(ellipsisDots)}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 ) : (
                   <FlatList
@@ -413,14 +442,20 @@ const SuggestionItem = cssInterop(
           ]}
         >
           <Text
-            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, titleStyle]}
+            style={[
+              { fontSize: FONT_SIZE, color: DEFAULT_TEXT_COLOR },
+              titleStyle,
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {title}
           </Text>
           <Text
-            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, subtitleStyle]}
+            style={[
+              { fontSize: FONT_SIZE, color: DEFAULT_TEXT_COLOR },
+              subtitleStyle,
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
