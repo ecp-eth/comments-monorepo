@@ -212,11 +212,7 @@ export const Editor = cssInterop(
           command={(item: MentionItem) => {
             webViewComRef.current?.invokeMentionCommand(item);
           }}
-          theme={props.theme}
-          className={props.theme?.suggestions?.className}
-          separatorClassName={
-            props.theme?.suggestions_item_separator?.className
-          }
+          theme={props.suggestionsTheme}
           ensRPC={props.ensRPC}
           {...mentionSuggestionProps}
         />

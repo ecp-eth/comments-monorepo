@@ -33,13 +33,11 @@ import { MINIMUM_QUERY_LENGTH } from "../../constants.js";
 import { KeyboardAvoidPopUpView } from "../../components/KeyboardAvoidPopUpView.js";
 import blo from "blo-png";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { INativeExposedComSuggestionProps } from "../../editor.type.js";
+import type { MentionsExtensionTheme } from "../types.js";
 import {
-  EditorTheme,
-  INativeExposedComSuggestionProps,
-} from "../../editor.type.js";
-import {
-  themeContext,
-  ThemeContextProvider,
+  mentionsThemeContext,
+  MentionsThemeContextProvider,
 } from "../../components/ThemeContextProvider.js";
 import { cssInterop } from "nativewind";
 import FastImage from "react-native-fast-image";
@@ -55,13 +53,22 @@ export type SuggestionsProps = INativeExposedComSuggestionProps & {
   command: (item: MentionItem) => void;
   enabled: boolean;
   onDismiss: () => void;
-  style?: StyleProp<ViewStyle>;
-  separatorStyle?: StyleProp<ViewStyle>;
-  theme?: EditorTheme;
+  theme?: MentionsExtensionTheme;
   ensRPC?: string;
 };
 
-export const Suggestions = cssInterop(
+export function Suggestions({ theme, ...rest }: SuggestionsProps) {
+  return (
+    <CSSInteroppedSuggestions
+      className={theme?.suggestionsClassName}
+      separatorClassName={theme?.suggestionsItemSeparatorClassName}
+      theme={theme}
+      {...rest}
+    />
+  );
+}
+
+const CSSInteroppedSuggestions = cssInterop(
   function Suggestions({
     items,
     query,
@@ -73,7 +80,10 @@ export const Suggestions = cssInterop(
     separatorStyle,
     theme,
     ensRPC,
-  }: SuggestionsProps) {
+  }: SuggestionsProps & {
+    style?: StyleProp<ViewStyle>;
+    separatorStyle?: StyleProp<ViewStyle>;
+  }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const flatListRef = useRef<FlatList>(null);
 
@@ -170,7 +180,7 @@ export const Suggestions = cssInterop(
       >
         {({ popAbove, maxHeight }) => {
           return shouldShowPopup ? (
-            <ThemeContextProvider value={theme ?? {}}>
+            <MentionsThemeContextProvider value={theme ?? {}}>
               <View
                 style={[
                   {
@@ -199,6 +209,7 @@ export const Suggestions = cssInterop(
                         fontSize: FONT_SIZE,
                         color: "#6b7280",
                       }}
+                      className={theme?.suggestionsContinueTypingClassName}
                     >
                       Continue typing to see ENS name suggestions
                     </Text>
@@ -233,7 +244,7 @@ export const Suggestions = cssInterop(
                   />
                 )}
               </View>
-            </ThemeContextProvider>
+            </MentionsThemeContextProvider>
           ) : null;
         }}
       </KeyboardAvoidPopUpView>
@@ -258,6 +269,7 @@ const SuggestionItem = cssInterop(
     style,
     titleStyle,
     subtitleStyle,
+    infoStyle,
     avatarStyle,
     address,
   }: {
@@ -274,6 +286,7 @@ const SuggestionItem = cssInterop(
     style?: StyleProp<ViewStyle>;
     titleStyle?: StyleProp<ViewStyle>;
     subtitleStyle?: StyleProp<ViewStyle>;
+    infoStyle?: StyleProp<ViewStyle>;
     avatarStyle?: StyleProp<{
       [K in keyof ViewStyle]: Exclude<
         ViewStyle[K],
@@ -391,10 +404,13 @@ const SuggestionItem = cssInterop(
           />
         )}
         <View
-          style={{
-            flex: 1,
-            minWidth: 0,
-          }}
+          style={[
+            {
+              flex: 1,
+              minWidth: 0,
+            },
+            infoStyle,
+          ]}
         >
           <Text
             style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, titleStyle]}
@@ -418,6 +434,7 @@ const SuggestionItem = cssInterop(
     className: "style",
     titleClassName: "titleStyle",
     subtitleClassName: "subtitleStyle",
+    infoClassName: "infoStyle",
     avatarClassName: "avatarStyle",
   },
 );
@@ -439,7 +456,7 @@ function AccountSuggestion({
   handle,
   client,
 }: AccountSuggestionProps) {
-  const theme = useContext(themeContext);
+  const theme = useContext(mentionsThemeContext);
   const [source, setSource] = useState<{
     uri?: string;
   }>();
@@ -472,10 +489,11 @@ function AccountSuggestion({
       source={source}
       title={name}
       subtitle={handle}
-      className={theme?.suggestions_item?.className}
-      titleClassName={theme?.suggestions_item_title?.className}
-      subtitleClassName={theme?.suggestions_item_subtitle?.className}
-      avatarClassName={theme?.suggestions_item_avatar?.className}
+      className={theme?.suggestionsItemClassName}
+      titleClassName={theme?.suggestionsItemNameClassName}
+      subtitleClassName={theme?.suggestionsItemHandleClassName}
+      infoClassName={theme?.suggestionsItemInfoClassName}
+      avatarClassName={theme?.suggestionsItemAvatarClassName}
       address={address}
     />
   );
@@ -490,7 +508,7 @@ function ERC20TokenSuggestion({
   index,
   suggestion,
 }: ERC20TokenSuggestionProps) {
-  const theme = useContext(themeContext);
+  const theme = useContext(mentionsThemeContext);
   const chainName =
     getChainById(suggestion.chainId, Object.values(chains))?.name ??
     "Unknown Chain";
@@ -503,10 +521,11 @@ function ERC20TokenSuggestion({
       }}
       title={"$" + suggestion.symbol}
       subtitle={chainName}
-      className={theme?.suggestions_item?.className}
-      titleClassName={theme?.suggestions_item_title?.className}
-      subtitleClassName={theme?.suggestions_item_subtitle?.className}
-      avatarClassName={theme?.suggestions_item_avatar?.className}
+      className={theme?.suggestionsItemClassName}
+      titleClassName={theme?.suggestionsItemSymbolClassName}
+      subtitleClassName={theme?.suggestionsItemChainClassName}
+      infoClassName={theme?.suggestionsItemInfoClassName}
+      avatarClassName={theme?.suggestionsItemAvatarClassName}
       address={suggestion.address}
     />
   );

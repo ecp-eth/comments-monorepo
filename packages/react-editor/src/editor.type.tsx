@@ -66,24 +66,6 @@ export type EditorTheme = {
   placeholder?: {
     className?: string;
   };
-  suggestions?: {
-    className?: string;
-  };
-  suggestions_item?: {
-    className?: string;
-  };
-  suggestions_item_separator?: {
-    className?: string;
-  };
-  suggestions_item_title?: {
-    className?: string;
-  };
-  suggestions_item_subtitle?: {
-    className?: string;
-  };
-  suggestions_item_avatar?: {
-    className?: string;
-  };
 };
 
 export type EditorProps = {

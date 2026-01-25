@@ -117,59 +117,70 @@ export const Suggestions = forwardRef(function Suggestions(
     children = (
       <>
         {items.map((item, index) => (
-          <button
-            ref={index === selectedIndex ? selectedItemRef : null}
-            className={cn(
-              "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
-              theme?.suggestionsItemClassName,
-              index === selectedIndex
-                ? cn(
-                    "bg-accent text-accent-foreground",
-                    theme?.suggestionsItemSelectedClassName,
-                  )
-                : "",
-            )}
-            key={`${query}-${index}`}
-            onClick={() => selectItem(index)}
-          >
-            {item.type === "ens" ? (
-              <AccountSuggestion
-                className={theme?.suggestionsItemClassName}
-                avatarClassName={theme?.suggestionsItemAvatarClassName}
-                nameClassName={theme?.suggestionsItemNameClassName}
-                handleClassName={theme?.suggestionsItemHandleClassName}
-                infoClassName={theme?.suggestionsItemInfoClassName}
-                address={item.address}
-                name={item.name}
-                avatarUrl={item.avatarUrl}
-                handle={item.name}
-                client={publicClient}
-              />
-            ) : null}
-            {item.type === "farcaster" ? (
-              <AccountSuggestion
-                className={theme?.suggestionsItemClassName}
-                avatarClassName={theme?.suggestionsItemAvatarClassName}
-                nameClassName={theme?.suggestionsItemNameClassName}
-                handleClassName={theme?.suggestionsItemHandleClassName}
-                infoClassName={theme?.suggestionsItemInfoClassName}
-                address={item.address}
-                avatarUrl={item.pfpUrl}
-                name={item.displayName || item.username}
-                handle={item.fname}
-                client={publicClient}
-              />
-            ) : null}
-            {item.type === "erc20" ? (
-              <ERC20TokenSuggestion
-                suggestion={item}
-                className={theme?.suggestionsItemClassName}
-                avatarClassName={theme?.suggestionsItemAvatarClassName}
-                symbolClassName={theme?.suggestionsItemSymbolClassName}
-                infoClassName={theme?.suggestionsItemInfoClassName}
-              />
-            ) : null}
-          </button>
+          <>
+            <button
+              ref={index === selectedIndex ? selectedItemRef : null}
+              className={cn(
+                "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+                theme?.suggestionsItemClassName,
+                index === selectedIndex
+                  ? cn(
+                      "bg-accent text-accent-foreground",
+                      theme?.suggestionsItemSelectedClassName,
+                    )
+                  : "",
+              )}
+              key={`${query}-${index}`}
+              onClick={() => selectItem(index)}
+            >
+              {item.type === "ens" ? (
+                <AccountSuggestion
+                  className={theme?.suggestionsItemClassName}
+                  avatarClassName={theme?.suggestionsItemAvatarClassName}
+                  nameClassName={theme?.suggestionsItemNameClassName}
+                  handleClassName={theme?.suggestionsItemHandleClassName}
+                  infoClassName={theme?.suggestionsItemInfoClassName}
+                  address={item.address}
+                  name={item.name}
+                  avatarUrl={item.avatarUrl}
+                  handle={item.name}
+                  client={publicClient}
+                />
+              ) : null}
+              {item.type === "farcaster" ? (
+                <AccountSuggestion
+                  className={theme?.suggestionsItemClassName}
+                  avatarClassName={theme?.suggestionsItemAvatarClassName}
+                  nameClassName={theme?.suggestionsItemNameClassName}
+                  handleClassName={theme?.suggestionsItemHandleClassName}
+                  infoClassName={theme?.suggestionsItemInfoClassName}
+                  address={item.address}
+                  avatarUrl={item.pfpUrl}
+                  name={item.displayName || item.username}
+                  handle={item.fname}
+                  client={publicClient}
+                />
+              ) : null}
+              {item.type === "erc20" ? (
+                <ERC20TokenSuggestion
+                  suggestion={item}
+                  className={theme?.suggestionsItemClassName}
+                  avatarClassName={theme?.suggestionsItemAvatarClassName}
+                  symbolClassName={theme?.suggestionsItemSymbolClassName}
+                  infoClassName={theme?.suggestionsItemInfoClassName}
+                />
+              ) : null}
+            </button>
+            {theme?.suggestionsItemSeparatorClassName &&
+              index < items.length - 1 && (
+                <div
+                  className={cn(
+                    "h-px w-full bg-border",
+                    theme?.suggestionsItemSeparatorClassName,
+                  )}
+                />
+              )}
+          </>
         ))}
       </>
     );
