@@ -218,30 +218,51 @@ const CSSInteroppedSuggestions = cssInterop(
                       paddingHorizontal: PADDING_HORIZONTAL,
                       alignItems: "center",
                       justifyContent: "center",
-                      position: "relative",
                     }}
                   >
-                    <Text
+                    <View
                       style={{
-                        fontSize: FONT_SIZE,
-                        color: DEFAULT_TEXT_COLOR,
+                        position: "relative",
+                        flex: 1,
+                        flexDirection: "row",
+                        flexShrink: 1,
+                        flexGrow: 0,
                       }}
-                      className={theme?.suggestionsContinueTypingClassName}
                     >
-                      Continue typing to see ENS name suggestions
-                    </Text>
-                    {query.length > 0 && (
-                      <View style={{ position: "absolute", left: "100%" }}>
-                        <Text
+                      <Text
+                        style={{
+                          fontSize: FONT_SIZE,
+                          color: DEFAULT_TEXT_COLOR,
+                        }}
+                        className={theme?.suggestionsContinueTypingClassName}
+                      >
+                        Continue typing to see suggestions
+                      </Text>
+                      {query.length > 0 && (
+                        <View
                           style={{
-                            fontSize: FONT_SIZE,
-                            color: DEFAULT_TEXT_COLOR,
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            transform: [{ translateX: "100%" }],
+                            zIndex: 1,
+
+                            flex: 1,
+                            flexDirection: "row",
                           }}
                         >
-                          {".".repeat(ellipsisDots)}
-                        </Text>
-                      </View>
-                    )}
+                          <Text
+                            style={{
+                              fontSize: FONT_SIZE,
+                              color: DEFAULT_TEXT_COLOR,
+                            }}
+                          >
+                            {".".repeat(ellipsisDots)}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
                 ) : (
                   <FlatList

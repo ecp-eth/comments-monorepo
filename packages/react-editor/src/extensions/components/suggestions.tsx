@@ -100,7 +100,7 @@ export const Suggestions = forwardRef(function Suggestions(
           theme?.suggestionsContinueTypingClassName,
         )}
       >
-        Continue typing to see ENS name suggestions
+        Continue typing to see suggestions
       </div>
     );
   } else if (items.length === 0) {
