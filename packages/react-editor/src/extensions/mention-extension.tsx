@@ -17,7 +17,6 @@ import type {
 } from "./types.js";
 import type { SearchSuggestionsFunction } from "./types.js";
 import { MINIMUM_QUERY_LENGTH } from "../constants.js";
-import { DOMOutputSpec } from "prosemirror-model";
 
 type SuggestionItem = MentionItem;
 
