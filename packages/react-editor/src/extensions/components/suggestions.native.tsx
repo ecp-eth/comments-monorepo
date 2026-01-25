@@ -106,8 +106,10 @@ export const Suggestions = cssInterop(
       [ensRPC],
     );
 
-    const enableContent =
-      isValidQuery(query, MINIMUM_QUERY_LENGTH) && items.length > 0 && enabled;
+    // Show popup if enabled and either query is valid with items, or query is too short (to show continue typing message)
+    const shouldShowPopup = enabled && query.length >= 0;
+    const hasValidQuery = isValidQuery(query, MINIMUM_QUERY_LENGTH);
+    const showContinueTyping = !hasValidQuery;
 
     const renderItem = ({
       item,
@@ -161,13 +163,13 @@ export const Suggestions = cssInterop(
 
     return (
       <KeyboardAvoidPopUpView
-        enabled={enableContent}
+        enabled={shouldShowPopup}
         inputRect={clientRect}
         gap={GAP_DROPDOWN_FROM_INPUT_BOTTOM}
         onDismiss={onDismiss}
       >
         {({ popAbove, maxHeight }) => {
-          return enableContent ? (
+          return shouldShowPopup ? (
             <ThemeContextProvider value={theme ?? {}}>
               <View
                 style={[
@@ -183,7 +185,25 @@ export const Suggestions = cssInterop(
                   style,
                 ]}
               >
-                {items.length <= 0 ? null : (
+                {showContinueTyping ? (
+                  <View
+                    style={{
+                      paddingVertical: PADDING_VERTICAL,
+                      paddingHorizontal: PADDING_HORIZONTAL,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: FONT_SIZE,
+                        color: "#6b7280",
+                      }}
+                    >
+                      Continue typing to see ENS name suggestions
+                    </Text>
+                  </View>
+                ) : (
                   <FlatList
                     ref={flatListRef}
                     data={items}
