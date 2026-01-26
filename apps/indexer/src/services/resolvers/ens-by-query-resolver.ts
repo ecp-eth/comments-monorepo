@@ -196,13 +196,27 @@ const domainFragment = gql`
 
 const searchByNameQuery = gql`
   ${domainFragment}
-  query SearchByName($name: String!) {
+  query SearchByName($name: String!, $expiryDateGte: BigInt!) {
     domains(
       where: {
-        name_contains: $name
-        # make sure to exclude reverse records
-        name_not_ends_with: ".addr.reverse"
+        # The query at the time of writing is only used when user typing a @query
+        # in the input box to search for candidate of mention
+        # using starts with will make the search more relevant
+        name_starts_with: $name
         resolvedAddress_not: ""
+        # make sure to exclude reverse records and test records
+        and: [
+          { name_not_ends_with: ".addr.reverse" }
+          { name_not_ends_with: "].eth" }
+          { name_not_starts_with: "test.[" }
+        ]
+        or: [
+          { expiryDate_gte: $expiryDateGte }
+          {
+            # some sub domains even they are active they don't have an expiry date from ensnode
+            expiryDate: null
+          }
+        ]
       }
       first: 20
     ) {
@@ -258,6 +272,7 @@ async function searchEns(
       searchByNameQuery,
       {
         name: query,
+        expiryDateGte: currentTimestamp.toString(),
       },
     );
   }

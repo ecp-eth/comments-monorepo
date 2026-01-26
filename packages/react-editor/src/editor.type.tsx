@@ -66,21 +66,6 @@ export type EditorTheme = {
   placeholder?: {
     className?: string;
   };
-  suggestions?: {
-    className?: string;
-  };
-  suggestions_item?: {
-    className?: string;
-  };
-  suggestions_item_separator?: {
-    className?: string;
-  };
-  suggestions_item_title?: {
-    className?: string;
-  };
-  suggestions_item_subtitle?: {
-    className?: string;
-  };
 };
 
 export type EditorProps = {
@@ -115,6 +100,7 @@ export type EditorProps = {
    */
   fileComponent?: UploadTrackerFileComponent;
   theme?: EditorTheme;
+  ensRPC?: string;
 };
 
 /**

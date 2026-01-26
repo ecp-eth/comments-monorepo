@@ -4,16 +4,17 @@ import React, {
   useState,
   useCallback,
   useContext,
+  useMemo,
 } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
-  Image,
-  ImageSourcePropType,
   StyleProp,
   ViewStyle,
+  Animated as RNAnimated,
+  OpaqueColorValue,
 } from "react-native";
 import Animated, {
   useSharedValue,
@@ -22,7 +23,7 @@ import Animated, {
   withDelay,
   Easing,
 } from "react-native-reanimated";
-import type { Hex } from "viem";
+import { createPublicClient, http, type Hex, type PublicClient } from "viem";
 import * as chains from "viem/chains";
 import type { IndexerAPIAutocompleteERC20SchemaType } from "@ecp.eth/sdk/indexer";
 import { getChainById } from "@ecp.eth/shared/helpers";
@@ -32,34 +33,43 @@ import { MINIMUM_QUERY_LENGTH } from "../../constants.js";
 import { KeyboardAvoidPopUpView } from "../../components/KeyboardAvoidPopUpView.js";
 import blo from "blo-png";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { INativeExposedComSuggestionProps } from "../../editor.type.js";
+import type { MentionsExtensionTheme } from "../types.js";
 import {
-  EditorTheme,
-  INativeExposedComSuggestionProps,
-} from "../../editor.type.js";
-import {
-  themeContext,
-  ThemeContextProvider,
+  mentionsThemeContext,
+  MentionsThemeContextProvider,
 } from "../../components/ThemeContextProvider.js";
 import { cssInterop } from "nativewind";
+import FastImage from "react-native-fast-image";
 
-// TODO: should we configure native wind for all sizes?
 const ICON_SIZE = 24;
 const FONT_SIZE = 12;
 const GAP = 8;
 const PADDING_VERTICAL = 12;
 const PADDING_HORIZONTAL = 20;
-const GAP_DROPDOWN_FROM_INPUT_BOTTOM = 8;
+const GAP_DROPDOWN_FROM_INPUT_BOTTOM = 14;
+const DEFAULT_TEXT_COLOR = "#6b7280";
 
 export type SuggestionsProps = INativeExposedComSuggestionProps & {
   command: (item: MentionItem) => void;
   enabled: boolean;
   onDismiss: () => void;
-  style?: StyleProp<ViewStyle>;
-  separatorStyle?: StyleProp<ViewStyle>;
-  theme?: EditorTheme;
+  theme?: MentionsExtensionTheme;
+  ensRPC?: string;
 };
 
-export const Suggestions = cssInterop(
+export function Suggestions({ theme, ...rest }: SuggestionsProps) {
+  return (
+    <CSSInteroppedSuggestions
+      className={theme?.suggestionsClassName}
+      separatorClassName={theme?.suggestionsItemSeparatorClassName}
+      theme={theme}
+      {...rest}
+    />
+  );
+}
+
+const CSSInteroppedSuggestions = cssInterop(
   function Suggestions({
     items,
     query,
@@ -70,9 +80,14 @@ export const Suggestions = cssInterop(
     style,
     separatorStyle,
     theme,
-  }: SuggestionsProps) {
+    ensRPC,
+  }: SuggestionsProps & {
+    style?: StyleProp<ViewStyle>;
+    separatorStyle?: StyleProp<ViewStyle>;
+  }) {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const flatListRef = useRef<FlatList>(null);
+    const [ellipsisDots, setEllipsisDots] = useState(1);
 
     const selectItem = (index: number) => {
       const item = items[index];
@@ -94,8 +109,33 @@ export const Suggestions = cssInterop(
       }
     }, [selectedIndex, items.length]);
 
-    const enableContent =
-      isValidQuery(query, MINIMUM_QUERY_LENGTH) && items.length > 0 && enabled;
+    const publicClient = useMemo(
+      () =>
+        createPublicClient({
+          chain: chains.mainnet,
+          transport: http(ensRPC),
+        }),
+      [ensRPC],
+    );
+
+    // Show popup if enabled and either query is valid with items, or query is too short (to show continue typing message)
+    const shouldShowPopup = enabled && query.length >= 0;
+    const hasValidQuery = isValidQuery(query, MINIMUM_QUERY_LENGTH);
+    const showContinueTyping = !hasValidQuery;
+
+    // Animate ellipsis dots when query.length > 0
+    useEffect(() => {
+      if (!showContinueTyping || query.length === 0) {
+        setEllipsisDots(1);
+        return;
+      }
+
+      const interval = setInterval(() => {
+        setEllipsisDots((prev) => (prev >= 3 ? 1 : prev + 1));
+      }, 200);
+
+      return () => clearInterval(interval);
+    }, [showContinueTyping, query.length]);
 
     const renderItem = ({
       item,
@@ -130,7 +170,10 @@ export const Suggestions = cssInterop(
                         ? item.displayName || item.username
                         : item.name
                     }
-                    handle={item.type === "farcaster" ? item.fname : item.name}
+                    handle={
+                      item.type === "farcaster" ? item.fname : item.address
+                    }
+                    client={publicClient}
                   />
                 );
 
@@ -146,14 +189,14 @@ export const Suggestions = cssInterop(
 
     return (
       <KeyboardAvoidPopUpView
-        enabled={enableContent}
+        enabled={shouldShowPopup}
         inputRect={clientRect}
         gap={GAP_DROPDOWN_FROM_INPUT_BOTTOM}
         onDismiss={onDismiss}
       >
         {({ popAbove, maxHeight }) => {
-          return enableContent ? (
-            <ThemeContextProvider value={theme ?? {}}>
+          return shouldShowPopup ? (
+            <MentionsThemeContextProvider value={theme ?? {}}>
               <View
                 style={[
                   {
@@ -168,7 +211,60 @@ export const Suggestions = cssInterop(
                   style,
                 ]}
               >
-                {items.length <= 0 ? null : (
+                {showContinueTyping ? (
+                  <View
+                    style={{
+                      paddingVertical: PADDING_VERTICAL,
+                      paddingHorizontal: PADDING_HORIZONTAL,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        position: "relative",
+                        flex: 1,
+                        flexDirection: "row",
+                        flexShrink: 1,
+                        flexGrow: 0,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: FONT_SIZE,
+                          color: DEFAULT_TEXT_COLOR,
+                        }}
+                        className={theme?.suggestionsContinueTypingClassName}
+                      >
+                        Continue typing to see suggestions
+                      </Text>
+                      {query.length > 0 && (
+                        <View
+                          style={{
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            transform: [{ translateX: "100%" }],
+                            zIndex: 1,
+
+                            flex: 1,
+                            flexDirection: "row",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: FONT_SIZE,
+                              color: DEFAULT_TEXT_COLOR,
+                            }}
+                          >
+                            {".".repeat(ellipsisDots)}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                ) : (
                   <FlatList
                     ref={flatListRef}
                     data={items}
@@ -198,7 +294,7 @@ export const Suggestions = cssInterop(
                   />
                 )}
               </View>
-            </ThemeContextProvider>
+            </MentionsThemeContextProvider>
           ) : null;
         }}
       </KeyboardAvoidPopUpView>
@@ -223,19 +319,52 @@ const SuggestionItem = cssInterop(
     style,
     titleStyle,
     subtitleStyle,
+    infoStyle,
+    avatarStyle,
+    address,
   }: {
-    source: ImageSourcePropType;
+    /**
+     * when `source` is not provided, it is considered the source is still being loaded
+     * if `source` is provided, but uri is undefined, it is considered "no source" and a `blo` will be used
+     */
+    source?: {
+      uri?: string;
+    };
     title: React.ReactNode;
     subtitle: React.ReactNode;
     index: number;
     style?: StyleProp<ViewStyle>;
     titleStyle?: StyleProp<ViewStyle>;
     subtitleStyle?: StyleProp<ViewStyle>;
+    infoStyle?: StyleProp<ViewStyle>;
+    avatarStyle?: StyleProp<{
+      [K in keyof ViewStyle]: Exclude<
+        ViewStyle[K],
+        string | RNAnimated.AnimatedNode | OpaqueColorValue
+      >;
+    }>;
+    address: Hex;
   }) {
     const { left, right } = useSafeAreaInsets();
     const opacity = useSharedValue(0);
     const translateX = useSharedValue(SLIDE_DISTANCE);
     const [hasAnimated, setHasAnimated] = useState(false);
+    const [hasImageError, setHasImageError] = useState(false);
+
+    const getBlo = useCallback(() => {
+      return blo(
+        address,
+        (typeof avatarStyle === "object" &&
+          avatarStyle !== null &&
+          "width" in avatarStyle &&
+          typeof avatarStyle.width === "number" &&
+          avatarStyle.width > 0 &&
+          "height" in avatarStyle &&
+          typeof avatarStyle.height === "number" &&
+          Math.max(avatarStyle.width, avatarStyle.height)) ||
+          ICON_SIZE,
+      );
+    }, [address, avatarStyle]);
 
     const handleLayout = useCallback(() => {
       if (hasAnimated) return;
@@ -288,30 +417,66 @@ const SuggestionItem = cssInterop(
           style,
         ]}
       >
-        <Image
-          source={source}
-          style={{
-            width: ICON_SIZE,
-            height: ICON_SIZE,
-            borderRadius: ICON_SIZE / 2,
-            backgroundColor: "#f3f4f6",
-          }}
-        />
+        {hasImageError ? (
+          <ImageErrorIcon avatarStyle={avatarStyle} />
+        ) : source === undefined ? (
+          <View
+            style={[
+              {
+                width: ICON_SIZE,
+                height: ICON_SIZE,
+                borderRadius: ICON_SIZE / 2,
+                backgroundColor: "#f3f4f6",
+              },
+              avatarStyle,
+            ]}
+          />
+        ) : (
+          <FastImage
+            source={{
+              uri: source.uri ?? getBlo(),
+            }}
+            style={[
+              {
+                width: ICON_SIZE,
+                height: ICON_SIZE,
+                borderRadius: ICON_SIZE / 2,
+                backgroundColor: "#f3f4f6",
+              },
+              avatarStyle,
+            ]}
+            onLoadStart={() => {
+              setHasImageError(false);
+            }}
+            onError={() => {
+              setHasImageError(true);
+            }}
+          />
+        )}
         <View
-          style={{
-            flex: 1,
-            minWidth: 0,
-          }}
+          style={[
+            {
+              flex: 1,
+              minWidth: 0,
+            },
+            infoStyle,
+          ]}
         >
           <Text
-            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, titleStyle]}
+            style={[
+              { fontSize: FONT_SIZE, color: DEFAULT_TEXT_COLOR },
+              titleStyle,
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
             {title}
           </Text>
           <Text
-            style={[{ fontSize: FONT_SIZE, color: "#6b7280" }, subtitleStyle]}
+            style={[
+              { fontSize: FONT_SIZE, color: DEFAULT_TEXT_COLOR },
+              subtitleStyle,
+            ]}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -325,6 +490,8 @@ const SuggestionItem = cssInterop(
     className: "style",
     titleClassName: "titleStyle",
     subtitleClassName: "subtitleStyle",
+    infoClassName: "infoStyle",
+    avatarClassName: "avatarStyle",
   },
 );
 
@@ -334,6 +501,7 @@ type AccountSuggestionProps = {
   avatarUrl: string | null | undefined;
   name: string;
   handle: string;
+  client: PublicClient;
 };
 
 function AccountSuggestion({
@@ -342,17 +510,47 @@ function AccountSuggestion({
   avatarUrl,
   name,
   handle,
+  client,
 }: AccountSuggestionProps) {
-  const theme = useContext(themeContext);
+  const theme = useContext(mentionsThemeContext);
+  const [source, setSource] = useState<{
+    uri?: string;
+  }>();
+
+  useEffect(() => {
+    if (avatarUrl) {
+      setSource({
+        uri: avatarUrl,
+      });
+      return;
+    }
+
+    client
+      .getEnsAvatar({ name })
+      .then((avatar) => {
+        setSource({
+          uri: avatar ?? undefined,
+        });
+      })
+      .catch(() => {
+        setSource({
+          uri: undefined,
+        });
+      });
+  }, [client, avatarUrl, name]);
+
   return (
     <SuggestionItem
       index={index}
-      source={{ uri: avatarUrl ?? blo(address, 24) }}
+      source={source}
       title={name}
       subtitle={handle}
-      className={theme?.suggestions_item?.className}
-      titleClassName={theme?.suggestions_item_title?.className}
-      subtitleClassName={theme?.suggestions_item_subtitle?.className}
+      className={theme?.suggestionsItemClassName}
+      titleClassName={theme?.suggestionsItemNameClassName}
+      subtitleClassName={theme?.suggestionsItemHandleClassName}
+      infoClassName={theme?.suggestionsItemInfoClassName}
+      avatarClassName={theme?.suggestionsItemAvatarClassName}
+      address={address}
     />
   );
 }
@@ -366,7 +564,7 @@ function ERC20TokenSuggestion({
   index,
   suggestion,
 }: ERC20TokenSuggestionProps) {
-  const theme = useContext(themeContext);
+  const theme = useContext(mentionsThemeContext);
   const chainName =
     getChainById(suggestion.chainId, Object.values(chains))?.name ??
     "Unknown Chain";
@@ -374,12 +572,61 @@ function ERC20TokenSuggestion({
   return (
     <SuggestionItem
       index={index}
-      source={{ uri: suggestion.logoURI ?? blo(suggestion.address, 24) }}
+      source={{
+        uri: suggestion.logoURI ?? undefined,
+      }}
       title={"$" + suggestion.symbol}
       subtitle={chainName}
-      className={theme?.suggestions_item?.className}
-      titleClassName={theme?.suggestions_item_title?.className}
-      subtitleClassName={theme?.suggestions_item_subtitle?.className}
+      className={theme?.suggestionsItemClassName}
+      titleClassName={theme?.suggestionsItemSymbolClassName}
+      subtitleClassName={theme?.suggestionsItemChainClassName}
+      infoClassName={theme?.suggestionsItemInfoClassName}
+      avatarClassName={theme?.suggestionsItemAvatarClassName}
+      address={suggestion.address}
     />
+  );
+}
+
+function ImageErrorIcon({
+  avatarStyle,
+}: {
+  avatarStyle?: StyleProp<ViewStyle>;
+}) {
+  return (
+    <View
+      style={[
+        {
+          width: ICON_SIZE,
+          height: ICON_SIZE,
+          borderRadius: ICON_SIZE / 2,
+          backgroundColor: "#f3f4f6",
+          position: "relative",
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        avatarStyle,
+      ]}
+    >
+      <View
+        style={{
+          position: "absolute",
+          width: 15,
+          height: 2,
+          borderRadius: 1,
+          backgroundColor: "red",
+          transform: [{ rotate: "45deg" }],
+        }}
+      />
+      <View
+        style={{
+          position: "absolute",
+          width: 15,
+          height: 2,
+          borderRadius: 1,
+          backgroundColor: "red",
+          transform: [{ rotate: "-45deg" }],
+        }}
+      />
+    </View>
   );
 }

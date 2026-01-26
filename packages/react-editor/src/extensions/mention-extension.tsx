@@ -262,6 +262,14 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
         char: "@",
         startOfLine: false,
         command: ({ editor, range, props }) => {
+          // Check if there's already a space after the insertion point
+          const nodeAfter = editor.view.state.selection.$to.nodeAfter;
+          const overrideSpace = nodeAfter?.text?.startsWith(" ") ?? false;
+
+          if (overrideSpace) {
+            range.to += 1;
+          }
+
           editor
             .chain()
             .focus()
@@ -269,6 +277,10 @@ export const MentionExtension = Mention.extend<MentionExtensionOptions>({
               {
                 type: this.name,
                 attrs: props,
+              },
+              {
+                type: "text",
+                text: " ",
               },
             ])
             .run();

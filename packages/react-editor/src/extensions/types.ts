@@ -79,6 +79,8 @@ export type SearchSuggestionsFunction = (
 export type MentionsExtensionTheme = {
   suggestionsClassName?: string;
   suggestionsNoResultsClassName?: string;
+  suggestionsContinueTypingClassName?: string;
+  suggestionsItemSeparatorClassName?: string;
   suggestionsItemClassName?: string;
   suggestionsItemSelectedClassName?: string;
   suggestionsItemAvatarClassName?: string;

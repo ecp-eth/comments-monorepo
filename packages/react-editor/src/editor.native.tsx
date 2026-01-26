@@ -31,7 +31,6 @@ import { useFreshRef } from "@ecp.eth/shared/hooks/useFreshRef";
 import { cssInterop } from "nativewind";
 import Animated, {
   useSharedValue,
-  useAnimatedStyle,
   withTiming,
   Easing,
 } from "react-native-reanimated";
@@ -172,6 +171,7 @@ export const Editor = cssInterop(
       freshWebViewLayout,
       nativeMessageEventEndpoint,
       clearNativeMessageEventListeners,
+      opacity,
     ]);
 
     return (
@@ -212,11 +212,8 @@ export const Editor = cssInterop(
           command={(item: MentionItem) => {
             webViewComRef.current?.invokeMentionCommand(item);
           }}
-          theme={props.theme}
-          className={props.theme?.suggestions?.className}
-          separatorClassName={
-            props.theme?.suggestions_item_separator?.className
-          }
+          theme={props.suggestionsTheme}
+          ensRPC={props.ensRPC}
           {...mentionSuggestionProps}
         />
       </>
