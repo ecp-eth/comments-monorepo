@@ -295,25 +295,23 @@ async function searchEns(
     return null;
   }
 
-  return Promise.all(
-    parsedResults.data.domains
-      .filter((domain) => {
-        // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
-        // one of the example is test.normx.eth
-        // so we need to filter them out manually rather than using expiryDate_gte
-        if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
-          return false;
-        }
+  return parsedResults.data.domains
+    .filter((domain) => {
+      // what we found out is that some domains returned from ensnode do not have expiry, but they are actually not expired
+      // one of the example is test.normx.eth
+      // so we need to filter them out manually rather than using expiryDate_gte
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return false;
+      }
 
-        return true;
-      })
-      .map(async (domain) => ({
-        address: domain.resolvedAddress.id,
-        name: domain.name,
-        avatarUrl: domain.avatarUrl,
-        url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
-      })),
-  );
+      return true;
+    })
+    .map((domain) => ({
+      address: domain.resolvedAddress.id,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
+      url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
+    }));
 }
 
 async function searchEnsByExactAddressInBatch(
