@@ -1,5 +1,11 @@
 # @ecp.eth/indexer
 
+## 0.0.40
+
+### Patch Changes
+
+- c39fe0f: fix(indexer): improve ens autocomplete result accuracy and performance
+
 ## 0.0.39
 
 ### Patch Changes

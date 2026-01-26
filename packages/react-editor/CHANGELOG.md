@@ -1,5 +1,14 @@
 # @ecp.eth/react-editor
 
+## 0.0.25
+
+### Patch Changes
+
+- c39fe0f: fix(react-editor): suggestion did not show ens address correctly
+- c39fe0f: feat(react-editor): show prompt to the user for continue typing after user pressed `@`
+- c39fe0f: feat(react-editor): allow customisation of suggestion avatar
+- c39fe0f: refactor(react-editor): improve avatar loading by showing different loading state
+
 ## 0.0.24
 
 ### Patch Changes
