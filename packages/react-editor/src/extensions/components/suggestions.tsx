@@ -238,6 +238,10 @@ function SuggestionItem({
 }: SuggestionItemProps) {
   const [hasImageError, setHasImageError] = useState(false);
 
+  useEffect(() => {
+    setHasImageError(false);
+  }, [source]);
+
   const getEffigyAvatar = useCallback(() => {
     return `https://effigy.im/a/${address}`;
   }, [address]);
