@@ -122,13 +122,13 @@ type ENSNodeResult = {
     name: string;
     resolvedAddress: {
       id: Hex;
-    };
+    } | null;
     resolver: {
       textChangeds: {
         key: "avatar" | string;
         value: string | null;
       }[];
-    };
+    } | null;
   }[];
 };
 
@@ -143,19 +143,21 @@ const ensResultDomainsSchema = z
           id: HexSchema,
         })
         .nullable(),
-      resolver: z.object({
-        textChangeds: z.array(
-          z.object({
-            key: z.string().or(z.literal("avatar")),
-            value: z.string().nullable(),
-          }),
-        ),
-      }),
+      resolver: z
+        .object({
+          textChangeds: z.array(
+            z.object({
+              key: z.string().or(z.literal("avatar")),
+              value: z.string().nullable(),
+            }),
+          ),
+        })
+        .nullable(),
     }),
   )
   .transform((val) => {
     return val.map((domain) => {
-      const avatarUrl = domain.resolver.textChangeds.find(
+      const avatarUrl = domain.resolver?.textChangeds.find(
         (t) => t.key === "avatar" && !!t.value,
       )?.value;
 
@@ -284,12 +286,16 @@ async function searchEns(
   const parsedResults = ensResultSchema.safeParse(results);
 
   if (!parsedResults.success) {
+    console.error(
+      "ENSNode subgraph returned invalid data",
+      JSON.stringify(parsedResults.error.flatten(), null, 2),
+    );
     Sentry.captureMessage("ENSNode subgraph returned invalid data", {
       level: "warning",
       extra: {
         query,
         results,
-        error: parsedResults.error.flatten(),
+        error: JSON.stringify(parsedResults.error.flatten()),
       },
     });
     return null;
@@ -351,12 +357,16 @@ async function searchEnsByExactAddressInBatch(
   const parsedResults = ensResultByExactAddressSchema.safeParse(results);
 
   if (!parsedResults.success) {
+    console.error(
+      "ENSNode subgraph returned invalid data",
+      JSON.stringify(parsedResults.error.flatten(), null, 2),
+    );
     Sentry.captureMessage("ENSNode subgraph returned invalid data", {
       level: "warning",
       extra: {
         addresses,
         results,
-        error: parsedResults.error.flatten(),
+        error: JSON.stringify(parsedResults.error.flatten()),
       },
     });
 
