@@ -5,7 +5,6 @@ import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
-import { never } from "@ecp.eth/shared/helpers";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;
@@ -138,11 +137,9 @@ const ensResultDomainsSchema = z
       id: HexSchema,
       name: z.string(),
       expiryDate: z.coerce.number().nullable(),
-      resolvedAddress: z
-        .object({
-          id: HexSchema,
-        })
-        .nullable(),
+      resolvedAddress: z.object({
+        id: HexSchema,
+      }),
       resolver: z.object({
         textChangeds: z.array(
           z.object({
@@ -206,8 +203,7 @@ const searchByNameQuery = gql`
         # in the input box to search for candidate of mention
         # using starts with will make the search more relevant
         name_starts_with: $name
-        # comment out for now as it slows down the search (not always, but often)
-        # resolvedAddress_not: ""
+        resolvedAddress_not: ""
         # make sure to exclude reverse records and test records
         and: [
           { name_not_ends_with: ".addr.reverse" }
@@ -308,24 +304,14 @@ async function searchEns(
         return false;
       }
 
-      if (!domain.resolvedAddress) {
-        return false;
-      }
-
       return true;
     })
-    .map((domain) => {
-      const address = (domain.resolvedAddress?.id ??
-        never(
-          "null should be filtered out already, should never reach here",
-        )) as Hex;
-      return {
-        address,
-        name: domain.name,
-        avatarUrl: domain.avatarUrl,
-        url: `https://app.ens.domains/${address}`,
-      };
-    });
+    .map((domain) => ({
+      address: domain.resolvedAddress.id,
+      name: domain.name,
+      avatarUrl: domain.avatarUrl,
+      url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
+    }));
 }
 
 async function searchEnsByExactAddressInBatch(
@@ -371,28 +357,23 @@ async function searchEnsByExactAddressInBatch(
       return;
     }
 
-    domains
-      .filter((domain) => !!domain.resolvedAddress)
-      .forEach((domain) => {
-        if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
-          return;
-        }
+    domains.forEach((domain) => {
+      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+        return;
+      }
 
-        const address: Hex = (domain.resolvedAddress?.id.toLowerCase() ??
-          never(
-            "null should be filtered out already, should never reach here",
-          )) as Hex;
-        const existing = resolvedEnsDataMap.get(address) ?? [];
+      const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
+      const existing = resolvedEnsDataMap.get(address) ?? [];
 
-        existing.push({
-          address,
-          name: domain.name,
-          avatarUrl: domain.avatarUrl,
-          url: `https://app.ens.domains/${address}`,
-        });
-
-        resolvedEnsDataMap.set(address, existing);
+      existing.push({
+        address,
+        name: domain.name,
+        avatarUrl: domain.avatarUrl,
+        url: `https://app.ens.domains/${address}`,
       });
+
+      resolvedEnsDataMap.set(address, existing);
+    });
   });
 
   return addresses.map(
