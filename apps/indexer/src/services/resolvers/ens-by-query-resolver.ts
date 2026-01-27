@@ -5,6 +5,7 @@ import { gql, request as graphqlRequest } from "graphql-request";
 import { type Hex, HexSchema } from "@ecp.eth/sdk/core";
 import type { ResolvedENSData } from "./ens.types";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
+import { never } from "@ecp.eth/shared/helpers";
 
 const FULL_WALLET_ADDRESS_LENGTH = 42;
 const MAX_DOMAIN_PER_ADDRESS = 30;
@@ -137,9 +138,11 @@ const ensResultDomainsSchema = z
       id: HexSchema,
       name: z.string(),
       expiryDate: z.coerce.number().nullable(),
-      resolvedAddress: z.object({
-        id: HexSchema,
-      }),
+      resolvedAddress: z
+        .object({
+          id: HexSchema,
+        })
+        .nullable(),
       resolver: z.object({
         textChangeds: z.array(
           z.object({
@@ -305,14 +308,24 @@ async function searchEns(
         return false;
       }
 
+      if (!domain.resolvedAddress) {
+        return false;
+      }
+
       return true;
     })
-    .map((domain) => ({
-      address: domain.resolvedAddress.id,
-      name: domain.name,
-      avatarUrl: domain.avatarUrl,
-      url: `https://app.ens.domains/${domain.resolvedAddress.id}`,
-    }));
+    .map((domain) => {
+      const address = (domain.resolvedAddress?.id ??
+        never(
+          "null should be filtered out already, should never reach here",
+        )) as Hex;
+      return {
+        address,
+        name: domain.name,
+        avatarUrl: domain.avatarUrl,
+        url: `https://app.ens.domains/${address}`,
+      };
+    });
 }
 
 async function searchEnsByExactAddressInBatch(
@@ -358,23 +371,28 @@ async function searchEnsByExactAddressInBatch(
       return;
     }
 
-    domains.forEach((domain) => {
-      if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
-        return;
-      }
+    domains
+      .filter((domain) => !!domain.resolvedAddress)
+      .forEach((domain) => {
+        if (domain.expiryDate && domain.expiryDate < currentTimestamp) {
+          return;
+        }
 
-      const address: Hex = domain.resolvedAddress.id.toLowerCase() as Hex;
-      const existing = resolvedEnsDataMap.get(address) ?? [];
+        const address: Hex = (domain.resolvedAddress?.id.toLowerCase() ??
+          never(
+            "null should be filtered out already, should never reach here",
+          )) as Hex;
+        const existing = resolvedEnsDataMap.get(address) ?? [];
 
-      existing.push({
-        address,
-        name: domain.name,
-        avatarUrl: domain.avatarUrl,
-        url: `https://app.ens.domains/${address}`,
+        existing.push({
+          address,
+          name: domain.name,
+          avatarUrl: domain.avatarUrl,
+          url: `https://app.ens.domains/${address}`,
+        });
+
+        resolvedEnsDataMap.set(address, existing);
       });
-
-      resolvedEnsDataMap.set(address, existing);
-    });
   });
 
   return addresses.map(
