@@ -203,6 +203,8 @@ const searchByNameQuery = gql`
         # in the input box to search for candidate of mention
         # using starts with will make the search more relevant
         name_starts_with: $name
+        # adding this might slow down the search for some queries, such as "te",
+        # but will improve drastically for some, such as "brim".
         resolvedAddress_not: ""
         # make sure to exclude reverse records and test records
         and: [
@@ -285,7 +287,7 @@ async function searchEns(
       extra: {
         query,
         results,
-        error: parsedResults.error.flatten(),
+        error: JSON.stringify(parsedResults.error.flatten()),
       },
     });
     return null;
@@ -342,7 +344,7 @@ async function searchEnsByExactAddressInBatch(
       extra: {
         addresses,
         results,
-        error: parsedResults.error.flatten(),
+        error: JSON.stringify(parsedResults.error.flatten()),
       },
     });
 
