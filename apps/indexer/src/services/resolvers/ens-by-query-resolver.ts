@@ -203,7 +203,8 @@ const searchByNameQuery = gql`
         # in the input box to search for candidate of mention
         # using starts with will make the search more relevant
         name_starts_with: $name
-        resolvedAddress_not: ""
+        # comment out for now as it slows down the search (not always, but often)
+        # resolvedAddress_not: ""
         # make sure to exclude reverse records and test records
         and: [
           { name_not_ends_with: ".addr.reverse" }
