@@ -7,7 +7,12 @@ import {
   useConnectAccount,
 } from "@ecp.eth/shared/hooks/useConnectAccount";
 import { SiweMessage } from "siwe";
-import { useChainId, useSignMessage } from "wagmi";
+import {
+  useChainId,
+  useDisconnect,
+  useSignMessage,
+  useSwitchChain,
+} from "wagmi";
 import { Loader2Icon } from "lucide-react";
 import {
   siweNonceResponseSchema,
@@ -31,9 +36,43 @@ export default function SignInPage() {
   const auth = useAuth();
   const chainId = useChainId();
   const connectAccountUsingRainbowKit = useConnectAccount();
+  const { disconnectAsync } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
+  const { isPending: isSwitchingChain, switchChainAsync } = useSwitchChain({
+    mutation: {
+      onError(error) {
+        console.error(error);
+        toast.error(`Failed to switch chain to ${chain.name} (${chain.id}).`, {
+          action: (
+            <Button
+              disabled={isSwitchingChain}
+              onClick={() => {
+                toast.promise(
+                  () => {
+                    return switchChainAsync({ chainId: chain.id });
+                  },
+                  {
+                    loading: "Switching chain...",
+                    success: "Switched chain successfully",
+                    error: "Failed to switch chain",
+                  },
+                );
+              }}
+            >
+              Switch Chain
+            </Button>
+          ),
+        });
+      },
+      onSuccess() {
+        toast.success("Switched chain successfully");
+      },
+    },
+  });
   const signInMutation = useMutation({
     mutationFn: async () => {
+      await disconnectAsync(); // allow to use different wallet
+
       const address = await connectAccountUsingRainbowKit();
 
       if (!address) {
@@ -103,9 +142,28 @@ export default function SignInPage() {
         toast.error(error.message);
       } else if (error instanceof SwitchChainError) {
         console.error(error);
-        toast.error(
-          `Failed to switch chain to ${chain.name} (${chain.id}). Please try again.`,
-        );
+        toast.error(`Failed to switch chain to ${chain.name} (${chain.id}).`, {
+          action: (
+            <Button
+              disabled={isSwitchingChain}
+              onClick={() => {
+                toast.promise(
+                  () => {
+                    return switchChainAsync({ chainId: chain.id });
+                  },
+                  {
+                    loading: "Switching chain...",
+                    success: "Switched chain successfully",
+                    error: "Failed to switch chain",
+                  },
+                );
+              }}
+              size="sm"
+            >
+              Switch Chain
+            </Button>
+          ),
+        });
       } else {
         console.error(error);
 
