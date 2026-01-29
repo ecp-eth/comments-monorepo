@@ -47,10 +47,19 @@ export default function SignInPage() {
             <Button
               disabled={isSwitchingChain}
               onClick={() => {
-                return switchChainAsync({ chainId: chain.id });
+                toast.promise(
+                  () => {
+                    return switchChainAsync({ chainId: chain.id });
+                  },
+                  {
+                    loading: "Switching chain...",
+                    success: "Switched chain successfully",
+                    error: "Failed to switch chain",
+                  },
+                );
               }}
             >
-              {isSwitchingChain ? "Switching..." : "Switch Chain"}
+              Switch Chain
             </Button>
           ),
         });
@@ -138,11 +147,20 @@ export default function SignInPage() {
             <Button
               disabled={isSwitchingChain}
               onClick={() => {
-                return switchChainAsync({ chainId: chain.id });
+                toast.promise(
+                  () => {
+                    return switchChainAsync({ chainId: chain.id });
+                  },
+                  {
+                    loading: "Switching chain...",
+                    success: "Switched chain successfully",
+                    error: "Failed to switch chain",
+                  },
+                );
               }}
               size="sm"
             >
-              {isSwitchingChain ? "Switching..." : "Switch Chain"}
+              Switch Chain
             </Button>
           ),
         });
