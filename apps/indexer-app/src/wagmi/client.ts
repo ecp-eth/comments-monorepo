@@ -3,8 +3,10 @@ import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { publicEnv } from "@/env/public";
 import { SUPPORTED_CHAINS } from "@ecp.eth/sdk";
 
+export const chain = SUPPORTED_CHAINS[publicEnv.NEXT_PUBLIC_CHAIN_ID].chain;
+
 export const webConfig = getDefaultConfig({
-  chains: [SUPPORTED_CHAINS[publicEnv.NEXT_PUBLIC_CHAIN_ID].chain],
+  chains: [chain],
   transports: {
     [publicEnv.NEXT_PUBLIC_CHAIN_ID]: http(publicEnv.NEXT_PUBLIC_RPC_URL),
   },

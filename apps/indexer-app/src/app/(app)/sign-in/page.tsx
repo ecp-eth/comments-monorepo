@@ -17,10 +17,15 @@ import {
 } from "@/api/schemas/siwe";
 import { toast } from "sonner";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
-import { ContractFunctionExecutionError, UserRejectedRequestError } from "viem";
+import {
+  ContractFunctionExecutionError,
+  SwitchChainError,
+  UserRejectedRequestError,
+} from "viem";
 import { cn, createFetchUrl } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import Link from "next/link";
+import { chain } from "@/wagmi/client";
 
 export default function SignInPage() {
   const auth = useAuth();
@@ -96,6 +101,11 @@ export default function SignInPage() {
         toast.error("Connecting a wallet timed out");
       } else if (error instanceof ConnectAccountError) {
         toast.error(error.message);
+      } else if (error instanceof SwitchChainError) {
+        console.error(error);
+        toast.error(
+          `Failed to switch chain to ${chain.name} (${chain.id}). Please try again.`,
+        );
       } else {
         console.error(error);
 
