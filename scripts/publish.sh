@@ -24,7 +24,12 @@ fi
 # ensure we are up to date
 git pull
 
-# TODO: ensure main is not ahead of origin/main
+# ensure main is not ahead of origin/main
+AHEAD_COUNT=$(git rev-list --count origin/main..HEAD)
+if [[ "$AHEAD_COUNT" -gt 0 ]]; then
+    printf "${RED}❌ Local main is ${AHEAD_COUNT} commit(s) ahead of origin/main. Please push your changes first.${NC}\n"
+    exit 1
+fi
 
 COMMIT_HASH=$(git rev-parse --short HEAD)
 RELEASE_BRANCH_NAME="release-${COMMIT_HASH}"
