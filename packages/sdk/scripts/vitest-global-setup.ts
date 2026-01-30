@@ -18,8 +18,7 @@ export async function setup() {
       "anvil",
       "--host",
       "0.0.0.0",
-      "--block-time",
-      "0.5",
+
       // let's use a different port for sdk testing so we don't conflict with the main anvil node
       "--port",
       ANVIL_PORT_FOR_TESTS.toString(),
