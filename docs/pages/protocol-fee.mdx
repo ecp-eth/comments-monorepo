@@ -7,10 +7,10 @@ description: Learn about ECP protocol fees.
 
 The protocol implements several fee mechanisms:
 
-1. Channel Creation Fee (default: 0.02 ETH)
+1. Channel Creation Fee (default: 0 - free)
 
-   - Paid when creating a new channel
-   - Can be adjusted by the protocol owner
+   - Channel creation is currently free
+   - Can be adjusted by the protocol owner if needed in the future
    - Can be retrieved by calling `getChannelCreationFee()`[/protocol-reference/ProtocolFees#getchannelcreationfee--uint96-external] on `ChannelManager`
 
 2. Comment Creation Fee (default: 0)
