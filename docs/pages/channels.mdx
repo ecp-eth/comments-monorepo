@@ -13,11 +13,9 @@ The channel owner can set the **hooks** for their channel that enable flexible a
 - Charging a small fee to post a comment
 - Integrating with other protocols, such as tokens or NFTs
 
-To prevent spam and ensure quality channels, creating a new channel requires paying a small fee. The current channel creation fee can be retrieved by calling `getChannelCreationFee` from the SDK. This fee helps maintain the quality of channels in the protocol while still keeping channel creation accessible.
+Channel creation is currently free. The protocol retains the ability to introduce a channel creation fee in the future if needed for spam prevention, which can be checked by calling `getChannelCreationFee` from the SDK.
 
 Together with [hooks](/hooks), channels create a flexible system for building onchain communities and apps with customizable rules.
-
-Creating a channel currently requires paying a fee, currently set to 0.02 ETH, to deter initial spam, while we figure out how to combat it. If you are building an app that will create channels, feel free to reach out to us and we may be able to sponsor the channel fee.
 
 ## Getting Started
 
