@@ -45,6 +45,7 @@ const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
         transport,
         chain,
       }),
+      rpc: rpcUrl,
     };
     return acc;
   },
@@ -55,6 +56,7 @@ const chains = Object.entries(env.CHAIN_CONFIGS).reduce(
       transport: Transport;
       disableCache?: boolean;
       startBlock?: number;
+      rpc: string;
       channelManagerAddress: Hex;
       commentManagerAddress: Hex;
       publicClient: PublicClient;
