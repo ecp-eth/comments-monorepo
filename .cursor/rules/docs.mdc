@@ -1,11 +1,6 @@
 ---
-description: 
-globs: 
-alwaysApply: true
----
----
 description: Where to add docs
-globs: 
+globs:
 alwaysApply: true
 ---
 
