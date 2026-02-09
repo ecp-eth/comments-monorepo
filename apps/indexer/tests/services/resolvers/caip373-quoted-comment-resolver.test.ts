@@ -34,6 +34,7 @@ describe("CAIP373QuotedCommentResolver", () => {
           transport: http(),
           chain: anvil,
         }),
+        rpc: "http://localhost:8545",
       },
     },
     commentByIdResolver: commentByIdResolverService,
