@@ -85,7 +85,7 @@ export class SIMAPIService implements ISIMAPIService {
 
           if (!tokenInfoResult.success) {
             console.warn(
-              "Failed to parse SIM token info, we might want to adjust the schema",
+              `Failed to parse SIM token info for ${address}, we might want to adjust the schema`,
               {
                 token,
                 errors: JSON.stringify(tokenInfoResult.error.errors, null, 2),
@@ -96,6 +96,7 @@ export class SIMAPIService implements ISIMAPIService {
               {
                 level: "warning",
                 extra: {
+                  address,
                   token,
                   errors: JSON.stringify(tokenInfoResult.error.errors, null, 2),
                 },

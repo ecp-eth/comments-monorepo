@@ -33,7 +33,8 @@ export async function waitForIndexerToBeReady(params: {
         return;
       }
     } catch (error) {
-      console.error("Indexer is not ready yet", error);
+      // let's not log out as `error`, it is expected to happen during startup
+      console.log("Indexer is not ready yet.. retrying in 1 second", error);
     }
 
     await sleep(1000);
