@@ -17,3 +17,4 @@ scrape_configs:
     static_configs:
       - targets: ["builder.ethcomments.xyz"]
     metrics_path: "/api/metrics"
+    bearer_token_file: /etc/prometheus/bearer_token
