@@ -53,7 +53,7 @@ export default function CommentsEmbedPreview({
     }
 
     if ("channelId" in source) {
-      if (source.channelId == null) {
+      if (!source.channelId?.trim()) {
         throw new Error("Invalid source");
       }
 
