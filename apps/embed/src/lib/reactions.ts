@@ -6,6 +6,11 @@ export type EmbedReaction = EmbedConfigReactionSchemaType;
 export function getConfiguredReactions(
   reactions?: EmbedReaction[],
 ): EmbedReaction[] {
+  // If reactions is explicitly an empty array, disable reactions entirely
+  if (Array.isArray(reactions) && reactions.length === 0) {
+    return [];
+  }
+
   const source = reactions?.length ? reactions : [...EMBED_DEFAULT_REACTIONS];
   const uniqueReactionValues = new Set<string>();
   const output: EmbedReaction[] = [];
