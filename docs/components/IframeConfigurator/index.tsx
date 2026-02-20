@@ -519,13 +519,16 @@ export default function IframeConfigurator() {
                       }
                       onChange={(e) => {
                         const channelId = e.target.value.trim();
+                        const isNumeric = /^\d+$/.test(channelId);
 
                         field.onChange({
                           channelId,
                         });
                         form.setValue(
                           "config.channelId",
-                          channelId === "" ? undefined : BigInt(channelId),
+                          channelId === "" || !isNumeric
+                            ? undefined
+                            : BigInt(channelId),
                           {
                             shouldDirty: true,
                             shouldValidate: true,
