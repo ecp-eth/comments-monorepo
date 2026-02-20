@@ -11,9 +11,10 @@ import {
 } from "@ecp.eth/shared/helpers";
 import { useCommentRelativeTime } from "@ecp.eth/shared/hooks";
 import {
-  CommentActionLikeButton,
+  CommentActionButton,
   CommentMediaReferences,
   CommentText,
+  useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { useSetupPendingAction } from "./hooks/useSetupPendingAction";
 import { createCommentItemsQueryKey } from "./queries/queryKeys";
@@ -22,6 +23,8 @@ import {
   EmbedConfigProviderByAuthorConfig,
   useEmbedConfig,
 } from "../EmbedConfigProvider";
+import { getConfiguredReactions } from "@/lib/reactions";
+import { ReactionIcon } from "./ReactionIcon";
 
 interface CommentByAuthorProps {
   comment: CommentType;
@@ -48,8 +51,13 @@ export function CommentByAuthor({
     () => createCommentItemsQueryKey(connectedAddress, chainId, source.author),
     [chainId, connectedAddress, source.author],
   );
+  const reactions = useMemo(
+    () => getConfiguredReactions(source.reactions),
+    [source.reactions],
+  );
+  const connectBeforeAction = useConnectBeforeAction();
 
-  const { isLiking } = useSetupPendingAction({
+  const { isReactionPending } = useSetupPendingAction({
     comment,
     queryKey,
   });
@@ -102,8 +110,33 @@ export function CommentByAuthor({
         content={comment.content}
         references={comment.references}
       />
-      <div className="mb-2">
-        <CommentActionLikeButton isLiking={isLiking} comment={comment} />
+      <div className="mb-2 flex flex-wrap gap-2">
+        {reactions.map((reaction) => {
+          const isReacted =
+            (comment.viewerReactions?.[reaction.value]?.length ?? 0) > 0;
+          const pending = isReactionPending(reaction.value);
+
+          return (
+            <CommentActionButton
+              key={`${comment.id}-${reaction.value}`}
+              className={cn(
+                "gap-1 px-1.5 py-0.5",
+                isReacted && "text-accent-foreground",
+              )}
+              disabled={pending}
+              onClick={connectBeforeAction(() => {
+                return {
+                  type: isReacted ? "unreact" : "react",
+                  commentId: comment.id,
+                  reactionType: reaction.value,
+                };
+              })}
+            >
+              <ReactionIcon icon={reaction.icon} />
+              {comment.reactionCounts?.[reaction.value] ?? 0}
+            </CommentActionButton>
+          );
+        })}
       </div>
     </div>
   );

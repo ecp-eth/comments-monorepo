@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  EMBED_REACTION_PRESETS,
   type EmbedConfigSchemaInputType,
   EmbedConfigSchema,
+  type EmbedConfigReactionSchemaType,
   EmbedConfigSupportedFont,
 } from "@ecp.eth/sdk/embed";
 import { useDebounce } from "use-debounce";
@@ -26,7 +28,7 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
@@ -37,10 +39,19 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { ChevronsDown, Info, Link } from "lucide-react";
+import {
+  ArrowBigDown,
+  ArrowBigUp,
+  ChevronDown,
+  ChevronUp,
+  ChevronsDown,
+  Heart,
+  Info,
+  Repeat2,
+} from "lucide-react";
 
 const formSchema = z.object({
-  mode: z.enum(["post", "author", "replies"]),
+  mode: z.enum(["post", "author", "replies", "channel"]),
   source: z.union([
     z.object({
       targetUri: z.string().url(),
@@ -51,18 +62,170 @@ const formSchema = z.object({
     z.object({
       commentId: HexSchema,
     }),
+    z.object({
+      channelId: z
+        .string()
+        .trim()
+        .min(1)
+        .regex(/^\d+$/, "Channel ID must be a non-negative integer"),
+    }),
   ]),
   config: EmbedConfigSchema,
   embedUri: z.string().url().optional(),
   autoHeightAdjustment: z.boolean(),
 });
 
+const DEFAULT_REACTION_ICON_PICKER_RESULT_SIZE = 36;
+
+function ReactionRow({
+  reactionField,
+  index,
+  form,
+  reactions,
+  phosphorIconSlugs,
+  onRemove,
+}: {
+  reactionField: { id: string };
+  index: number;
+  form: ReturnType<typeof useForm<z.input<typeof formSchema>>>;
+  reactions: EmbedConfigReactionSchemaType[] | undefined;
+  phosphorIconSlugs: readonly string[];
+  onRemove: () => void;
+}) {
+  const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+  const selectedIcon = normalizeReactionIconToken(
+    reactions?.[index]?.icon ?? "",
+  );
+  const filteredPhosphorIcons = getFilteredPhosphorIconSlugs(
+    phosphorIconSlugs,
+    reactions?.[index]?.icon ?? "",
+    selectedIcon,
+  );
+
+  return (
+    <div className="border border-input-border rounded-md p-3 space-y-2">
+      <div className="flex gap-2 items-end">
+        <FormField
+          key={`config.reactions.${index}.value`}
+          control={form.control}
+          name={`config.reactions.${index}.value`}
+          render={({ field }) => (
+            <FormItem className="flex-1 min-w-0">
+              <FormLabel className="text-xs text-muted-foreground">
+                Value
+              </FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="e.g. like"
+                  value={field.value ?? ""}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          key={`config.reactions.${index}.icon`}
+          control={form.control}
+          name={`config.reactions.${index}.icon`}
+          render={({ field }) => (
+            <FormItem className="flex-1 min-w-0">
+              <FormLabel className="text-xs text-muted-foreground">
+                Icon
+              </FormLabel>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsIconPickerOpen(!isIconPickerOpen)}
+                  className={`h-9 w-9 shrink-0 rounded-md border bg-background flex items-center justify-center transition-colors ${
+                    isIconPickerOpen
+                      ? "border-primary"
+                      : "border-input-border hover:border-primary/50"
+                  }`}
+                >
+                  <ReactionIconPreview icon={field.value ?? ""} />
+                </button>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Icon name or emoji"
+                    value={field.value ?? ""}
+                    onFocus={() => setIsIconPickerOpen(true)}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="shrink-0 h-9 w-9 text-muted-foreground hover:text-destructive"
+          onClick={onRemove}
+        >
+          <span className="sr-only">Remove</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </Button>
+      </div>
+      {isIconPickerOpen && (
+        <div className="border border-input-border rounded-md max-h-32 overflow-y-auto">
+          {filteredPhosphorIcons.length > 0 ? (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-1 p-1.5">
+              {filteredPhosphorIcons.map((iconSlug) => (
+                <button
+                  key={`${reactionField.id}-${iconSlug}`}
+                  type="button"
+                  className={`flex items-center gap-1.5 rounded px-1.5 py-1 text-left text-foreground bg-background transition-colors text-xs ${
+                    selectedIcon === iconSlug
+                      ? "border border-primary bg-secondary"
+                      : "border border-transparent hover:bg-secondary/70"
+                  }`}
+                  onClick={() => {
+                    form.setValue(`config.reactions.${index}.icon`, iconSlug, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                    setIsIconPickerOpen(false);
+                  }}
+                >
+                  <span className="inline-flex h-3.5 w-3.5 items-center justify-center shrink-0">
+                    <ReactionIconPreview icon={iconSlug} />
+                  </span>
+                  <span className="truncate">{iconSlug}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="px-3 py-2 text-xs text-muted-foreground">
+              No icons found.
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function IframeConfigurator() {
   const { ref } = usePreventKeyboardShortcut();
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [appSigner, setAppSigner] = useState<"embed" | "custom" | "all">(
-    "embed",
-  );
+  const [appSigner, setAppSigner] = useState<"embed" | "custom" | "all">("all");
 
   const form = useForm<z.input<typeof formSchema>>({
     mode: "all",
@@ -73,32 +236,122 @@ export default function IframeConfigurator() {
         targetUri: "",
       },
       embedUri: "",
-      config: DEFAULT_CONFIG,
+      config: structuredClone(DEFAULT_CONFIG),
       autoHeightAdjustment: true,
     },
+  });
+  const reactionsForm = useFieldArray({
+    control: form.control,
+    name: "config.reactions",
   });
   const mode = useWatch({ control: form.control, name: "mode" });
   const source = useWatch({ control: form.control, name: "source" });
   const embedUri = useWatch({ control: form.control, name: "embedUri" });
   const config = useWatch({ control: form.control, name: "config" });
+  const reactions = useWatch({
+    control: form.control,
+    name: "config.reactions",
+  });
   const autoHeightAdjustment = useWatch({
     control: form.control,
     name: "autoHeightAdjustment",
   });
+  const [phosphorIconSlugs, setPhosphorIconSlugs] = useState<readonly string[]>(
+    () =>
+      Array.from(new Set(EMBED_REACTION_PRESETS.map((item) => item.icon))).sort(
+        (a, b) => a.localeCompare(b),
+      ),
+  );
 
   const [debouncedConfig] = useDebounce(config, 500);
   const getEmbedUri = useCallback(() => {
+    const byChannelUri = publicEnv.VITE_ECP_ETH_EMBED_URL
+      ? new URL("/by-channel", publicEnv.VITE_ECP_ETH_EMBED_URL).toString()
+      : undefined;
+
     return mode === "post"
       ? publicEnv.VITE_ECP_ETH_EMBED_URL
       : mode === "author"
         ? publicEnv.VITE_ECP_ETH_EMBED_BY_AUTHOR_URL
-        : publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL;
+        : mode === "replies"
+          ? publicEnv.VITE_ECP_ETH_EMBED_BY_REPLIES_URL
+          : byChannelUri;
   }, [mode]);
 
   // Update embedUri when mode changes
   useEffect(() => {
     form.setValue("embedUri", getEmbedUri());
   }, [getEmbedUri]);
+
+  useEffect(() => {
+    const currentSource = form.getValues("source");
+
+    if (mode === "post" && !("targetUri" in currentSource)) {
+      form.setValue("source", { targetUri: "" });
+      form.setValue("config.channelId", undefined);
+      return;
+    }
+
+    if (mode === "author" && !("author" in currentSource)) {
+      form.setValue("source", { author: "" as `0x${string}` });
+      form.setValue("config.channelId", undefined);
+      return;
+    }
+
+    if (mode === "replies" && !("commentId" in currentSource)) {
+      form.setValue("source", { commentId: "" as `0x${string}` });
+      form.setValue("config.channelId", undefined);
+      return;
+    }
+
+    if (
+      mode === "channel" &&
+      (!("channelId" in currentSource) || currentSource.channelId == null)
+    ) {
+      const channelId = getChannelIdAsString(
+        form.getValues("config.channelId"),
+      );
+      form.setValue("source", { channelId });
+      form.setValue(
+        "config.channelId",
+        channelId === "" ? undefined : BigInt(channelId),
+      );
+      return;
+    }
+
+    if (mode !== "channel") {
+      form.setValue("config.channelId", undefined);
+    }
+  }, [form, mode]);
+
+  useEffect(() => {
+    if (config.app === "embed" || config.app === "all") {
+      setAppSigner(config.app);
+      return;
+    }
+
+    setAppSigner("custom");
+  }, [config.app]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    void import("./phosphorIconSlugs")
+      .then((module) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setPhosphorIconSlugs(module.PHOSPHOR_ICON_SLUGS);
+      })
+      .catch(() => {
+        // Ignore and keep minimal fallback list.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const updateFontFamily = (type: "system" | "google", value: string) => {
     const prev = form.getValues("config");
@@ -118,6 +371,16 @@ export default function IframeConfigurator() {
 
   const hasSystemFont = hasFontFamilySystem(config);
   const hasGoogleFont = hasFontFamilyGoogle(config);
+
+  const appendReaction = (reaction: EmbedConfigReactionSchemaType) => {
+    const hasExisting =
+      reactions?.some((current) => current.value === reaction.value) ?? false;
+    if (hasExisting) {
+      return;
+    }
+
+    reactionsForm.append(reaction);
+  };
 
   return (
     <Form {...form}>
@@ -150,6 +413,9 @@ export default function IframeConfigurator() {
                       </SelectItem>
                       <SelectItem value="replies">
                         Show replies to a comment
+                      </SelectItem>
+                      <SelectItem value="channel">
+                        Show comments by channel
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -211,7 +477,7 @@ export default function IframeConfigurator() {
                     />
                     <FormMessage />
                   </FormItem>
-                ) : (
+                ) : mode === "replies" ? (
                   <FormItem>
                     <FormLabel>Comment ID</FormLabel>
                     <Input
@@ -233,11 +499,108 @@ export default function IframeConfigurator() {
                     />
                     <FormMessage />
                   </FormItem>
+                ) : (
+                  <FormItem>
+                    <FormLabel>Channel ID</FormLabel>
+                    <FormDescription>
+                      Filters comments by channel and uses this channel for new
+                      comments.
+                    </FormDescription>
+                    <Input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      {...field}
+                      value={
+                        (field.value &&
+                          "channelId" in field.value &&
+                          field.value?.channelId) ||
+                        ""
+                      }
+                      onChange={(e) => {
+                        const channelId = e.target.value.trim();
+                        const isNumeric = /^\d+$/.test(channelId);
+
+                        field.onChange({
+                          channelId,
+                        });
+                        form.setValue(
+                          "config.channelId",
+                          channelId === "" || !isNumeric
+                            ? undefined
+                            : BigInt(channelId),
+                          {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          },
+                        );
+                      }}
+                      placeholder="0"
+                    />
+                    <FormMessage />
+                  </FormItem>
                 )}
               </>
             )}
           />
 
+          <div className="space-y-3">
+            <FormLabel>Reactions</FormLabel>
+            <div className="flex flex-wrap gap-1.5">
+              {EMBED_REACTION_PRESETS.map((reaction) => (
+                <Button
+                  key={`preset-reaction-${reaction.value}`}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs"
+                  onClick={() =>
+                    appendReaction({
+                      value: reaction.value,
+                      icon: reaction.icon,
+                    })
+                  }
+                >
+                  <span className="mr-1 inline-flex h-3.5 w-3.5 items-center justify-center">
+                    <ReactionIconPreview icon={reaction.icon} />
+                  </span>
+                  {reaction.value}
+                </Button>
+              ))}
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs"
+                onClick={() =>
+                  reactionsForm.append({
+                    value: "",
+                    icon: "heart",
+                  })
+                }
+              >
+                + Custom
+              </Button>
+            </div>
+            {reactionsForm.fields.length === 0 && (
+              <div className="text-sm text-muted-foreground border border-dashed border-input-border rounded-md p-3">
+                No reactions configured.
+              </div>
+            )}
+            <div className="space-y-2">
+              {reactionsForm.fields.map((reactionField, index) => (
+                <ReactionRow
+                  key={reactionField.id}
+                  reactionField={reactionField}
+                  index={index}
+                  form={form}
+                  reactions={reactions}
+                  phosphorIconSlugs={phosphorIconSlugs}
+                  onRemove={() => reactionsForm.remove(index)}
+                />
+              ))}
+            </div>
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -308,11 +671,11 @@ export default function IframeConfigurator() {
                       <SelectValue placeholder="Theme Mode" />
                     </SelectTrigger>
                     <SelectContent id="theme-mode-select">
-                      <SelectItem value="embed" defaultChecked>
-                        Default (embed app signer)
+                      <SelectItem value="all">All apps (default)</SelectItem>
+                      <SelectItem value="embed">
+                        Embed app signer only
                       </SelectItem>
                       <SelectItem value="custom">Custom app signer</SelectItem>
-                      <SelectItem value="all">All apps</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -356,57 +719,6 @@ export default function IframeConfigurator() {
                   )}
                 />
               )}
-
-              <FormField
-                key="config.channelId"
-                control={form.control}
-                name="config.channelId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Channel ID</FormLabel>
-                    <FormDescription>
-                      You can specify a custom channel ID for posting comments.
-                      If you plan to charge users for posting, please ensure
-                      your channel hook follows the{" "}
-                      <a
-                        href="/hooks"
-                        target="_blank"
-                        style={{ textDecoration: "underline" }}
-                      >
-                        instructions
-                      </a>{" "}
-                      <a
-                        href="/hooks"
-                        target="_blank"
-                        style={{ textDecoration: "underline" }}
-                      >
-                        <Link className="inline-block w-3 h-3" />
-                      </a>
-                      . <br />
-                      <span className="text-yellow-400">
-                        <Info className="w-3 h-3 stroke-yellow-400 inline-block" />
-                        &nbsp;Gasless transactions are not supported when the
-                        channel requires a fee for posting comments.
-                      </span>
-                    </FormDescription>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        {...field}
-                        value={field.value?.toString() || ""}
-                        onChange={(e) => {
-                          const newValue = e.target.value;
-                          field.onChange(
-                            newValue === "" ? undefined : newValue,
-                          );
-                        }}
-                        placeholder="0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 key="config.gasSponsorship"
@@ -845,6 +1157,121 @@ export default function IframeConfigurator() {
       </div>
     </Form>
   );
+}
+
+function getFilteredPhosphorIconSlugs(
+  iconSlugs: readonly string[],
+  rawSearch: string,
+  selectedIcon: string,
+): string[] {
+  const normalizedSearch = normalizeReactionIconToken(rawSearch);
+  const matchingIcons =
+    normalizedSearch.length > 0
+      ? [
+          ...iconSlugs.filter((iconSlug) =>
+            iconSlug.startsWith(normalizedSearch),
+          ),
+          ...iconSlugs.filter(
+            (iconSlug) =>
+              !iconSlug.startsWith(normalizedSearch) &&
+              iconSlug.includes(normalizedSearch),
+          ),
+        ]
+      : [...iconSlugs];
+  const limitedIcons = matchingIcons.slice(
+    0,
+    DEFAULT_REACTION_ICON_PICKER_RESULT_SIZE,
+  );
+
+  if (
+    selectedIcon.length > 0 &&
+    !isLikelyEmojiIcon(selectedIcon) &&
+    !limitedIcons.includes(selectedIcon)
+  ) {
+    return [selectedIcon, ...limitedIcons].slice(
+      0,
+      DEFAULT_REACTION_ICON_PICKER_RESULT_SIZE,
+    );
+  }
+
+  return limitedIcons;
+}
+
+function normalizeReactionIconToken(icon: string): string {
+  return icon.trim().replace(/_/g, "-").toLowerCase();
+}
+
+function isLikelyEmojiIcon(icon: string): boolean {
+  return /[\p{Extended_Pictographic}\p{Emoji_Presentation}]/u.test(icon);
+}
+
+function createPhosphorIconUrl(icon: string): string {
+  const normalizedIcon = normalizeReactionIconToken(icon);
+  return `https://unpkg.com/@phosphor-icons/core/assets/regular/${encodeURIComponent(normalizedIcon)}.svg`;
+}
+
+const knownReactionIconByName: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
+  heart: Heart,
+  repost: Repeat2,
+  repeat: Repeat2,
+  upvote: ChevronUp,
+  "arrow-fat-up": ArrowBigUp,
+  "caret-up": ChevronUp,
+  downvote: ChevronDown,
+  "arrow-fat-down": ArrowBigDown,
+  "caret-down": ChevronDown,
+} as const;
+
+function ReactionIconPreview(props: { icon: string }) {
+  const normalizedIcon = normalizeReactionIconToken(props.icon);
+  if (normalizedIcon.length === 0) {
+    return <span className="text-xs text-muted-foreground">-</span>;
+  }
+
+  if (isLikelyEmojiIcon(normalizedIcon)) {
+    return <span className="leading-none text-sm">{normalizedIcon}</span>;
+  }
+
+  const IconComponent = knownReactionIconByName[normalizedIcon];
+  if (IconComponent) {
+    return <IconComponent className="h-4 w-4 text-foreground" />;
+  }
+
+  return (
+    <img
+      src={createPhosphorIconUrl(normalizedIcon)}
+      alt={normalizedIcon}
+      className="h-4 w-4 dark:invert dark:brightness-200"
+      onError={(event) => {
+        const image = event.currentTarget;
+        if (image.dataset.hasFallback === "1") {
+          return;
+        }
+
+        image.dataset.hasFallback = "1";
+        image.src = createPhosphorIconUrl("question");
+      }}
+    />
+  );
+}
+
+function getChannelIdAsString(value: unknown): string {
+  if (typeof value === "bigint") {
+    return value.toString();
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.trunc(value).toString();
+  }
+
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  return "";
 }
 
 function hasFontFamilySystem(

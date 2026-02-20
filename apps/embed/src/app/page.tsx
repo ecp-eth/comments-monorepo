@@ -3,7 +3,10 @@ import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "./providers";
-import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
+import {
+  EmbedConfigFromSearchParamsSchema,
+  normalizeEmbedSearchParams,
+} from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
 import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
@@ -24,7 +27,7 @@ type EmbedPageProps = {
 
 export default async function EmbedPage({ searchParams }: EmbedPageProps) {
   const parseSearchParamsResult = SearchParamsSchema.safeParse(
-    await searchParams,
+    normalizeEmbedSearchParams(await searchParams),
   );
 
   if (!parseSearchParamsResult.success) {

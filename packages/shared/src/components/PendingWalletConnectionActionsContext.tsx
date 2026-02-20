@@ -32,15 +32,27 @@ type PendingWalletConnectionAction =
       commentId: Hex;
     }
   | {
+      type: "react";
+      commentId: Hex;
+      reactionType: string;
+    }
+  | {
+      type: "unreact";
+      commentId: Hex;
+      reactionType: string;
+    }
+  | {
       // for the ui to prepare for replying
       type: "prepareReply";
       commentId: Hex;
     };
 
 type PendingWalletConnectionActionHandler = {
-  like: () => void;
-  unlike: () => void;
-  prepareReply: () => void;
+  like: () => Promise<void> | void;
+  unlike: () => Promise<void> | void;
+  react?: (reactionType: string) => Promise<void> | void;
+  unreact?: (reactionType: string) => Promise<void> | void;
+  prepareReply: () => Promise<void> | void;
 };
 
 type PendingWalletConnectionActionHandlerRecord = Record<
@@ -105,7 +117,37 @@ export const PendingWalletConnectionActionsProvider = ({
       // Remove the action from the array if handler is found.
       actions.splice(len - 1, 1);
 
-      await handler[action.type]();
+      switch (action.type) {
+        case "like":
+          await handler.like();
+          break;
+        case "unlike":
+          await handler.unlike();
+          break;
+        case "react":
+          if (handler.react) {
+            await handler.react(action.reactionType);
+            break;
+          }
+
+          if (action.reactionType === "like") {
+            await handler.like();
+          }
+          break;
+        case "unreact":
+          if (handler.unreact) {
+            await handler.unreact(action.reactionType);
+            break;
+          }
+
+          if (action.reactionType === "like") {
+            await handler.unlike();
+          }
+          break;
+        case "prepareReply":
+          await handler.prepareReply();
+          break;
+      }
     }
   }, [client, connectedAddress]);
   const triggerActionsRef = useFreshRef(triggerActions);
@@ -154,15 +196,27 @@ export const useConsumePendingWalletConnectionActions = ({
   commentId,
   onLikeAction,
   onUnlikeAction,
+  onReactAction,
+  onUnreactAction,
   onPrepareReplyAction,
 }: {
   commentId: Hex;
   onLikeAction: (commentId: Hex) => Promise<void> | void;
   onUnlikeAction: (commentId: Hex) => Promise<void> | void;
+  onReactAction?: (
+    commentId: Hex,
+    reactionType: string,
+  ) => Promise<void> | void;
+  onUnreactAction?: (
+    commentId: Hex,
+    reactionType: string,
+  ) => Promise<void> | void;
   onPrepareReplyAction: (commentId: Hex) => Promise<void> | void;
 }) => {
   const onLikeActionRef = useFreshRef(onLikeAction);
   const onUnlikeActionRef = useFreshRef(onUnlikeAction);
+  const onReactActionRef = useFreshRef(onReactAction);
+  const onUnreactActionRef = useFreshRef(onUnreactAction);
   const onPrepareReplyActionRef = useFreshRef(onPrepareReplyAction);
   const { addHandler, deleteHandler } =
     usePendingWalletConnectionActionsContext();
@@ -174,6 +228,26 @@ export const useConsumePendingWalletConnectionActions = ({
       },
       unlike: async () => {
         await onUnlikeActionRef.current(commentId);
+      },
+      react: async (reactionType) => {
+        if (onReactActionRef.current) {
+          await onReactActionRef.current(commentId, reactionType);
+          return;
+        }
+
+        if (reactionType === "like") {
+          await onLikeActionRef.current(commentId);
+        }
+      },
+      unreact: async (reactionType) => {
+        if (onUnreactActionRef.current) {
+          await onUnreactActionRef.current(commentId, reactionType);
+          return;
+        }
+
+        if (reactionType === "like") {
+          await onUnlikeActionRef.current(commentId);
+        }
       },
       prepareReply: async () => {
         await onPrepareReplyActionRef.current(commentId);
@@ -189,6 +263,8 @@ export const useConsumePendingWalletConnectionActions = ({
     deleteHandler,
     onLikeActionRef,
     onUnlikeActionRef,
+    onReactActionRef,
+    onUnreactActionRef,
     onPrepareReplyActionRef,
   ]);
 };

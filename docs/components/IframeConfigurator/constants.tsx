@@ -76,6 +76,13 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
       "root-padding-horizontal": "0",
     },
   },
+  app: "all",
+  reactions: [
+    {
+      value: "like",
+      icon: "heart",
+    },
+  ],
   restrictMaximumContainerWidth: true,
   gasSponsorship: "gasless-not-preapproved",
 };

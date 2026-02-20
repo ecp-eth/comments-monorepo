@@ -14,6 +14,7 @@ Functionality for embedding comments in web applications
 | Function | Description |
 | ------ | ------ |
 | [CommentsByAuthorEmbed](/sdk-reference/embed/functions/CommentsByAuthorEmbed.mdx) | Renders comments embed iframe for the given author. |
+| [CommentsByChannelEmbed](/sdk-reference/embed/functions/CommentsByChannelEmbed.mdx) | Renders comments embed iframe for a specific channel. |
 | [CommentsByRepliesEmbed](/sdk-reference/embed/functions/CommentsByRepliesEmbed.mdx) | Renders comments embed iframe for replies to a specific comment. |
 | [CommentsEmbed](/sdk-reference/embed/functions/CommentsEmbed.mdx) | Renders comments embed iframe for the given uri. |
 
@@ -22,10 +23,12 @@ Functionality for embedding comments in web applications
 | Name | Description |
 | ------ | ------ |
 | [CommentsByAuthorEmbedProps](/sdk-reference/embed/type-aliases/CommentsByAuthorEmbedProps.mdx) | - |
+| [CommentsByChannelEmbedProps](/sdk-reference/embed/type-aliases/CommentsByChannelEmbedProps.mdx) | - |
 | [CommentsByRepliesEmbedProps](/sdk-reference/embed/type-aliases/CommentsByRepliesEmbedProps.mdx) | - |
 | [CommentsEmbedProps](/sdk-reference/embed/type-aliases/CommentsEmbedProps.mdx) | The props for `<CommentsEmbed />` component. |
 | [CreateCommentsEmbedURLParams](/sdk-reference/embed/type-aliases/CreateCommentsEmbedURLParams.mdx) | Parameters for `createCommentsEmbedURL` |
 | [EmbedConfigFontSchemaType](/sdk-reference/embed/type-aliases/EmbedConfigFontSchemaType.mdx) | - |
+| [EmbedConfigReactionSchemaType](/sdk-reference/embed/type-aliases/EmbedConfigReactionSchemaType.mdx) | The zod schema for a custom reaction rendered under a comment. |
 | [EmbedConfigSchemaInputType](/sdk-reference/embed/type-aliases/EmbedConfigSchemaInputType.mdx) | Custom configuration for `<CommentEmbed />` component. |
 | [EmbedConfigSchemaOutputType](/sdk-reference/embed/type-aliases/EmbedConfigSchemaOutputType.mdx) | - |
 | [EmbedConfigSupportedChainIdsSchemaType](/sdk-reference/embed/type-aliases/EmbedConfigSupportedChainIdsSchemaType.mdx) | The type for supported chain ids |
@@ -35,8 +38,12 @@ Functionality for embedding comments in web applications
 | [EmbedConfigThemeSchemaType](/sdk-reference/embed/type-aliases/EmbedConfigThemeSchemaType.mdx) | The type for embed theme configuration |
 | [EmbedGetDimensionsEventSchemaType](/sdk-reference/embed/type-aliases/EmbedGetDimensionsEventSchemaType.mdx) | - |
 | [EmbedResizedEventSchemaType](/sdk-reference/embed/type-aliases/EmbedResizedEventSchemaType.mdx) | - |
+| [EMBED\_DEFAULT\_REACTIONS](/sdk-reference/embed/variables/EMBED_DEFAULT_REACTIONS.mdx) | Fallback reaction when no custom reactions are configured. |
+| [EMBED\_REACTION\_ICON\_PRESETS](/sdk-reference/embed/variables/EMBED_REACTION_ICON_PRESETS.mdx) | - |
+| [EMBED\_REACTION\_PRESETS](/sdk-reference/embed/variables/EMBED_REACTION_PRESETS.mdx) | Built-in reaction presets for iframe configurators. |
 | [EmbedConfigFontSchema](/sdk-reference/embed/variables/EmbedConfigFontSchema.mdx) | - |
 | [EmbedConfigFontSizeSchema](/sdk-reference/embed/variables/EmbedConfigFontSizeSchema.mdx) | - |
+| [EmbedConfigReactionSchema](/sdk-reference/embed/variables/EmbedConfigReactionSchema.mdx) | The zod schema for a custom reaction rendered under a comment. |
 | [EmbedConfigSchema](/sdk-reference/embed/variables/EmbedConfigSchema.mdx) | The zod schema for `EmbedConfigSchemaType` |
 | [EmbedConfigSupportedChainIdsSchema](/sdk-reference/embed/variables/EmbedConfigSupportedChainIdsSchema.mdx) | The zod schema for supported chain ids |
 | [EmbedConfigSupportedFont](/sdk-reference/embed/variables/EmbedConfigSupportedFont.mdx) | It supports the following fonts from GoogleFonts |
@@ -47,3 +54,4 @@ Functionality for embedding comments in web applications
 | [EmbedGetDimensionsEventSchema](/sdk-reference/embed/variables/EmbedGetDimensionsEventSchema.mdx) | - |
 | [EmbedResizedEventSchema](/sdk-reference/embed/variables/EmbedResizedEventSchema.mdx) | - |
 | [createCommentsEmbedURL](/sdk-reference/embed/functions/createCommentsEmbedURL.mdx) | Creates a URL for the comments embed iframe. |
+| [parseCommentsEmbedConfig](/sdk-reference/embed/functions/parseCommentsEmbedConfig.mdx) | Parse compressed config from `config` search param. |
