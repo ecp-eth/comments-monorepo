@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.42
+
+### Patch Changes
+
+- 1b04e95: feat(embed): add by-channel embed mode, configurable reactions with presets, and reaction config schemas
+
 ## 0.0.41
 
 ### Patch Changes

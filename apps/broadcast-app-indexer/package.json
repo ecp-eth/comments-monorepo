@@ -1,6 +1,6 @@
 {
   "name": "@ecp.eth/broadcast-app-indexer",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": true,
   "type": "module",
   "engines": {
