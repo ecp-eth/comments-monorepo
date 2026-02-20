@@ -1,0 +1,36 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / EmbedConfigReactionSchemaType
+
+# Type Alias: EmbedConfigReactionSchemaType
+
+```ts
+type EmbedConfigReactionSchemaType = {
+  icon: string;
+  value: string;
+};
+```
+
+Defined in: [packages/sdk/src/embed/schemas/index.ts:206](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L206)
+
+The zod schema for a custom reaction rendered under a comment.
+
+## Type declaration
+
+### icon
+
+```ts
+icon: string;
+```
+
+Icon token, supports emoji (e.g. "🔥") or a Phosphor icon slug (e.g. "heart", "arrow-fat-up").
+
+### value
+
+```ts
+value: string;
+```
+
+Lowercase value used as reaction content.

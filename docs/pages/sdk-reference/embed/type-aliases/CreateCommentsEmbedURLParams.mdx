@@ -18,11 +18,14 @@ type CreateCommentsEmbedURLParams = {
    }
      | {
      commentId: Hex;
+   }
+     | {
+     channelId: string | bigint;
    };
 };
 ```
 
-Defined in: [packages/sdk/src/embed/utils.ts:13](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L13)
+Defined in: [packages/sdk/src/embed/utils.ts:38](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L38)
 
 Parameters for `createCommentsEmbedURL`
 
@@ -34,7 +37,7 @@ Parameters for `createCommentsEmbedURL`
 optional config: EmbedConfigSchemaInputType;
 ```
 
-Defined in: [packages/sdk/src/embed/utils.ts:25](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L25)
+Defined in: [packages/sdk/src/embed/utils.ts:54](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L54)
 
 The configuration for the comments embed.
 
@@ -46,7 +49,7 @@ The configuration for the comments embed.
 embedUri: string;
 ```
 
-Defined in: [packages/sdk/src/embed/utils.ts:17](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L17)
+Defined in: [packages/sdk/src/embed/utils.ts:42](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L42)
 
 The URI of the comments embed iframe page.
 
@@ -64,9 +67,12 @@ source:
 }
   | {
   commentId: Hex;
+}
+  | {
+  channelId: string | bigint;
 };
 ```
 
-Defined in: [packages/sdk/src/embed/utils.ts:21](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L21)
+Defined in: [packages/sdk/src/embed/utils.ts:46](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/utils.ts#L46)
 
 The target URI, author address, or comment ID to embed comments for.
