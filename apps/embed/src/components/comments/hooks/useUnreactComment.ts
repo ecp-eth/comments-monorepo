@@ -108,7 +108,7 @@ export const useUnreactComment = () => {
           requestPayload: {
             author: viewer,
             commentId: reaction.id,
-            chainId: config.chainId,
+            chainId: reaction.chainId,
           },
           switchChainAsync: async (chainId: number) => {
             const result = await switchChainAsync({ chainId });
