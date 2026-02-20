@@ -59,6 +59,7 @@ export default function SnippetGenerator({
     | { targetUri: string }
     | { author: Hex }
     | { commentId: Hex }
+    | { channelId: string }
     | undefined;
   autoHeightAdjustment: boolean;
   onBeforeCopy?: () => Promise<boolean>;

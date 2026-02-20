@@ -44,7 +44,7 @@ interface CommentProps {
   onRetryPostClick: () => void;
   onEditClick: () => void;
   onRetryEditClick: () => void;
-  isLiking?: boolean;
+  isReactionPending?: (reactionType: string) => boolean;
   optimisticReferences: IndexerAPICommentReferencesSchemaType | undefined;
 }
 
@@ -55,7 +55,7 @@ export function Comment({
   onRetryPostClick,
   onEditClick,
   onRetryEditClick,
-  isLiking,
+  isReactionPending,
   optimisticReferences,
 }: CommentProps) {
   const { currentTimestamp } =
@@ -173,7 +173,7 @@ export function Comment({
           onRetryDeleteClick={onRetryDeleteClick}
           onRetryPostClick={onRetryPostClick}
           onRetryEditClick={onRetryEditClick}
-          isLiking={isLiking}
+          isReactionPending={isReactionPending}
         />
       </div>
     </>

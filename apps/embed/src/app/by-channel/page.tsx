@@ -1,26 +1,23 @@
-import { Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
-import {
-  fetchCommentReplies,
-  FetchCommentRepliesOptions,
-} from "@ecp.eth/sdk/indexer";
 import { Toaster } from "@/components/ui/sonner";
+import { CommentSection } from "@/components/comments/CommentSection";
 import { ErrorScreen } from "@/components/ErrorScreen";
 import { z } from "zod";
 import { Providers } from "../providers";
-import { COMMENTS_PER_PAGE } from "@/lib/constants";
-import { CommentSectionReplies } from "@/components/comments/CommentSectionReplies";
 import {
   EmbedConfigFromSearchParamsSchema,
   normalizeEmbedSearchParams,
 } from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
+import { fetchComments, FetchCommentsOptions } from "@ecp.eth/sdk/indexer";
+import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { cookies } from "next/headers";
+import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
 import { getAppSignerAddress } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
 
 const SearchParamsSchema = z.object({
-  commentId: HexSchema,
+  channelId: z.coerce.bigint(),
   config: EmbedConfigFromSearchParamsSchema,
 });
 
@@ -28,7 +25,7 @@ type EmbedPageProps = {
   searchParams: Promise<unknown>;
 };
 
-export default async function EmbedCommentsByRepliesPage({
+export default async function EmbedByChannelPage({
   searchParams,
 }: EmbedPageProps) {
   const parseSearchParamsResult = SearchParamsSchema.safeParse(
@@ -52,49 +49,49 @@ export default async function EmbedCommentsByRepliesPage({
     );
   }
 
-  const { commentId, config } = parseSearchParamsResult.data;
+  const { channelId, config } = parseSearchParamsResult.data;
+  const targetUri = `ecp://channel/${channelId.toString()}`;
+
   const cookieStore = await cookies();
   // viewer cookie is set by useSyncViewerCookie hook inside CommentSection
   const viewer = cookieStore.get("viewer")?.value as Hex | undefined;
 
   try {
-    const fetchCommentRepliesParams: FetchCommentRepliesOptions = {
+    const fetchCommentParams: FetchCommentsOptions = {
       chainId: config.chainId,
       app: getAppSignerAddress(config.app),
       apiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
-      commentType: COMMENT_TYPE_COMMENT,
       limit: COMMENTS_PER_PAGE,
+      commentType: COMMENT_TYPE_COMMENT,
       mode: "flat",
       viewer,
-      commentId,
-      channelId: config.channelId,
+      channelId,
     };
-    const comments = await fetchCommentReplies(fetchCommentRepliesParams);
+    const comments = await fetchComments(fetchCommentParams);
 
     return (
       <Providers
         config={{
-          commentId,
+          targetUri,
           currentTimestamp: Date.now(),
           ...config,
+          channelId,
         }}
       >
         <MainWrapper
           restrictMaximumContainerWidth={config.restrictMaximumContainerWidth}
         >
-          <CommentSectionReplies
-            commentId={commentId}
+          <CommentSection
             initialData={{
               pages: [comments],
               pageParams: [
-                // the page param here is to describe how to fetch current page, not the next page
                 {
                   limit: comments.pagination.limit,
                   cursor: undefined,
                 },
               ],
             }}
-            fetchCommentRepliesParams={fetchCommentRepliesParams}
+            fetchCommentParams={fetchCommentParams}
           />
         </MainWrapper>
         <Toaster />
@@ -102,6 +99,6 @@ export default async function EmbedCommentsByRepliesPage({
     );
   } catch (e) {
     console.error(e);
-    return <ErrorScreen description="Could not load comment replies" />;
+    return <ErrorScreen description="Could not load comments" />;
   }
 }

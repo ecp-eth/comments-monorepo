@@ -1,11 +1,12 @@
 import { useConsumePendingWalletConnectionActions } from "@ecp.eth/shared/components";
-import { useLikeComment } from "./useLikeComment";
-import { useUnlikeComment } from "./useUnlikeComment";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ContractFunctionExecutionError } from "viem";
 import { formatContractFunctionExecutionError } from "@ecp.eth/shared/helpers";
 import { toast } from "sonner";
 import { type Comment } from "@ecp.eth/shared/schemas";
+import type { Hex } from "@ecp.eth/sdk/core/schemas";
+import { useReactComment } from "./useReactComment";
+import { useUnreactComment } from "./useUnreactComment";
 
 type UseSetupPendingActionProps = {
   comment: Comment;
@@ -21,10 +22,12 @@ export function useSetupPendingAction({
 }: UseSetupPendingActionProps) {
   const isMountedRef = useRef(false);
   const [isReplying, setIsReplying] = useState(false);
-  const [isLiking, setIsLiking] = useState(false);
+  const [pendingReactions, setPendingReactions] = useState<
+    Record<string, boolean>
+  >({});
 
-  const likeComment = useLikeComment();
-  const unlikeComment = useUnlikeComment();
+  const reactComment = useReactComment();
+  const unreactComment = useUnreactComment();
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -33,67 +36,129 @@ export function useSetupPendingAction({
     };
   }, []);
 
+  const setReactionPending = useCallback(
+    (reactionType: string, nextValue: boolean) => {
+      if (!isMountedRef.current) {
+        return;
+      }
+
+      setPendingReactions((prev) => {
+        if (nextValue) {
+          return {
+            ...prev,
+            [reactionType]: true,
+          };
+        }
+
+        if (!prev[reactionType]) {
+          return prev;
+        }
+
+        const next = { ...prev };
+        delete next[reactionType];
+
+        return next;
+      });
+    },
+    [],
+  );
+
   const onReplyClick = useCallback(() => {
     setIsReplying(true);
   }, []);
 
-  const onLikeClick = useCallback(async () => {
-    if (isLiking) {
-      return;
+  const formatError = useCallback((error: unknown, fallbackMessage: string) => {
+    if (!(error instanceof Error)) {
+      return fallbackMessage;
     }
 
-    await likeComment({
+    if (error instanceof ContractFunctionExecutionError) {
+      return formatContractFunctionExecutionError(error);
+    }
+
+    return error.message;
+  }, []);
+
+  const onReactAction = useCallback(
+    async (_commentId: Hex, reactionType: string) => {
+      if (pendingReactions[reactionType]) {
+        return;
+      }
+
+      try {
+        await reactComment({
+          comment,
+          queryKey,
+          reactionType,
+          onBeforeStart: () => setReactionPending(reactionType, true),
+          onSuccess: () => setReactionPending(reactionType, false),
+          onFailed: (error) => {
+            setReactionPending(reactionType, false);
+            toast.error(
+              formatError(error, `Failed to react with ${reactionType}`),
+            );
+          },
+        });
+      } catch {
+        // Error already handled by onFailed callback
+      }
+    },
+    [
       comment,
+      formatError,
+      pendingReactions,
       queryKey,
-      onBeforeStart: () => setIsLiking(true),
-      onSuccess: () => setIsLiking(false),
-      onFailed: (e: unknown) => {
-        setIsLiking(false);
+      reactComment,
+      setReactionPending,
+    ],
+  );
 
-        if (!(e instanceof Error)) {
-          toast.error("Failed to like");
-          return;
-        }
+  const onUnreactAction = useCallback(
+    async (_commentId: Hex, reactionType: string) => {
+      if (pendingReactions[reactionType]) {
+        return;
+      }
 
-        const message =
-          e instanceof ContractFunctionExecutionError
-            ? formatContractFunctionExecutionError(e)
-            : e.message;
-
-        toast.error(message);
-      },
-    });
-  }, [isLiking, likeComment, comment, queryKey]);
-
-  const onUnlikeClick = useCallback(async () => {
-    await unlikeComment({
+      try {
+        await unreactComment({
+          comment,
+          queryKey,
+          reactionType,
+          onBeforeStart: () => setReactionPending(reactionType, true),
+          onSuccess: () => setReactionPending(reactionType, false),
+          onFailed: (error) => {
+            setReactionPending(reactionType, false);
+            toast.error(
+              formatError(error, `Failed to remove ${reactionType} reaction`),
+            );
+          },
+        });
+      } catch {
+        // Error already handled by onFailed callback
+      }
+    },
+    [
       comment,
+      formatError,
+      pendingReactions,
       queryKey,
-      onFailed: (e: unknown) => {
-        if (!(e instanceof Error)) {
-          toast.error("Failed to unlike");
-          return;
-        }
-
-        const message =
-          e instanceof ContractFunctionExecutionError
-            ? formatContractFunctionExecutionError(e)
-            : e.message;
-
-        toast.error(message);
-      },
-    });
-  }, [unlikeComment, comment, queryKey]);
+      setReactionPending,
+      unreactComment,
+    ],
+  );
 
   useConsumePendingWalletConnectionActions({
     commentId: comment.id,
-    onLikeAction: onLikeClick,
-    onUnlikeAction: onUnlikeClick,
+    onLikeAction: (commentId) => onReactAction(commentId, "like"),
+    onUnlikeAction: (commentId) => onUnreactAction(commentId, "like"),
+    onReactAction,
+    onUnreactAction,
     onPrepareReplyAction: onReplyClick,
   });
 
   return {
-    isLiking,
+    isReactionPending: (reactionType: string) =>
+      !!pendingReactions[reactionType],
     isReplying,
     setIsReplying: (value: boolean) => {
       if (!isMountedRef.current) {

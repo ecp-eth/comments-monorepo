@@ -6,7 +6,10 @@ import { z } from "zod";
 import { Providers } from "../providers";
 import { COMMENTS_PER_PAGE } from "@/lib/constants";
 import { CommentSectionByAuthor } from "@/components/comments/CommentSectionByAuthor";
-import { EmbedConfigFromSearchParamsSchema } from "@/lib/schemas";
+import {
+  EmbedConfigFromSearchParamsSchema,
+  normalizeEmbedSearchParams,
+} from "@/lib/schemas";
 import { MainWrapper } from "@/components/MainWrapper";
 import { cookies } from "next/headers";
 import { COMMENT_TYPE_COMMENT } from "@ecp.eth/sdk";
@@ -26,7 +29,7 @@ export default async function EmbedCommentsByAuthorPage({
   searchParams,
 }: EmbedPageProps) {
   const parseSearchParamsResult = SearchParamsSchema.safeParse(
-    await searchParams,
+    normalizeEmbedSearchParams(await searchParams),
   );
 
   if (!parseSearchParamsResult.success) {

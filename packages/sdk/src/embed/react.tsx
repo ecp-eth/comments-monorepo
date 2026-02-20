@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createCommentsEmbedURL } from "./utils.js";
 import {
   COMMENTS_EMBED_DEFAULT_BY_AUTHOR_URL,
+  COMMENTS_EMBED_DEFAULT_BY_CHANNEL_URL,
   COMMENTS_EMBED_DEFAULT_BY_REPLIES_URL,
   COMMENTS_EMBED_DEFAULT_URL,
 } from "../constants.js";
@@ -115,6 +116,25 @@ export type CommentsByRepliesEmbedProps = {
   iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
 } & EmbedConfigSchemaInputType;
 
+export type CommentsByChannelEmbedProps = {
+  /**
+   * The channel ID to filter comments by.
+   */
+  channelId: string | bigint;
+  /**
+   * URL of the comments embed iframe page. This page is rendered in the iframe.
+   */
+  embedUri?: string;
+  /**
+   * Allows to pass custom props to iframe's wrapper element
+   */
+  containerProps?: React.HTMLAttributes<HTMLDivElement>;
+  /**
+   * Allows to pass custom props to iframe
+   */
+  iframeProps?: React.IframeHTMLAttributes<HTMLIFrameElement>;
+} & Omit<EmbedConfigSchemaInputType, "channelId">;
+
 /**
  * Renders comments embed iframe for the given author.
  *
@@ -191,6 +211,58 @@ export function CommentsByRepliesEmbed({
       config: rest,
     });
   }, [embedUri, commentId, rest]);
+
+  return (
+    <CommentsEmbedInternal
+      src={iframeUri}
+      containerProps={containerProps}
+      iframeProps={iframeProps}
+    />
+  );
+}
+
+/**
+ * Renders comments embed iframe for a specific channel.
+ *
+ * This is client component only.
+ *
+ * @category Components
+ * @param props
+ */
+export function CommentsByChannelEmbed({
+  embedUri = COMMENTS_EMBED_DEFAULT_BY_CHANNEL_URL,
+  channelId,
+  containerProps,
+  iframeProps,
+  ...rest
+}: CommentsByChannelEmbedProps) {
+  const configKey = JSON.stringify(rest, (_key, value) =>
+    typeof value === "bigint" ? value.toString() : (value as unknown),
+  );
+
+  const iframeUri = useMemo(() => {
+    if (channelId == null) {
+      return;
+    }
+
+    const normalizedChannelId =
+      typeof channelId === "bigint" ? channelId.toString() : channelId.trim();
+
+    if (!normalizedChannelId) {
+      return;
+    }
+
+    return createCommentsEmbedURL({
+      embedUri,
+      source: { channelId: normalizedChannelId },
+      config: rest,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [embedUri, channelId, configKey]);
+
+  if (!iframeUri) {
+    return null;
+  }
 
   return (
     <CommentsEmbedInternal

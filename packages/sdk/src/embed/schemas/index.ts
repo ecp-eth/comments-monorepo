@@ -176,6 +176,59 @@ export type EmbedConfigSupportedChainIdsSchemaType = z.infer<
 >;
 
 /**
+ * The zod schema for a custom reaction rendered under a comment.
+ */
+export const EmbedConfigReactionSchema = z.object({
+  /**
+   * Lowercase value used as reaction content.
+   */
+  value: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1)
+    .max(32)
+    .regex(/^[a-z0-9_-]+$/)
+    .describe(
+      'Reaction value used in `content` for `commentType = 1`, e.g. "like" or "repost".',
+    ),
+  /**
+   * Icon token, supports emoji (e.g. "🔥") or a Phosphor icon slug (e.g. "heart", "arrow-fat-up").
+   */
+  icon: z
+    .string()
+    .trim()
+    .min(1)
+    .max(64)
+    .describe('Emoji or Phosphor icon slug, e.g. "heart" or "🔥".'),
+});
+
+export type EmbedConfigReactionSchemaType = z.infer<
+  typeof EmbedConfigReactionSchema
+>;
+
+const EmbedConfigReactionsSchema = z
+  .array(EmbedConfigReactionSchema)
+  .max(20)
+  .superRefine((reactions, ctx) => {
+    const values = new Set<string>();
+
+    for (const [index, reaction] of reactions.entries()) {
+      const key = reaction.value;
+
+      if (values.has(key)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate reaction value: ${key}`,
+          path: [index, "value"],
+        });
+      }
+
+      values.add(key);
+    }
+  });
+
+/**
  * The zod schema for `EmbedConfigSchemaType`
  */
 export const EmbedConfigSchema = z.object({
@@ -205,15 +258,15 @@ export const EmbedConfigSchema = z.object({
   /**
    * Specify the app signer address the comments associated with.
    *
-   * - Set it to "embed" will cause the embed to retrieve all comments posted by the embed app.
    * - Set it to "all" will cause the embed to retrieve all comments from all apps.
+   * - Set it to "embed" will cause the embed to retrieve all comments posted by the embed app.
    * - Set it to a valid hex address will cause the embed to retrieve all comments posted by the specified app.
    *
-   * @default "embed"
+   * @default "all"
    */
   app: z
     .union([HexSchema, z.literal("embed"), z.literal("all")])
-    .default("embed"),
+    .default("all"),
   /**
    * The id of the channel to post the comments to.
    */
@@ -231,6 +284,12 @@ export const EmbedConfigSchema = z.object({
       z.literal("gasless-preapproved"),
     ])
     .default("gasless-not-preapproved"),
+  /**
+   * Reactions rendered as action buttons under each comment.
+   *
+   * Each reaction is a pair of `{ value, icon }`.
+   */
+  reactions: EmbedConfigReactionsSchema.optional(),
 });
 
 /**

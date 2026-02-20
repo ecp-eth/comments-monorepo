@@ -2,12 +2,14 @@ import { Hex } from "@ecp.eth/sdk/core";
 import {
   CommentsEmbed,
   CommentsByAuthorEmbed,
+  CommentsByChannelEmbed,
   CommentsByRepliesEmbed,
   createCommentsEmbedURL,
   type EmbedConfigSchemaInputType,
 } from "@ecp.eth/sdk/embed";
 import { DEFAULT_CONFIG } from "./constants";
 import { CircleX, Info } from "lucide-react";
+import fastDeepEqual from "fast-deep-equal";
 
 export default function CommentsEmbedPreview({
   embedUri,
@@ -16,7 +18,11 @@ export default function CommentsEmbedPreview({
 }: {
   embedUri: string | undefined;
   config: EmbedConfigSchemaInputType;
-  source: { targetUri: string } | { author: Hex } | { commentId: Hex };
+  source:
+    | { targetUri: string }
+    | { author: Hex }
+    | { commentId: Hex }
+    | { channelId: string };
 }) {
   if (typeof window === "undefined" || !embedUri) {
     return null;
@@ -27,21 +33,40 @@ export default function CommentsEmbedPreview({
     createCommentsEmbedURL({
       embedUri,
       source,
-      config:
-        JSON.stringify(config) !== JSON.stringify(DEFAULT_CONFIG)
-          ? config
-          : undefined,
+      config: fastDeepEqual(config, DEFAULT_CONFIG) ? undefined : config,
     });
 
-    return "targetUri" in source ? (
-      <CommentsEmbed uri={source.targetUri} embedUri={embedUri} {...config} />
-    ) : "author" in source ? (
-      <CommentsByAuthorEmbed
-        author={source.author}
-        embedUri={embedUri}
-        {...config}
-      />
-    ) : (
+    if ("targetUri" in source) {
+      return (
+        <CommentsEmbed uri={source.targetUri} embedUri={embedUri} {...config} />
+      );
+    }
+
+    if ("author" in source) {
+      return (
+        <CommentsByAuthorEmbed
+          author={source.author}
+          embedUri={embedUri}
+          {...config}
+        />
+      );
+    }
+
+    if ("channelId" in source) {
+      if (source.channelId == null) {
+        throw new Error("Invalid source");
+      }
+
+      return (
+        <CommentsByChannelEmbed
+          channelId={source.channelId}
+          embedUri={embedUri}
+          {...config}
+        />
+      );
+    }
+
+    return (
       <CommentsByRepliesEmbed
         commentId={source.commentId}
         embedUri={embedUri}

@@ -38,10 +38,11 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
     retryEditComment({ comment, queryKey });
   }, [comment, retryEditComment, queryKey]);
 
-  const { isLiking, isReplying, setIsReplying } = useSetupPendingAction({
-    comment,
-    queryKey,
-  });
+  const { isReactionPending, isReplying, setIsReplying } =
+    useSetupPendingAction({
+      comment,
+      queryKey,
+    });
 
   return (
     <div className="mb-4 border-muted border-l-2 pl-4">
@@ -64,7 +65,7 @@ export function ReplyItem({ comment, queryKey }: ReplyItemProps) {
           onRetryDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
           onRetryEditClick={onRetryEditClick}
-          isLiking={isLiking}
+          isReactionPending={isReactionPending}
           optimisticReferences={
             comment.pendingOperation && "references" in comment.pendingOperation
               ? comment.pendingOperation.references

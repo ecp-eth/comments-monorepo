@@ -1,20 +1,22 @@
 import { Loader2Icon, MessageCircleWarningIcon } from "lucide-react";
 import type { Comment as CommentType } from "@ecp.eth/shared/schemas";
-import { type PropsWithChildren } from "react";
+import { type PropsWithChildren, useMemo } from "react";
 import {
   CommentActionButton,
-  CommentActionLikeButton,
   useConnectBeforeAction,
 } from "@ecp.eth/shared/components";
 import { cn } from "@ecp.eth/shared/helpers";
 import { RetryButton } from "./RetryButton";
+import { useEmbedConfig } from "../EmbedConfigProvider";
+import { getConfiguredReactions } from "@/lib/reactions";
+import { ReactionIcon } from "./ReactionIcon";
 
 interface CommentActionOrStatusProps {
   comment: CommentType;
   onRetryDeleteClick: () => void;
   onRetryPostClick: () => void;
   onRetryEditClick: () => void;
-  isLiking?: boolean;
+  isReactionPending?: (reactionType: string) => boolean;
 }
 
 export function CommentActionOrStatus({
@@ -22,7 +24,7 @@ export function CommentActionOrStatus({
   onRetryDeleteClick,
   onRetryPostClick,
   onRetryEditClick,
-  isLiking,
+  isReactionPending,
 }: CommentActionOrStatusProps) {
   const isDeleting =
     comment.pendingOperation?.action === "delete" &&
@@ -42,8 +44,12 @@ export function CommentActionOrStatus({
   const isEditing =
     comment.pendingOperation?.action === "edit" &&
     comment.pendingOperation.state.status === "pending";
-
   const connectBeforeAction = useConnectBeforeAction();
+  const config = useEmbedConfig();
+  const reactions = useMemo(
+    () => getConfiguredReactions(config.reactions),
+    [config.reactions],
+  );
 
   if (didPostingFailed) {
     return (
@@ -116,7 +122,7 @@ export function CommentActionOrStatus({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <CommentActionButton
         onClick={connectBeforeAction(() => {
           return {
@@ -127,7 +133,37 @@ export function CommentActionOrStatus({
       >
         reply
       </CommentActionButton>
-      <CommentActionLikeButton isLiking={isLiking} comment={comment} />
+      {reactions.map((reaction) => {
+        const isReacted =
+          (comment.viewerReactions?.[reaction.value]?.length ?? 0) > 0;
+        const count = comment.reactionCounts?.[reaction.value] ?? 0;
+        const pending = isReactionPending?.(reaction.value) ?? false;
+
+        return (
+          <CommentActionButton
+            key={`${comment.id}-${reaction.value}`}
+            className={cn(
+              "gap-1 px-1.5 py-0.5",
+              isReacted && "text-accent-foreground",
+            )}
+            disabled={pending}
+            onClick={connectBeforeAction(() => {
+              return {
+                type: isReacted ? "unreact" : "react",
+                commentId: comment.id,
+                reactionType: reaction.value,
+              };
+            })}
+          >
+            {pending ? (
+              <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <ReactionIcon icon={reaction.icon} />
+            )}
+            {count}
+          </CommentActionButton>
+        );
+      })}
     </div>
   );
 }

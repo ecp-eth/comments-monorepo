@@ -166,10 +166,11 @@ export function CommentItem({ comment }: CommentItemProps) {
     setIsEditing(true);
   }, []);
 
-  const { isLiking, isReplying, setIsReplying } = useSetupPendingAction({
-    comment,
-    queryKey: commentItemsQueryKey,
-  });
+  const { isReactionPending, isReplying, setIsReplying } =
+    useSetupPendingAction({
+      comment,
+      queryKey: commentItemsQueryKey,
+    });
 
   const replies = useMemo(() => {
     return repliesQuery.data?.pages.flatMap((page) => page.results) || [];
@@ -200,7 +201,7 @@ export function CommentItem({ comment }: CommentItemProps) {
               ? comment.pendingOperation.references
               : undefined
           }
-          isLiking={isLiking}
+          isReactionPending={isReactionPending}
         />
       )}
       {isReplying && (
