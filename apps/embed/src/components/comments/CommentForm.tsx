@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAccount } from "wagmi";
@@ -41,18 +42,54 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
-import { ImageIcon, CoinsIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { ImageIcon, Ellipsis, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { suggestionsTheme } from "./editorTheme";
 import { GaslessIndicator } from "./GaslessIndicator";
 import { usePostComment } from "./hooks/usePostComment";
 import { useEditComment } from "./hooks/useEditComment";
 import { Label } from "@/components/ui/label";
+import { createMetadataEntry, type MetadataType } from "@ecp.eth/sdk/comments";
+import type { MetadataEntry as ECPMetadataEntry } from "@ecp.eth/sdk/comments/types";
+
+interface FormMetadataEntry {
+  key: string;
+  value: string;
+  type: MetadataType;
+}
+
+const METADATA_TYPE_OPTIONS: MetadataType[] = [
+  "string",
+  "uint256",
+  "int256",
+  "address",
+  "bool",
+  "bytes",
+  "bytes32",
+];
+
+function parseChannelIdInput(value: string): bigint | undefined {
+  const trimmed = value.trim();
+  if (trimmed === "" || !/^\d+$/.test(trimmed)) return undefined;
+  return BigInt(trimmed);
+}
+
+function convertFormMetadataToECP(
+  entries: FormMetadataEntry[],
+): ECPMetadataEntry[] {
+  return entries
+    .filter((entry) => entry.key.trim() && entry.value.trim())
+    .map((entry) => createMetadataEntry(entry.key, entry.type, entry.value));
+}
 
 type OnSubmitFunction = (params: {
   author: Hex;
   content: string;
   references: IndexerAPICommentReferencesSchemaType;
+  metadata: ECPMetadataEntry[];
+  targetUriOverride?: string;
+  channelIdOverride?: bigint;
 }) => Promise<void>;
 
 type BaseCommentFormProps = {
@@ -121,6 +158,20 @@ function BaseCommentForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const onSubmitRef = useFreshRef(onSubmit);
   const onSubmitSuccessRef = useFreshRef(onSubmitSuccess);
+  const [metadata, setMetadata] = useState<FormMetadataEntry[]>([]);
+  const hasTargetUri = "targetUri" in targetUriOrParentIdContainer;
+  const [targetUriOverride, setTargetUriOverride] = useState("");
+  const [channelIdInput, setChannelIdInput] = useState(
+    config.channelId != null ? config.channelId.toString() : "",
+  );
+
+  const isDuplicateKey = (key: string, currentIndex: number) => {
+    if (!key.trim()) return false;
+    return metadata.some(
+      (entry, index) =>
+        index !== currentIndex && entry.key.trim() === key.trim(),
+    );
+  };
   const suggestions = useIndexerSuggestions({
     indexerApiUrl: publicEnv.NEXT_PUBLIC_COMMENTS_INDEXER_URL,
   });
@@ -146,15 +197,18 @@ function BaseCommentForm({
     },
   });
   const [content, setContent] = useState("");
+  const parsedChannelId = parseChannelIdInput(channelIdInput);
+
   const {
     data: {
+      fee,
       nativeTokenCostInEthText,
       nativeTokenCostInUSDText,
       erc20CostText,
     } = {},
   } = useChannelFee({
     action: isEdit ? "edit" : "post",
-    channelId: config.channelId,
+    channelId: parsedChannelId ?? config.channelId,
     address,
     content,
     app:
@@ -201,10 +255,15 @@ function BaseCommentForm({
             }),
           );
 
+        const ecpMetadata = convertFormMetadataToECP(metadata);
+
         const result = await onSubmitRef.current?.({
           author,
           content,
           references,
+          metadata: ecpMetadata,
+          targetUriOverride: targetUriOverride.trim() || undefined,
+          channelIdOverride: parsedChannelId,
         });
 
         return result;
@@ -221,6 +280,8 @@ function BaseCommentForm({
     onSuccess() {
       editorRef.current?.clear();
       submitMutation.reset();
+      setMetadata([]);
+      setTargetUriOverride("");
       onSubmitSuccessRef.current?.();
     },
     onError(error) {
@@ -279,11 +340,10 @@ function BaseCommentForm({
     return {
       editor: {
         className: cn(
-          defaultTheme.editor.className,
-          "w-full p-2 border border-gray-300 rounded",
+          "flex flex-col min-h-[80px] w-full bg-transparent px-3 pt-2 pb-1 text-base placeholder:text-muted-foreground focus-visible:outline-none md:text-sm",
           submitMutation.error &&
             submitMutation.error instanceof InvalidCommentError &&
-            "border-destructive focus-visible:border-destructive",
+            "ring-1 ring-destructive",
         ),
       },
       editor_disabled: {
@@ -312,97 +372,260 @@ function BaseCommentForm({
       }}
       className="flex flex-col gap-2 mb-2"
     >
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept={ALLOWED_UPLOAD_MIME_TYPES.join(",")}
-        onChange={handleFileSelect}
-        className="hidden"
-      />
-      <Editor
-        autoFocus={autoFocus}
-        disabled={isSubmitting || disabled}
-        placeholder={placeholder}
-        defaultValue={defaultContent}
-        ref={editorRef}
-        suggestions={suggestions}
-        suggestionsTheme={suggestionsTheme}
-        uploads={uploads}
-        onUpdate={() => {
-          setContent(
-            editorRef.current?.editor?.getText({
-              blockSeparator: "\n",
-            }) ?? "",
-          );
-        }}
-        onEscapePress={() => {
-          if (isSubmitting) {
-            return;
-          }
+      <div className="border border-border rounded-lg bg-background overflow-hidden">
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept={ALLOWED_UPLOAD_MIME_TYPES.join(",")}
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+        <Editor
+          autoFocus={autoFocus}
+          disabled={isSubmitting || disabled}
+          placeholder={placeholder}
+          defaultValue={defaultContent}
+          ref={editorRef}
+          suggestions={suggestions}
+          suggestionsTheme={suggestionsTheme}
+          uploads={uploads}
+          onUpdate={() => {
+            setContent(
+              editorRef.current?.editor?.getText({
+                blockSeparator: "\n",
+              }) ?? "",
+            );
+          }}
+          onEscapePress={() => {
+            if (isSubmitting) {
+              return;
+            }
 
-          onCancel?.();
-        }}
-        theme={editorTheme}
-      />
-      <div className="flex gap-2 justify-between text-xs">
-        {address && <CommentFormAuthor address={address} />}
-        <div className="flex gap-2 items-center ml-auto">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
+            onCancel?.();
+          }}
+          theme={editorTheme}
+        />
+        <div className="flex gap-2 justify-between items-center text-xs px-3 pb-2">
+          {address && <CommentFormAuthor address={address} />}
+          <div className="flex gap-2 items-center ml-auto">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="w-8 h-8"
+                    aria-label="Add media"
+                    variant="ghost"
+                    size="icon"
+                    type="button"
+                    onClick={handleAddFileClick}
+                    disabled={isSubmitting || disabled}
+                  >
+                    <ImageIcon className="stroke-foreground" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>Add media</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Popover>
+              <PopoverTrigger asChild>
                 <Button
-                  // to match the size of the submit button
                   className="w-8 h-8"
-                  aria-label="Add media"
-                  variant="outline"
+                  aria-label="More options"
+                  variant="ghost"
                   size="icon"
                   type="button"
-                  onClick={handleAddFileClick}
                   disabled={isSubmitting || disabled}
                 >
-                  <ImageIcon className="stroke-foreground" />
+                  <Ellipsis className="stroke-foreground h-4 w-4" />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>Add media</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          {(nativeTokenCostInEthText || erc20CostText) && (
-            <Label
-              className="h-8 text-[0.8em] flex flex-row items-center gap-2"
-              aria-label="Cost of posting"
-            >
-              <CoinsIcon className="w-3 h-3" />
-              Cost:{" "}
-              {[
-                nativeTokenCostInEthText +
-                  (nativeTokenCostInUSDText
-                    ? ` (≈ ${nativeTokenCostInUSDText})`
-                    : ""),
-                erc20CostText,
-              ]
-                .filter(Boolean)
-                .join(" and ")}{" "}
-            </Label>
-          )}
-          <ButtonWrapper>
-            <Button type="submit" disabled={isSubmitting || disabled} size="sm">
-              {isSubmitting ? submitPendingLabel : submitIdleLabel}
-            </Button>
-          </ButtonWrapper>
-          {onCancel && (
-            <Button
-              disabled={isSubmitting}
-              onClick={onCancel}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              {cancelLabel}
-            </Button>
-          )}
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  {hasTargetUri && (
+                    <div className="space-y-1.5">
+                      <h4 className="font-medium text-sm">Target</h4>
+                      <Input
+                        placeholder="https://example.com"
+                        value={targetUriOverride}
+                        onChange={(e) => setTargetUriOverride(e.target.value)}
+                        className="h-7 text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        The URL this comment is about.
+                      </p>
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    <h4 className="font-medium text-sm">Channel</h4>
+                    <Input
+                      placeholder="Channel ID (e.g. 0)"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      value={channelIdInput}
+                      onChange={(e) => {
+                        const value = e.target.value.trim();
+                        if (value === "" || /^\d+$/.test(value)) {
+                          setChannelIdInput(value);
+                        }
+                      }}
+                      className="h-7 text-xs"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      The channel to post this comment to.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium text-sm">Metadata</h4>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setMetadata([
+                          ...metadata,
+                          { key: "", value: "", type: "string" },
+                        ]);
+                      }}
+                      className="h-7 px-2 text-xs"
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      Add
+                    </Button>
+                  </div>
+                  {metadata.length > 0 && (
+                    <div className="space-y-2">
+                      {metadata.map((entry, index) => (
+                        <div key={index} className="space-y-1.5">
+                          <div className="flex gap-1.5 items-center">
+                            <Input
+                              placeholder="Key"
+                              value={entry.key}
+                              onChange={(e) => {
+                                const updated = [...metadata];
+                                updated[index] = {
+                                  ...updated[index],
+                                  key: e.target.value,
+                                };
+                                setMetadata(updated);
+                              }}
+                              className={cn(
+                                "h-7 text-xs flex-1",
+                                isDuplicateKey(entry.key, index) &&
+                                  "border-destructive",
+                              )}
+                            />
+                            <select
+                              value={entry.type}
+                              onChange={(e) => {
+                                const updated = [...metadata];
+                                updated[index] = {
+                                  ...updated[index],
+                                  type: e.target.value as MetadataType,
+                                };
+                                setMetadata(updated);
+                              }}
+                              className="h-7 rounded-md border border-border bg-transparent text-foreground px-1.5 text-xs appearance-none cursor-pointer"
+                            >
+                              {METADATA_TYPE_OPTIONS.map((type) => (
+                                <option key={type} value={type}>
+                                  {type}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              className="h-7 w-7 shrink-0 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-destructive transition-colors"
+                              onClick={() => {
+                                setMetadata(
+                                  metadata.filter((_, i) => i !== index),
+                                );
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <Input
+                            placeholder="Value"
+                            value={entry.value}
+                            onChange={(e) => {
+                              const updated = [...metadata];
+                              updated[index] = {
+                                ...updated[index],
+                                value: e.target.value,
+                              };
+                              setMetadata(updated);
+                            }}
+                            className="h-7 text-xs"
+                          />
+                          {isDuplicateKey(entry.key, index) && (
+                            <p className="text-xs text-destructive">
+                              Duplicate key
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {metadata.length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Add key-value pairs with Solidity types.
+                    </p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+            {fee &&
+            config.gasSponsorship !== "not-gasless" &&
+            fee.baseToken.amount === 0n &&
+            !erc20CostText ? (
+              <Label
+                className="h-8 text-[0.8em] flex flex-row items-center gap-2"
+                aria-label="Cost of posting"
+              >
+                Free
+              </Label>
+            ) : (
+              (nativeTokenCostInEthText || erc20CostText) && (
+                <Label
+                  className="h-8 text-[0.8em] flex flex-row items-center gap-2"
+                  aria-label="Cost of posting"
+                >
+                  {[
+                    nativeTokenCostInEthText +
+                      (nativeTokenCostInUSDText
+                        ? ` (≈ ${nativeTokenCostInUSDText})`
+                        : ""),
+                    erc20CostText,
+                  ]
+                    .filter(Boolean)
+                    .join(" and ")}
+                </Label>
+              )
+            )}
+            <ButtonWrapper>
+              <Button
+                type="submit"
+                disabled={isSubmitting || disabled}
+                size="sm"
+              >
+                {isSubmitting ? submitPendingLabel : submitIdleLabel}
+              </Button>
+            </ButtonWrapper>
+            {onCancel && (
+              <Button
+                disabled={isSubmitting}
+                onClick={onCancel}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                {cancelLabel}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       {submitMutation.error && (
@@ -440,14 +663,25 @@ export function CommentForm({
       {...props}
       {...(parentId ? { parentId } : { targetUri })}
       isEdit={false}
-      onSubmit={({ author, content, references }) =>
+      onSubmit={({
+        author,
+        content,
+        references,
+        metadata,
+        targetUriOverride,
+        channelIdOverride,
+      }) =>
         submitCommentMutation({
           queryKey,
           onSubmitStart: onSubmitStartRef.current,
           author,
           content,
           references,
-          targetUriOrParentId: parentId ? { parentId } : { targetUri },
+          metadata,
+          channelIdOverride,
+          targetUriOrParentId: parentId
+            ? { parentId }
+            : { targetUri: targetUriOverride || targetUri },
         })
       }
     />
@@ -468,15 +702,34 @@ function CommentFormAuthor({ address }: { address: Hex }) {
     },
   });
 
+  const authorName = getCommentAuthorNameOrAddress(
+    queryResult.data ?? { address },
+  );
+
   return (
     <div
       className="flex flex-row gap-2 items-center overflow-hidden"
-      title={`Publishing as ${getCommentAuthorNameOrAddress(queryResult.data ?? { address })}${embedConfig.gasSponsorship === "not-gasless" ? "" : " for free"}`}
+      title={`Publishing as ${authorName}${embedConfig.gasSponsorship === "not-gasless" ? "" : " for free"}`}
     >
-      <CommentAuthorAvatar author={queryResult.data ?? { address }} />
-      <div className="flex-grow text-xs text-muted-foreground truncate">
-        {getCommentAuthorNameOrAddress(queryResult.data ?? { address })}
-      </div>
+      {openAccountModal ? (
+        <button
+          className="flex flex-row gap-2 items-center overflow-hidden cursor-pointer"
+          onClick={() => openAccountModal()}
+          type="button"
+        >
+          <CommentAuthorAvatar author={queryResult.data ?? { address }} />
+          <div className="flex-grow text-xs text-muted-foreground truncate">
+            {authorName}
+          </div>
+        </button>
+      ) : (
+        <>
+          <CommentAuthorAvatar author={queryResult.data ?? { address }} />
+          <div className="flex-grow text-xs text-muted-foreground truncate">
+            {authorName}
+          </div>
+        </>
+      )}
 
       {address && !openAccountModal && openChainModal && (
         <button
@@ -485,15 +738,6 @@ function CommentFormAuthor({ address }: { address: Hex }) {
           type="button"
         >
           wrong network
-        </button>
-      )}
-      {openAccountModal && (
-        <button
-          className="text-account-edit-link text-xs"
-          onClick={() => openAccountModal()}
-          type="button"
-        >
-          edit
         </button>
       )}
     </div>
@@ -538,16 +782,16 @@ export function CommentEditForm({
         content: comment.content,
         references: comment.references,
       }}
-      onSubmit={({ author, content, references }) =>
-        submitCommentMutation({
+      onSubmit={({ author, content, references }) => {
+        return submitCommentMutation({
           queryKey,
           onSubmitStart: onSubmitStartRef.current,
           author,
           content,
           references,
           comment,
-        })
-      }
+        });
+      }}
       submitIdleLabel="Update"
       submitPendingLabel="Updating..."
     />

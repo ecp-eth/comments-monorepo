@@ -290,6 +290,12 @@ export const EmbedConfigSchema = z.object({
    * Each reaction is a pair of `{ value, icon }`.
    */
   reactions: EmbedConfigReactionsSchema.optional(),
+  /**
+   * Custom heading text displayed at the top of the comment section.
+   *
+   * @default "Comments"
+   */
+  title: z.string().max(100).optional(),
 });
 
 /**

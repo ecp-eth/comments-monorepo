@@ -14,7 +14,7 @@ export function PoweredBy({ className }: PoweredByProps) {
         href="https://docs.ethcomments.xyz"
         target="_blank"
       >
-        <Logo className="w-4 h-4" /> Comments powered by ECP
+        <Logo className="w-[20px] h-[20px]" /> Comments powered by ECP
       </Link>
     </div>
   );

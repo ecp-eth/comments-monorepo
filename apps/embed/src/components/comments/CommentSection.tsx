@@ -54,7 +54,7 @@ export function CommentSection({
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { targetUri, disablePromotion, restrictMaximumContainerWidth } =
+  const { targetUri, disablePromotion, restrictMaximumContainerWidth, title } =
     useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => createCommentItemsQueryKey(connectedAddress, chainId, targetUri),
@@ -133,7 +133,9 @@ export function CommentSection({
     <div
       className={cn("mx-auto", restrictMaximumContainerWidth && "max-w-2xl")}
     >
-      <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      <h2 className="text-headline font-bold mb-4 text-foreground">
+        {title ?? "Comments"}
+      </h2>
       <div className="mb-4">
         <CommentForm queryKey={queryKey} />
       </div>

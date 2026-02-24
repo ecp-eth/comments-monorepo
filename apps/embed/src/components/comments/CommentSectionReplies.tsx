@@ -65,7 +65,7 @@ export function CommentSectionReplies({
 
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
-  const { disablePromotion } =
+  const { disablePromotion, title } =
     useEmbedConfig<EmbedConfigProviderByRepliesConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
@@ -170,7 +170,9 @@ export function CommentSectionReplies({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      <h2 className="text-headline font-bold mb-4 text-foreground">
+        {title ?? "Comments"}
+      </h2>
       <div className="mb-4">
         <CommentForm
           placeholder="What are your thoughts?"

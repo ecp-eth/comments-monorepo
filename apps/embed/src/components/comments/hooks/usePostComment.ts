@@ -8,13 +8,16 @@ import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { QueryKey } from "@tanstack/react-query";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
+import type { MetadataEntry } from "@ecp.eth/sdk/comments/types";
 
 type UsePostCommentProps = (params: {
   queryKey: QueryKey;
   author: Hex;
   content: string;
   references: IndexerAPICommentReferencesSchemaType;
+  metadata: MetadataEntry[];
   targetUriOrParentId: { parentId: Hex } | { targetUri: string };
+  channelIdOverride?: bigint;
   onSubmitStart?: () => void;
 }) => Promise<void>;
 
@@ -30,7 +33,9 @@ export function usePostComment() {
       author,
       content,
       references,
+      metadata,
       targetUriOrParentId,
+      channelIdOverride,
       onSubmitStart,
       queryKey,
     }) => {
@@ -47,8 +52,8 @@ export function usePostComment() {
             author,
             chainId,
             content,
-            channelId,
-            metadata: [],
+            channelId: channelIdOverride ?? channelId,
+            metadata,
             ...("parentId" in targetUriOrParentId
               ? { parentId: targetUriOrParentId.parentId }
               : { targetUri: targetUriOrParentId.targetUri }),

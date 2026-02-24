@@ -54,7 +54,7 @@ export function CommentSectionByAuthor({
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { currentTimestamp, disablePromotion } =
+  const { currentTimestamp, disablePromotion, title } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
@@ -142,7 +142,9 @@ export function CommentSectionByAuthor({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-headline font-bold mb-4 text-foreground">Comments</h2>
+      <h2 className="text-headline font-bold mb-4 text-foreground">
+        {title ?? "Comments"}
+      </h2>
       {hasNewComments && (
         <Button
           className="mb-4"
