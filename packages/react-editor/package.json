@@ -8,7 +8,7 @@
     "url": "https://github.com/ecp-eth/ecp.git"
   },
   "homepage": "https://ecp.eth",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "type": "module",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
@@ -90,8 +90,8 @@
     "tippy.js": "^6.3.7"
   },
   "peerDependencies": {
-    "@ecp.eth/sdk": ">=0.0.42",
-    "@ecp.eth/shared": ">=0.0.21",
+    "@ecp.eth/sdk": ">=0.0.43",
+    "@ecp.eth/shared": ">=0.0.22",
     "@gorhom/portal": ">=1.0.14",
     "@tanstack/react-query": ">=5.0.0",
     "nativewind": ">=4.2.1",
