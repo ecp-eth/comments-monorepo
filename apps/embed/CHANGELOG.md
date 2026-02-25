@@ -1,5 +1,16 @@
 # @ecp.eth/embed
 
+## 0.0.51
+
+### Patch Changes
+
+- 8a09d9c: Small UI changes
+- Updated dependencies [8a09d9c]
+  - @ecp.eth/react-editor@0.0.26
+  - @ecp.eth/shared@0.0.22
+  - @ecp.eth/sdk@0.0.43
+  - @ecp.eth/shared-signer@0.0.2
+
 ## 0.0.50
 
 ### Patch Changes

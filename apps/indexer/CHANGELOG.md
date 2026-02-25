@@ -1,5 +1,13 @@
 # @ecp.eth/indexer
 
+## 0.0.42
+
+### Patch Changes
+
+- Updated dependencies [8a09d9c]
+  - @ecp.eth/shared@0.0.22
+  - @ecp.eth/sdk@0.0.43
+
 ## 0.0.41
 
 ### Patch Changes

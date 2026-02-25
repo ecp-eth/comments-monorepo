@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.43
+
+### Patch Changes
+
+- 8a09d9c: Small UI changes
+
 ## 0.0.42
 
 ### Patch Changes
