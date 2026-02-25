@@ -8,12 +8,27 @@ import { tracer } from "../telemetry";
 
 const app = new OpenAPIHono();
 
-app.use(
-  httpInstrumentationMiddleware({
-    tracer,
-    captureRequestHeaders: ["user-agent", "service-name"],
-  }),
-);
+const shouldIgnorePath = (path: string) => {
+  return (
+    path === "/metrics" ||
+    path === "/api/internal" ||
+    path.startsWith("/api/internal/")
+  );
+};
+
+const instrumentHttp = httpInstrumentationMiddleware({
+  tracer,
+  captureRequestHeaders: ["user-agent", "service-name"],
+});
+
+app.use(async (c, next) => {
+  if (shouldIgnorePath(c.req.path)) {
+    await next();
+    return;
+  }
+
+  await instrumentHttp(c, next);
+});
 
 // Add logging middleware
 app.use("*", async (c, next) => {
