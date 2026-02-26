@@ -68,6 +68,7 @@ export default async function EmbedCommentsByRepliesPage({
       viewer,
       commentId,
       channelId: config.channelId,
+      moderationStatus: config.moderationStatus,
     };
     const comments = await fetchCommentReplies(fetchCommentRepliesParams);
 

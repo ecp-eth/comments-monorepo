@@ -76,6 +76,32 @@ export function Comments() {
 }
 ```
 
+#### Showing All Comments (Bypassing Moderation Filter)
+
+When moderation is enabled, only approved comments are shown by default.
+Pass `moderationStatus` to include pending or rejected comments:
+
+```tsx twoslash
+/// <reference types="@ecp.eth/sdk" />
+// ---cut---
+import React from "react";
+import { CommentsEmbed } from "@ecp.eth/sdk/embed";
+
+export function AdminComments() {
+  return (
+    <CommentsEmbed
+      uri={
+        new URL(
+          window.location.pathname,
+          "https://demo.ethcomments.xyz",
+        )
+      }
+      moderationStatus={["approved", "rejected", "pending"]}
+    />
+  );
+}
+```
+
 - Please note that if you are rendering the `CommentsEmbed` with server-side rendering (SSR), you do not have access to the `window` object.
   Instead, you may want to construct the `uri` out of the `HttpRequest` object of your server-side framework.
 - Please also read the `targetUri` carefully in [Comment Data](/comment-data-props) for choosing an appropriate `uri`.

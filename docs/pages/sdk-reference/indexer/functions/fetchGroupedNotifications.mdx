@@ -14,7 +14,7 @@ function fetchGroupedNotifications(options): Promise<{
   notifications: {
      cursor: string;
      groupedBy: {
-        notificationType: "reaction" | "reply" | "mention" | "quote";
+        notificationType: "reply" | "mention" | "reaction" | "quote";
         parent: {
            comment: {
               app: `0x${string}`;
@@ -549,7 +549,7 @@ Fetch grouped notifications from the Indexer API
   `notifications`: \{
      `cursor`: `string`;
      `groupedBy`: \{
-        `notificationType`: `"reaction"` \| `"reply"` \| `"mention"` \| `"quote"`;
+        `notificationType`: `"reply"` \| `"mention"` \| `"reaction"` \| `"quote"`;
         `parent`: \{
            `comment`: \{
               `app`: `` `0x${string}` ``;

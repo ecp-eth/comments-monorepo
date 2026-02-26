@@ -64,6 +64,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
       viewer,
       targetUri,
       channelId: config.channelId,
+      moderationStatus: config.moderationStatus,
     };
     const comments = await fetchComments(fetchCommentParams);
 

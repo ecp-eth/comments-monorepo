@@ -66,6 +66,7 @@ export default async function EmbedByChannelPage({
       mode: "flat",
       viewer,
       channelId,
+      moderationStatus: config.moderationStatus,
     };
     const comments = await fetchComments(fetchCommentParams);
 
