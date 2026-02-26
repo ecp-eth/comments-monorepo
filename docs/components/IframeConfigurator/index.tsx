@@ -252,6 +252,10 @@ export default function IframeConfigurator() {
     control: form.control,
     name: "config.reactions",
   });
+  const moderationStatus = useWatch({
+    control: form.control,
+    name: "config.moderationStatus",
+  });
   const autoHeightAdjustment = useWatch({
     control: form.control,
     name: "autoHeightAdjustment",
@@ -860,6 +864,48 @@ export default function IframeConfigurator() {
                   </FormItem>
                 )}
               />
+
+              <FormItem>
+                <FormLabel>Moderation Status Filter</FormLabel>
+                <FormDescription>
+                  Select which moderation statuses to include. When none are
+                  selected, the indexer applies its default filtering (approved
+                  only).
+                </FormDescription>
+                <div className="flex gap-3">
+                  {(["approved", "rejected", "pending"] as const).map(
+                    (status) => {
+                      const currentStatuses = moderationStatus ?? [];
+                      const isChecked = currentStatuses.includes(status);
+                      return (
+                        <label
+                          key={status}
+                          className="flex items-center gap-1.5 text-sm cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              const next = e.target.checked
+                                ? [...currentStatuses, status]
+                                : currentStatuses.filter((s) => s !== status);
+                              form.setValue(
+                                "config.moderationStatus",
+                                next.length > 0 ? next : undefined,
+                                {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                },
+                              );
+                            }}
+                          />
+                          {status}
+                        </label>
+                      );
+                    },
+                  )}
+                </div>
+              </FormItem>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="flex flex-col gap-4">
