@@ -1,5 +1,11 @@
 # @ecp.eth/sdk
 
+## 0.0.44
+
+### Patch Changes
+
+- bcb145e: feat: add moderation settings to embed
+
 ## 0.0.43
 
 ### Patch Changes
