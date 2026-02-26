@@ -14,7 +14,7 @@ type IndexerAPIListGroupedNotificationsSchemaType = {
   notifications: {
      cursor: string;
      groupedBy: {
-        notificationType: "reaction" | "reply" | "mention" | "quote";
+        notificationType: "reply" | "mention" | "reaction" | "quote";
         parent: {
            comment: {
               app: `0x${string}`;
@@ -748,7 +748,7 @@ unseenCount: bigint;
 notifications: {
   cursor: string;
   groupedBy: {
-     notificationType: "reaction" | "reply" | "mention" | "quote";
+     notificationType: "reply" | "mention" | "reaction" | "quote";
      parent: {
         comment: {
            app: `0x${string}`;

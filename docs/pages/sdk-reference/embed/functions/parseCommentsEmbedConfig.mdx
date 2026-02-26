@@ -15,6 +15,7 @@ function parseCommentsEmbedConfig(compressedConfig):
   channelId?: bigint;
   disablePromotion: boolean;
   gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
+  moderationStatus?: ("approved" | "pending" | "rejected")[];
   reactions?: {
      icon: string;
      value: string;
@@ -1832,6 +1833,7 @@ function parseCommentsEmbedConfig(compressedConfig):
         root-padding-vertical?: string;
      };
   };
+  title?: string;
 };
 ```
 
@@ -1856,6 +1858,7 @@ Parse compressed config from `config` search param.
   channelId?: bigint;
   disablePromotion: boolean;
   gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
+  moderationStatus?: ("approved" | "pending" | "rejected")[];
   reactions?: {
      icon: string;
      value: string;
@@ -3673,6 +3676,7 @@ Parse compressed config from `config` search param.
         root-padding-vertical?: string;
      };
   };
+  title?: string;
 }
 ```
 
@@ -3740,6 +3744,20 @@ The gas sponsorship to use when posting comments.
 ```ts
 "gasless-not-preapproved"
 ```
+
+### moderationStatus?
+
+```ts
+optional moderationStatus: ("approved" | "pending" | "rejected")[];
+```
+
+Filter comments by moderation status.
+
+Pass an array of statuses to include, e.g. `["approved"]` for only
+approved comments, or `["approved", "rejected", "pending"]` to show
+all comments regardless of moderation status.
+
+When omitted the indexer applies its default moderation filtering.
 
 ### reactions?
 
@@ -9560,6 +9578,20 @@ optional root-padding-horizontal: string;
 
 ```ts
 optional root-padding-vertical: string;
+```
+
+### title?
+
+```ts
+optional title: string;
+```
+
+Custom heading text displayed at the top of the comment section.
+
+#### Default
+
+```ts
+"Comments"
 ```
 
 Parsed config or `undefined` when parsing fails.

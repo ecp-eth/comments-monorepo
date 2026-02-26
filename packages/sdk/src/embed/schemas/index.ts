@@ -2,6 +2,7 @@ import { z } from "zod/v3";
 import { EmbedConfigSupportedFont } from "./fonts.js";
 import { DEFAULT_CHAIN_ID, DEFAULT_CHAIN_ID_DEV } from "../../constants.js";
 import { HexSchema } from "../../core/schemas.js";
+import { IndexerAPICommentModerationStatusSchema } from "../../indexer/schemas.js";
 
 export { EmbedConfigSupportedFont };
 
@@ -296,6 +297,16 @@ export const EmbedConfigSchema = z.object({
    * @default "Comments"
    */
   title: z.string().max(100).optional(),
+  /**
+   * Filter comments by moderation status.
+   *
+   * Pass an array of statuses to include, e.g. `["approved"]` for only
+   * approved comments, or `["approved", "rejected", "pending"]` to show
+   * all comments regardless of moderation status.
+   *
+   * When omitted the indexer applies its default moderation filtering.
+   */
+  moderationStatus: z.array(IndexerAPICommentModerationStatusSchema).optional(),
 });
 
 /**
