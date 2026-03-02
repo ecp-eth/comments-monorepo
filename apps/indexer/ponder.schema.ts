@@ -1,4 +1,11 @@
-import { index, onchainTable, relations, sql, uniqueIndex } from "ponder";
+import {
+  index,
+  onchainTable,
+  primaryKey,
+  relations,
+  sql,
+  uniqueIndex,
+} from "ponder";
 import type {
   IndexerAPICommentReferencesSchemaType,
   IndexerAPICommentZeroExSwapSchemaType,
@@ -197,3 +204,25 @@ export const commentRelations = relations(comment, ({ one, many }) => ({
     references: [comment.id],
   }),
 }));
+
+export const channelHourlyVolume = onchainTable(
+  "channel_hourly_volume",
+  (t) => ({
+    channelId: t.numeric().notNull(),
+    hourTimestamp: t.timestamp({ withTimezone: true }).notNull(),
+    txCount: t.integer().notNull().default(0),
+    gasTotal: t.numeric().notNull().default("0"),
+    valueTotal: t.numeric().notNull().default("0"),
+    volumeTotal: t.numeric().notNull().default("0"),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.channelId, table.hourTimestamp] }),
+    hourTimestampIdx: index("chv_by_hour_timestamp_idx").on(
+      table.hourTimestamp,
+    ),
+    channelIdHourTimestampIdx: index("chv_by_channel_id_hour_timestamp_idx").on(
+      table.channelId,
+      table.hourTimestamp,
+    ),
+  }),
+);

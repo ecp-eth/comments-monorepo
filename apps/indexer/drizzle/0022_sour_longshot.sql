@@ -1,0 +1,1 @@
+DROP TABLE "ecp_indexer_schema"."channel_hourly_volume" CASCADE;
