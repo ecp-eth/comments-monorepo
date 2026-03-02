@@ -971,9 +971,10 @@ export default function IframeConfigurator() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      <LabelWithHelp help="Show a warning dialog when a channel hook charges more than this amount in USD. Set to 0 to always warn when a hook fee is present.">
-                        Hook Fee Warning Threshold (USD)
-                      </LabelWithHelp>
+                      <LabelWithHelp
+                        label="Hook Fee Warning Threshold (USD)"
+                        help="Show a warning dialog when a channel hook charges more than this amount in USD. Set to 0 to always warn when a hook fee is present."
+                      />
                     </FormLabel>
                     <FormDescription>
                       Transactions with hook fees above this USD amount will
