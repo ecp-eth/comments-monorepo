@@ -51,29 +51,34 @@ export async function analyzeHookFee({
 
   let erc20Approval: HookFeeAnalysis["erc20Approval"];
   if (hasErc20Cost && fee.contractAsset) {
-    const [symbol, decimals] = await Promise.all([
-      publicClient.readContract({
-        address: fee.contractAsset.address,
-        abi: erc20Abi,
-        functionName: "symbol",
-        args: [],
-      }),
-      publicClient.readContract({
-        address: fee.contractAsset.address,
-        abi: erc20Abi,
-        functionName: "decimals",
-        args: [],
-      }),
-    ]);
+    let symbol = "???";
+    let decimals = 18;
+    try {
+      const [readSymbol, readDecimals] = await Promise.all([
+        publicClient.readContract({
+          address: fee.contractAsset.address,
+          abi: erc20Abi,
+          functionName: "symbol",
+          args: [],
+        }),
+        publicClient.readContract({
+          address: fee.contractAsset.address,
+          abi: erc20Abi,
+          functionName: "decimals",
+          args: [],
+        }),
+      ]);
+      symbol = readSymbol || symbol;
+      decimals = readDecimals ?? decimals;
+    } catch {
+      // best-effort metadata; keep fallback values
+    }
 
     erc20Approval = {
       tokenAddress: fee.contractAsset.address,
-      tokenSymbol: symbol || "???",
+      tokenSymbol: symbol,
       amount: fee.contractAsset.amount,
-      amountFormatted:
-        formatUnits(fee.contractAsset.amount, decimals ?? 18) +
-        " " +
-        (symbol || "???"),
+      amountFormatted: `${formatUnits(fee.contractAsset.amount, decimals)} ${symbol}`,
       hookAddress: fee.hook,
     };
   }
