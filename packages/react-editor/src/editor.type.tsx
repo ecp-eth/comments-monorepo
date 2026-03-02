@@ -84,6 +84,12 @@ export type EditorProps = {
   onUpdate?: (props?: EditorEvents["update"]) => void;
   onBlur?: (props?: EditorEvents["blur"]) => void;
   onEscapePress?: () => void;
+  /**
+   * Mention trigger characters to enable in the editor.
+   *
+   * @default ["@"]
+   */
+  mentionTriggerCharacters?: Array<"@" | "$">;
   suggestions: EditorSuggestionsService;
   suggestionsTheme?: MentionsExtensionTheme;
   uploads: UploadFilesService;

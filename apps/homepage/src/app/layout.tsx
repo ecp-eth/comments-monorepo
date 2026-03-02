@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   appleWebApp: {
     title: "ECP",
   },
+  other: {
+    "base:app_id": "6943c14ad77c069a945bdff6",
+  },
 };
 
 export default function RootLayout({

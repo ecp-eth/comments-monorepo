@@ -65,7 +65,7 @@ export function CommentSectionReplies({
 
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
-  const { disablePromotion, title } =
+  const { disablePromotion, title, hideEmptyScreen } =
     useEmbedConfig<EmbedConfigProviderByRepliesConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
@@ -190,7 +190,7 @@ export function CommentSectionReplies({
           Load new comments
         </Button>
       )}
-      {results.length === 0 && <NoCommentsScreen />}
+      {results.length === 0 && !hideEmptyScreen && <NoCommentsScreen />}
       {results.map((comment) => (
         <CommentItem comment={comment} key={comment.id} />
       ))}

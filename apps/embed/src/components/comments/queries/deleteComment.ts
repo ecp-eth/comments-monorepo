@@ -8,6 +8,7 @@ import type { PendingDeleteCommentOperationSchemaType } from "@ecp.eth/shared/sc
 import {
   bigintReplacer,
   formatContractFunctionExecutionError,
+  isUserRejectionError,
 } from "@ecp.eth/shared/helpers";
 import {
   ContractWriteFunctions,
@@ -97,7 +98,15 @@ async function deleteCommentWithGaslessAndAuthorSig({
     chainId,
   });
   const deadline = typedDeleteData.message.deadline;
-  const authorSignature = await signTypedDataAsync(typedDeleteData);
+  let authorSignature;
+  try {
+    authorSignature = await signTypedDataAsync(typedDeleteData);
+  } catch (e) {
+    if (isUserRejectionError(e)) {
+      throw new SubmitDeleteCommentMutationError("Transaction was rejected.");
+    }
+    throw e;
+  }
 
   const response = await fetch(getSignerURL("/api/delete-comment/send"), {
     method: "POST",
@@ -169,6 +178,10 @@ async function deleteCommentWithoutGasless({
       commentId,
     };
   } catch (e) {
+    if (isUserRejectionError(e)) {
+      throw new SubmitDeleteCommentMutationError("Transaction was rejected.");
+    }
+
     if (!(e instanceof Error)) {
       throw new SubmitDeleteCommentMutationError(
         "Failed to delete comment, please try again.",

@@ -8,6 +8,7 @@ import type { Hex } from "viem";
 import { TX_RECEIPT_TIMEOUT } from "../../../lib/constants";
 import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
+import { useTransactionWarning } from "../TransactionWarningProvider";
 
 export type OnRetryPostCommentParams = {
   comment: Comment;
@@ -37,6 +38,7 @@ export function useRetryPostComment({
   const { switchChainAsync } = useSwitchChain();
   const embedConfig = useEmbedConfig();
   const publicClient = usePublicClient();
+  const { confirmTransaction } = useTransactionWarning();
 
   if (!publicClient) {
     throw new Error("No public client found");
@@ -84,6 +86,8 @@ export function useRetryPostComment({
           publicClient,
           walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
+          hookFeeWarningThresholdUsd: embedConfig.hookFeeWarningThresholdUsd,
+          confirmTransaction,
         })),
         references: comment.references,
       };
@@ -120,9 +124,11 @@ export function useRetryPostComment({
       }
     },
     [
+      confirmTransaction,
       connectedAddress,
-      publicClient,
       embedConfig.gasSponsorship,
+      embedConfig.hookFeeWarningThresholdUsd,
+      publicClient,
       switchChainAsync,
       commentRetrySubmission,
       wagmiConfig,

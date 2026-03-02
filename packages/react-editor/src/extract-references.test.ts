@@ -433,4 +433,54 @@ describe("extractReferences", () => {
     ]);
     expect(renderToStaticMarkup(rendered.element)).toEqual("<p>test</p>");
   });
+
+  it("extracts erc20 references from $ mention nodes", () => {
+    const caip19 =
+      "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
+    const references = extractReferences({
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "mentionDollar",
+              attrs: {
+                address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+                caip19,
+                chainId: 8453,
+                name: "USD Coin",
+                symbol: "USDC",
+                type: "erc20",
+                decimals: 6,
+                logoURI: null,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(references).toStrictEqual([
+      {
+        type: "erc20",
+        address: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        chainId: 8453,
+        chains: [
+          {
+            caip: caip19,
+            chainId: 8453,
+          },
+        ],
+        decimals: 6,
+        logoURI: null,
+        name: "USD Coin",
+        symbol: "USDC",
+        position: {
+          start: 0,
+          end: caip19.length,
+        },
+      },
+    ]);
+  });
 });

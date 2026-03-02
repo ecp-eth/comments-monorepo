@@ -54,8 +54,13 @@ export function CommentSection({
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { targetUri, disablePromotion, restrictMaximumContainerWidth, title } =
-    useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
+  const {
+    targetUri,
+    disablePromotion,
+    restrictMaximumContainerWidth,
+    title,
+    hideEmptyScreen,
+  } = useEmbedConfig<EmbedConfigProviderByTargetURIConfig>();
   const queryKey = useMemo(
     () => createCommentItemsQueryKey(connectedAddress, chainId, targetUri),
     [targetUri, connectedAddress, chainId],
@@ -158,7 +163,7 @@ export function CommentSection({
               Load new comments
             </Button>
           )}
-          {results.length === 0 && <NoCommentsScreen />}
+          {results.length === 0 && !hideEmptyScreen && <NoCommentsScreen />}
           {results.map((comment) => (
             <CommentItem comment={comment} key={comment.id} />
           ))}

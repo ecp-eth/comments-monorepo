@@ -693,7 +693,7 @@ export function getNetworkFromProcessEnv(
 export function formatContractFunctionExecutionError(
   error: ContractFunctionExecutionError,
 ) {
-  if (error.shortMessage.includes("User rejected the request")) {
+  if (isUserRejectionError(error)) {
     return "Transaction was rejected.";
   }
 
@@ -702,6 +702,41 @@ export function formatContractFunctionExecutionError(
   }
 
   return error.shortMessage;
+}
+
+/**
+ * Detects wallet user-rejection errors across different wallet providers.
+ * Some wallets return non-standard error messages (e.g. "JSON is not a valid request object")
+ * when the user cancels a transaction or signature request.
+ */
+export function isUserRejectionError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+
+  const errorWithCode = error as Error & {
+    code?: number;
+    shortMessage?: string;
+  };
+
+  if (errorWithCode.code === 4001) return true;
+
+  const textsToCheck = [
+    errorWithCode.shortMessage,
+    errorWithCode.message,
+  ].filter(Boolean) as string[];
+
+  const rejectionPatterns = [
+    "user rejected",
+    "user denied",
+    "user cancelled",
+    "rejected the request",
+    "request rejected",
+    "json is not a valid request",
+  ];
+
+  return textsToCheck.some((text) => {
+    const lower = text.toLowerCase();
+    return rejectionPatterns.some((pattern) => lower.includes(pattern));
+  });
 }
 
 export function never(message: string = "should never happen"): never {

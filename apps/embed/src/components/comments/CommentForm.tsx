@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { QueryKey, useMutation, useQuery } from "@tanstack/react-query";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useAccount } from "wagmi";
 import { fetchAuthorData } from "@ecp.eth/sdk/indexer";
 import { useConnectAccount, useFreshRef } from "@ecp.eth/shared/hooks";
@@ -68,6 +74,7 @@ const METADATA_TYPE_OPTIONS: MetadataType[] = [
   "bytes",
   "bytes32",
 ];
+const COMMENT_EDITOR_MENTION_TRIGGER_CHARACTERS: Array<"@" | "$"> = ["@", "$"];
 
 function parseChannelIdInput(value: string): bigint | undefined {
   const trimmed = value.trim();
@@ -198,6 +205,7 @@ function BaseCommentForm({
   });
   const [content, setContent] = useState("");
   const parsedChannelId = parseChannelIdInput(channelIdInput);
+  const previousAddressRef = useRef(address);
 
   const {
     data: {
@@ -359,6 +367,17 @@ function BaseCommentForm({
   const ButtonWrapper =
     config.gasSponsorship !== "not-gasless" ? GaslessIndicator : React.Fragment;
 
+  useEffect(() => {
+    const wasConnected = !!previousAddressRef.current;
+    const isDisconnected = !address;
+
+    if (wasConnected && isDisconnected && submitMutation.isPending) {
+      submitMutation.reset();
+    }
+
+    previousAddressRef.current = address;
+  }, [address, submitMutation]);
+
   return (
     <form
       action={async (formData) => {
@@ -385,6 +404,7 @@ function BaseCommentForm({
           autoFocus={autoFocus}
           disabled={isSubmitting || disabled}
           placeholder={placeholder}
+          mentionTriggerCharacters={COMMENT_EDITOR_MENTION_TRIGGER_CHARACTERS}
           defaultValue={defaultContent}
           ref={editorRef}
           suggestions={suggestions}

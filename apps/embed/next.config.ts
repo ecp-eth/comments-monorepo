@@ -1,13 +1,25 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import path from "node:path";
 
 import "./src/env";
+
+const rainbowkitPath = path.resolve(
+  import.meta.dirname,
+  "node_modules/@rainbow-me/rainbowkit",
+);
 
 const nextConfig: NextConfig = {
   // https://github.com/WalletConnect/walletconnect-monorepo/issues/1908#issuecomment-1487801131
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
+    config.resolve.alias["@rainbow-me/rainbowkit"] = rainbowkitPath;
     return config;
+  },
+  turbopack: {
+    resolveAlias: {
+      "@rainbow-me/rainbowkit": "./node_modules/@rainbow-me/rainbowkit",
+    },
   },
   // below is to fixed warning mentioned here: https://github.com/vercel/next.js/discussions/76247
   serverExternalPackages: ["import-in-the-middle", "require-in-the-middle"],

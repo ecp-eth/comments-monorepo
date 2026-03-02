@@ -1,6 +1,6 @@
 // in order to make tsup builds the css, we need to import it
 import "./editor.css";
-import { useImperativeHandle, useState } from "react";
+import { useImperativeHandle, useMemo, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { Document } from "@tiptap/extension-document";
 import { Paragraph } from "@tiptap/extension-paragraph";
@@ -11,6 +11,7 @@ import { HardBreak } from "@tiptap/extension-hard-break";
 import { MentionOptions } from "@tiptap/extension-mention";
 import { cn } from "@ecp.eth/shared/helpers";
 import { MentionExtension } from "./extensions/mention-extension.js";
+import { PluginKey } from "@tiptap/pm/state";
 import {
   type UploadTrackerUploadedFile,
   type UploadTrackerAttributes,
@@ -36,6 +37,20 @@ type EditorWebProps = {
   >["suggestion"]["render"];
 };
 
+const DEFAULT_MENTION_TRIGGER_CHARACTERS: Array<"@" | "$"> = ["@"];
+
+function getMentionTriggerCharacters(
+  mentionTriggerCharacters?: Array<"@" | "$">,
+): Array<"@" | "$"> {
+  if (!mentionTriggerCharacters || mentionTriggerCharacters.length === 0) {
+    return DEFAULT_MENTION_TRIGGER_CHARACTERS;
+  }
+
+  const uniqueTriggerCharacters = new Set<"@" | "$">(mentionTriggerCharacters);
+
+  return Array.from(uniqueTriggerCharacters);
+}
+
 export function Editor({
   disabled = false,
   placeholder,
@@ -45,6 +60,7 @@ export function Editor({
   onUpdate,
   onBlur,
   onEscapePress,
+  mentionTriggerCharacters,
   defaultValue,
   suggestions,
   suggestionsTheme,
@@ -62,6 +78,31 @@ export function Editor({
     defaultValue?.references,
     theme,
   );
+  const mentionExtensions = useMemo(() => {
+    return getMentionTriggerCharacters(mentionTriggerCharacters).map((char) => {
+      const extension =
+        char === "@"
+          ? MentionExtension
+          : MentionExtension.extend({ name: "mentionDollar" });
+
+      return extension.configure({
+        searchSuggestions: suggestions.search,
+        suggestion: {
+          char,
+          pluginKey: new PluginKey(
+            char === "@" ? "mentionAt" : "mentionDollar",
+          ),
+        },
+        theme: suggestionsTheme,
+        mentionSuggestionRenderer,
+      });
+    });
+  }, [
+    mentionSuggestionRenderer,
+    mentionTriggerCharacters,
+    suggestions.search,
+    suggestionsTheme,
+  ]);
 
   const editor = useEditor({
     content,
@@ -88,14 +129,7 @@ export function Editor({
           theme?.placeholder?.className ?? defaultTheme.placeholder.className,
       }),
       // ens, farcaster, erc20, address mentions
-      MentionExtension.configure({
-        searchSuggestions: suggestions.search,
-        suggestion: {
-          char: "@",
-        },
-        theme: suggestionsTheme,
-        mentionSuggestionRenderer,
-      }),
+      ...mentionExtensions,
       UploadTracker.configure({
         imageComponent,
         videoComponent,

@@ -54,7 +54,7 @@ export function CommentSectionByAuthor({
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { currentTimestamp, disablePromotion, title } =
+  const { disablePromotion, title, hideEmptyScreen } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
@@ -155,7 +155,7 @@ export function CommentSectionByAuthor({
           Load new comments
         </Button>
       )}
-      {results.length === 0 && <NoCommentsScreen />}
+      {results.length === 0 && !hideEmptyScreen && <NoCommentsScreen />}
       {results.map((comment) => (
         <CommentByAuthor
           comment={comment}

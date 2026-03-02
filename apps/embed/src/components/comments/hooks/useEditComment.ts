@@ -9,6 +9,7 @@ import { IndexerAPICommentReferencesSchemaType } from "@ecp.eth/sdk/indexer";
 import { Hex } from "@ecp.eth/sdk/core/schemas";
 import { QueryKey } from "@tanstack/react-query";
 import type { Comment } from "@ecp.eth/shared/schemas";
+import { useTransactionWarning } from "../TransactionWarningProvider";
 
 type UseEditCommentProps = (params: {
   queryKey: QueryKey;
@@ -35,6 +36,7 @@ export function useEditComment() {
   const embedConfig = useEmbedConfig();
   const { chainId } = embedConfig;
   const publicClient = usePublicClient();
+  const { confirmTransaction } = useTransactionWarning();
 
   if (!publicClient) {
     throw new Error("No public client found");
@@ -66,6 +68,8 @@ export function useEditComment() {
           publicClient,
           walletClient,
           gasSponsorship: embedConfig.gasSponsorship,
+          hookFeeWarningThresholdUsd: embedConfig.hookFeeWarningThresholdUsd,
+          confirmTransaction,
         })),
         references,
       };
@@ -104,7 +108,9 @@ export function useEditComment() {
     [
       chainId,
       commentEdition,
+      confirmTransaction,
       embedConfig.gasSponsorship,
+      embedConfig.hookFeeWarningThresholdUsd,
       publicClient,
       switchChainAsync,
       wagmiConfig,

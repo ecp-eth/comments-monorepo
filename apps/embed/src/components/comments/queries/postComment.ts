@@ -25,6 +25,7 @@ import type { PendingPostCommentOperationSchemaType } from "@ecp.eth/shared/sche
 import {
   bigintReplacer,
   formatContractFunctionExecutionError,
+  isUserRejectionError,
 } from "@ecp.eth/shared/helpers";
 import { EmbedConfigSchemaOutputType } from "@ecp.eth/sdk/embed/schemas";
 import { prepareContractAssetForTransfer } from "./prepareContractAssetForTransfer";
@@ -36,8 +37,14 @@ import {
   SignPostCommentResponseBodySchema,
 } from "@ecp.eth/shared-signer/schemas/signer-api/post";
 import z from "zod";
+import { analyzeHookFee, type HookFeeAnalysis } from "./analyzeHookFee";
 
 class SubmitPostCommentMutationError extends Error {}
+export class TransactionCancelledError extends Error {
+  constructor() {
+    super("Transaction cancelled by user.");
+  }
+}
 
 type SubmitPostCommentParams = {
   requestPayload: z.input<
@@ -45,6 +52,8 @@ type SubmitPostCommentParams = {
   >["comment"];
   switchChainAsync: (chainId: number) => Promise<Chain>;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
+  hookFeeWarningThresholdUsd: number;
+  confirmTransaction?: (analysis: HookFeeAnalysis) => Promise<boolean>;
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
 };
@@ -60,6 +69,8 @@ export async function submitPostComment({
   publicClient,
   walletClient,
   gasSponsorship,
+  hookFeeWarningThresholdUsd,
+  confirmTransaction,
 }: SubmitPostCommentParams): Promise<SubmitPostCommentMutationResult> {
   const parseResult =
     SendPostCommentRequestPayloadSchema.shape.comment.safeParse(requestPayload);
@@ -93,6 +104,8 @@ export async function submitPostComment({
         publicClient,
         walletClient,
         resolvedAuthor,
+        hookFeeWarningThresholdUsd,
+        confirmTransaction,
       });
 
     case "gasless-not-preapproved":
@@ -135,7 +148,15 @@ async function postCommentWithGaslessAndAuthorSig({
   });
 
   const deadline = commentData.deadline;
-  const authorSignature = await walletClient.signTypedData(typedCommentData);
+  let authorSignature;
+  try {
+    authorSignature = await walletClient.signTypedData(typedCommentData);
+  } catch (e) {
+    if (isUserRejectionError(e)) {
+      throw new TransactionCancelledError();
+    }
+    throw e;
+  }
 
   const response = await fetch(getSignerURL("/api/post-comment/send"), {
     method: "POST",
@@ -186,6 +207,8 @@ async function postCommentWithoutGasless({
   publicClient,
   walletClient,
   resolvedAuthor,
+  hookFeeWarningThresholdUsd,
+  confirmTransaction,
 }: {
   requestPayload: z.input<
     typeof SendPostCommentRequestPayloadSchema
@@ -193,6 +216,8 @@ async function postCommentWithoutGasless({
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
   resolvedAuthor?: Awaited<ReturnType<typeof fetchAuthorData>>;
+  hookFeeWarningThresholdUsd: number;
+  confirmTransaction?: (analysis: HookFeeAnalysis) => Promise<boolean>;
 }): Promise<SubmitPostCommentMutationResult> {
   const { chainId, channelId, author } = requestPayload;
   const response = await fetch(getSignerURL("/api/post-comment/sign"), {
@@ -247,6 +272,21 @@ async function postCommentWithoutGasless({
       });
     }
 
+    if (fee && confirmTransaction) {
+      const feeAnalysis = await analyzeHookFee({
+        fee,
+        hookFeeWarningThresholdUsd,
+        publicClient,
+      });
+
+      if (feeAnalysis?.exceedsThreshold) {
+        const confirmed = await confirmTransaction(feeAnalysis);
+        if (!confirmed) {
+          throw new TransactionCancelledError();
+        }
+      }
+    }
+
     if (fee?.contractAsset && fee.contractAsset.amount > 0n) {
       await prepareContractAssetForTransfer({
         contractAsset: fee.contractAsset,
@@ -274,6 +314,14 @@ async function postCommentWithoutGasless({
       chainId,
     };
   } catch (e) {
+    if (e instanceof TransactionCancelledError) {
+      throw new SubmitPostCommentMutationError(e.message);
+    }
+
+    if (isUserRejectionError(e)) {
+      throw new SubmitPostCommentMutationError("Transaction was rejected.");
+    }
+
     if (!(e instanceof Error)) {
       throw new SubmitPostCommentMutationError(
         "Failed to post comment, please try again.",

@@ -28,7 +28,7 @@ export function extractReferences(
         if (child.type === "text") {
           // advance position
           currentPosition += (child.text ?? "").length;
-        } else if (child.type === "mention") {
+        } else if (child.type === "mention" || child.type === "mentionDollar") {
           const mention = child.attrs as MentionItem;
 
           switch (mention.type) {
