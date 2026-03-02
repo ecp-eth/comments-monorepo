@@ -59,6 +59,7 @@ import { setupAnalyticsSlaBandsGet } from "./analytics/sla-bands/get";
 import { setupAnalyticsErrorsGet } from "./analytics/errors/get";
 import { setupInternalMetricsGet } from "./internal-metrics/get";
 import { setupGetChannelVolume } from "./channels/volume/get";
+import { setupGetChannelVolumeById } from "./channels/[id]/volume/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -121,6 +122,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupAppNotificationsGroupedGet(app);
   setupInternalMetricsGet(app);
   setupGetChannelVolume(app);
+  setupGetChannelVolumeById(app);
 
   return app;
 }
