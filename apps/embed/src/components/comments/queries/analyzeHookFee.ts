@@ -118,6 +118,7 @@ async function getETHPrice(): Promise<number> {
       );
 
       if (!response.ok) {
+        getETHPricePromise = undefined;
         return 0;
       }
 
@@ -125,11 +126,13 @@ async function getETHPrice(): Promise<number> {
       const parseResult = coinGeckoResponseBodySchema.safeParse(data);
 
       if (!parseResult.success) {
+        getETHPricePromise = undefined;
         return 0;
       }
 
       return parseResult.data.ethereum.usd;
     } catch {
+      getETHPricePromise = undefined;
       return 0;
     }
   })();
