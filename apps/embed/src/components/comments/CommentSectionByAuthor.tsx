@@ -54,7 +54,7 @@ export function CommentSectionByAuthor({
   const { address: connectedAddress } = useAccount();
   const isAccountStatusResolved = useIsAccountStatusResolved();
 
-  const { disablePromotion, title, hideEmptyScreen } =
+  const { disablePromotion, title, hideEmptyScreen, currentTimestamp } =
     useEmbedConfig<EmbedConfigProviderByAuthorConfig>();
   const chainId = useChainId();
   const queryKey = useMemo(
