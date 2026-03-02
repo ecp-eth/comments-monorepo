@@ -22,21 +22,49 @@ const ChannelVolumeQueryParamsSchema = z.object({
   }),
 });
 
+const WeiStringSchema = z
+  .string()
+  .regex(/^\d+$/, "Must be a non-negative integer string (wei)")
+  .openapi({ example: "892340000000000" });
+
+const NumericIdStringSchema = z
+  .string()
+  .regex(/^\d+$/, "Must be a non-negative integer string");
+
 const ChannelVolumeGetResponseSchema = z.object({
   results: z.array(
     z.object({
-      channelId: z.string(),
-      txCount: z.number(),
-      gasTotal: z.string(),
-      valueTotal: z.string(),
-      volumeTotal: z.string(),
+      channelId: NumericIdStringSchema.openapi({
+        description: "On-chain channel identifier (uint256)",
+        example: "42",
+      }),
+      txCount: z.number().int().min(0).openapi({
+        description:
+          "Number of transactions (CommentAdded + CommentEdited + CommentDeleted) in the time window",
+        example: 142,
+      }),
+      gasTotal: WeiStringSchema.openapi({
+        description:
+          "Sum of gas costs in wei (gasUsed * effectiveGasPrice per transaction)",
+      }),
+      valueTotal: WeiStringSchema.openapi({
+        description:
+          "Sum of native ETH sent via msg.value in wei (does not include ERC-20 hook fees)",
+      }),
+      volumeTotal: WeiStringSchema.openapi({
+        description: "gasTotal + valueTotal in wei",
+      }),
     }),
   ),
   pagination: z.object({
-    page: z.number(),
-    limit: z.number(),
-    totalCount: z.number(),
-    totalPages: z.number(),
+    page: z.number().int().min(1).openapi({ example: 1 }),
+    limit: z.number().int().min(1).max(100).openapi({ example: 50 }),
+    totalCount: z.number().int().min(0).openapi({
+      description:
+        "Total number of distinct channels with activity in the time window",
+      example: 230,
+    }),
+    totalPages: z.number().int().min(0).openapi({ example: 5 }),
     hasNext: z.boolean(),
     hasPrevious: z.boolean(),
   }),
