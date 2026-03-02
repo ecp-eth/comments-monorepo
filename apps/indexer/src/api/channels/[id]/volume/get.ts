@@ -5,6 +5,9 @@ import {
   GetChannelParamsSchema,
 } from "../../../../lib/schemas";
 import { db } from "../../../../services";
+import { db as ponderDb } from "ponder:api";
+import ponderSchema from "ponder:schema";
+import { eq } from "ponder";
 import { sql } from "drizzle-orm";
 import { schema } from "../../../../../schema";
 
@@ -77,7 +80,7 @@ export function setupGetChannelVolumeById(app: OpenAPIHono) {
           },
         },
         404: {
-          description: "No activity found for this channel in the time window",
+          description: "Channel not found",
           content: {
             "application/json": {
               schema: APIErrorResponseSchema,
@@ -89,6 +92,14 @@ export function setupGetChannelVolumeById(app: OpenAPIHono) {
     async (c) => {
       const { channelId } = c.req.valid("param");
       const { hours } = c.req.valid("query");
+
+      const channel = await ponderDb.query.channel.findFirst({
+        where: eq(ponderSchema.channel.id, channelId),
+      });
+
+      if (!channel) {
+        return c.json({ message: "Channel not found" }, 404);
+      }
 
       const timeFilter = sql`${schema.channelHourlyVolume.hourTimestamp} >= NOW() - make_interval(hours => ${hours})`;
 
@@ -113,23 +124,13 @@ export function setupGetChannelVolumeById(app: OpenAPIHono) {
 
       const row = rows[0];
 
-      if (!row) {
-        return c.json(
-          {
-            message:
-              "No activity found for this channel in the given time window",
-          },
-          404,
-        );
-      }
-
       return c.json(
         {
-          channelId: row.channel_id,
-          txCount: row.tx_count,
-          gasTotal: row.gas_total,
-          valueTotal: row.value_total,
-          volumeTotal: row.volume_total,
+          channelId: row?.channel_id ?? channelId.toString(),
+          txCount: row?.tx_count ?? 0,
+          gasTotal: row?.gas_total ?? "0",
+          valueTotal: row?.value_total ?? "0",
+          volumeTotal: row?.volume_total ?? "0",
         },
         200,
       );
