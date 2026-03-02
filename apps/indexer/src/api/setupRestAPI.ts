@@ -58,6 +58,7 @@ import { setupAnalyticsE2ELatencyGet } from "./analytics/e2e-latency/get";
 import { setupAnalyticsSlaBandsGet } from "./analytics/sla-bands/get";
 import { setupAnalyticsErrorsGet } from "./analytics/errors/get";
 import { setupInternalMetricsGet } from "./internal-metrics/get";
+import { setupGetChannelVolume } from "./channels/volume/get";
 
 export default function setupRestAPI(app: OpenAPIHono) {
   setupGetChannel(app);
@@ -119,6 +120,7 @@ export default function setupRestAPI(app: OpenAPIHono) {
   setupNotificationsGet(app);
   setupAppNotificationsGroupedGet(app);
   setupInternalMetricsGet(app);
+  setupGetChannelVolume(app);
 
   return app;
 }

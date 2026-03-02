@@ -15,6 +15,7 @@ import {
   mutedAccountsManagementService,
   commentReferencesResolutionService,
   notificationOutboxService,
+  channelVolumeService,
 } from "../services/index.ts";
 import { type Hex } from "@ecp.eth/sdk/core/schemas";
 import { isSameHex } from "@ecp.eth/shared/helpers";
@@ -262,6 +263,20 @@ async function commentsAddedHandler({
 
     await moderationResult.saveAndNotify();
 
+    if (event.transactionReceipt) {
+      const gasCost =
+        event.transactionReceipt.gasUsed *
+        event.transactionReceipt.effectiveGasPrice;
+
+      await channelVolumeService.incrementVolume({
+        channelId: event.args.channelId,
+        blockTimestamp: event.block.timestamp,
+        gasCost,
+        value: event.transaction.value,
+        tx,
+      });
+    }
+
     await eventOutboxService.publishEvent({
       event: ponderEventToCommentAddedEvent({
         event,
@@ -389,6 +404,20 @@ async function commentDeletedHandler({
       })
       .where(eq(schema.comment.id, event.args.commentId))
       .execute();
+
+    if (event.transactionReceipt) {
+      const deleteGasCost =
+        event.transactionReceipt.gasUsed *
+        event.transactionReceipt.effectiveGasPrice;
+
+      await channelVolumeService.incrementVolume({
+        channelId: existingComment.channelId,
+        blockTimestamp: event.block.timestamp,
+        gasCost: deleteGasCost,
+        value: event.transaction.value,
+        tx,
+      });
+    }
 
     await eventOutboxService.publishEvent({
       event: ponderEventToCommentDeletedEvent({
@@ -523,6 +552,20 @@ async function commentEditedHandler({
       })
       .where(eq(schema.comment.id, event.args.commentId))
       .execute();
+
+    if (event.transactionReceipt) {
+      const editGasCost =
+        event.transactionReceipt.gasUsed *
+        event.transactionReceipt.effectiveGasPrice;
+
+      await channelVolumeService.incrementVolume({
+        channelId: existingComment.channelId,
+        blockTimestamp: event.block.timestamp,
+        gasCost: editGasCost,
+        value: event.transaction.value,
+        tx,
+      });
+    }
 
     await eventOutboxService.publishEvent({
       event: ponderEventToCommentEditedEvent({

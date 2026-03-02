@@ -95,6 +95,11 @@ vi.mock("../../src/services/index.ts", async () => {
         "publishNotifications",
       ),
     },
+    channelVolumeService: {
+      incrementVolume: vi
+        .spyOn(services.channelVolumeService, "incrementVolume")
+        .mockResolvedValue(undefined),
+    },
   };
 });
 
@@ -206,7 +211,8 @@ function buildEvent(
 ) {
   return {
     args,
-    transaction: { hash: "0xabc" },
+    transaction: { hash: "0xabc", value: 0n },
+    transactionReceipt: { gasUsed: 21000n, effectiveGasPrice: 1000000000n },
     log: { logIndex: 7 },
     block: { timestamp: BigInt(1_700_000_000), number: 1n },
   } as const;

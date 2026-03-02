@@ -76,10 +76,18 @@ export default createConfig({
           acc[chainId] = {
             address: network.commentManagerAddress,
             startBlock: network.startBlock,
+            includeTransactionReceipts: true,
           };
           return acc;
         },
-        {} as Record<string, { address: `0x${string}`; startBlock?: number }>,
+        {} as Record<
+          string,
+          {
+            address: `0x${string}`;
+            startBlock?: number;
+            includeTransactionReceipts: true;
+          }
+        >,
       ),
     },
     CommentsV1ChannelManager: {

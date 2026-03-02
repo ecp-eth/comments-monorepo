@@ -45,6 +45,7 @@ import { NotificationOutboxService } from "./notifications/notification-outbox-s
 import { caip373QuotedCommentResolverService } from "./caip373-quoted-comment-resolver";
 import { metrics } from "./metrics";
 import { wrapServiceWithTracing } from "../telemetry";
+import { ChannelVolumeService } from "./channel-volume-service";
 
 export { db };
 
@@ -274,6 +275,12 @@ export const notificationService = wrapServiceWithTracing(
 
 export const notificationOutboxService = wrapServiceWithTracing(
   new NotificationOutboxService({
+    db,
+  }),
+);
+
+export const channelVolumeService = wrapServiceWithTracing(
+  new ChannelVolumeService({
     db,
   }),
 );
