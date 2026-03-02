@@ -346,6 +346,9 @@ function BaseCommentForm({
 
   const editorTheme = useMemo(() => {
     return {
+      editorContainer: {
+        className: cn(defaultTheme.editorContainer.className, "min-h-[80px]"),
+      },
       editor: {
         className: cn(
           "flex flex-col min-h-[80px] w-full bg-transparent px-3 pt-2 pb-1 text-base placeholder:text-muted-foreground focus-visible:outline-none md:text-sm",
