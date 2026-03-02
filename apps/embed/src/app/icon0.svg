@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><style>
+    #light-icon {
+      display: inline;
+    }
+    #dark-icon {
+      display: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      #light-icon {
+        display: none;
+      }
+      #dark-icon {
+        display: inline;
+      }
+    }
+  </style><g id="light-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(0.49455984174085066,0,0,0.49455984174085066,0,38.82294757665676)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="2022" height="1865"><svg width="2022" height="1865" viewBox="0 0 2022 1865" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2022.01 932.5C2022.01 1447.51 1604.51 1865 1089.51 1865C886.705 1865 699.024 1800.26 546.002 1690.32L0.893227 1727.15L222.284 1275.93C180.159 1169.65 157.007 1053.78 157.007 932.5C157.007 417.494 574.502 0 1089.51 0C1604.51 0 2022.01 417.494 2022.01 932.5ZM1475.61 912.207L1089.91 256L704.212 912.207L1089.91 1152.21L1475.61 912.207ZM1089.91 1539.92L1476.01 989.266L1089.91 1231.28L703.008 989.266L1089.91 1539.92Z" fill="black"></path>
+</svg></svg></g></g></svg></g><g id="dark-icon"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="1000"><g><g transform="matrix(0.49455984174085066,0,0,0.49455984174085066,0,38.82294757665676)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="2022" height="1865"><svg width="2022" height="1865" viewBox="0 0 2022 1865" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2022.01 932.5C2022.01 1447.51 1604.51 1865 1089.51 1865C886.705 1865 699.024 1800.26 546.002 1690.32L0.893227 1727.15L222.284 1275.93C180.159 1169.65 157.007 1053.78 157.007 932.5C157.007 417.494 574.502 0 1089.51 0C1604.51 0 2022.01 417.494 2022.01 932.5ZM1475.61 912.207L1089.91 256L704.212 912.207L1089.91 1152.21L1475.61 912.207ZM1089.91 1539.92L1476.01 989.266L1089.91 1231.28L703.008 989.266L1089.91 1539.92Z" fill="white"></path>
+</svg></svg></g></g></svg></g></svg>

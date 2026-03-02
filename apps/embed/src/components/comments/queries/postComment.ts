@@ -153,7 +153,9 @@ async function postCommentWithGaslessAndAuthorSig({
     authorSignature = await walletClient.signTypedData(typedCommentData);
   } catch (e) {
     if (isUserRejectionError(e)) {
-      throw new SubmitPostCommentMutationError("Transaction cancelled by user.");
+      throw new SubmitPostCommentMutationError(
+        "Transaction cancelled by user.",
+      );
     }
     throw e;
   }
@@ -273,11 +275,16 @@ async function postCommentWithoutGasless({
     }
 
     if (fee && confirmTransaction) {
-      const feeAnalysis = await analyzeHookFee({
-        fee,
-        hookFeeWarningThresholdUsd,
-        publicClient,
-      });
+      let feeAnalysis: HookFeeAnalysis | null | undefined;
+      try {
+        feeAnalysis = await analyzeHookFee({
+          fee,
+          hookFeeWarningThresholdUsd,
+          publicClient,
+        });
+      } catch (e) {
+        console.error("Failed to analyze hook fee:", e);
+      }
 
       if (feeAnalysis?.exceedsThreshold) {
         const confirmed = await confirmTransaction(feeAnalysis);

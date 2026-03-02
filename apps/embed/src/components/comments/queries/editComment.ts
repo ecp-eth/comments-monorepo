@@ -261,11 +261,16 @@ async function editCommentWithoutGasless({
     }
 
     if (fee && confirmTransaction) {
-      const feeAnalysis = await analyzeHookFee({
-        fee,
-        hookFeeWarningThresholdUsd,
-        publicClient,
-      });
+      let feeAnalysis: HookFeeAnalysis | null | undefined;
+      try {
+        feeAnalysis = await analyzeHookFee({
+          fee,
+          hookFeeWarningThresholdUsd,
+          publicClient,
+        });
+      } catch (e) {
+        console.error("Failed to analyze hook fee:", e);
+      }
 
       if (feeAnalysis?.exceedsThreshold) {
         const confirmed = await confirmTransaction(feeAnalysis);

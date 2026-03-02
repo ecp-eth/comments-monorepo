@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -45,6 +46,10 @@ export function TransactionWarningProvider({
 
   const confirmTransaction = useCallback(
     (feeAnalysis: HookFeeAnalysis): Promise<boolean> => {
+      if (resolveRef.current) {
+        resolveRef.current(false);
+        resolveRef.current = null;
+      }
       setAnalysis(feeAnalysis);
       return new Promise<boolean>((resolve) => {
         resolveRef.current = resolve;
@@ -63,6 +68,16 @@ export function TransactionWarningProvider({
     resolveRef.current?.(false);
     resolveRef.current = null;
     setAnalysis(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (resolveRef.current) {
+        resolveRef.current(false);
+        resolveRef.current = null;
+      }
+      setAnalysis(null);
+    };
   }, []);
 
   const contextValue = useMemo(
