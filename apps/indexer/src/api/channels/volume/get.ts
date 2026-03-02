@@ -107,7 +107,7 @@ export function setupGetChannelVolume(app: OpenAPIHono) {
           FROM ${schema.channelHourlyVolume}
           WHERE ${timeFilter}
           GROUP BY ${schema.channelHourlyVolume.channelId}
-          ORDER BY volume_total DESC
+          ORDER BY SUM(${schema.channelHourlyVolume.volumeTotal}) DESC
           LIMIT ${limit}
           OFFSET ${offset}
         `),
