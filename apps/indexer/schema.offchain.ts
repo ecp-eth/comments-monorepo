@@ -14,7 +14,6 @@ import {
   bigserial,
   boolean,
   bigint,
-  numeric,
 } from "drizzle-orm/pg-core";
 import { ECP_INDEXER_SCHEMA_NAME } from "./src/constants.ts";
 import type { Hex } from "viem";
@@ -868,26 +867,6 @@ export const authorShortIds = offchainSchema.table(
       columns: [table.authorAddress],
     }),
     index("author_short_id_by_short_id_idx").on(table.shortId),
-  ],
-);
-
-export const channelHourlyVolume = offchainSchema.table(
-  "channel_hourly_volume",
-  {
-    channelId: numeric().notNull(),
-    hourTimestamp: timestamp({ withTimezone: true }).notNull(),
-    txCount: integer().notNull().default(0),
-    gasTotal: numeric().notNull().default("0"),
-    valueTotal: numeric().notNull().default("0"),
-    volumeTotal: numeric().notNull().default("0"),
-  },
-  (table) => [
-    primaryKey({ columns: [table.channelId, table.hourTimestamp] }),
-    index("chv_by_hour_timestamp_idx").on(table.hourTimestamp),
-    index("chv_by_channel_id_hour_timestamp_idx").on(
-      table.channelId,
-      table.hourTimestamp,
-    ),
   ],
 );
 
