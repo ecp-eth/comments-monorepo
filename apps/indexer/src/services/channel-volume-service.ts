@@ -37,7 +37,7 @@ export class ChannelVolumeService {
 
     await connection.execute(
       sql`INSERT INTO ${schema.channelHourlyVolume} (channel_id, hour_timestamp, tx_count, gas_total, value_total, volume_total)
-          VALUES (${channelId}, date_trunc('hour', to_timestamp(${blockTimestamp})), 1, ${gasCost.toString()}, ${value.toString()}, ${totalCost.toString()})
+          VALUES (${channelId.toString()}, date_trunc('hour', to_timestamp(${blockTimestamp})), 1, ${gasCost.toString()}, ${value.toString()}, ${totalCost.toString()})
           ON CONFLICT (channel_id, hour_timestamp)
           DO UPDATE SET
             tx_count = ${schema.channelHourlyVolume}.tx_count + 1,
