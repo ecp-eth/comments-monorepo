@@ -874,7 +874,7 @@ export const authorShortIds = offchainSchema.table(
 export const channelHourlyVolume = offchainSchema.table(
   "channel_hourly_volume",
   {
-    channelId: bigint({ mode: "bigint" }).notNull(),
+    channelId: numeric().notNull(),
     hourTimestamp: timestamp({ withTimezone: true }).notNull(),
     txCount: integer().notNull().default(0),
     gasTotal: numeric().notNull().default("0"),

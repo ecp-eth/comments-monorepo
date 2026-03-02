@@ -1,0 +1,1 @@
+ALTER TABLE "ecp_indexer_schema"."channel_hourly_volume" ALTER COLUMN "channel_id" SET DATA TYPE numeric;
