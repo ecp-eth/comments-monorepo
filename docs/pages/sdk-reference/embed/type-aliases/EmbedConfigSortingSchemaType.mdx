@@ -1,0 +1,77 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / EmbedConfigSortingSchemaType
+
+# Type Alias: EmbedConfigSortingSchemaType
+
+```ts
+type EmbedConfigSortingSchemaType = {
+  algorithm: "chronological" | "hot";
+  hot: {
+     reaction: string;
+     volumeMetadataKey: string;
+  };
+};
+```
+
+Defined in: [packages/sdk/src/embed/schemas/index.ts:271](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L271)
+
+## Type declaration
+
+### algorithm
+
+```ts
+algorithm: "chronological" | "hot";
+```
+
+Sorting algorithm.
+
+- "chronological" sorts by creation time descending.
+- "hot" applies a Hacker News-style time-decayed ranking score.
+
+#### Default
+
+```ts
+"chronological"
+```
+
+### hot
+
+```ts
+hot: {
+  reaction: string;
+  volumeMetadataKey: string;
+};
+```
+
+Hot ranking configuration.
+
+#### hot.reaction
+
+```ts
+reaction: string;
+```
+
+Reaction key used as score input for hot sorting.
+
+##### Default
+
+```ts
+"like"
+```
+
+#### hot.volumeMetadataKey
+
+```ts
+volumeMetadataKey: string;
+```
+
+Metadata key used to read a numeric volume score from hook metadata.
+
+##### Default
+
+```ts
+"volume"
+```

@@ -1,0 +1,46 @@
+[**@ecp.eth/sdk**](../../index.mdx)
+
+***
+
+[@ecp.eth/sdk](/sdk-reference/index.mdx) / [embed](/sdk-reference/embed/index.mdx) / EmbedConfigHotSortingSchemaType
+
+# Type Alias: EmbedConfigHotSortingSchemaType
+
+```ts
+type EmbedConfigHotSortingSchemaType = {
+  reaction: string;
+  volumeMetadataKey: string;
+};
+```
+
+Defined in: [packages/sdk/src/embed/schemas/index.ts:251](https://github.com/ecp-eth/comments-monorepo/blob/main/packages/sdk/src/embed/schemas/index.ts#L251)
+
+## Type declaration
+
+### reaction
+
+```ts
+reaction: string;
+```
+
+Reaction key used as score input for hot sorting.
+
+#### Default
+
+```ts
+"like"
+```
+
+### volumeMetadataKey
+
+```ts
+volumeMetadataKey: string;
+```
+
+Metadata key used to read a numeric volume score from hook metadata.
+
+#### Default
+
+```ts
+"volume"
+```
