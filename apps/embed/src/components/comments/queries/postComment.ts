@@ -153,7 +153,7 @@ async function postCommentWithGaslessAndAuthorSig({
     authorSignature = await walletClient.signTypedData(typedCommentData);
   } catch (e) {
     if (isUserRejectionError(e)) {
-      throw new TransactionCancelledError();
+      throw new SubmitPostCommentMutationError("Transaction cancelled by user.");
     }
     throw e;
   }
