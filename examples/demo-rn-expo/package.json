@@ -14,10 +14,10 @@
     "api:schema:sync": "scripts/sync-api-schemas.sh"
   },
   "dependencies": {
-    "@ecp.eth/react-editor": "~0.0.26",
-    "@ecp.eth/sdk": "~0.0.44",
-    "@ecp.eth/shared": "~0.0.22",
-    "@ecp.eth/shared-signer": "~0.0.2",
+    "@ecp.eth/react-editor": "~1.0.0",
+    "@ecp.eth/sdk": "~0.1.0",
+    "@ecp.eth/shared": "~1.0.0",
+    "@ecp.eth/shared-signer": "~1.0.0",
     "@expo/vector-icons": "^15.0.3",
     "@formatjs/intl-getcanonicallocales": "^2.5.4",
     "@formatjs/intl-locale": "^4.2.10",

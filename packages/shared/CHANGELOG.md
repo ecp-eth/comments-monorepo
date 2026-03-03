@@ -1,5 +1,20 @@
 # @ecp.eth/shared
 
+## 1.0.0
+
+### Patch Changes
+
+- c301d76: feat: hook fee warning dialog and hideEmptyScreen
+
+  - Add `hookFeeWarningThresholdUsd` embed config option with a transaction warning dialog shown before opening the wallet when channel hook fees exceed the threshold.
+  - Add `hideEmptyScreen` embed config option to hide the empty state when there are no comments.
+  - Add `isUserRejectionError` helper for consistent wallet rejection detection across providers.
+  - Improve user rejection error handling across post, edit, delete, and react flows.
+
+- Updated dependencies [c301d76]
+  - @ecp.eth/sdk@0.1.0
+  - @ecp.eth/shared-signer@1.0.0
+
 ## 0.0.22
 
 ### Patch Changes

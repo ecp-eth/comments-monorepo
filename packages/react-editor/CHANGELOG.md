@@ -1,5 +1,13 @@
 # @ecp.eth/react-editor
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [c301d76]
+  - @ecp.eth/sdk@0.1.0
+  - @ecp.eth/shared@1.0.0
+
 ## 0.0.26
 
 ### Patch Changes
