@@ -777,6 +777,103 @@ export default function IframeConfigurator() {
               />
 
               <FormField
+                key="config.sorting.algorithm"
+                control={form.control}
+                name="config.sorting.algorithm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comment Sorting Algorithm</FormLabel>
+                    <FormDescription>
+                      Choose between plain time ordering and a hot ranking score
+                      (Hacker News style) that boosts engagement while decaying
+                      over time.
+                    </FormDescription>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          if (value === "chronological" || value === "hot") {
+                            field.onChange(value);
+                            return;
+                          }
+
+                          field.onChange("chronological");
+                        }}
+                        value={field.value ?? "chronological"}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Comment sorting algorithm" />
+                        </SelectTrigger>
+                        <SelectContent id="comment-sorting-algorithm-select">
+                          <SelectItem value="chronological">
+                            Chronological (newest first)
+                          </SelectItem>
+                          <SelectItem value="hot">
+                            Hot (time-decayed engagement ranking)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {(config.sorting?.algorithm ?? "chronological") === "hot" && (
+                <>
+                  <FormField
+                    key="config.sorting.hot.reaction"
+                    control={form.control}
+                    name="config.sorting.hot.reaction"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hot Ranking Reaction Key</FormLabel>
+                        <FormDescription>
+                          The reaction key counted by the hot algorithm. Use the
+                          reaction content string (for example{" "}
+                          <code className="vocs_Code">like</code>).
+                        </FormDescription>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="like"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    key="config.sorting.hot.volumeMetadataKey"
+                    control={form.control}
+                    name="config.sorting.hot.volumeMetadataKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hot Ranking Volume Metadata Key</FormLabel>
+                        <FormDescription>
+                          Metadata key to read numeric volume from{" "}
+                          <code className="vocs_Code">hookMetadata</code> (falls
+                          back to post metadata). Useful for sybil-resistant
+                          ranking inputs.
+                        </FormDescription>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="volume"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              <FormField
                 key="autoHeightAdjustment"
                 control={form.control}
                 name="autoHeightAdjustment"
@@ -828,6 +925,72 @@ export default function IframeConfigurator() {
                           <SelectItem value="1">Yes</SelectItem>
                         </SelectContent>
                       </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                key="config.hideEmptyScreen"
+                control={form.control}
+                name="config.hideEmptyScreen"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hide empty state screen</FormLabel>
+                    <FormDescription>
+                      Hide the icon and message shown when there are no
+                      comments.
+                    </FormDescription>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value === "1");
+                        }}
+                        {...field}
+                        value={field.value ? "1" : "0"}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Hide empty screen" />
+                        </SelectTrigger>
+                        <SelectContent id="hide-empty-screen-select">
+                          <SelectItem value="0">No</SelectItem>
+                          <SelectItem value="1">Yes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                key="config.hookFeeWarningThresholdUsd"
+                control={form.control}
+                name="config.hookFeeWarningThresholdUsd"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <LabelWithHelp
+                        label="Hook Fee Warning Threshold (USD)"
+                        help="Show a warning dialog when a channel hook charges more than this amount in USD. Set to 0 to always warn when a hook fee is present."
+                      />
+                    </FormLabel>
+                    <FormDescription>
+                      Transactions with hook fees above this USD amount will
+                      show a confirmation dialog before opening the wallet.
+                    </FormDescription>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={0.5}
+                        {...field}
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          field.onChange(isNaN(val) ? 1 : val);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

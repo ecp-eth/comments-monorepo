@@ -15,12 +15,21 @@ function parseCommentsEmbedConfig(compressedConfig):
   channelId?: bigint;
   disablePromotion: boolean;
   gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
+  hideEmptyScreen: boolean;
+  hookFeeWarningThresholdUsd: number;
   moderationStatus?: ("approved" | "pending" | "rejected")[];
   reactions?: {
      icon: string;
      value: string;
   }[];
   restrictMaximumContainerWidth: boolean;
+  sorting: {
+     algorithm: "chronological" | "hot";
+     hot: {
+        reaction: string;
+        volumeMetadataKey: string;
+     };
+  };
   theme?: {
      colors?: {
         dark?: {
@@ -1858,12 +1867,21 @@ Parse compressed config from `config` search param.
   channelId?: bigint;
   disablePromotion: boolean;
   gasSponsorship: "not-gasless" | "gasless-not-preapproved" | "gasless-preapproved";
+  hideEmptyScreen: boolean;
+  hookFeeWarningThresholdUsd: number;
   moderationStatus?: ("approved" | "pending" | "rejected")[];
   reactions?: {
      icon: string;
      value: string;
   }[];
   restrictMaximumContainerWidth: boolean;
+  sorting: {
+     algorithm: "chronological" | "hot";
+     hot: {
+        reaction: string;
+        volumeMetadataKey: string;
+     };
+  };
   theme?: {
      colors?: {
         dark?: {
@@ -3745,6 +3763,36 @@ The gas sponsorship to use when posting comments.
 "gasless-not-preapproved"
 ```
 
+### hideEmptyScreen
+
+```ts
+hideEmptyScreen: boolean;
+```
+
+Hide the empty state screen shown when there are no comments.
+
+#### Default
+
+```ts
+false
+```
+
+### hookFeeWarningThresholdUsd
+
+```ts
+hookFeeWarningThresholdUsd: number;
+```
+
+USD threshold for showing a warning before hook transactions.
+When a channel hook charges fees exceeding this amount, a confirmation
+dialog is shown before opening the wallet. Set to 0 to always warn.
+
+#### Default
+
+```ts
+1
+```
+
 ### moderationStatus?
 
 ```ts
@@ -3784,6 +3832,76 @@ Restrict the maximum container width
 
 ```ts
 true
+```
+
+### sorting
+
+```ts
+sorting: {
+  algorithm: "chronological" | "hot";
+  hot: {
+     reaction: string;
+     volumeMetadataKey: string;
+  };
+};
+```
+
+Sorting configuration for comments in the embed.
+
+#### sorting.algorithm
+
+```ts
+algorithm: "chronological" | "hot";
+```
+
+Sorting algorithm.
+
+- "chronological" sorts by creation time descending.
+- "hot" applies a Hacker News-style time-decayed ranking score.
+
+##### Default
+
+```ts
+"chronological"
+```
+
+#### sorting.hot
+
+```ts
+hot: {
+  reaction: string;
+  volumeMetadataKey: string;
+};
+```
+
+Hot ranking configuration.
+
+#### sorting.hot.reaction
+
+```ts
+reaction: string;
+```
+
+Reaction key used as score input for hot sorting.
+
+##### Default
+
+```ts
+"like"
+```
+
+#### sorting.hot.volumeMetadataKey
+
+```ts
+volumeMetadataKey: string;
+```
+
+Metadata key used to read a numeric volume score from hook metadata.
+
+##### Default
+
+```ts
+"volume"
 ```
 
 ### theme?

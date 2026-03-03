@@ -17,6 +17,7 @@ import {
   ReportCommentDialogProvider,
   ReportCommentDialogRenderer,
 } from "@/components/comments/ReportCommentDialogProvider";
+import { TransactionWarningProvider } from "@/components/comments/TransactionWarningProvider";
 
 const queryClient = new QueryClient();
 
@@ -50,10 +51,12 @@ export function Providers<
           <WagmiProvider config={wagmiConfig} initialState={initialState}>
             <RainbowKitProvider>
               <PendingWalletConnectionActionsProvider>
-                <ReportCommentDialogProvider>
-                  {children}
-                  <ReportCommentDialogRenderer />
-                </ReportCommentDialogProvider>
+                <TransactionWarningProvider>
+                  <ReportCommentDialogProvider>
+                    {children}
+                    <ReportCommentDialogRenderer />
+                  </ReportCommentDialogProvider>
+                </TransactionWarningProvider>
               </PendingWalletConnectionActionsProvider>
             </RainbowKitProvider>
           </WagmiProvider>

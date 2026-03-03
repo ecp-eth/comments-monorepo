@@ -17,7 +17,7 @@ import { getAppSignerAddress } from "@/lib/utils";
 import { publicEnv } from "@/publicEnv";
 
 const SearchParamsSchema = z.object({
-  targetUri: z.string().url(),
+  targetUri: z.string().url().optional(),
   config: EmbedConfigFromSearchParamsSchema,
 });
 
@@ -71,7 +71,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
     return (
       <Providers
         config={{
-          targetUri,
+          targetUri: targetUri ?? "",
           currentTimestamp: Date.now(),
           ...config,
         }}

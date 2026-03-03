@@ -8,6 +8,7 @@ import { useAccount } from "wagmi";
 import { useEmbedConfig } from "../../EmbedConfigProvider";
 import { submitDeleteComment } from "../queries/deleteComment";
 import { useReadWriteContractAsync } from "@/hooks/useReadWriteContractAsync";
+import { toast } from "sonner";
 
 type OnCommentDeleteParams = {
   commentId: Hex;
@@ -34,6 +35,10 @@ export function useDeleteComment(): OnCommentDelete {
 
         if (!viewer) {
           throw new Error("Wallet not connected");
+        }
+
+        if (config.gasSponsorship === "not-gasless") {
+          toast.info("Please check your wallet to sign the delete request");
         }
 
         const pendingOperation = await submitDeleteComment({

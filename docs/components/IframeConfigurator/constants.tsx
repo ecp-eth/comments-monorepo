@@ -85,6 +85,14 @@ export const DEFAULT_CONFIG: EmbedConfigSchemaInputType = {
   ],
   restrictMaximumContainerWidth: true,
   gasSponsorship: "gasless-not-preapproved",
+  hookFeeWarningThresholdUsd: 1,
+  sorting: {
+    algorithm: "chronological",
+    hot: {
+      reaction: "like",
+      volumeMetadataKey: "volume",
+    },
+  },
 };
 
 export const COLOR_FIELDS = [

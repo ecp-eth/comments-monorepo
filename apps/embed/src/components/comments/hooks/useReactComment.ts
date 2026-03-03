@@ -16,6 +16,7 @@ import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import { submitPostComment } from "../queries/postComment";
 import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 import { getWalletClient, waitForTransactionReceipt } from "@wagmi/core";
+import { useTransactionWarning } from "../TransactionWarningProvider";
 
 type UseReactCommentProps = {
   /**
@@ -48,9 +49,11 @@ export const useReactComment = () => {
   const wagmiConfig = useConfig();
   const { switchChainAsync } = useSwitchChain();
   const { address: connectedAddress } = useAccount();
-  const { channelId, gasSponsorship } = useEmbedConfig();
+  const { channelId, gasSponsorship, hookFeeWarningThresholdUsd } =
+    useEmbedConfig();
   const publicClient = usePublicClient();
   const queryClient = useQueryClient();
+  const { confirmTransaction } = useTransactionWarning();
 
   return useCallback(
     async (params: UseReactCommentProps) => {
@@ -108,6 +111,8 @@ export const useReactComment = () => {
             publicClient,
             walletClient,
             gasSponsorship,
+            hookFeeWarningThresholdUsd,
+            confirmTransaction,
           })),
           references: [],
         };
@@ -166,8 +171,10 @@ export const useReactComment = () => {
     },
     [
       channelId,
+      confirmTransaction,
       connectedAddress,
       gasSponsorship,
+      hookFeeWarningThresholdUsd,
       publicClient,
       queryClient,
       switchChainAsync,

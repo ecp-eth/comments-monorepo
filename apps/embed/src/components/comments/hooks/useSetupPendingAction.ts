@@ -7,6 +7,7 @@ import { type Comment } from "@ecp.eth/shared/schemas";
 import type { Hex } from "@ecp.eth/sdk/core/schemas";
 import { useReactComment } from "./useReactComment";
 import { useUnreactComment } from "./useUnreactComment";
+import { useEmbedConfig } from "@/components/EmbedConfigProvider";
 
 type UseSetupPendingActionProps = {
   comment: Comment;
@@ -25,6 +26,7 @@ export function useSetupPendingAction({
   const [pendingReactions, setPendingReactions] = useState<
     Record<string, boolean>
   >({});
+  const { gasSponsorship } = useEmbedConfig();
 
   const reactComment = useReactComment();
   const unreactComment = useUnreactComment();
@@ -90,7 +92,14 @@ export function useSetupPendingAction({
           comment,
           queryKey,
           reactionType,
-          onBeforeStart: () => setReactionPending(reactionType, true),
+          onBeforeStart: () => {
+            if (gasSponsorship === "not-gasless") {
+              toast.info(
+                "Please check your wallet to sign the reaction request",
+              );
+            }
+            setReactionPending(reactionType, true);
+          },
           onSuccess: () => setReactionPending(reactionType, false),
           onFailed: (error) => {
             setReactionPending(reactionType, false);
@@ -106,6 +115,7 @@ export function useSetupPendingAction({
     [
       comment,
       formatError,
+      gasSponsorship,
       pendingReactions,
       queryKey,
       reactComment,
@@ -124,7 +134,14 @@ export function useSetupPendingAction({
           comment,
           queryKey,
           reactionType,
-          onBeforeStart: () => setReactionPending(reactionType, true),
+          onBeforeStart: () => {
+            if (gasSponsorship === "not-gasless") {
+              toast.info(
+                "Please check your wallet to sign the reaction request",
+              );
+            }
+            setReactionPending(reactionType, true);
+          },
           onSuccess: () => setReactionPending(reactionType, false),
           onFailed: (error) => {
             setReactionPending(reactionType, false);
@@ -140,6 +157,7 @@ export function useSetupPendingAction({
     [
       comment,
       formatError,
+      gasSponsorship,
       pendingReactions,
       queryKey,
       setReactionPending,

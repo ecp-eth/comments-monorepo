@@ -9,6 +9,7 @@ import { useCommentSubmission } from "@ecp.eth/shared/hooks";
 import { QueryKey } from "@tanstack/react-query";
 import { TX_RECEIPT_TIMEOUT } from "@/lib/constants";
 import type { MetadataEntry } from "@ecp.eth/sdk/comments/types";
+import { useTransactionWarning } from "../TransactionWarningProvider";
 
 type UsePostCommentProps = (params: {
   queryKey: QueryKey;
@@ -24,9 +25,11 @@ type UsePostCommentProps = (params: {
 export function usePostComment() {
   const wagmiConfig = useConfig();
   const commentSubmission = useCommentSubmission();
-  const { chainId, channelId, gasSponsorship } = useEmbedConfig();
+  const { chainId, channelId, gasSponsorship, hookFeeWarningThresholdUsd } =
+    useEmbedConfig();
   const { switchChainAsync } = useSwitchChain();
   const publicClient = usePublicClient();
+  const { confirmTransaction } = useTransactionWarning();
 
   return useCallback<UsePostCommentProps>(
     async ({
@@ -64,6 +67,8 @@ export function usePostComment() {
           publicClient,
           walletClient,
           gasSponsorship: gasSponsorship,
+          hookFeeWarningThresholdUsd,
+          confirmTransaction,
         })),
         references,
       };
@@ -103,7 +108,9 @@ export function usePostComment() {
       chainId,
       channelId,
       commentSubmission,
+      confirmTransaction,
       gasSponsorship,
+      hookFeeWarningThresholdUsd,
       publicClient,
       switchChainAsync,
       wagmiConfig,

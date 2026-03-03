@@ -13,7 +13,7 @@ import {
   throwKnownResponseCodeError,
 } from "@ecp.eth/shared/errors";
 import type { PendingEditCommentOperationSchemaType } from "@ecp.eth/shared/schemas";
-import { bigintReplacer } from "@ecp.eth/shared/helpers";
+import { bigintReplacer, isUserRejectionError } from "@ecp.eth/shared/helpers";
 import {
   createEditCommentData,
   createEditCommentTypedData,
@@ -34,8 +34,14 @@ import {
   SignEditCommentRequestPayloadSchema,
   SignEditCommentResponseBodySchema,
 } from "@ecp.eth/shared-signer/schemas/signer-api/edit";
+import { analyzeHookFee, type HookFeeAnalysis } from "./analyzeHookFee";
 
 class SubmitEditCommentMutationError extends Error {}
+export class EditTransactionCancelledError extends Error {
+  constructor() {
+    super("Transaction cancelled by user.");
+  }
+}
 
 type SubmitEditCommentParams = {
   requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
@@ -43,6 +49,8 @@ type SubmitEditCommentParams = {
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
   gasSponsorship: EmbedConfigSchemaOutputType["gasSponsorship"];
+  hookFeeWarningThresholdUsd: number;
+  confirmTransaction?: (analysis: HookFeeAnalysis) => Promise<boolean>;
 };
 type PendingEditCommentOperationSchemaTypeWithoutReferences = Omit<
   PendingEditCommentOperationSchemaType,
@@ -55,6 +63,8 @@ export async function submitEditComment({
   publicClient,
   walletClient,
   gasSponsorship,
+  hookFeeWarningThresholdUsd,
+  confirmTransaction,
 }: SubmitEditCommentParams): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   const parseResult =
     SendEditCommentRequestPayloadSchema.shape.edit.safeParse(requestPayload);
@@ -76,6 +86,8 @@ export async function submitEditComment({
         requestPayload,
         publicClient,
         walletClient,
+        hookFeeWarningThresholdUsd,
+        confirmTransaction,
       });
     case "gasless-not-preapproved":
       return await editCommentWithGaslessAndAuthorSig({
@@ -123,7 +135,15 @@ async function editCommentWithGaslessAndAuthorSig({
   });
 
   const deadline = editCommentData.deadline;
-  const authorSignature = await walletClient.signTypedData(typedCommentData);
+  let authorSignature;
+  try {
+    authorSignature = await walletClient.signTypedData(typedCommentData);
+  } catch (e) {
+    if (isUserRejectionError(e)) {
+      throw new EditTransactionCancelledError();
+    }
+    throw e;
+  }
 
   const response = await fetch(getSignerURL("/api/edit-comment/send"), {
     method: "POST",
@@ -172,10 +192,14 @@ async function editCommentWithoutGasless({
   requestPayload,
   publicClient,
   walletClient,
+  hookFeeWarningThresholdUsd,
+  confirmTransaction,
 }: {
   requestPayload: z.input<typeof SendEditCommentRequestPayloadSchema>["edit"];
   publicClient: PublicClient<Transport, Chain, undefined>;
   walletClient: WalletClient<Transport, Chain, Account>;
+  hookFeeWarningThresholdUsd: number;
+  confirmTransaction?: (analysis: HookFeeAnalysis) => Promise<boolean>;
 }): Promise<PendingEditCommentOperationSchemaTypeWithoutReferences> {
   const { author, commentId, chainId } = requestPayload;
   const response = await fetch(getSignerURL("/api/edit-comment/sign"), {
@@ -236,6 +260,26 @@ async function editCommentWithoutGasless({
       });
     }
 
+    if (fee && confirmTransaction) {
+      let feeAnalysis: HookFeeAnalysis | null | undefined;
+      try {
+        feeAnalysis = await analyzeHookFee({
+          fee,
+          hookFeeWarningThresholdUsd,
+          publicClient,
+        });
+      } catch (e) {
+        console.error("Failed to analyze hook fee:", e);
+      }
+
+      if (feeAnalysis?.exceedsThreshold) {
+        const confirmed = await confirmTransaction(feeAnalysis);
+        if (!confirmed) {
+          throw new EditTransactionCancelledError();
+        }
+      }
+    }
+
     if (fee?.contractAsset && fee.contractAsset.amount > 0n) {
       await prepareContractAssetForTransfer({
         contractAsset: fee.contractAsset,
@@ -262,13 +306,15 @@ async function editCommentWithoutGasless({
       chainId,
     };
   } catch (e) {
-    if (e instanceof ContractFunctionExecutionError) {
-      if (e.shortMessage.includes("User rejected the request.")) {
-        throw new SubmitEditCommentMutationError(
-          "Could not edit the comment because the transaction was rejected.",
-        );
-      }
+    if (e instanceof EditTransactionCancelledError) {
+      throw new SubmitEditCommentMutationError(e.message);
+    }
 
+    if (isUserRejectionError(e)) {
+      throw new SubmitEditCommentMutationError("Transaction was rejected.");
+    }
+
+    if (e instanceof ContractFunctionExecutionError) {
       throw new SubmitEditCommentMutationError(e.details);
     }
 

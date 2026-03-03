@@ -21,7 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="has-parent-window has-not-parent-window">
+    <html
+      lang="en"
+      className="has-parent-window has-not-parent-window theme-root bg-background"
+    >
       <head>
         <meta name="color-scheme" content="dark light" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

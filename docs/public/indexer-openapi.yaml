@@ -27052,4 +27052,220 @@ paths:
             text/plain:
               schema:
                 type: string
+  /api/channels/volume:
+    get:
+      tags:
+        - channels
+        - volume
+      description: Get channels ranked by economic volume over a time window
+      parameters:
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            description: Number of channels per page
+            example: 50
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            default: 1
+            description: Page number
+            example: 1
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 168
+            default: 24
+            description: Lookback window in hours
+            example: 24
+          required: false
+          name: hours
+          in: query
+      responses:
+        '200':
+          description: Channels ranked by economic volume
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        channelId:
+                          type: string
+                          pattern: ^\d+$
+                          description: On-chain channel identifier (uint256)
+                          example: '42'
+                        txCount:
+                          type: integer
+                          minimum: 0
+                          description: >-
+                            Number of transactions (CommentAdded + CommentEdited
+                            + CommentDeleted) in the time window
+                          example: 142
+                        gasTotal:
+                          type: string
+                          pattern: ^\d+$
+                          description: >-
+                            Sum of gas costs in wei (gasUsed * effectiveGasPrice
+                            per transaction)
+                          example: '892340000000000'
+                        valueTotal:
+                          type: string
+                          pattern: ^\d+$
+                          description: >-
+                            Sum of native ETH sent via msg.value in wei (does
+                            not include ERC-20 hook fees)
+                          example: '892340000000000'
+                        volumeTotal:
+                          type: string
+                          pattern: ^\d+$
+                          description: gasTotal + valueTotal in wei
+                          example: '892340000000000'
+                      required:
+                        - channelId
+                        - txCount
+                        - gasTotal
+                        - valueTotal
+                        - volumeTotal
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        minimum: 1
+                        example: 1
+                      limit:
+                        type: integer
+                        minimum: 1
+                        maximum: 100
+                        example: 50
+                      totalCount:
+                        type: integer
+                        minimum: 0
+                        description: >-
+                          Total number of distinct channels with activity in the
+                          time window
+                        example: 230
+                      totalPages:
+                        type: integer
+                        minimum: 0
+                        example: 5
+                      hasNext:
+                        type: boolean
+                      hasPrevious:
+                        type: boolean
+                    required:
+                      - page
+                      - limit
+                      - totalCount
+                      - totalPages
+                      - hasNext
+                      - hasPrevious
+                required:
+                  - results
+                  - pagination
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIBadRequestResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
+  /api/channels/{channelId}/volume:
+    get:
+      tags:
+        - channels
+        - volume
+      description: Get economic volume for a single channel over a time window
+      parameters:
+        - schema:
+            type: string
+            pattern: ^d+$
+            description: The ID of the channel
+          required: true
+          name: channelId
+          in: path
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 168
+            default: 24
+            description: Lookback window in hours
+            example: 24
+          required: false
+          name: hours
+          in: query
+      responses:
+        '200':
+          description: Channel volume data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channelId:
+                    type: string
+                    pattern: ^\d+$
+                    description: On-chain channel identifier (uint256)
+                    example: '42'
+                  txCount:
+                    type: integer
+                    minimum: 0
+                    description: >-
+                      Number of transactions (CommentAdded + CommentEdited +
+                      CommentDeleted) in the time window
+                    example: 142
+                  gasTotal:
+                    type: string
+                    pattern: ^\d+$
+                    description: >-
+                      Sum of gas costs in wei (gasUsed * effectiveGasPrice per
+                      transaction)
+                    example: '892340000000000'
+                  valueTotal:
+                    type: string
+                    pattern: ^\d+$
+                    description: >-
+                      Sum of native ETH sent via msg.value in wei (does not
+                      include ERC-20 hook fees)
+                    example: '892340000000000'
+                  volumeTotal:
+                    type: string
+                    pattern: ^\d+$
+                    description: gasTotal + valueTotal in wei
+                    example: '892340000000000'
+                required:
+                  - channelId
+                  - txCount
+                  - gasTotal
+                  - valueTotal
+                  - volumeTotal
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIBadRequestResponse'
+        '404':
+          description: Channel not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIErrorResponse'
 webhooks: {}

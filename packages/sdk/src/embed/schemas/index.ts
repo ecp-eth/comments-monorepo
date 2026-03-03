@@ -176,9 +176,6 @@ export type EmbedConfigSupportedChainIdsSchemaType = z.infer<
   typeof EmbedConfigSupportedChainIdsSchema
 >;
 
-/**
- * The zod schema for a custom reaction rendered under a comment.
- */
 export const EmbedConfigReactionSchema = z.object({
   /**
    * Lowercase value used as reaction content.
@@ -208,26 +205,72 @@ export type EmbedConfigReactionSchemaType = z.infer<
   typeof EmbedConfigReactionSchema
 >;
 
-const EmbedConfigReactionsSchema = z
+export const EmbedConfigReactionsSchema = z
   .array(EmbedConfigReactionSchema)
   .max(20)
   .superRefine((reactions, ctx) => {
     const values = new Set<string>();
 
     for (const [index, reaction] of reactions.entries()) {
-      const key = reaction.value;
-
-      if (values.has(key)) {
+      if (values.has(reaction.value)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Duplicate reaction value: ${key}`,
+          message: `Duplicate reaction value: ${reaction.value}`,
           path: [index, "value"],
         });
       }
 
-      values.add(key);
+      values.add(reaction.value);
     }
   });
+
+export const EmbedConfigSortingAlgorithmSchema = z.enum([
+  "chronological",
+  "hot",
+]);
+
+export type EmbedConfigSortingAlgorithmSchemaType = z.infer<
+  typeof EmbedConfigSortingAlgorithmSchema
+>;
+
+export const EmbedConfigHotSortingSchema = z.object({
+  /**
+   * Reaction key used as score input for hot sorting.
+   *
+   * @default "like"
+   */
+  reaction: z.string().trim().min(1).max(64).default("like"),
+  /**
+   * Metadata key used to read a numeric volume score from hook metadata.
+   *
+   * @default "volume"
+   */
+  volumeMetadataKey: z.string().trim().min(1).max(64).default("volume"),
+});
+
+export type EmbedConfigHotSortingSchemaType = z.infer<
+  typeof EmbedConfigHotSortingSchema
+>;
+
+export const EmbedConfigSortingSchema = z.object({
+  /**
+   * Sorting algorithm.
+   *
+   * - "chronological" sorts by creation time descending.
+   * - "hot" applies a Hacker News-style time-decayed ranking score.
+   *
+   * @default "chronological"
+   */
+  algorithm: EmbedConfigSortingAlgorithmSchema.default("chronological"),
+  /**
+   * Hot ranking configuration.
+   */
+  hot: EmbedConfigHotSortingSchema.default({}),
+});
+
+export type EmbedConfigSortingSchemaType = z.infer<
+  typeof EmbedConfigSortingSchema
+>;
 
 /**
  * The zod schema for `EmbedConfigSchemaType`
@@ -307,6 +350,24 @@ export const EmbedConfigSchema = z.object({
    * When omitted the indexer applies its default moderation filtering.
    */
   moderationStatus: z.array(IndexerAPICommentModerationStatusSchema).optional(),
+  /**
+   * Sorting configuration for comments in the embed.
+   */
+  sorting: EmbedConfigSortingSchema.default({}),
+  /**
+   * Hide the empty state screen shown when there are no comments.
+   *
+   * @default false
+   */
+  hideEmptyScreen: z.boolean().default(false),
+  /**
+   * USD threshold for showing a warning before hook transactions.
+   * When a channel hook charges fees exceeding this amount, a confirmation
+   * dialog is shown before opening the wallet. Set to 0 to always warn.
+   *
+   * @default 1
+   */
+  hookFeeWarningThresholdUsd: z.number().min(0).default(1),
 });
 
 /**
