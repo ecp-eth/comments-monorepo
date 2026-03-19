@@ -62,7 +62,7 @@ export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
     let tokenListResponse: Response;
 
     try {
-      tokenListResponse = await fetch("http://tokens.1inch.eth.link");
+      tokenListResponse = await fetch("https://tokens.1inch.eth.link");
     } catch (error) {
       console.error(
         "Failed to fetch token list, the ERC20TokensService will not work",
