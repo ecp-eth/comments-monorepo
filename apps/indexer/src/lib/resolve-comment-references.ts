@@ -109,19 +109,6 @@ export async function resolveCommentReferences(
       continue;
     }
 
-    match = restOfContent.match(ENS_NAME_REGEX);
-
-    if (match) {
-      const position = { start: pos, end: pos + match[0].length };
-      const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
-
-      promises.push(resolveEnsName(ensName, position, options));
-      allResolvedPositions.push(position);
-      pos += match[0].length;
-
-      continue;
-    }
-
     match = restOfContent.match(FARCASTER_FNAME_REGEX);
 
     if (match) {
@@ -133,6 +120,21 @@ export async function resolveCommentReferences(
       );
       allResolvedPositions.push(position);
       pos += match[0].length;
+
+      continue;
+    }
+
+    match = restOfContent.match(ENS_NAME_REGEX);
+
+    if (match) {
+      const position = { start: pos, end: pos + match[0].length };
+      const ensName = match[0].startsWith("@") ? match[0].slice(1) : match[0];
+
+      promises.push(resolveEnsName(ensName, position, options));
+      allResolvedPositions.push(position);
+      pos += match[0].length;
+
+      continue;
     }
 
     match = restOfContent.match(ERC_20_CAIP_19_REGEX);
@@ -283,7 +285,7 @@ const ERC20_TOKEN_ETH_ADDRESS_REGEX = /^\$0x[a-fA-F0-9]{40}/;
 /**
  * Handles ens name or ens name mention
  */
-const ENS_NAME_REGEX = /^@?[a-zA-Z0-9.-]+\.eth/iu;
+const ENS_NAME_REGEX = /^@?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+/iu;
 /**
  * Handles farcaster fname
  */

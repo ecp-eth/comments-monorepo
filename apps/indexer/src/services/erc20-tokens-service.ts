@@ -59,7 +59,19 @@ export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
   }
 
   private async loadList(): Promise<ERC20Token[]> {
-    const tokenListResponse = await fetch("http://tokens.1inch.eth.link");
+    let tokenListResponse: Response;
+
+    try {
+      tokenListResponse = await fetch("https://tokens.1inch.eth.link");
+    } catch (error) {
+      console.error(
+        "Failed to fetch token list, the ERC20TokensService will not work",
+        {
+          error,
+        },
+      );
+      return [];
+    }
 
     if (!tokenListResponse.ok) {
       console.error(
@@ -73,7 +85,16 @@ export class ERC20TokensService extends DataLoader<"", ERC20Token[]> {
       return [];
     }
 
-    const tokenList = await tokenListResponse.json();
+    let tokenList: unknown;
+
+    try {
+      tokenList = await tokenListResponse.json();
+    } catch (error) {
+      console.error("Failed to parse token list JSON", {
+        error,
+      });
+      return [];
+    }
 
     return z.array(tokenWithCaip19IdSchema).parse(
       tokenListSchema.parse(tokenList).tokens.map((token) => ({

@@ -5,7 +5,7 @@ import {
   APIErrorResponseSchema,
   GetCommentQuerySchema,
 } from "../../../../../lib/schemas";
-import { isEthName } from "../../../../../services/resolvers";
+import { isEnsName } from "../../../../../services/resolvers";
 import { ensByNameResolverService } from "../../../../../services/ens-by-name-resolver";
 import { db } from "../../../../../services";
 import schema from "ponder:schema";
@@ -133,7 +133,7 @@ async function resolveAuthorShortId(
 
   let resolvedAddress: Hex;
 
-  if (isEthName(authorShortId)) {
+  if (isEnsName(authorShortId)) {
     const ens = await ensByNameResolverService.load(authorShortId);
 
     if (!ens) {

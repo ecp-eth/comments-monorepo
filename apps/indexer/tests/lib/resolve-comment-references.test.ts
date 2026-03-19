@@ -226,6 +226,52 @@ describe("resolveCommentReferences", () => {
         },
       ]);
     });
+
+    it("resolves non-.eth ens names", async () => {
+      resolveEnsByName.mockResolvedValue({
+        address: ("0x" + "1".repeat(40)) as Hex,
+        name: "nick.chat.fun",
+        avatarUrl: null,
+        url: "https://app.ens.domains/nick.chat.fun",
+      });
+
+      const result = await resolveCommentReferences(
+        {
+          chainId: 1,
+          content: "nick.chat.fun @nick.chat.fun",
+        },
+        options,
+      );
+
+      expect(resolveEnsByName).toHaveBeenCalledTimes(2);
+      expect(resolveEnsByName).toHaveBeenCalledWith("nick.chat.fun");
+
+      expect(result.status).toBe("success");
+      expect(result.references).toEqual([
+        {
+          type: "ens",
+          name: "nick.chat.fun",
+          address: ("0x" + "1".repeat(40)) as Hex,
+          avatarUrl: null,
+          position: {
+            start: 0,
+            end: 13,
+          },
+          url: "https://app.ens.domains/nick.chat.fun",
+        },
+        {
+          type: "ens",
+          name: "nick.chat.fun",
+          address: ("0x" + "1".repeat(40)) as Hex,
+          avatarUrl: null,
+          position: {
+            start: 14,
+            end: 28,
+          },
+          url: "https://app.ens.domains/nick.chat.fun",
+        },
+      ]);
+    });
   });
 
   describe("farcaster fname", () => {

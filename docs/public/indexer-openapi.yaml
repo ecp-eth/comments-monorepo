@@ -16125,7 +16125,7 @@ paths:
                       description: The Ethereum address of the user
                       pattern: ^0x[a-fA-F0-9]{40}$
                     - description: The ENS name of the user
-                      pattern: ^[a-zA-Z0-9.-]+\.eth$
+                      pattern: ^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$
                   description: The ENS name or address of the user
                 app:
                   anyOf:
@@ -16266,7 +16266,7 @@ paths:
                 description: The Ethereum address of the user
                 pattern: ^0x[a-fA-F0-9]{40}$
               - description: The ENS name of the user
-                pattern: ^[a-zA-Z0-9.-]+\.eth$
+                pattern: ^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$
             description: The ENS name or address of the user
           required: true
           name: user
@@ -21311,7 +21311,7 @@ paths:
                 description: The Ethereum address of the user
                 pattern: ^0x[a-fA-F0-9]{40}$
               - description: The ENS name of the user
-                pattern: ^[a-zA-Z0-9.-]+\.eth$
+                pattern: ^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$
             description: The ENS name or address of the user
           required: true
           name: user
