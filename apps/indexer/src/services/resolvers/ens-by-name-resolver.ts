@@ -4,8 +4,25 @@ import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import { DataLoader, type DataLoaderOptions } from "../dataloader";
 
-export function isEthName(name: string): name is `${string}.eth` {
-  return name.match(/.+\.eth$/i) !== null;
+export function isEnsName(name: string): boolean {
+  if (!/^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/u.test(name)) {
+    return false;
+  }
+
+  try {
+    normalize(name);
+  } catch {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Kept for backwards compatibility while callers are migrated.
+ */
+export function isEthName(name: string): boolean {
+  return isEnsName(name);
 }
 
 async function resolveEnsData(

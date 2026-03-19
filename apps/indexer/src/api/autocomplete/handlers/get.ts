@@ -6,7 +6,7 @@ import { farcasterByAddressResolverService } from "../../../services/farcaster-b
 import { erc20ByAddressResolverService } from "../../../services/erc20-by-address-resolver";
 import { ensByNameResolverService } from "../../../services/ens-by-name-resolver";
 import { farcasterByNameResolverService } from "../../../services/farcaster-by-name-resolver";
-import { isEthName, isFarcasterFname } from "../../../services/resolvers";
+import { isEnsName, isFarcasterFname } from "../../../services/resolvers";
 import {
   extractERC20CAIP19,
   isERC20CAIP19,
@@ -70,7 +70,21 @@ export async function getAutocompleteHandler({
       }
 
       return { results: [] };
-    } else if (isEthName(query)) {
+    } else if (isFarcasterFname(query)) {
+      const farcaster = await farcasterByNameResolverService.load(query);
+
+      if (farcaster) {
+        return {
+          results: [
+            {
+              type: "farcaster",
+              ...farcaster,
+              value: farcaster.address,
+            },
+          ],
+        };
+      }
+    } else if (isEnsName(query)) {
       const ensName = await ensByNameResolverService.load(query);
 
       if (ensName) {
@@ -83,20 +97,6 @@ export async function getAutocompleteHandler({
               url: ensName.url,
               avatarUrl: ensName.avatarUrl,
               value: ensName.address,
-            },
-          ],
-        };
-      }
-    } else if (isFarcasterFname(query)) {
-      const farcaster = await farcasterByNameResolverService.load(query);
-
-      if (farcaster) {
-        return {
-          results: [
-            {
-              type: "farcaster",
-              ...farcaster,
-              value: farcaster.address,
             },
           ],
         };

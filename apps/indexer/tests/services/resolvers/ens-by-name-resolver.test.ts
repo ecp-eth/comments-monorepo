@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { ENSByNameResolver } from "../../../src/services/resolvers/ens-by-name-resolver";
+import {
+  ENSByNameResolver,
+  isEnsName,
+} from "../../../src/services/resolvers/ens-by-name-resolver";
 import { metrics } from "../../../src/services/metrics";
 
 const resolver = new ENSByNameResolver({
@@ -8,6 +11,20 @@ const resolver = new ENSByNameResolver({
 });
 
 describe("ENSByNameResolver", () => {
+  describe("isEnsName", () => {
+    it("returns true for valid ens names", () => {
+      expect(isEnsName("furlong.eth")).toBe(true);
+      expect(isEnsName("alice.chat.fun")).toBe(true);
+      expect(isEnsName("test.normx.eth")).toBe(true);
+    });
+
+    it("returns false for invalid names", () => {
+      expect(isEnsName("invalid")).toBe(false);
+      expect(isEnsName("not_valid.chat.fun")).toBe(false);
+      expect(isEnsName(".chat.fun")).toBe(false);
+    });
+  });
+
   it(
     "should resolve ens name",
     {

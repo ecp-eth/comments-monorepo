@@ -2,6 +2,7 @@ import { type Hex, HexSchema } from "@ecp.eth/sdk/core/schemas";
 import { IndexerAPICommentModerationStatusSchema } from "@ecp.eth/sdk/indexer/schemas";
 import { z } from "@hono/zod-openapi";
 import { hexToString } from "viem";
+import { normalize as normalizeEnsName } from "viem/ens";
 import { normalizeUrl } from "./utils.ts";
 import { SUPPORTED_CHAIN_IDS } from "../env.ts";
 import { CommentModerationLabel } from "../services/types.ts";
@@ -27,8 +28,22 @@ export const OpenAPIETHAddressSchema = ETHAddressSchema.openapi({
   pattern: "^0x[a-fA-F0-9]{40}$",
 });
 
-export const ENSNameSchema = z.custom<`${string}.eth`>(
-  (v) => /^[a-zA-Z0-9.-]+\.eth$/.test(v),
+const ENS_NAME_REGEX = /^[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/u;
+
+export const ENSNameSchema = z.custom<string>(
+  (v) => {
+    if (!ENS_NAME_REGEX.test(v)) {
+      return false;
+    }
+
+    try {
+      normalizeEnsName(v);
+    } catch {
+      return false;
+    }
+
+    return true;
+  },
   {
     message: "Invalid ENS name",
   },
@@ -38,7 +53,7 @@ export type ENSNameSchemaType = z.infer<typeof ENSNameSchema>;
 
 export const OpenAPIENSNameSchema = ENSNameSchema.openapi({
   description: "The ENS name of the user",
-  pattern: "^[a-zA-Z0-9.-]+\\.eth$",
+  pattern: "^[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)+$",
 });
 
 export const OpenAPIENSNameOrAddressSchema = OpenAPIETHAddressSchema.or(
